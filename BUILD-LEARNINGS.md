@@ -21,7 +21,10 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - Env size 965 MB. Disk free went from 14 GB to 13 GB.
 - pytest's default temp root `/tmp/pytest-of-webadmin` is shared with other projects and
   held 438 MB of leftovers; pruning it made every run take ~33 s for 25 trivial tests.
-  The root conftest.py gives each checkout its own `--basetemp` (0.1 s).
+  The root conftest.py gives each checkout its own temp root (`PYTEST_DEBUG_TEMPROOT`), 0.1 s.
+  A fixed `--basetemp` was tried first, but concurrent runs (check.sh inside deploy.sh
+  while another pytest runs) would share and wipe one folder; pytest's numbered,
+  lock-protected run folders under the per-checkout root avoid that (tests/test_pytest_temp.py).
 - pytest-socket with `--disable-socket` alone breaks TestClient (asyncio needs an AF_UNIX
   socketpair); `--allow-unix-socket` fixes it. It also blocks `getaddrinfo`, so a test
   can't leak a hostname through DNS either.
