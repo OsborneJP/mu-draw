@@ -8,8 +8,10 @@
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 export ROOT
 
-# stdlib-only Python; any python3 will do before the env is on PATH.
-eval "$(python3 -I "$ROOT/scripts/lib/appconfig.py" --shell)"
+# stdlib-only Python; any python3 will do before the env is on PATH. Assign first: a
+# failing command substitution inside `eval "$(...)"` would not stop a set -e script.
+CONFIG_VARS="$(python3 -I "$ROOT/scripts/lib/appconfig.py" --shell)"
+eval "$CONFIG_VARS"
 export APP_NAME APP_PATH STAGING_PATH BASE_PRODUCTION BASE_STAGING APP_HOST URL_PRODUCTION \
   URL_STAGING ENV_NAME DEPLOY_ROOT PORT_PRODUCTION PORT_STAGING PORT_DEV UNIT_PRODUCTION UNIT_STAGING
 

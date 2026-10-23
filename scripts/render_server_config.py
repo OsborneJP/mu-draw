@@ -109,8 +109,11 @@ def apache_block(t: Target, policy: str) -> str:
         ]
     else:
         lines += [
-            "# Production is public, like /chemtutor. For campus-only, add:",
-            f'# <LocationMatch "^/{p}(/|$)"> Require ip {CAMPUS} </LocationMatch>',
+            "# Production is public, like /chemtutor. For campus and VPN only, uncomment:",
+            f'# <LocationMatch "^/{p}(/|$)">',
+            f"#     Require ip {CAMPUS}",
+            '#     ErrorDocument 403 "This app opens only on the campus network or VPN."',
+            "# </LocationMatch>",
         ]
     lines.append(f"# {t.marker} END")
     return "\n".join(lines)
@@ -230,7 +233,8 @@ sudo apache2ctl configtest && sudo systemctl reload apache2
 
 ### Step 6. Check it end to end
 
-Headers, health, and the offline smoke test against the live site:
+Headers, health, and the offline smoke test against the live site. Run it from the commit
+step 1 deployed, with a clean tree: the live checks only vouch for the deployed commit.
 
 ```bash
 scripts/deploy.sh --smoke-only staging
@@ -261,6 +265,10 @@ first whether production is public (as rendered, like /chemtutor) or campus-only
 - **OPSIN (name to structure).** Needs Java, which isn't installed. Options: the system
   package `openjdk-21-jre-headless` (apt, applied by a person), OpenJDK from conda-forge
   inside the project env, or the EBI web service first. Undecided.
+- **Rolling back production's web files.** Each promotion first copies the previous
+  production build, if it had passed the live checks, to `production/web.prev`, with its
+  commit in `production/WEB_PREV_COMMIT`. To restore it:
+  `rsync -a --delete {production.root}/web.prev/ {production.web}/`.
 - **Lookup cache.** The SQLite cache will live in `<target>/data`, outside the deployed
   code (deploys replace `server/`). Its unit will then need `ReadWritePaths=` for it.
 - **Renaming the app.** Edit `app.config.json`, re-render this file, create the new conda

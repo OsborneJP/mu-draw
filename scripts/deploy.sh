@@ -20,53 +20,49 @@ usage() {
   exit 2
 }
 
-require_clean_tree() {
-  if [[ -n "$(git status --porcelain)" ]]; then
-    echo "The working tree has uncommitted changes; deploy only committed, checked code." >&2
-    git status --short >&2
-    exit 1
-  fi
-}
-
 url_for() { [[ "$1" == production ]] && echo "$URL_PRODUCTION" || echo "$URL_STAGING"; }
 base_for() { [[ "$1" == production ]] && echo "$BASE_PRODUCTION" || echo "$BASE_STAGING"; }
 unit_for() { [[ "$1" == production ]] && echo "$UNIT_PRODUCTION" || echo "$UNIT_STAGING"; }
 dist_for() { [[ "$1" == production ]] && echo "dist-production" || echo "dist"; }
 
-# Copy a checked build and the committed server code into place, and record what is there.
+# Stop unless the tree is clean and HEAD is still the commit this run started with.
+require_unchanged() {
+  require_clean_tree
+  [[ "$(git rev-parse HEAD)" == "$1" ]] || { echo "HEAD moved during the deploy; start again" >&2; exit 1; }
+}
+
+# Copy a checked build and a commit's server code into place, and record what is there.
 publish() {
-  local target="$1" dir commit previous=""
+  local target="$1" commit="$2" dir previous
   dir="$(target_dir "$target")"
-  commit="$(git rev-parse HEAD)"
   check_dist "web/$(dist_for "$target")"
-  [[ -f "$dir/DEPLOYED_COMMIT" ]] && previous="$(cat "$dir/DEPLOYED_COMMIT")"
+  previous="$(marker "$dir" DEPLOYED_COMMIT)"
   mkdir -p "$dir"
-  rm -f "$dir/VERIFIED_COMMIT"
-  if [[ "$target" == production && -d "$dir/web" ]]; then
-    echo "== keeping the previous production build in $dir/web.prev"
-    rsync -a --delete "$dir/web/" "$dir/web.prev/"
+  [[ "$target" == production ]] && snapshot_web "$dir"
+  clear_verified "$dir"
+  echo "== publishing server/ at $commit to $dir/server"
+  ship_server "$dir/server" "$commit"
+  if server_changed "$previous" "$commit"; then
+    date +%s > "$dir/SERVER_DEPLOYED_AT"
   fi
   echo "== publishing web/$(dist_for "$target") to $dir/web"
   rsync_web "web/$(dist_for "$target")" "$dir/web"
-  echo "== publishing server/ at $commit to $dir/server"
-  ship_server "$dir/server"
-  if server_changed "$previous"; then
-    date +%s > "$dir/SERVER_DEPLOYED_AT"
-  fi
   echo "$commit" > "$dir/DEPLOYED_COMMIT"
 }
 
-# The live checks; on success, mark the deployed commit as verified.
+# The live checks; on success, mark the deployed commit as verified. They run this
+# checkout's tests, so HEAD must be the deployed commit and the tree clean.
 verify() {
-  local target="$1" dir url base unit
+  local target="$1" dir url base unit deployed code
   dir="$(target_dir "$target")"
   url="$(url_for "$target")"
   base="$(base_for "$target")"
   unit="$(unit_for "$target")"
-  [[ -f "$dir/DEPLOYED_COMMIT" ]] || { echo "nothing deployed to $target yet" >&2; exit 1; }
+  require_clean_tree
+  require_deployed_head "$dir"
+  deployed="$(marker "$dir" DEPLOYED_COMMIT)"
 
   echo "== probing ${url}api/health"
-  local code
   code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${url}api/health" || true)"
   if [[ "$code" != 200 ]]; then
     echo "The $target API is not reachable through Apache (HTTP $code)." >&2
@@ -74,7 +70,7 @@ verify() {
     echo "  scripts/deploy.sh --smoke-only $target" >&2
     exit 3
   fi
-  if [[ -f "$dir/SERVER_DEPLOYED_AT" ]] && ! started_since "$unit" "$(cat "$dir/SERVER_DEPLOYED_AT")"; then
+  if restart_pending "$dir" "$unit"; then
     echo "The server code changed, but $unit is still running the old copy. Run:" >&2
     echo "  sudo systemctl restart $unit && scripts/deploy.sh --smoke-only $target" >&2
     exit 3
@@ -84,9 +80,8 @@ verify() {
   python scripts/check_live.py "$url" "$dir/web"
   echo "== running the smoke tests against $url"
   web env BASE="$base" SMOKE_URL="$url" npx --no-install playwright test
-  cp "$dir/DEPLOYED_COMMIT" "$dir/VERIFIED_COMMIT"
-  rm -f "$dir/SERVER_DEPLOYED_AT"
-  echo "== $target verified at $(cat "$dir/VERIFIED_COMMIT")"
+  mark_verified "$dir"
+  echo "== $target verified at $deployed"
 }
 
 deploy_staging() {
@@ -94,22 +89,19 @@ deploy_staging() {
   use_env
   local head
   head="$(git rev-parse HEAD)"
+  # check.sh builds and tests web/dist for staging; publish exactly that build.
   scripts/check.sh
-  # check.sh built and tested web/dist for staging; publish exactly that.
-  require_clean_tree
-  [[ "$(git rev-parse HEAD)" == "$head" ]] || { echo "HEAD moved during the check" >&2; exit 1; }
-  publish staging
+  require_unchanged "$head"
+  publish staging "$head"
   verify staging
 }
 
 deploy_production() {
   require_clean_tree
-  local head staging_dir verified=""
+  local head
   head="$(git rev-parse HEAD)"
-  staging_dir="$(target_dir staging)"
-  [[ -f "$staging_dir/VERIFIED_COMMIT" ]] && verified="$(cat "$staging_dir/VERIFIED_COMMIT")"
-  if [[ "$verified" != "$head" ]]; then
-    echo "Refusing: HEAD ($head) is not the commit verified on staging (${verified:-none})." >&2
+  if ! staging_verified "$(target_dir staging)" "$head"; then
+    echo "Refusing: HEAD ($head) is not the commit verified on staging." >&2
     echo "Deploy it to staging first: scripts/deploy.sh staging" >&2
     exit 1
   fi
@@ -119,7 +111,8 @@ deploy_production() {
   # The base path is part of the build, so production is rebuilt from the same commit and
   # goes through the same guards and offline smoke tests before anything is copied.
   build_and_verify "$BASE_PRODUCTION" dist-production
-  publish production
+  require_unchanged "$head"
+  publish production "$head"
   verify production
 }
 
@@ -128,6 +121,7 @@ case "${1:-}" in
   --production) deploy_production ;;
   --smoke-only)
     [[ $# -eq 2 ]] || usage
+    target_dir "$2" > /dev/null
     use_env
     npm_ci_if_stale
     require_chromium

@@ -54,9 +54,25 @@ def test_apache_block_routes_api_and_caches_correctly(name):
     assert "Header always" not in block
 
 
+CAMPUS_SECTION = re.compile(
+    r'^<LocationMatch "\^/[^"]+">\n'
+    r"\s+Require ip 10\.0\.0\.0/8\n"
+    r'\s+ErrorDocument 403 "[^"]+"\n'
+    r"</LocationMatch>$",
+    re.MULTILINE,
+)
+
+
 def test_only_staging_is_restricted_to_campus():
     staging = rsc.apache_block(target("staging"), POLICY)
     production = rsc.apache_block(target("production"), POLICY)
-    assert re.search(r"<LocationMatch[^>]*>\s*\n\s*Require ip 10\.0\.0\.0/8", staging)
+    assert CAMPUS_SECTION.search(staging)
     active = [line for line in production.splitlines() if not line.lstrip().startswith("#")]
     assert not any("Require ip" in line for line in active)
+
+
+def test_production_campus_option_is_a_valid_section_once_uncommented():
+    # Apache needs the opening and closing tags on their own lines.
+    production = rsc.apache_block(target("production"), POLICY)
+    uncommented = "\n".join(re.sub(r"^# ?", "", line) for line in production.splitlines())
+    assert CAMPUS_SECTION.search(uncommented)

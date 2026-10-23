@@ -113,7 +113,8 @@ systemctl status mu-draw-api-staging --no-pager
 
 ### Step 6. Check it end to end
 
-Headers, health, and the offline smoke test against the live site:
+Headers, health, and the offline smoke test against the live site. Run it from the commit
+step 1 deployed, with a clean tree: the live checks only vouch for the deployed commit.
 
 ```bash
 scripts/deploy.sh --smoke-only staging
@@ -151,8 +152,11 @@ Alias /draw /home/webadmin/srv/mu-draw/production/web
 <Directory /home/webadmin/srv/mu-draw/production/web/assets>
     Header set Cache-Control "public, max-age=31536000, immutable"
 </Directory>
-# Production is public, like /chemtutor. For campus-only, add:
-# <LocationMatch "^/draw(/|$)"> Require ip 10.0.0.0/8 </LocationMatch>
+# Production is public, like /chemtutor. For campus and VPN only, uncomment:
+# <LocationMatch "^/draw(/|$)">
+#     Require ip 10.0.0.0/8
+#     ErrorDocument 403 "This app opens only on the campus network or VPN."
+# </LocationMatch>
 # mu-draw-production END
 ```
 
@@ -198,6 +202,10 @@ systemctl status mu-draw-api --no-pager
 - **OPSIN (name to structure).** Needs Java, which isn't installed. Options: the system
   package `openjdk-21-jre-headless` (apt, applied by a person), OpenJDK from conda-forge
   inside the project env, or the EBI web service first. Undecided.
+- **Rolling back production's web files.** Each promotion first copies the previous
+  production build, if it had passed the live checks, to `production/web.prev`, with its
+  commit in `production/WEB_PREV_COMMIT`. To restore it:
+  `rsync -a --delete /home/webadmin/srv/mu-draw/production/web.prev/ /home/webadmin/srv/mu-draw/production/web/`.
 - **Lookup cache.** The SQLite cache will live in `<target>/data`, outside the deployed
   code (deploys replace `server/`). Its unit will then need `ReadWritePaths=` for it.
 - **Renaming the app.** Edit `app.config.json`, re-render this file, create the new conda

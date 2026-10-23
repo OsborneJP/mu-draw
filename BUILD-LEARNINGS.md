@@ -170,6 +170,20 @@ Record why, not just what: the next person (or agent) should not have to redisco
   file it lists already in place.
 - deploy.sh never uses sudo. When server code changes it records the time, and the live
   check refuses to mark the commit verified until the unit was restarted after it.
+- After the milestone review every decision deploy.sh makes lives in scripts/lib/deploy.sh
+  with a test (tests/test_deploy_lib.py), using temp repos, temp HOMEs and a stub
+  `systemctl`:
+  - the production gate;
+  - the clean-tree check and "live checks only vouch for the deployed commit" (`--smoke-only`
+    could otherwise stamp a commit verified using a newer checkout's tests);
+  - HEAD re-checked after the long production build, and the commit captured at the start
+    shipped explicitly;
+  - the verified-mark lifecycle and the restart check;
+  - snapshots of verified production builds only;
+  - server code must import before it replaces the deployed copy.
+- `eval "$(cmd)"` doesn't stop a `set -e` script when cmd fails (eval's status is that of
+  the evaluated text). config.sh assigns first, then evals; a test proves the old form
+  carried on after a config error.
 - Ketcher 3.18's debug shortcut Alt+Shift+R ("qs-serialize") navigates to
   `?mol=<the whole Molfile>`, which would put a student's structure in Apache's access log
   (the spec promises structures never appear in URLs) and lose the drawing. Its `hidden`
