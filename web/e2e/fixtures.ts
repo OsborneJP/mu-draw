@@ -91,7 +91,16 @@ function installPageGuards() {
   addEventListener('sw-error', (e) => report('sw-error', String((e as CustomEvent).detail)));
   const once = (name: string) =>
     new Promise<true>((resolve) => addEventListener(name, () => resolve(true), { once: true }));
+  // Records every key that gets past window's capture phase (where the app blocks
+  // Ketcher's debug shortcut) to the document.
+  const keysAtDocument: string[] = [];
+  document.addEventListener(
+    'keydown',
+    (e) => keysAtDocument.push(`${e.altKey ? 'Alt+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.code}`),
+    true,
+  );
   Object.assign(window, {
+    __keysAtDocument: keysAtDocument,
     __editorReady: once('editor-ready'),
     __indigoReady: once('struct-service-initialized'),
     __swRegistered: once('sw-registered'),

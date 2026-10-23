@@ -83,6 +83,18 @@ test('online: the editor loads, works, stays on its own origin and is installabl
   await page.setViewportSize({ width: 1280, height: 720 });
   await expectHiddenUiInvisible(page);
 
+  // Ketcher's debug shortcut Alt+Shift+R would write the drawing into the URL (and so the
+  // server's access log). The app swallows it before it reaches the document; a harmless
+  // combination still gets through, which shows the spy works.
+  const url = page.url();
+  await page.locator('.Ketcher-root').focus();
+  await page.keyboard.press('Alt+Shift+KeyQ');
+  await page.keyboard.press('Alt+Shift+KeyR');
+  const keys = await page.evaluate(() => (window as unknown as { __keysAtDocument: string[] }).__keysAtDocument);
+  expect(keys).toContain('Alt+Shift+KeyQ');
+  expect(keys).not.toContain('Alt+Shift+KeyR');
+  expect(page.url()).toBe(url);
+
   await waitForServiceWorker(app);
   // Positive control for the request policy: the requests it judged really happened.
   await Promise.all(Object.values(seen));

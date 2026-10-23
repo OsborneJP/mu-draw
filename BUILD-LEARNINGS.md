@@ -170,3 +170,11 @@ Record why, not just what: the next person (or agent) should not have to redisco
   file it lists already in place.
 - deploy.sh never uses sudo. When server code changes it records the time, and the live
   check refuses to mark the commit verified until the unit was restarted after it.
+- Ketcher 3.18's debug shortcut Alt+Shift+R ("qs-serialize") navigates to
+  `?mol=<the whole Molfile>`, which would put a student's structure in Apache's access log
+  (the spec promises structures never appear in URLs) and lose the drawing. Its `hidden`
+  option sits at the wrong level in ketcher-react, so the buttons config can't disable it.
+  src/editor/debugHotkeys.ts swallows the key in window's capture phase, before Ketcher's
+  element listener. The online smoke test checks it with a document-level spy that must see
+  a harmless Alt+Shift+Q but not Alt+Shift+R. Proven: without the blocker the URL becomes
+  `.../?mol=(R)-2-butanol...V2000...` and the test fails. (Found by the milestone review.)
