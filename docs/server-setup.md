@@ -30,9 +30,11 @@ scripts/deploy.sh staging
 ### Step 2. Back up the live vhost
 
 It is a regular file in sites-enabled; the copy in sites-available is stale and not loaded.
+Keep this shell open: step 4 uses `$BAK`.
 
 ```bash
-sudo cp /etc/apache2/sites-enabled/osbornelab.conf /etc/apache2/sites-enabled/osbornelab.conf.bak.$(date +%Y%m%d_%H%M%S)
+BAK=/etc/apache2/sites-enabled/osbornelab.conf.bak.$(date +%Y%m%d_%H%M%S)
+sudo cp -p /etc/apache2/sites-enabled/osbornelab.conf "$BAK"
 ```
 
 ### Step 3. Add the staging block to the vhost
@@ -44,7 +46,8 @@ Edit `/etc/apache2/sites-enabled/osbornelab.conf`. Inside `<VirtualHost *:443>`,
 # mu-draw-staging BEGIN (rendered by scripts/render_server_config.py; do not hand-edit)
 # Staging: static app at /draw-staging/, naming API proxied to uvicorn on 8051.
 # ProxyPass is matched before Alias, so /api/ never reaches the static files.
-ProxyPass /draw-staging/api/ http://127.0.0.1:8051/api/
+# retry=0: after a restart, the next request tries uvicorn again at once.
+ProxyPass /draw-staging/api/ http://127.0.0.1:8051/api/ retry=0
 ProxyPassReverse /draw-staging/api/ http://127.0.0.1:8051/api/
 Alias /draw-staging /home/webadmin/srv/mu-draw/staging/web
 <Directory /home/webadmin/srv/mu-draw/staging/web>
@@ -73,6 +76,13 @@ Alias /draw-staging /home/webadmin/srv/mu-draw/staging/web
 
 ```bash
 sudo apache2ctl configtest && sudo systemctl reload apache2
+```
+
+If configtest fails, nothing was reloaded, but the broken file is still in place and the
+next Apache start would fail for every app on this vhost. Put the backup back:
+
+```bash
+sudo cp -p "$BAK" /etc/apache2/sites-enabled/osbornelab.conf
 ```
 
 ### Step 5. Install and start the staging API service
@@ -115,6 +125,9 @@ systemctl status mu-draw-api-staging --no-pager
 
 Headers, health, and the offline smoke test against the live site. Run it from the commit
 step 1 deployed, with a clean tree: the live checks only vouch for the deployed commit.
+Staging accepts campus addresses only, so this host must reach its own name from a 10.x
+address (`curl -so /dev/null -w '%{remote_ip}\n' https://osbornelab.manchester.edu/` shows where it goes; a
+403 from the checks means it doesn't).
 
 ```bash
 scripts/deploy.sh --smoke-only staging
@@ -127,7 +140,8 @@ first whether production is public (as rendered, like /chemtutor) or campus-only
 
 1. Run `scripts/deploy.sh --production`. The first run stops at the health probe, as above.
 2. Back up the vhost as in step 2, then paste this block next to the staging block.
-3. Run `sudo apache2ctl configtest && sudo systemctl reload apache2`.
+3. Run `sudo apache2ctl configtest && sudo systemctl reload apache2` (restore `$BAK` if
+   configtest fails, as in step 4).
 4. Install and start the production API service (below).
 5. Run `scripts/deploy.sh --smoke-only production`.
 
@@ -135,7 +149,8 @@ first whether production is public (as rendered, like /chemtutor) or campus-only
 # mu-draw-production BEGIN (rendered by scripts/render_server_config.py; do not hand-edit)
 # Production: static app at /draw/, naming API proxied to uvicorn on 8050.
 # ProxyPass is matched before Alias, so /api/ never reaches the static files.
-ProxyPass /draw/api/ http://127.0.0.1:8050/api/
+# retry=0: after a restart, the next request tries uvicorn again at once.
+ProxyPass /draw/api/ http://127.0.0.1:8050/api/ retry=0
 ProxyPassReverse /draw/api/ http://127.0.0.1:8050/api/
 Alias /draw /home/webadmin/srv/mu-draw/production/web
 <Directory /home/webadmin/srv/mu-draw/production/web>
@@ -202,10 +217,9 @@ systemctl status mu-draw-api --no-pager
 - **OPSIN (name to structure).** Needs Java, which isn't installed. Options: the system
   package `openjdk-21-jre-headless` (apt, applied by a person), OpenJDK from conda-forge
   inside the project env, or the EBI web service first. Undecided.
-- **Rolling back production's web files.** Each promotion first copies the previous
-  production build, if it had passed the live checks, to `production/web.prev`, with its
-  commit in `production/WEB_PREV_COMMIT`. To restore it:
-  `rsync -a --delete /home/webadmin/srv/mu-draw/production/web.prev/ /home/webadmin/srv/mu-draw/production/web/`.
+- **Rolling back.** Redeploy the last good commit through the normal path, so the files,
+  server code and markers stay consistent: `git checkout <commit>`,
+  `scripts/deploy.sh staging`, then `scripts/deploy.sh --production`.
 - **Lookup cache.** The SQLite cache will live in `<target>/data`, outside the deployed
   code (deploys replace `server/`). Its unit will then need `ReadWritePaths=` for it.
 - **Renaming the app.** Edit `app.config.json`, re-render this file, create the new conda

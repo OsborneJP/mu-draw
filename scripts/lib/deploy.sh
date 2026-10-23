@@ -1,9 +1,13 @@
 # shellcheck shell=bash
 # Deploy helpers, sourced by scripts/deploy.sh (and by tests/test_deploy_lib.py).
 # Needs config.sh's variables (ROOT, APP_NAME, DEPLOY_ROOT, ...). Never uses sudo.
-# Every decision deploy.sh makes lives here as a small function with a test.
+# The decisions live here as small functions with tests; tests/test_deploy_lib.py also
+# runs deploy.sh's mode functions with stubs to check they call them.
 
-RSYNC_OPTS=(-a --chmod=D755,F644 --out-format=%n)
+# --checksum: compare content, not size+mtime. git archive stamps files with the commit
+# time, so two versions of a file with the same length committed in the same second
+# would otherwise look unchanged and the old one would stay (a test caught this).
+RSYNC_OPTS=(-a --checksum --chmod=D755,F644 --out-format=%n)
 
 # The deploy folder for a target, after checking it is exactly $HOME/srv/<name>/<target>.
 # A bad config must never point rsync --delete somewhere else.
@@ -23,6 +27,8 @@ target_dir() {
   echo "$DEPLOY_ROOT/$target"
 }
 
+head_commit() { git -C "$ROOT" rev-parse HEAD; }
+
 # Deploy only committed code: no modified, staged or untracked files.
 require_clean_tree() {
   local status
@@ -30,6 +36,17 @@ require_clean_tree() {
   if [[ -n "$status" ]]; then
     echo "The working tree has uncommitted changes; deploy only committed, checked code:" >&2
     echo "$status" >&2
+    return 1
+  fi
+}
+
+# The tree is still clean and HEAD is still the commit a run started with (a build or a
+# check can take minutes; nothing else may land in the meantime).
+require_unchanged() {
+  local commit="$1"
+  require_clean_tree
+  if [[ "$(head_commit)" != "$commit" ]]; then
+    echo "HEAD moved during the deploy (was $commit); start again" >&2
     return 1
   fi
 }
@@ -42,7 +59,7 @@ marker() { [[ -f "$1/$2" ]] && cat "$1/$2" || true; }
 require_deployed_head() {
   local dir="$1" deployed head
   deployed="$(marker "$dir" DEPLOYED_COMMIT)"
-  head="$(git -C "$ROOT" rev-parse HEAD)"
+  head="$(head_commit)"
   if [[ -z "$deployed" ]]; then
     echo "nothing deployed in $dir yet" >&2
     return 1
@@ -91,16 +108,6 @@ rsync_web() {
   rsync "${RSYNC_OPTS[@]}" --delete "$src/" "$dest/"
 }
 
-# Keep the live production build as web.prev, but only if it passed the live checks, so a
-# failed promotion can't overwrite the last good copy.
-snapshot_web() {
-  local dir="$1" verified
-  verified="$(marker "$dir" VERIFIED_COMMIT)"
-  [[ -d "$dir/web" && -n "$verified" && "$verified" == "$(marker "$dir" DEPLOYED_COMMIT)" ]] || return 0
-  rsync -a --delete "$dir/web/" "$dir/web.prev/"
-  echo "$verified" > "$dir/WEB_PREV_COMMIT"
-}
-
 # Ship a commit's server code (not the working tree), without its tests and scripts. It
 # must import with the env's Python before it replaces the deployed copy.
 ship_server() {
@@ -122,7 +129,7 @@ ship_server() {
 # True if the server's code or environment changed between a deployed commit and another
 # (or if nothing was deployed before).
 server_changed() {
-  local previous="$1" commit="${2:-HEAD}"
+  local previous="$1" commit="$2"
   [[ -z "$previous" ]] && return 0
   ! git -C "$ROOT" diff --quiet "$previous" "$commit" -- server environment.yml environment.lock.txt 2>/dev/null
 }
@@ -142,9 +149,35 @@ restart_pending() {
   [[ -f "$dir/SERVER_DEPLOYED_AT" ]] && ! started_since "$unit" "$(cat "$dir/SERVER_DEPLOYED_AT")"
 }
 
+# What to tell the person when the API health probe through Apache doesn't answer
+# {"ok": true}. Returns 0 (nothing to say) when it does.
+probe_advice() {
+  local code="$1" body="$2" unit="$3" target="$4"
+  if [[ "$code" == 200 && "$(tr -d ' \n' <<< "$body")" == '{"ok":true}' ]]; then
+    return 0
+  fi
+  case "$code" in
+    404) echo "Apache doesn't know the $target path yet (HTTP 404): apply docs/server-setup.md." ;;
+    403) echo "Apache refused this host (HTTP 403): its own address must be inside 10.0.0.0/8." ;;
+    502 | 503) echo "Apache can't reach the API (HTTP $code): check 'systemctl status $unit'." ;;
+    200) echo "Something answered with HTTP 200 but not {\"ok\": true}: check the Apache block." ;;
+    *) echo "The $target API probe failed (HTTP ${code:-none})." ;;
+  esac
+  echo "Then run: scripts/deploy.sh --smoke-only $target"
+  return 1
+}
+
 # A target is verified only after its live checks pass; publishing clears the mark first.
 clear_verified() { rm -f "$1/VERIFIED_COMMIT"; }
+
+# Mark a commit verified, but only if it is still the one deployed there (a deploy that
+# ran meanwhile must not inherit this run's result).
 mark_verified() {
-  cp "$1/DEPLOYED_COMMIT" "$1/VERIFIED_COMMIT"
-  rm -f "$1/SERVER_DEPLOYED_AT"
+  local dir="$1" commit="$2"
+  if [[ "$(marker "$dir" DEPLOYED_COMMIT)" != "$commit" ]]; then
+    echo "$dir changed during the live checks; not marking $commit verified" >&2
+    return 1
+  fi
+  echo "$commit" > "$dir/VERIFIED_COMMIT"
+  rm -f "$dir/SERVER_DEPLOYED_AT"
 }

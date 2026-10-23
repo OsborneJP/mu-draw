@@ -173,17 +173,27 @@ Record why, not just what: the next person (or agent) should not have to redisco
   file it lists already in place.
 - deploy.sh never uses sudo. When server code changes it records the time, and the live
   check refuses to mark the commit verified until the unit was restarted after it.
-- After the milestone review every decision deploy.sh makes lives in scripts/lib/deploy.sh
-  with a test (tests/test_deploy_lib.py), using temp repos, temp HOMEs and a stub
-  `systemctl`:
+- Deploy decisions live in scripts/lib/deploy.sh as small functions. deploy.sh is
+  sourceable, so tests/test_deploy_lib.py also runs its real mode functions in temp repos,
+  with a temp HOME and shell-function stubs for the build, check.sh, curl and the smoke
+  tests. Round 1 tested only the functions; round 2 showed the calls could be deleted
+  with every test green. Now each of these is caught when removed (checked by deleting
+  each call in turn):
   - the production gate;
-  - the clean-tree check and "live checks only vouch for the deployed commit" (`--smoke-only`
-    could otherwise stamp a commit verified using a newer checkout's tests);
-  - HEAD re-checked after the long production build, and the commit captured at the start
-    shipped explicitly;
-  - the verified-mark lifecycle and the restart check;
-  - snapshots of verified production builds only;
-  - server code must import before it replaces the deployed copy.
+  - publish refusing a moved HEAD or a dirty tree;
+  - `--smoke-only` and verify checking the deployed commit before any live check;
+  - mark_verified refusing if the target was redeployed meanwhile;
+  - staging publishing only after check.sh passes;
+  - ship_server shipping the given commit;
+  - rsync comparing content.
+- rsync needs `--checksum` here. git archive stamps files with the commit time, so a file
+  with the same length in two commits made in the same second looked unchanged, and
+  ship_server kept the old main.py. The new test found it.
+- The web.prev rollback copy was dropped: restoring files alone left the markers and
+  server/ naming another commit. Rollback = redeploy the last good commit via staging.
+- The health probe now says what a failure means: 404 is Apache not configured, 403 is
+  this host not in 10/8, 502/503 is the service down. It also requires `{"ok": true}`.
+  ProxyPass has `retry=0`, so a request right after a restart isn't refused for 60 s.
 - `eval "$(cmd)"` doesn't stop a `set -e` script when cmd fails (eval's status is that of
   the evaluated text). config.sh assigns first, then evals; a test proves the old form
   carried on after a config error.

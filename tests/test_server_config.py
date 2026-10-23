@@ -46,7 +46,7 @@ def test_apache_block_routes_api_and_caches_correctly(name):
     t = target(name)
     block = rsc.apache_block(t, POLICY)
     p = t.path
-    assert f"ProxyPass /{p}/api/ http://127.0.0.1:{t.port}/api/" in block
+    assert f"ProxyPass /{p}/api/ http://127.0.0.1:{t.port}/api/ retry=0" in block
     assert f"Alias /{p} /home/u/srv/zz-app/{name}/web" in block
     assert 'Header set Cache-Control "no-cache"' in block
     assert f'Header set Cache-Control "{rsc.IMMUTABLE}"' in block
