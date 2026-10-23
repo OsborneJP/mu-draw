@@ -49,7 +49,7 @@ publish() {
 # The live checks; on success, mark the deployed commit as verified. They run this
 # checkout's tests, so HEAD must be the deployed commit and the tree clean.
 verify() {
-  local target="$1" dir url unit deployed code body
+  local target="$1" dir url unit deployed response code body
   dir="$(target_dir "$target")"
   require_clean_tree
   require_deployed_head "$dir"
@@ -58,13 +58,13 @@ verify() {
   unit="$(unit_for "$target")"
 
   echo "== probing ${url}api/health"
-  body="$(mktemp)"
-  code="$(curl -s -o "$body" -w '%{http_code}' --max-time 20 "${url}api/health" || true)"
-  if ! probe_advice "$code" "$(cat "$body")" "$unit" "$target" >&2; then
-    rm -f "$body"
+  # The body, then the status code on its own last line.
+  response="$(curl -s -w '\n%{http_code}' --max-time 20 "${url}api/health" || true)"
+  code="${response##*$'\n'}"
+  body="${response%$'\n'*}"
+  if ! probe_advice "$code" "$body" "$unit" "$target" >&2; then
     exit 3
   fi
-  rm -f "$body"
   if restart_pending "$dir" "$unit"; then
     echo "The server code changed, but $unit is still running the old copy. Run" >&2
     echo "  sudo systemctl restart $unit" >&2

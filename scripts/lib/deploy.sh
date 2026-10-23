@@ -99,12 +99,16 @@ check_dist() {
 # no longer has. Prints each file as it is transferred.
 rsync_web() {
   local src="$1" dest="$2"
-  mkdir -p "$dest"
+  echo "-- phase 1: everything but the entry files"
   rsync "${RSYNC_OPTS[@]}" --exclude=/index.html --exclude=/manifest.webmanifest \
     --exclude=/sw.js "$src/" "$dest/"
+  echo "-- phase 2: manifest"
   rsync "${RSYNC_OPTS[@]}" "$src/manifest.webmanifest" "$dest/"
+  echo "-- phase 3: index.html"
   rsync "${RSYNC_OPTS[@]}" "$src/index.html" "$dest/"
+  echo "-- phase 4: sw.js"
   rsync "${RSYNC_OPTS[@]}" "$src/sw.js" "$dest/"
+  echo "-- phase 5: delete what the new build doesn't have"
   rsync "${RSYNC_OPTS[@]}" --delete "$src/" "$dest/"
 }
 
@@ -116,7 +120,6 @@ ship_server() {
   if git -C "$ROOT" archive "$commit" server | tar -x -C "$tmp" &&
     rm -rf "$tmp/server/tests" "$tmp/server/scripts" &&
     (cd "$tmp/server" && PYTHONDONTWRITEBYTECODE=1 python -c 'import main'); then
-    mkdir -p "$dest"
     rsync "${RSYNC_OPTS[@]}" --delete "$tmp/server/" "$dest/" || status=$?
   else
     echo "server code at $commit doesn't import; the deployed copy was left alone" >&2

@@ -50,6 +50,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Deploy: `scripts/deploy.sh staging`, `scripts/deploy.sh --production`,
   `scripts/deploy.sh --smoke-only <staging|production>`. Production promotes only the
   commit that passed the live staging checks; live checks run from that commit.
+- After changing scripts/deploy.sh or scripts/lib/deploy.sh: `python scripts/mutation_sweep.py`
+  (~5 min) must report every line covered.
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures: `python scripts/fetch_reference_smiles.py` (network; only when the compound list

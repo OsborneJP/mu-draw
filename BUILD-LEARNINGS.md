@@ -26,7 +26,9 @@ Record why, not just what: the next person (or agent) should not have to redisco
   The root conftest.py gives each checkout its own temp root (`PYTEST_DEBUG_TEMPROOT`), 0.1 s.
   A fixed `--basetemp` was tried first, but concurrent runs (check.sh inside deploy.sh
   while another pytest runs) would share and wipe one folder; pytest's numbered,
-  lock-protected run folders under the per-checkout root avoid that (tests/test_pytest_temp.py).
+  lock-protected run folders under the per-checkout root avoid that (tests/test_pytest_temp.py,
+  which skips only when the caller chose the location: an earlier version keyed the skip on
+  a flag the conftest set, so deleting the conftest block skipped the test instead of failing it).
 - pytest-socket with `--disable-socket` alone breaks TestClient (asyncio needs an AF_UNIX
   socketpair); `--allow-unix-socket` fixes it. It also blocks `getaddrinfo`, so a test
   can't leak a hostname through DNS either.
@@ -175,20 +177,18 @@ Record why, not just what: the next person (or agent) should not have to redisco
   check refuses to mark the commit verified until the unit was restarted after it.
 - Deploy decisions live in scripts/lib/deploy.sh as small functions. deploy.sh is
   sourceable, so tests/test_deploy_lib.py also runs its real mode functions in temp repos,
-  with a temp HOME and shell-function stubs for the build, check.sh, curl and the smoke
-  tests. Round 1 tested only the functions; round 2 showed the calls could be deleted
-  with every test green. Now each of these is caught when removed (checked by deleting
-  each call in turn):
-  - the production gate;
-  - publish refusing a moved HEAD or a dirty tree;
-  - `--smoke-only` and verify checking the deployed commit before any live check;
-  - mark_verified refusing if the target was redeployed meanwhile;
-  - staging publishing only after check.sh passes;
-  - ship_server shipping the given commit;
-  - rsync comparing content.
+  with a temp HOME and shell-function stubs for the build, check.sh, curl, systemctl and
+  the smoke tests. Two review rounds in a row found guard calls that could be deleted
+  with every test green; patching one review at a time kept missing some. So
+  `scripts/mutation_sweep.py` now deletes each executable line of both deploy scripts in
+  turn and fails if any deletion goes unnoticed. It reports 132 caught and 4 accepted
+  survivors (help text and three equivalent mutants, each explained in the script). Run it
+  after changing the deploy scripts; it takes ~5 min, so it isn't in check.sh.
 - rsync needs `--checksum` here. git archive stamps files with the commit time, so a file
   with the same length in two commits made in the same second looked unchanged, and
-  ship_server kept the old main.py. The new test found it.
+  ship_server kept the old main.py. The new test found it. Its first version only failed
+  when the test's commits landed in the same second; the test helper now gives every
+  commit one fixed date, so it fails every time without `--checksum`.
 - The web.prev rollback copy was dropped: restoring files alone left the markers and
   server/ naming another commit. Rollback = redeploy the last good commit via staging.
 - The health probe now says what a failure means: 404 is Apache not configured, 403 is

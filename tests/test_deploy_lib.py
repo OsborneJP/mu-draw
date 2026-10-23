@@ -5,6 +5,7 @@ Everything runs in temp git repos and a temp HOME, with git's global config igno
 """
 
 import os
+import shutil
 import subprocess
 import sys
 from datetime import UTC, datetime
@@ -30,6 +31,10 @@ def hermetic_env(**extra: str) -> dict[str, str]:
         GIT_AUTHOR_EMAIL="t@example.invalid",
         GIT_COMMITTER_NAME="t",
         GIT_COMMITTER_EMAIL="t@example.invalid",
+        # One fixed instant for every commit: files from git archive then share an mtime,
+        # which is what makes rsync's size+mtime shortcut miss changes (see --checksum).
+        GIT_AUTHOR_DATE="2001-01-01T00:00:00+0000",
+        GIT_COMMITTER_DATE="2001-01-01T00:00:00+0000",
     )
     env.update(extra)
     return env
@@ -74,6 +79,15 @@ def repo(tmp_path: Path) -> Path:
     return root
 
 
+@pytest.fixture
+def built_repo(repo: Path) -> Path:
+    """The temp repo plus an ignored web/dist, so publish can run all the way."""
+    commit(repo, "ignore builds", {".gitignore": "web/dist/\nweb/dist-production/\n"})
+    shutil.copytree(make_dist(repo / "web"), repo / "web" / "dist-production")
+    assert git("status", "--porcelain", cwd=repo) == ""
+    return repo
+
+
 def commit(repo: Path, message: str, files: dict[str, str] | None = None) -> str:
     for rel, text in (files or {}).items():
         path = repo / rel
@@ -86,7 +100,10 @@ def commit(repo: Path, message: str, files: dict[str, str] | None = None) -> str
 
 def deploy_sh(script: str, repo: Path, home: Path, stubs: str = "") -> subprocess.CompletedProcess:
     """Source the real deploy.sh, point it at a temp repo and HOME, stub, then run."""
-    base_stubs = "use_env(){ echo ENV; }; npm_ci_if_stale(){ :; }; require_chromium(){ :; };"
+    base_stubs = (
+        "use_env(){ echo ENV; }; npm_ci_if_stale(){ echo NPM; };"
+        " require_chromium(){ echo CHROMIUM; };"
+    )
     return run_bash(
         f"set -euo pipefail; source {DEPLOY}; ROOT={repo}; {base_stubs} {stubs} {script}",
         path=f"{ENV_BIN}:/usr/bin:/bin",
@@ -126,6 +143,10 @@ def test_rsync_web_publishes_sw_last_then_deletes(tmp_path: Path):
     assert result.returncode == 0, result.stderr
     log = result.stdout.splitlines()
     order = {name: log.index(name) for name in log}
+    # sw.js goes out in its own phase, after index.html's, before the delete pass.
+    phase = {line.split(":")[0]: i for i, line in enumerate(log) if line.startswith("-- phase")}
+    assert phase["-- phase 3"] < order["index.html"] < phase["-- phase 4"]
+    assert phase["-- phase 4"] < order["sw.js"] < phase["-- phase 5"]
     for early in [
         "assets/index-x.js",
         "icons/icon-192.png",
@@ -180,6 +201,11 @@ def test_require_clean_tree(repo: Path):
 def test_require_unchanged(repo: Path):
     start = git("rev-parse", "HEAD", cwd=repo)
     assert bash(f"require_unchanged {start}", ROOT=str(repo)).returncode == 0
+    (repo / "stray.txt").write_text("x")
+    result = bash(f"require_unchanged {start}", ROOT=str(repo))
+    assert result.returncode == 1
+    assert "uncommitted changes" in result.stderr
+    (repo / "stray.txt").unlink()
     commit(repo, "meanwhile")
     result = bash(f"require_unchanged {start}", ROOT=str(repo))
     assert result.returncode == 1
@@ -190,9 +216,17 @@ def test_ship_server_ships_the_given_commit_without_tests(repo: Path, tmp_path: 
     first = git("rev-parse", "HEAD", cwd=repo)
     commit(repo, "second", {"server/main.py": "VALUE = 2\n", "server/tests/test_x.py": ""})
     dest = tmp_path / "deployed"
-    result = bash(f"ship_server {dest} {first}", path=f"{ENV_BIN}:/usr/bin:/bin", ROOT=str(repo))
+    scratch = tmp_path / "scratch"
+    scratch.mkdir()
+    result = bash(
+        f"ship_server {dest} {first}",
+        path=f"{ENV_BIN}:/usr/bin:/bin",
+        ROOT=str(repo),
+        TMPDIR=str(scratch),
+    )
     assert result.returncode == 0, result.stderr
     assert (dest / "main.py").read_text() == "VALUE = 1\n"
+    assert list(scratch.iterdir()) == []  # the temp copy is gone
     commit(repo, "third")
     result = bash(f"ship_server {dest} HEAD", path=f"{ENV_BIN}:/usr/bin:/bin", ROOT=str(repo))
     assert result.returncode == 0, result.stderr
@@ -228,7 +262,9 @@ def test_live_checks_only_vouch_for_the_deployed_commit(repo: Path, tmp_path: Pa
     dir_ = tmp_path / "target"
     dir_.mkdir()
     check = f"require_deployed_head {dir_}"
-    assert bash(check, ROOT=str(repo)).returncode == 1  # nothing deployed
+    result = bash(check, ROOT=str(repo))
+    assert result.returncode == 1
+    assert "nothing deployed" in result.stderr
     (dir_ / "DEPLOYED_COMMIT").write_text(deployed + "\n")
     assert bash(check, ROOT=str(repo)).returncode == 0
     commit(repo, "newer")
@@ -347,12 +383,10 @@ def test_production_builds_publishes_and_verifies_the_verified_commit(repo: Path
     )
     result = deploy_sh("deploy_production", repo, home, stubs)
     assert result.returncode == 0, result.stderr
-    steps = [
-        line
-        for line in result.stdout.splitlines()
-        if line.split()[0] in {"BUILD", "PUBLISH", "VERIFY"}
-    ]
-    assert steps == [
+    assert result.stdout.splitlines() == [
+        "ENV",
+        "NPM",
+        "CHROMIUM",
         f"BUILD {load().base('production')} dist-production",
         f"PUBLISH production {head}",
         "VERIFY production",
@@ -375,6 +409,49 @@ def test_publish_refuses_a_dirty_tree(repo: Path, tmp_path: Path):
     (repo / "stray.txt").write_text("x")
     result = deploy_sh(f"publish staging {head}", repo, home)
     assert result.returncode == 1
+    assert "uncommitted changes" in result.stderr
+    assert not target(home, "staging").exists()
+
+
+def test_publish_records_what_it_deployed(built_repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    staging = target(home, "staging")
+    staging.mkdir(parents=True)
+    (staging / "VERIFIED_COMMIT").write_text("old\n")
+    head = git("rev-parse", "HEAD", cwd=built_repo)
+    result = deploy_sh(f"publish staging {head}", built_repo, home)
+    assert result.returncode == 0, result.stderr
+    assert (staging / "DEPLOYED_COMMIT").read_text() == head + "\n"
+    assert not (staging / "VERIFIED_COMMIT").exists()
+    assert (staging / "SERVER_DEPLOYED_AT").exists()  # first deploy: server is new
+    assert (staging / "web" / "sw.js").is_file() and (staging / "server" / "main.py").is_file()
+    # A redeploy that doesn't touch server code doesn't ask for a restart.
+    (staging / "SERVER_DEPLOYED_AT").unlink()
+    docs = commit(built_repo, "docs", {"README.md": "x\n"})
+    result = deploy_sh(f"publish staging {docs}", built_repo, home)
+    assert result.returncode == 0, result.stderr
+    assert not (staging / "SERVER_DEPLOYED_AT").exists()
+
+
+def test_failed_publish_leaves_nothing_vouched_for(built_repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    staging = target(home, "staging")
+    staging.mkdir(parents=True)
+    (staging / "DEPLOYED_COMMIT").write_text("previous\n")
+    (staging / "VERIFIED_COMMIT").write_text("previous\n")
+    broken = commit(built_repo, "broken", {"server/main.py": "import does_not_exist\n"})
+    result = deploy_sh(f"publish staging {broken}", built_repo, home)
+    assert result.returncode != 0
+    assert not (staging / "DEPLOYED_COMMIT").exists()
+    assert not (staging / "VERIFIED_COMMIT").exists()
+
+
+def test_publish_refuses_an_unsafe_dist_before_writing(built_repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    (built_repo / "web" / "dist" / "assets" / "index-x.js.map").write_text("{}")
+    head = git("rev-parse", "HEAD", cwd=built_repo)
+    result = deploy_sh(f"publish staging {head}", built_repo, home)
+    assert result.returncode == 1
     assert not target(home, "staging").exists()
 
 
@@ -385,6 +462,7 @@ def test_staging_publishes_only_after_check_passes(repo: Path, tmp_path: Path):
     result = deploy_sh("deploy_staging", repo, home, stubs)
     assert result.returncode == 0, result.stderr
     lines = result.stdout.splitlines()
+    assert lines.index("ENV") < lines.index("CHECK")
     assert (
         lines.index("CHECK")
         < lines.index(f"PUBLISH staging {head}")
@@ -394,6 +472,57 @@ def test_staging_publishes_only_after_check_passes(repo: Path, tmp_path: Path):
     result = deploy_sh("deploy_staging", repo, home, stubs)
     assert result.returncode == 1
     assert "PUBLISH" not in result.stdout
+
+
+@pytest.mark.parametrize("mode", ["deploy_staging", "deploy_production"])
+def test_deploys_refuse_a_dirty_tree_before_building(repo: Path, tmp_path: Path, mode: str):
+    home = tmp_path / "home"
+    head = git("rev-parse", "HEAD", cwd=repo)
+    staging = target(home, "staging")
+    staging.mkdir(parents=True)
+    (staging / "VERIFIED_COMMIT").write_text(head + "\n")
+    (repo / "stray.txt").write_text("x")
+    stubs = (
+        "build_and_verify(){ echo BUILD; }; publish(){ echo PUBLISH; }; verify(){ echo VERIFY; };"
+    )
+    result = deploy_sh(mode, repo, home, stubs)
+    assert result.returncode == 1
+    assert "uncommitted changes" in result.stderr
+    assert not {"ENV", "CHECK", "BUILD", "PUBLISH"} & set(result.stdout.split())
+
+
+def test_publish_creates_the_target_on_a_first_deploy(built_repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    head = git("rev-parse", "HEAD", cwd=built_repo)
+    result = deploy_sh(f"publish production {head}", built_repo, home)
+    assert result.returncode == 0, result.stderr
+    assert (target(home, "production") / "DEPLOYED_COMMIT").read_text() == head + "\n"
+
+
+@pytest.mark.parametrize(
+    ("args", "expected"),
+    [
+        ("staging", "DEPLOY_STAGING"),
+        ("--production", "DEPLOY_PRODUCTION"),
+        ("--smoke-only staging", "SMOKE_ONLY staging"),
+    ],
+)
+def test_main_dispatches_each_mode(repo: Path, tmp_path: Path, args: str, expected: str):
+    stubs = (
+        "deploy_staging(){ echo DEPLOY_STAGING; }; deploy_production(){ echo DEPLOY_PRODUCTION; };"
+        ' smoke_only(){ echo "SMOKE_ONLY $*"; };'
+    )
+    result = deploy_sh(f"main {args}", repo, tmp_path / "home", stubs)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == expected
+
+
+@pytest.mark.parametrize("args", ["", "production", "--smoke-only", "--smoke-only staging extra"])
+def test_main_shows_usage_for_anything_else(repo: Path, tmp_path: Path, args: str):
+    stubs = "deploy_staging(){ echo X; }; deploy_production(){ echo X; }; smoke_only(){ echo X; };"
+    result = deploy_sh(f"main {args}", repo, tmp_path / "home", stubs)
+    assert result.returncode == 2
+    assert "X" not in result.stdout.split()
 
 
 def test_smoke_only_checks_the_deployed_commit_before_anything_else(repo: Path, tmp_path: Path):
@@ -408,13 +537,11 @@ def test_smoke_only_checks_the_deployed_commit_before_anything_else(repo: Path, 
     (staging / "DEPLOYED_COMMIT").write_text(git("rev-parse", "HEAD", cwd=repo) + "\n")
     result = deploy_sh("smoke_only staging", repo, home, stubs)
     assert result.returncode == 0, result.stderr
-    assert result.stdout.splitlines()[-2:] == ["ENV", "VERIFY staging"]
+    assert result.stdout.splitlines()[-4:] == ["ENV", "NPM", "CHROMIUM", "VERIFY staging"]
 
 
-CURL_OK = (
-    'curl(){ local out=""; while (($#)); do [[ $1 == -o ]] && { out=$2; shift; }; shift; done;'
-    ' echo \'{"ok": true}\' > "$out"; printf 200; };'
-)
+# curl -w '\n%{http_code}': the body, then the status code on its own line.
+CURL_OK = "curl(){ printf '{\"ok\": true}\\n200'; };"
 
 
 def deployed_staging(repo: Path, home: Path) -> Path:
@@ -427,15 +554,18 @@ def deployed_staging(repo: Path, home: Path) -> Path:
 def test_verify_marks_verified_only_after_every_live_check(repo: Path, tmp_path: Path):
     home = tmp_path / "home"
     staging = deployed_staging(repo, home)
-    passing = CURL_OK + " python(){ echo LIVE; }; web(){ echo SMOKE; };"
+    passing = CURL_OK + ' python(){ echo "LIVE $*"; }; web(){ echo "SMOKE $*"; };'
     result = deploy_sh("verify staging", repo, home, passing)
     assert result.returncode == 0, result.stderr
+    config = load()
+    assert f"scripts/check_live.py {config.url('staging')} {staging}/web" in result.stdout
+    assert f"BASE={config.base('staging')} SMOKE_URL={config.url('staging')}" in result.stdout
     assert (staging / "VERIFIED_COMMIT").read_text() == (staging / "DEPLOYED_COMMIT").read_text()
 
     for failing in [
         CURL_OK + " python(){ echo LIVE; }; web(){ return 1; };",  # smoke tests fail
         CURL_OK + " python(){ return 1; }; web(){ echo SMOKE; };",  # headers wrong
-        "curl(){ printf 404; }; python(){ echo LIVE; }; web(){ echo SMOKE; };",  # no Apache
+        "curl(){ printf 'Not Found\\n404'; }; python(){ echo LIVE; }; web(){ echo SMOKE; };",
     ]:
         (staging / "VERIFIED_COMMIT").unlink(missing_ok=True)
         result = deploy_sh("verify staging", repo, home, failing)
@@ -453,6 +583,58 @@ def test_verify_refuses_another_commit_before_any_live_check(repo: Path, tmp_pat
     assert result.returncode == 1
     assert "Check out the deployed commit" in result.stderr
     assert not {"CURL", "LIVE", "SMOKE"} & set(result.stdout.split())
+
+
+def systemctl_stub(started_epoch: int) -> str:
+    return (
+        f"systemctl(){{ case $1 in show) echo '{stamp(started_epoch)}';;"
+        " is-active) echo active;; esac; };"
+    )
+
+
+def test_verify_waits_for_the_service_to_run_new_server_code(repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    staging = deployed_staging(repo, home)
+    (staging / "SERVER_DEPLOYED_AT").write_text("2000000000\n")
+    checks = CURL_OK + " python(){ echo LIVE; }; web(){ echo SMOKE; };"
+    result = deploy_sh("verify staging", repo, home, checks + systemctl_stub(1_999_999_900))
+    assert result.returncode == 3
+    assert "still running the old copy" in result.stderr
+    assert not {"LIVE", "SMOKE"} & set(result.stdout.split())
+    assert not (staging / "VERIFIED_COMMIT").exists()
+    result = deploy_sh("verify staging", repo, home, checks + systemctl_stub(2_000_000_100))
+    assert result.returncode == 0, result.stderr
+    assert (staging / "VERIFIED_COMMIT").exists()
+    assert not (staging / "SERVER_DEPLOYED_AT").exists()
+
+
+def test_verify_refuses_a_dirty_tree_before_any_live_check(repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    deployed_staging(repo, home)
+    (repo / "stray.txt").write_text("x")
+    stubs = "curl(){ echo CURL; printf 200; }; python(){ echo LIVE; }; web(){ echo SMOKE; };"
+    result = deploy_sh("verify staging", repo, home, stubs)
+    assert result.returncode == 1
+    assert "uncommitted changes" in result.stderr
+    assert not {"CURL", "LIVE", "SMOKE"} & set(result.stdout.split())
+
+
+def test_verify_does_not_vouch_if_the_tree_changed_during_the_checks(repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    staging = deployed_staging(repo, home)
+    edits = CURL_OK + f" python(){{ echo LIVE; }}; web(){{ echo x > {repo}/stray.txt; }};"
+    result = deploy_sh("verify staging", repo, home, edits)
+    assert result.returncode == 1
+    assert not (staging / "VERIFIED_COMMIT").exists()
+
+
+def test_smoke_only_refuses_a_dirty_tree_before_anything_else(repo: Path, tmp_path: Path):
+    home = tmp_path / "home"
+    deployed_staging(repo, home)
+    (repo / "stray.txt").write_text("x")
+    result = deploy_sh("smoke_only staging", repo, home, "verify(){ echo VERIFY; };")
+    assert result.returncode == 1
+    assert "ENV" not in result.stdout and "VERIFY" not in result.stdout
 
 
 def test_verify_does_not_vouch_for_a_redeploy_during_the_checks(repo: Path, tmp_path: Path):
