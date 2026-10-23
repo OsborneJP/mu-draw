@@ -1,7 +1,8 @@
 // Fixtures for the smoke tests: a server the test owns, a fresh browser profile, and
 // guards that fail the test on page errors, editor or service-worker errors, CSP
-// violations, popups, websockets, same-origin HTTP errors, and any request outside the
-// app's own origin and base path (invariant 1).
+// violations, popups, websockets, same-origin HTTP errors, any request outside the
+// app's own origin and base path (invariant 1), and the app reloading itself or letting
+// a new build take over without the student clicking the update banner.
 //
 // Local runs serve DIST_DIR (default dist) at BASE (default staging) with Vite's preview
 // server. With SMOKE_URL set, the tests run against that deployed URL instead.
@@ -79,8 +80,11 @@ export function referenceCompound(typedName: string): ReferenceCompound {
   return found;
 }
 
+/** The update banner's Reload button: the only thing that may reload the app. */
+export const RELOAD_BUTTON_TEST_ID = 'update-reload-button';
+
 // Runs in every document before any page script.
-function installPageGuards() {
+function installPageGuards(reloadButtonTestId: string) {
   type Report = (kind: string, detail: string) => void;
   const report: Report = (kind, detail) =>
     (window as unknown as { __reportGuard?: Report }).__reportGuard?.(kind, detail);
@@ -89,6 +93,34 @@ function installPageGuards() {
   );
   addEventListener('editor-error', (e) => report('editor-error', String((e as CustomEvent).detail)));
   addEventListener('sw-error', (e) => report('sw-error', String((e as CustomEvent).detail)));
+  // The app may leave the page, or tell a waiting service worker (a new build) to take
+  // over, only after a real click on the update banner's Reload button. Either one
+  // without it would lose or break a drawing mid-session, so it is reported and stopped.
+  // Playwright's own goto() and reload() are browser-initiated and fire no navigate event.
+  let reloadClicked = false;
+  document.addEventListener(
+    'click',
+    (e) => {
+      const target = e.target instanceof Element ? e.target : null;
+      if (e.isTrusted && target?.closest(`[data-testid="${reloadButtonTestId}"]`)) reloadClicked = true;
+    },
+    true,
+  );
+  navigation.addEventListener('navigate', (e) => {
+    if (e.destination.sameDocument || e.downloadRequest !== null) return;
+    if (e.navigationType === 'reload' && reloadClicked) return;
+    e.preventDefault();
+    report('navigation', `${e.navigationType} to ${e.destination.url} without a click on Reload`);
+  });
+  const postMessage = ServiceWorker.prototype.postMessage as (this: ServiceWorker, ...args: unknown[]) => void;
+  ServiceWorker.prototype.postMessage = function (this: ServiceWorker, ...args: unknown[]) {
+    const message = args[0] as { type?: unknown } | null;
+    if (message?.type === 'SKIP_WAITING' && !reloadClicked) {
+      report('takeover', 'a waiting service worker was told to take over without a click on Reload');
+      return;
+    }
+    postMessage.apply(this, args);
+  } as ServiceWorker['postMessage'];
   const once = (name: string) =>
     new Promise<true>((resolve) => addEventListener(name, () => resolve(true), { once: true }));
   // Records every key that gets past window's capture phase (where the app blocks
@@ -146,7 +178,7 @@ export const test = base.extend<{ app: App }>({
     await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
       addProblem(`${kind}: ${detail}`);
     });
-    await context.addInitScript(installPageGuards);
+    await context.addInitScript(installPageGuards, RELOAD_BUTTON_TEST_ID);
     context.on('request', (request) => {
       requests.push(request);
       const problem = requestProblem(request.url(), server.url);
