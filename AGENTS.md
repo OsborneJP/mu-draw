@@ -59,10 +59,11 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
-- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker; highlight
-  helpers later.
+- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker, image request
+  queue, the ready Ketcher (instance.ts); highlight helpers later.
 - `web/src/chem/`: later: RDKit.js loader, descriptors, functional groups.
-- `web/src/panels/`: later: properties, Lipinski, naming, export UI.
+- `web/src/panels/`: Export dialog and Copy image (exportImage.ts makes every image);
+  later: properties, Lipinski, naming.
 - `web/src/api.ts`: later: calls to `<base>api/*`.
 - `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
@@ -70,6 +71,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
+  export.spec.ts reads PNG headers, pixels and the clipboard back.
 - `server/main.py`: FastAPI (`/api/health`; later `/api/name`, `/api/structure`).
 - `server/{pubchem,opsin,cache}.py`, `server/opsin/opsin.jar`: later.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
@@ -121,6 +123,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   event; compare InChIKey and relative positions). Pressing Undo/Redo keys in a test
   without waiting for the button state (Ketcher refreshes it 100 ms after a change).
 - RDKit's CDXML (`BondLength=""`) doesn't load in Indigo 1.46.
+- Asking Indigo for two images at once: with different drawings one never settles
+  (src/editor/imageQueue.ts queues them; keep the provider). `exportImage('svg')` copies the
+  canvas offset by Ketcher's toolbar, so the app's header clips it; use `generateImage`.
 - `tsc --noEmit` on the solution-style tsconfig checks zero files; use `tsc -b`.
 - Playwright's default headless shell always reports a page as installable; it never
   reports /favicon.ico requests; the `controllerchange` wait hangs in prompt mode;

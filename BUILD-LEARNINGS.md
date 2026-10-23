@@ -150,7 +150,9 @@ Record why, not just what: the next person (or agent) should not have to redisco
   never requested (XML namespaces, licence text, links in hidden UI). Invariant 1 is
   enforced at runtime by the CSP and by the smoke tests' request guard.
 - Ketcher's CSS has 17 `url(data:...)` images (see above), hence `img-src data:`. The online and offline tests don't render any of them
-  (dropping `data:` passed both); the Open/Save test opens modals and does.
+  (dropping `data:` passed both); the Open/Save test opens modals and does. Since session 3
+  Export and Copy image need it too: the drawing's SVG reaches the canvas as a `data:`
+  image (proven: without `data:` the export test fails with a CSP report, below).
 - Proven: adding `https:` to connect-src fails verify-dist (and so check.sh and deploy).
 - Proven: a planted `url(https://example.com/...)` background is reported twice, as a CSP
   violation and by the request guard (Playwright still reports the blocked request).
@@ -349,3 +351,86 @@ that fails without the fix. Accepted as known limits:
   Playwright tests), then 12 Playwright tests against the live /draw-staging/ (autosave
   offline and across a relaunch, the guards, header, About, smoke); the 2 update-banner
   tests skip there by design.
+
+## Export and copy (session 3, 2026-10-23)
+
+- Measured before designing (Ketcher 3.18, Chromium, the real CSP):
+  - Ketcher's Save dialog offers "PNG Image" and "SVG Document" at one size, with no scale
+    or background option. Its PNG has a transparent background.
+  - `ketcher.exportImage('svg')` copies the on-screen canvas: its viewBox subtracts Ketcher's
+    own toolbar sizes (54 px top, 50 px left) from screen coordinates and follows the zoom,
+    so the app's 36 px header would shift and clip it. Not used.
+  - `ketcher.generateImage(ket, { outputFormat })` renders in the Indigo worker with the
+    student's Ketcher display settings (`editor.serverSettings`, bond length 40 px). Its SVG
+    has a unitless (px) width and height, draws letters as paths (no fonts needed, so it
+    looks the same in any program) and has no background unless asked. An empty drawing
+    renders as a 4×4 SVG that draws nothing.
+  - Indigo's own PNG can't be scaled exactly: caffeine is 218×169 at bond length 40 and
+    408×322 at 80 (margins and fonts don't follow); `image-resolution` changes nothing. So
+    every PNG is the SVG drawn on a canvas at 1x, 2x or 4x: exactly scale × the SVG's size.
+  - The SVG reaches the canvas as a `data:` image (img-src allows `data:`; `blob:` was
+    dropped). No CSP report, and the canvas stays readable (`toBlob` works). Chromium's
+    canvas PNGs are always RGBA (colour type 6) with no pHYs chunk, even when opaque.
+  - Ketcher has its own Copy Image (Mod+Shift+F, toolbar copy menu): the selection only,
+    1x, white background. Kept, like its Save dialog's PNG and SVG.
+- ketcher-standalone 3.18 answers every image request through one shared event, and each
+  request listens `once`, keeping only an answer for its own input. With two requests for
+  different drawings in flight, the first answer removes the second's listener and the second
+  never settles (5 of 5 when forced; a later request works). Ketcher's Save dialog sits
+  inside `.Ketcher-root` and doesn't cover the header, so a student could start both. The
+  provider now queues image requests (src/editor/imageQueue.ts), which covers Ketcher's own
+  callers too: ketcher-react binds the service's methods once, in `createApi()`.
+  - The browser test forces the ordering: ask for another drawing and this one together,
+    then this one again once the first answered. Proven: without the queue it fails in 2 s
+    ("third" settles, "second" never does). Its first version asked for the other drawing
+    the third time: unqueued, the second's late answer then removed the third's listener as
+    well, so both hung and the test only failed at the 3-minute deadline.
+  - Proven in unit tests: a pass-through queue fails both ordering tests; keeping a failed
+    request in the chain (no `.catch`) fails the failure test at once (it races "started"
+    against settling instead of waiting for a start that never comes).
+- Downloads use an `<a download>` with a `blob:` URL revoked right after `click()`:
+  Chromium keeps it readable for the navigation already started (the file arrived intact).
+  The navigate event carries `downloadRequest` (the file name), so the fixtures' navigation
+  guard lets it through, and Playwright reports no request for `data:` images or `blob:`
+  downloads, so the request guard sees nothing new.
+- Each PNG carries a pHYs chunk of 96 × scale dpi (3780, 7559, 15118 pixels per metre), so
+  that Word places 1x, 2x and 4x at the same size (not yet seen in Word: one of Jeff's
+  manual checks). The clipboard can't carry it: Chromium
+  re-encodes a copied PNG (a white RGBA PNG read back as colour type 2, no pHYs), so a
+  pasted image's size follows its pixels; Copy image uses 2x.
+- Copy image calls `navigator.clipboard.write` inside the click, with a promise for the PNG
+  (`ClipboardItem` accepts one), so the browser counts the write as the student's action
+  however long the drawing takes. Headless Chromium with
+  `grantPermissions(['clipboard-read', 'clipboard-write'])` on the persistent context reads
+  `image/png` back.
+- tsconfig.app.json (all of src/) has no Node types, so a unit test in src can't import
+  `node:zlib`. exportImage.test.ts checks the CRC against the standard check value (CRC-32
+  of "123456789" is 0xCBF43926); e2e/export.spec.ts checks real PNGs' pHYs CRC with
+  `zlib.crc32`.
+- Each guard was removed in turn, rebuilt, and its test failed (e2e/export.spec.ts):
+  - no white fill: corner pixel `[0,0,0,0]`; transparent box ignored: corner alpha 255;
+    scale ignored: wrong size; no `withDpi`: no pHYs chunk (all in the Export test);
+  - `img-src` without `data:`: "guard tripped: csp: img-src blocked data" in 2 s. Its first
+    run only failed at the 3-minute deadline, because the download wait didn't race the
+    guards; every download, message and copy-state wait now does (`guarded()`);
+  - Export's catch turned into a rethrow: "guard tripped: pageerror: the canvas could not be
+    encoded as PNG" in 2 s; the same for Copy image's catch;
+  - no empty-drawing check (Export or Copy): no "Nothing to ..." message. These fail at the
+    30 s assertion deadline (the app saves or copies a blank image instead);
+  - Copy image's staleness rule removed: `data-state` is "done" where "idle" is expected,
+    2 s; not clearing on a change: stays "done" (30 s deadline);
+  - Copy image's `png.catch` removed: first SURVIVED, because with clipboard permission
+    granted Chrome reads the PNG promise itself. It matters when the browser refuses the
+    write and never reads the PNG. The new test refuses the write, records
+    `unhandledrejection` events (with preventDefault, so they don't trip the page-error
+    guard), then waits for a deliberate "control" rejection: the HTML spec reports
+    rejections in the order they happen, so a PNG failure reported before it fails the
+    test (2 s).
+- The tests check what the student gets, not the code: PNG width and height read from the
+  file's IHDR are exactly scale × the SVG's width and height; pixels decoded in the browser
+  (`createImageBitmap`); the SVG parsed with DOMParser and equal to Indigo's rendering of
+  the drawing at that moment; the clipboard read back with `navigator.clipboard.read()`.
+- Accepted limits: the empty-drawing and clear-on-change mutations fail at the 30 s
+  assertion deadline rather than at once. Pasting into Word and Google Docs (Windows 11
+  Chrome and Edge, macOS Chrome), inserting a 4x PNG into Word (same size as 1x, sharper),
+  opening the SVG in PowerPoint and printing a 4x PNG are checked by hand.
