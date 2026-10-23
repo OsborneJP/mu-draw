@@ -269,6 +269,11 @@ export async function clearCanvas(page: Page): Promise<void> {
 export async function openWithDialog(app: App, path: string): Promise<void> {
   const { page } = app;
   await page.getByTestId('open-file-button').filter({ visible: true }).click();
+  // The dialog's "Open from image" tile (structure from image, a "Later version" feature)
+  // exists but must be hidden by src/editor/editor.css.
+  const imageTile = page.getByTestId('open-from-image-button');
+  await expect(imageTile).toHaveCount(1);
+  expect(await imageTile.evaluate((el) => getComputedStyle(el).display)).toBe('none');
   const [chooser] = await Promise.all([
     page.waitForEvent('filechooser'),
     page.getByTestId('open-from-file-button').click(),

@@ -178,3 +178,12 @@ Record why, not just what: the next person (or agent) should not have to redisco
   element listener. The online smoke test checks it with a document-level spy that must see
   a harmless Alt+Shift+Q but not Alt+Shift+R. Proven: without the blocker the URL becomes
   `.../?mol=(R)-2-butanol...V2000...` and the test fails. (Found by the milestone review.)
+- Smoke checks added after the milestone review, each proven to fail when broken:
+  - the Open dialog's "Open from image" tile exists and is `display: none` (hidden by
+    editor.css; without the rule it shows as `flex`);
+  - sw.js and the Indigo worker arrive with the CSP header (workers ignore the page's meta
+    tag; without the preview header the test fails);
+  - offline, every same-origin response after the reload must come from the service
+    worker. With Apache-style `immutable` caching and the icons left out of the
+    precache, Chrome answered the icon from its HTTP cache while offline; the old checks
+    passed and the new one names the file. This is what keeps the live run honest.

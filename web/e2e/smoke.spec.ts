@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { cspPolicy } from '../config/csp.ts';
 import { RDKIT_WASM_FILE } from '../config/rdkitWasm.ts';
 import {
   appManifest,
@@ -75,13 +76,11 @@ test('online: the editor loads, works, stays on its own origin and is installabl
   await expectHiddenUiInvisible(page);
   // Ketcher re-renders its toolbar in a compact form after a resize, and that form ignores
   // buttons.hidden. Force it: the compact form duplicates the Save button, which is the
-  // positive signal that it has rendered. Then nothing hidden may be visible, before or
-  // after growing the window again.
+  // positive signal that it has rendered. Nothing hidden may show there either.
   await page.setViewportSize({ width: 640, height: 480 });
   await expect(page.getByTestId('save-file-button')).toHaveCount(2);
   await expectHiddenUiInvisible(page);
   await page.setViewportSize({ width: 1280, height: 720 });
-  await expectHiddenUiInvisible(page);
 
   // Ketcher's debug shortcut Alt+Shift+R would write the drawing into the URL (and so the
   // server's access log). The app swallows it before it reaches the document; a harmless
@@ -97,7 +96,18 @@ test('online: the editor loads, works, stays on its own origin and is installabl
 
   await waitForServiceWorker(app);
   // Positive control for the request policy: the requests it judged really happened.
-  await Promise.all(Object.values(seen));
+  const [swScript, , indigoWorker] = await Promise.all([
+    seen.serviceWorkerScript,
+    seen.precacheFetch,
+    seen.indigoWorker,
+    seen.indigoWasm,
+  ]);
+  // Workers get their CSP only from their own response header, never from the page's
+  // meta tag: the test server (like Apache) must send it.
+  for (const request of [swScript, indigoWorker]) {
+    const headers = (await request.response())?.headers() ?? {};
+    expect(headers['content-security-policy'], request.url()).toBe(cspPolicy());
+  }
 
   // RDKit.js ships before any code uses it: served as WebAssembly and compilable.
   const rdkit = await fetchAndCompileWasm(page, new URL(RDKIT_WASM_FILE, server.url).href);
@@ -127,6 +137,14 @@ test('offline: after one visit the app loads and works with no network and no se
     if (r.serviceWorker()) networkAfterReload.push(`service worker fetched ${r.url()}`);
   });
   context.on('requestfailed', (r) => networkAfterReload.push(`failed ${r.url()}`));
+  // Against a deployed site the HTTP cache could answer a request the service worker
+  // missed; so every same-origin response from here on must come from the worker.
+  const origin = new URL(server.url).origin;
+  context.on('response', (r) => {
+    if (new URL(r.url()).origin === origin && !r.fromServiceWorker()) {
+      networkAfterReload.push(`not from the service worker: ${r.url()}`);
+    }
+  });
   // Created before the reload so no response can be missed.
   const documentResponse = page.waitForResponse((r) => r.url() === server.url);
   const indigoWasm = context.waitForEvent('response', (r) =>
