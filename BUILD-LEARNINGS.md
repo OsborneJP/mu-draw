@@ -333,3 +333,7 @@ that fails without the fix. Accepted as known limits:
   Ketcher's toolbars re-lay out without problems, and the banner adds 40 px while shown.
 - `context.setOffline()` flips `navigator.onLine` and fires `offline`/`online`, so the badge
   test waits on the badge itself. Proven: without the event listeners it fails.
+- `scripts/deploy.sh staging` passed at 54d1860 (2026-10-23): check.sh (98 unit tests, 14
+  Playwright tests), then 12 Playwright tests against the live /draw-staging/ (autosave
+  offline and across a relaunch, the guards, header, About, smoke); the 2 update-banner
+  tests skip there by design.
