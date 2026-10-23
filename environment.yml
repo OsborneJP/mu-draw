@@ -1,0 +1,27 @@
+# One env for the server runtime and the web build/test toolchain.
+# No `name:` here: the env name comes from app.config.json.
+#   conda env create -n "$(python3 -I scripts/lib/appconfig.py --get ENV_NAME)" -f environment.yml
+#   conda env update -n "$(python3 -I scripts/lib/appconfig.py --get ENV_NAME)" -f environment.yml --prune
+# Then refresh the lock:
+#   conda list -n "$(python3 -I scripts/lib/appconfig.py --get ENV_NAME)" --explicit > environment.lock.txt
+# This env is also the production runtime of the API services. Change it only
+# through this file, never with an ad hoc `conda install`.
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  # Same release as @rdkit/rdkit in web/package.json (2026.9.1).
+  - rdkit=2026.09.1
+  - nodejs=24.22.1
+  # fastapi-core, not fastapi: the conda metapackage pulls in an
+  # OpenTelemetry SDK and exporter.
+  - fastapi-core
+  - uvicorn
+  # httpx for outbound calls (mockable with respx); httpx2 for TestClient.
+  - httpx
+  - httpx2
+  - pytest
+  - pytest-socket
+  - ruff
+  - pillow

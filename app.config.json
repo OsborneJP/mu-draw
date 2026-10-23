@@ -1,0 +1,9 @@
+{
+  "name": "mu-draw",
+  "path": "draw",
+  "ports": {
+    "production": 8050,
+    "staging": 8051,
+    "dev": 8052
+  }
+}

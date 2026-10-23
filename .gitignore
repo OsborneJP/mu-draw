@@ -1,0 +1,20 @@
+# check.sh writes its full log here.
+.check.log
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Web build and test output
+web/node_modules/
+web/dist/
+web/dist-*/
+web/.vitest/
+web/test-results/
+web/playwright-report/
+web/blob-report/
+
+# OS / editors
+.DS_Store
