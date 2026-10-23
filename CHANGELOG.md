@@ -20,3 +20,5 @@ All notable changes to this project. The format follows
   to production only the commit that passed the live staging checks. Apache and systemd
   setup is rendered into docs/server-setup.md for a person to apply.
 - Staging is live at /draw-staging/ (campus and VPN only) and passes the live checks.
+- The staging app installs as "Structure Editor (staging)", so it can't be mistaken for
+  production.

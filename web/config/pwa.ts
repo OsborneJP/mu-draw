@@ -1,8 +1,25 @@
 // The PWA plugin's options, built in one place from the base path so that Vite's base,
 // the manifest's scope/start_url/id and the service worker's navigation rules can't drift.
+import type { Plugin } from 'vite';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
+import { basePath } from './app.ts';
 
 export const APP_TITLE = 'Structure Editor';
+
+/** The app's name for a base: staging says so, so an installed staging app can't be
+ * mistaken for the production one. */
+export function appTitle(base: string): string {
+  return base === basePath('staging') ? `${APP_TITLE} (staging)` : APP_TITLE;
+}
+
+/** Puts the app's name in index.html's <title> (the installed window's title). */
+export function htmlTitle(title: string): Plugin {
+  const escaped = title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return {
+    name: 'html-title',
+    transformIndexHtml: (html) => html.replace(/<title>[^<]*<\/title>/, `<title>${escaped}</title>`),
+  };
+}
 // Workbox skips files over 2 MB by default; Indigo's wasm alone is 11.8 MB.
 export const MAX_PRECACHE_BYTES = 30 * 1024 * 1024;
 
@@ -23,8 +40,8 @@ export function pwaOptions(base: string): Partial<VitePWAOptions> {
     strategies: 'generateSW',
     manifest: {
       id: base,
-      name: APP_TITLE,
-      short_name: APP_TITLE,
+      name: appTitle(base),
+      short_name: appTitle(base),
       description: 'Draw chemical structures and reactions. Works offline.',
       start_url: base,
       scope: base,

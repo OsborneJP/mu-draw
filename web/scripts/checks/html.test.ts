@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkHtmlLinks } from './html';
+import { checkHtmlLinks, checkTitle } from './html';
 
 const BASE = '/app-x/';
 const FILES = ['index.html', 'icons/icon-192.png', 'manifest.webmanifest', 'assets/index-a.js', 'assets/index-b.css'];
@@ -43,5 +43,13 @@ describe('checkHtmlLinks', () => {
   it('fails on a file missing from the build', () => {
     const html = page(GOOD.replace('icons/icon-192.png', 'icons/missing.png'));
     expect(checkHtmlLinks(html, BASE, FILES)).toEqual([`href="icons/missing.png" names a file that isn't in the build`]);
+  });
+});
+
+describe('checkTitle', () => {
+  it('passes the expected title and fails any other', () => {
+    expect(checkTitle('<title>Editor (staging)</title>', 'Editor (staging)')).toEqual([]);
+    expect(checkTitle('<title>Editor</title>', 'Editor (staging)')).toEqual(['<title> is "Editor", not "Editor (staging)"']);
+    expect(checkTitle('<head></head>', 'Editor')).toEqual(['expected one <title>, found 0']);
   });
 });

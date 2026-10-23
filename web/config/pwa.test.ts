@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { basePath, type Target } from './app';
-import { MAX_PRECACHE_BYTES, pwaOptions } from './pwa';
+import { APP_TITLE, appTitle, htmlTitle, MAX_PRECACHE_BYTES, pwaOptions } from './pwa';
 
 describe.each<Target>(['staging', 'production'])('pwaOptions for %s', (target) => {
   const base = basePath(target);
@@ -35,5 +35,20 @@ describe.each<Target>(['staging', 'production'])('pwaOptions for %s', (target) =
     const denied = options.workbox?.navigateFallbackDenylist || [];
     expect(denied.some((re) => re.test(`${base}api/health`))).toBe(true);
     expect(denied.some((re) => re.test(base))).toBe(false);
+  });
+});
+
+describe('app name', () => {
+  it('labels staging so it cannot be mistaken for production', () => {
+    const nameFor = (target: Target) => (pwaOptions(basePath(target)).manifest || {}).name;
+    expect(nameFor('staging')).toBe(`${APP_TITLE} (staging)`);
+    expect(nameFor('production')).toBe(APP_TITLE);
+    expect(appTitle(basePath('production'))).not.toMatch(/staging/i);
+  });
+
+  it('sets the page title', () => {
+    const plugin = htmlTitle('A & B <test>');
+    const transform = plugin.transformIndexHtml as (html: string) => string;
+    expect(transform('<head><title>Old</title></head>')).toBe('<head><title>A &amp; B &lt;test></title></head>');
   });
 });

@@ -232,8 +232,8 @@ Three capped review rounds ran at this milestone. Round 1 found 7 medium issues,
 found 1 medium, round 3 found incomplete deploy test coverage (closed by the mutation
 sweep rather than another review round). Everything high or medium was fixed with a test
 that fails without the fix. Accepted as known limits:
-- Installing the PWA from Chrome and Edge on Windows 11 and Chrome on macOS is a manual
-  check (the automated installability check passes).
+- Installing the PWA on Chrome for macOS is still to check by hand (Windows 11 Chrome and
+  Edge passed; see below).
 - SMILES strings and numbers typed into source are caught by review only (the static
   check covers Molfile, CDXML, InChI and InChIKey text).
 - No static scan of URL strings in the built bundles (CSP and the request guard enforce
@@ -256,3 +256,12 @@ that fails without the fix. Accepted as known limits:
   header/type checks, and all 4 Playwright tests against
   https://osbornelab.manchester.edu/draw-staging/, both offline tests included. This host
   reaches its own name at 10.95.20.32, inside the campus-only range.
+- Manual install check (Jeff, 2026-10-23): the staging app installs and works offline
+  (relaunched with Wi-Fi off, drew, saved and reopened a Molfile) in Chrome and Edge on
+  Windows 11. Chrome on macOS: not yet checked.
+- Staging installs as "Structure Editor (staging)" and production as "Structure Editor",
+  so the two installed apps can't be confused. The name comes from `appTitle(base)`
+  (web/config/pwa.ts) and is set in both the manifest and the page title; verify-dist
+  checks both for the target being built. The manifest `id` didn't change, so an
+  installed staging app is renamed rather than duplicated. Chrome may ask to confirm the
+  name change when it next updates the app.

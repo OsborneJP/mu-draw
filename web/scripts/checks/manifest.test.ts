@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { checkManifest, checkPromptMode } from './manifest';
 
 const BASE = '/app-x/';
+const TITLE = 'Editor (staging)';
 const GOOD = {
-  name: 'Editor',
+  name: TITLE,
+  short_name: TITLE,
   scope: BASE,
   start_url: BASE,
   id: BASE,
@@ -16,15 +18,19 @@ const GOOD = {
 
 describe('checkManifest', () => {
   it('passes a manifest tied to the base', () => {
-    expect(checkManifest(GOOD, BASE)).toEqual([]);
+    expect(checkManifest(GOOD, BASE, TITLE)).toEqual([]);
   });
 
   it.each(['scope', 'start_url', 'id'])('fails when %s drifts from the base', (key) => {
-    expect(checkManifest({ ...GOOD, [key]: '/' }, BASE)).toEqual([`${key} is "/", not "${BASE}"`]);
+    expect(checkManifest({ ...GOOD, [key]: '/' }, BASE, TITLE)).toEqual([`${key} is "/", not "${BASE}"`]);
+  });
+
+  it("fails when the name is not the target's", () => {
+    expect(checkManifest({ ...GOOD, name: 'Editor' }, BASE, TITLE)).toEqual(['name is "Editor", not "Editor (staging)"']);
   });
 
   it('fails without a 512 px icon', () => {
-    expect(checkManifest({ ...GOOD, icons: GOOD.icons.slice(0, 1) }, BASE)).toEqual(['no 512x512 PNG icon']);
+    expect(checkManifest({ ...GOOD, icons: GOOD.icons.slice(0, 1) }, BASE, TITLE)).toEqual(['no 512x512 PNG icon']);
   });
 });
 

@@ -37,3 +37,10 @@ export function checkHtmlLinks(html: string, base: string, files: string[]): str
   if (icons === 0) errors.push('no <link rel="icon">, so browsers request /favicon.ico at the site root');
   return errors;
 }
+
+/** The built page's <title> is the target's app name (the installed window shows it). */
+export function checkTitle(html: string, title: string): string[] {
+  const titles = [...html.matchAll(/<title>([^<]*)<\/title>/gi)].map((m) => m[1].replaceAll('&amp;', '&'));
+  if (titles.length !== 1) return [`expected one <title>, found ${titles.length}`];
+  return titles[0] === title ? [] : [`<title> is "${titles[0]}", not "${title}"`];
+}
