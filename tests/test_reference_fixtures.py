@@ -85,9 +85,11 @@ def test_molfiles_carry_the_chiral_flag_for_specified_centres(generated):
 
 
 def test_rdkit_default_chiral_flag_would_be_caught():
-    # The tripwire above only works if RDKit really writes 0 without the property.
+    # The tripwire above only works if RDKit writes 0 when nobody sets the property.
     gen.configure()
     mols = (Chem.MolFromSmiles(row["smiles"]) for row in gen.read_rows())
     mol = next(m for m in mols if gen.has_specified_tetrahedral(m))
-    reread = Chem.MolFromMolBlock(gen.molfile(mol, "probe", chiral_flag=False))
+    drawn = gen.with_2d_coords(mol, "probe")
+    assert not drawn.HasProp("_MolFileChiralFlag")
+    reread = Chem.MolFromMolBlock(Chem.MolToMolBlock(drawn))
     assert reread.GetIntProp("_MolFileChiralFlag") == 0

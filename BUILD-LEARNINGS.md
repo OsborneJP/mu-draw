@@ -51,8 +51,8 @@ Record why, not just what: the next person (or agent) should not have to redisco
   `flagPossible=True`. The JSON stores both lists raw; the properties panel decides.
 - RDKit writes Molfile chiral flag 0 by default, and Ketcher turns flag 0 into an AND
   stereo group, which makes Indigo's InChIKey non-standard. The generator sets the flag
-  to 1 when a tetrahedral centre is specified; a test proves the flag is present and
-  that RDKit's default would be caught.
+  to 1 when a tetrahedral centre is specified. Tests check the flag is present, and that
+  RDKit writes 0 when the property is never set, so the check would catch a lost setting.
 - RDKit's ChemDraw writer (rdChemDraw.MolToChemDrawBlock) emits an empty `BondLength=""`.
   Indigo 1.46 (Ketcher 3.18) can't parse it: Ketcher's Open dialog reports "Convert error!
   ... stoi: no conversion". Worse, `ketcher.setMolecule()` on the same text doesn't fail;
