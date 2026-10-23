@@ -32,3 +32,4 @@ All notable changes to this project. The format follows
 - Update banner: when a new version has been downloaded, "An update is ready. Reload to
   use it." appears with a Reload button. The app never reloads by itself, and Reload in
   one tab doesn't reload the others.
+- Production (/draw/) opens on the campus network and VPN only, for now, like staging.

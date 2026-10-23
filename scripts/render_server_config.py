@@ -23,6 +23,9 @@ DOC = ROOT / "docs" / "server-setup.md"
 CSP_FILE = ROOT / "web" / "csp.json"
 VHOST = "/etc/apache2/sites-enabled/osbornelab.conf"
 CAMPUS = "10.0.0.0/8"
+# Production opens on the campus network and VPN only, for now (Jeff, 2026-10-23). False
+# makes it public like /chemtutor: re-render, then re-apply the production block.
+PRODUCTION_CAMPUS_ONLY = True
 IMMUTABLE = "public, max-age=31536000, immutable"
 
 
@@ -108,6 +111,14 @@ def apache_block(t: Target, policy: str) -> str:
             '    ErrorDocument 403 "This test version opens only on the campus network or VPN."',
             "</LocationMatch>",
         ]
+    elif PRODUCTION_CAMPUS_ONLY:
+        lines += [
+            "# Production is campus and VPN only, for now (covers the static files and the API).",
+            f'<LocationMatch "^/{p}(/|$)">',
+            f"    Require ip {CAMPUS}",
+            '    ErrorDocument 403 "This app opens only on the campus network or VPN."',
+            "</LocationMatch>",
+        ]
     else:
         lines += [
             "# Production is public, like /chemtutor. For campus and VPN only, uncomment:",
@@ -173,6 +184,14 @@ def render(config: AppConfig, home: Path, user: str, uvicorn: Path, policy: str)
     staging = Target(config, "staging", home, user)
     production = Target(config, "production", home, user)
     host = config.host
+    access = (
+        "It opens on the campus network and VPN only, for now (set `PRODUCTION_CAMPUS_ONLY`\n"
+        "in scripts/render_server_config.py to change that), so the live checks, like\n"
+        "staging's, need this host to reach its own name from a 10.x address."
+        if PRODUCTION_CAMPUS_ONLY
+        else "Decide first whether production is public (as rendered, like /chemtutor) or\n"
+        "campus-only (set `PRODUCTION_CAMPUS_ONLY` in scripts/render_server_config.py)."
+    )
     rows = "\n".join(
         f"| {t.name} | `https://{host}/{t.path}/` | `{t.web}` | `{t.unit}` on 127.0.0.1:{t.port} |"
         for t in (staging, production)
@@ -255,8 +274,8 @@ scripts/deploy.sh --smoke-only staging
 
 ## (b) Production: apply when promoting
 
-Only after staging has passed (`scripts/deploy.sh --production` refuses otherwise). Decide
-first whether production is public (as rendered, like /chemtutor) or campus-only.
+Only after staging has passed (`scripts/deploy.sh --production` refuses otherwise).
+{access}
 
 1. Run `scripts/deploy.sh --production`. The first run stops at the health probe, as above.
 2. Back up the vhost as in step 2, then paste this block next to the staging block.

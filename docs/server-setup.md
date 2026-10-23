@@ -135,8 +135,10 @@ scripts/deploy.sh --smoke-only staging
 
 ## (b) Production: apply when promoting
 
-Only after staging has passed (`scripts/deploy.sh --production` refuses otherwise). Decide
-first whether production is public (as rendered, like /chemtutor) or campus-only.
+Only after staging has passed (`scripts/deploy.sh --production` refuses otherwise).
+It opens on the campus network and VPN only, for now (set `PRODUCTION_CAMPUS_ONLY`
+in scripts/render_server_config.py to change that), so the live checks, like
+staging's, need this host to reach its own name from a 10.x address.
 
 1. Run `scripts/deploy.sh --production`. The first run stops at the health probe, as above.
 2. Back up the vhost as in step 2, then paste this block next to the staging block.
@@ -167,11 +169,11 @@ Alias /draw /home/webadmin/srv/mu-draw/production/web
 <Directory /home/webadmin/srv/mu-draw/production/web/assets>
     Header set Cache-Control "public, max-age=31536000, immutable"
 </Directory>
-# Production is public, like /chemtutor. For campus and VPN only, uncomment:
-# <LocationMatch "^/draw(/|$)">
-#     Require ip 10.0.0.0/8
-#     ErrorDocument 403 "This app opens only on the campus network or VPN."
-# </LocationMatch>
+# Production is campus and VPN only, for now (covers the static files and the API).
+<LocationMatch "^/draw(/|$)">
+    Require ip 10.0.0.0/8
+    ErrorDocument 403 "This app opens only on the campus network or VPN."
+</LocationMatch>
 # mu-draw-production END
 ```
 

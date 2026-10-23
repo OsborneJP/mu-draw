@@ -243,8 +243,9 @@ that fails without the fix. Accepted as known limits:
   by running check.sh inside its tests.
 - `require_unchanged` relies on `set -e` to stop after `require_clean_tree`; every caller
   is a top-level statement in a set -e script.
-- The probe's 403 advice mentions 10.0.0.0/8 even for production, which is public unless
-  the campus-only option is chosen.
+- (Resolved 2026-10-23: production is campus and VPN only for now, so the probe's 403
+  advice about 10.0.0.0/8 holds for both targets. `PRODUCTION_CAMPUS_ONLY` in
+  scripts/render_server_config.py switches it.)
 - (Closed in session 2: the update banner now lets a student switch to a new build
   without closing every tab.)
 
