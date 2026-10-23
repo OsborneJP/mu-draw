@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { getSaveStatus, subscribeSaveStatus } from '../editor/autosave';
+import ExportDialog from '../panels/ExportDialog';
 import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
@@ -37,6 +38,7 @@ export default function Header() {
             </span>
           )}
         </span>
+        <ExportDialog />
         <AboutBox title={TITLE} />
       </div>
     </header>

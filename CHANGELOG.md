@@ -33,3 +33,10 @@ All notable changes to this project. The format follows
   use it." appears with a Reload button. The app never reloads by itself, and Reload in
   one tab doesn't reload the others.
 - Production (/draw/) opens on the campus network and VPN only, for now, like staging.
+- Export (in the header): download the drawing as a PNG at 1x, 2x or 4x, on white or with a
+  transparent background, or as an SVG. Made on this device, offline too. PNGs record their
+  resolution, so Word places 1x, 2x and 4x at the same size; higher scales are sharper.
+
+### Fixed
+- Ketcher's image previews and exports could hang when two were made at once; they now
+  take turns.

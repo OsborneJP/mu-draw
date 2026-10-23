@@ -7,6 +7,7 @@ import { StandaloneStructServiceProvider } from 'ketcher-standalone/dist/binaryW
 import { autosaveKey, setSaveStatus, startAutosave, type AutosaveEditor } from './autosave';
 import './editor.css';
 import { imageQueue } from './imageQueue';
+import { setKetcher } from './instance';
 import { DISABLE_MACROMOLECULES_EDITOR, HIDDEN_BUTTONS } from './ketcherUi';
 
 declare global {
@@ -58,9 +59,10 @@ function onInit(ketcher: Ketcher) {
   window.ketcher = ketcher;
   // Ready once the last drawing is back on the canvas and changes are being saved.
   const key = autosaveKey(import.meta.env.BASE_URL);
-  void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus).then(() =>
-    window.dispatchEvent(new Event('editor-ready')),
-  );
+  void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus).then(() => {
+    setKetcher(ketcher);
+    window.dispatchEvent(new Event('editor-ready'));
+  });
 }
 
 export default function KetcherEditor() {
