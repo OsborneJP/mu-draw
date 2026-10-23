@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { checkPins, PINNED, readPinInputs, type PinInputs } from './pins';
 
-const KETCHER = ['ketcher-react', 'ketcher-standalone', 'ketcher-core'];
+const KETCHER = { 'ketcher-react': '3.18.0', 'ketcher-standalone': '3.18.0', 'ketcher-core': '3.18.0' };
 
 function inputs(version = '3.18.0'): PinInputs {
-  const names = KETCHER;
+  const names = Object.keys(KETCHER);
   return {
     packageJson: { dependencies: Object.fromEntries(names.map((n) => [n, version])) },
     lock: { packages: Object.fromEntries(names.map((n) => [`node_modules/${n}`, { version }])) },
@@ -45,6 +45,12 @@ describe('pin check', () => {
     expect(checkPins(bad, KETCHER)).toContain('ketcher-standalone: missing from package.json');
   });
 
+  it('rejects an upgrade that was not made in config/pins.ts', () => {
+    expect(checkPins(inputs('3.19.0'), KETCHER).join('\n')).toMatch(
+      /ketcher-react: package.json has 3.19.0, but config\/pins.ts pins 3.18.0/,
+    );
+  });
+
   it('rejects Ketcher packages that differ', () => {
     const bad = inputs();
     bad.packageJson.dependencies!['ketcher-standalone'] = '3.17.2';
@@ -54,7 +60,7 @@ describe('pin check', () => {
   });
 
   it('covers every pinned engine', () => {
-    expect(PINNED).toEqual(
+    expect(Object.keys(PINNED)).toEqual(
       expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit']),
     );
   });

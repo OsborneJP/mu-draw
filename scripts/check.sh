@@ -7,6 +7,7 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/lib/config.sh"
 source "$ROOT/scripts/lib/web.sh"
+source "$ROOT/scripts/lib/tree.sh"
 cd "$ROOT"
 exec > >(tee "$ROOT/.check.log") 2>&1
 
@@ -28,8 +29,9 @@ use_env
 npm_ci_if_stale
 require_chromium
 # The check must leave the tree as it found it (no fixtures regenerated in
-# place, no stray files outside .gitignore).
+# place, no stray files outside .gitignore), compared by content.
 STATUS_BEFORE="$(git status --porcelain)"
+TREE_BEFORE="$(tree_fingerprint)"
 
 stage "placeholder literals" checks placeholders
 stage "chemistry literals" checks chem_literals
@@ -42,8 +44,8 @@ stage "vitest" web npx --no-install vitest run
 stage "build + verify (staging)" build_and_verify "$BASE_STAGING" dist
 
 CURRENT_STAGE="tree unchanged"
-if [[ "$(git status --porcelain)" != "$STATUS_BEFORE" ]]; then
-  echo "check.sh changed the working tree:"
+if [[ "$(tree_fingerprint)" != "$TREE_BEFORE" ]]; then
+  echo "check.sh changed the working tree (a file was created, deleted or rewritten):"
   diff <(echo "$STATUS_BEFORE") <(git status --porcelain) || true
   exit 1
 fi

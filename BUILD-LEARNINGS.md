@@ -217,3 +217,8 @@ Record why, not just what: the next person (or agent) should not have to redisco
     worker. With Apache-style `immutable` caching and the icons left out of the
     precache, Chrome answered the icon from its HTTP cache while offline; the old checks
     passed and the new one names the file. This is what keeps the live run honest.
+- check.sh's "tree unchanged" guard compares a content fingerprint (scripts/lib/tree.sh),
+  not just `git status`, which shows " M" before and after however a test rewrites an
+  already-modified file. Proven with a planted test that rewrote CHANGELOG.md.
+- The pin check asserts the exact versions in web/config/pins.ts, not just the x.y.z form,
+  so an engine upgrade is a deliberate edit that re-reads the 3.18 workarounds above.

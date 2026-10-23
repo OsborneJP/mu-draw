@@ -28,6 +28,13 @@ describe('checkHtmlLinks', () => {
     expect(checkHtmlLinks(html, BASE, FILES)).toEqual(['href="/favicon.ico" (outside /app-x/)']);
   });
 
+  it.each([
+    ['single quotes', "<link rel='icon' href='/favicon.ico'>"],
+    ['no quotes', '<link rel=icon href=/favicon.ico>'],
+  ])('reads %s', (_name, extra) => {
+    expect(checkHtmlLinks(page(GOOD + extra), BASE, FILES)).toEqual(['href="/favicon.ico" (outside /app-x/)']);
+  });
+
   it('fails on another origin', () => {
     const html = page(`${GOOD}<script src="https://cdn.example.com/x.js"></script>`);
     expect(checkHtmlLinks(html, BASE, FILES)).toEqual(['src="https://cdn.example.com/x.js" (other origin)']);

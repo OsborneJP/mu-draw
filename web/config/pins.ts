@@ -4,7 +4,15 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-export const PINNED = ['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit'] as const;
+// Changing a version here is a deliberate upgrade: first re-read the Ketcher 3.18 and
+// RDKit notes in BUILD-LEARNINGS.md (hidden UI, debug shortcut, CDXML, chiral flag), since
+// those workarounds were checked against these exact versions.
+export const PINNED: Record<string, string> = {
+  'ketcher-react': '3.18.0',
+  'ketcher-standalone': '3.18.0',
+  'ketcher-core': '3.18.0',
+  '@rdkit/rdkit': '2026.9.1',
+};
 // The Ketcher packages must move together.
 export const SAME_VERSION = ['ketcher-react', 'ketcher-standalone', 'ketcher-core'] as const;
 
@@ -17,8 +25,9 @@ export interface PinInputs {
   installed: Record<string, string | undefined>;
 }
 
-export function checkPins(inputs: PinInputs, names: readonly string[] = PINNED): string[] {
+export function checkPins(inputs: PinInputs, pinned: Record<string, string> = PINNED): string[] {
   const errors: string[] = [];
+  const names = Object.keys(pinned);
   const deps = { ...inputs.packageJson.devDependencies, ...inputs.packageJson.dependencies };
   for (const name of names) {
     const spec = deps[name];
@@ -27,6 +36,9 @@ export function checkPins(inputs: PinInputs, names: readonly string[] = PINNED):
       continue;
     }
     if (!EXACT.test(spec)) errors.push(`${name}: "${spec}" is not an exact x.y.z version`);
+    else if (spec !== pinned[name]) {
+      errors.push(`${name}: package.json has ${spec}, but config/pins.ts pins ${pinned[name]}`);
+    }
     const entries = Object.entries(inputs.lock.packages).filter(
       ([path]) => path === `node_modules/${name}` || path.endsWith(`/node_modules/${name}`),
     );
@@ -48,7 +60,7 @@ export function checkPins(inputs: PinInputs, names: readonly string[] = PINNED):
 
 /** The real inputs, read from web/. Installed versions are read by file path because some
  * packages (e.g. @rdkit/rdkit) don't export their package.json. */
-export function readPinInputs(names: readonly string[] = PINNED): PinInputs {
+export function readPinInputs(names: readonly string[] = Object.keys(PINNED)): PinInputs {
   const web = (rel: string) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
   const json = (rel: string) => JSON.parse(readFileSync(web(rel), 'utf8'));
   const installed: Record<string, string | undefined> = {};

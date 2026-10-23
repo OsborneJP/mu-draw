@@ -6,8 +6,10 @@ import { requestProblem } from '../../config/requestPolicy.ts';
 
 const APP_ORIGIN = 'https://app.invalid';
 
+// Double-quoted, single-quoted or unquoted, as HTML allows.
 function attribute(tag: string, name: string): string | undefined {
-  return tag.match(new RegExp(`\\s${name}\\s*=\\s*"([^"]*)"`, 'i'))?.[1];
+  const match = tag.match(new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'=<>\`]+))`, 'i'));
+  return match ? (match[1] ?? match[2] ?? match[3]) : undefined;
 }
 
 export function checkHtmlLinks(html: string, base: string, files: string[]): string[] {
