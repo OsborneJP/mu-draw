@@ -35,5 +35,6 @@ build_and_verify() {
   local base="$1" dist="$2"
   echo "build: BASE=$base -> web/$dist"
   web env BASE="$base" npx --no-install vite build --outDir "$dist" --emptyOutDir
+  web env BASE="$base" DIST_DIR="$dist" node scripts/verify-dist.ts
   smoke "$base" "$dist"
 }

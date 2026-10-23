@@ -1,14 +1,23 @@
 // Fixtures for the smoke tests: a server the test owns, a fresh browser profile, and
-// guards that fail the test on page errors, editor errors, CSP violations, popups,
-// websockets and same-origin HTTP errors.
+// guards that fail the test on page errors, editor or service-worker errors, CSP
+// violations, popups, websockets, same-origin HTTP errors, and any request outside the
+// app's own origin and base path (invariant 1).
 //
 // Local runs serve DIST_DIR (default dist) at BASE (default staging) with Vite's preview
 // server. With SMOKE_URL set, the tests run against that deployed URL instead.
-import { test as base, chromium, expect, type BrowserContext, type Page } from '@playwright/test';
+import {
+  test as base,
+  chromium,
+  expect,
+  type BrowserContext,
+  type Page,
+  type Request,
+} from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { preview } from 'vite';
 import { resolveBase } from '../config/app.ts';
+import { requestProblem } from '../config/requestPolicy.ts';
 
 const WEB_DIR = fileURLToPath(new URL('..', import.meta.url));
 const FIXTURES_DIR = fileURLToPath(new URL('../../tests/fixtures/', import.meta.url));
@@ -66,11 +75,13 @@ function installPageGuards() {
     report('csp', `${e.violatedDirective} blocked ${e.blockedURI}`),
   );
   addEventListener('editor-error', (e) => report('editor-error', String((e as CustomEvent).detail)));
+  addEventListener('sw-error', (e) => report('sw-error', String((e as CustomEvent).detail)));
   const once = (name: string) =>
     new Promise<true>((resolve) => addEventListener(name, () => resolve(true), { once: true }));
   Object.assign(window, {
     __editorReady: once('editor-ready'),
     __indigoReady: once('struct-service-initialized'),
+    __swRegistered: once('sw-registered'),
   });
 }
 
@@ -78,6 +89,8 @@ export interface App {
   server: AppServer;
   context: BrowserContext;
   page: Page;
+  /** Every request seen (page, workers and service worker), in order. */
+  requests: Request[];
   /** Every problem the guards saw; the fixture asserts it is empty after the test. */
   problems: string[];
 }
@@ -87,17 +100,29 @@ export const test = base.extend<{ app: App }>({
   app: async ({}, use, testInfo) => {
     const server = await startServer();
     // A fresh persistent profile: not incognito (Chrome reports 'in-incognito' as not
-    // installable) and with no service worker left over from an earlier run.
+    // installable) and with no service worker left over from an earlier run. Full
+    // Chromium, because the headless shell stubs the installability check.
     const context = await chromium.launchPersistentContext(testInfo.outputPath('profile'), {
       channel: 'chromium',
       headless: true,
     });
     const problems: string[] = [];
+    const requests: Request[] = [];
     const origin = new URL(server.url).origin;
     await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
       problems.push(`${kind}: ${detail}`);
     });
     await context.addInitScript(installPageGuards);
+    context.on('request', (request) => {
+      requests.push(request);
+      const problem = requestProblem(request.url(), server.url);
+      if (problem) problems.push(`request (${problem}): ${request.url()}`);
+    });
+    context.on('response', (response) => {
+      if (new URL(response.url()).origin === origin && response.status() >= 400) {
+        problems.push(`HTTP ${response.status()}: ${response.url()}`);
+      }
+    });
     const watch = (page: Page) => {
       page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
       page.on('websocket', (ws) => problems.push(`websocket: ${ws.url()}`));
@@ -108,12 +133,7 @@ export const test = base.extend<{ app: App }>({
       problems.push(`popup: ${popup.url()}`);
       watch(popup);
     });
-    context.on('response', (response) => {
-      if (new URL(response.url()).origin === origin && response.status() >= 400) {
-        problems.push(`HTTP ${response.status()}: ${response.url()}`);
-      }
-    });
-    await use({ server, context, page, problems });
+    await use({ server, context, page, requests, problems });
     await context.close();
     await server.close();
     expect(problems, 'guards').toEqual([]);
@@ -131,6 +151,52 @@ export async function waitForEditor(page: Page): Promise<void> {
     const w = window as unknown as { __editorReady: Promise<true>; __indigoReady: Promise<true> };
     return Promise.all([w.__editorReady, w.__indigoReady]);
   });
+}
+
+/** Wait until the service worker is installed (precache complete) and active. Fails at
+ * once if the install fails, instead of hanging like navigator.serviceWorker.ready. */
+export async function waitForServiceWorker(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    await (window as unknown as { __swRegistered: Promise<true> }).__swRegistered;
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (!registration) throw new Error('service worker registered but no registration found');
+    if (registration.active) return;
+    const worker = registration.installing ?? registration.waiting;
+    if (!worker) throw new Error('registration has no installing or waiting worker');
+    await new Promise<void>((resolve, reject) => {
+      const settle = () => {
+        if (worker.state === 'activated') resolve();
+        if (worker.state === 'redundant') reject(new Error('service worker install failed'));
+      };
+      worker.addEventListener('statechange', settle);
+      settle();
+    });
+  });
+}
+
+export interface InstallabilityError {
+  errorId: string;
+  errorArguments: { name: string; value: string }[];
+}
+
+/** Chrome's own verdict on whether the page can be installed as an app. */
+export async function installabilityErrors(app: App): Promise<InstallabilityError[]> {
+  const cdp = await app.context.newCDPSession(app.page);
+  const result = (await cdp.send('Page.getInstallabilityErrors')) as {
+    installabilityErrors: InstallabilityError[];
+  };
+  await cdp.detach();
+  return result.installabilityErrors;
+}
+
+/** The manifest Chrome loaded for the page, with URLs resolved. */
+export async function appManifest(app: App): Promise<{ scope: string; startUrl: string; id: string }> {
+  const cdp = await app.context.newCDPSession(app.page);
+  const { url, data } = (await cdp.send('Page.getAppManifest')) as { url: string; data: string };
+  await cdp.detach();
+  const raw = JSON.parse(data) as { scope: string; start_url: string; id: string };
+  const resolve = (value: string) => new URL(value, url).href;
+  return { scope: resolve(raw.scope), startUrl: resolve(raw.start_url), id: resolve(raw.id) };
 }
 
 export { expect };

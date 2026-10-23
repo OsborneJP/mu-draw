@@ -80,3 +80,16 @@ Record why, not just what: the next person (or agent) should not have to redisco
   confirmed present with hiding switched off, so the absence checks are not vacuous.
 - Indigo's InChIKey for the RDKit (R)-2-butanol Molfile equals RDKit's, once the Molfile
   carries chiral flag 1.
+
+## PWA
+
+- vite-plugin-pwa 2.0 output: `sw.js` and `workbox-<hash>.js` at the dist root,
+  `manifest.webmanifest`, 17 precache entries (21 MB) for this build.
+- `registerSW()` reloads the page by default when a new worker takes control; a no-op
+  `onNeedReload` turns that off (src/pwa/register.ts, with a test).
+- Playwright never reports requests for URLs ending in `/favicon.ico`. A planted
+  `fetch('/favicon.ico')` passed the request guard, while `/outside-probe.txt` failed it.
+  index.html therefore declares a relative `<link rel=icon>`, so Chrome never asks the site
+  root for a favicon.
+- Proven: a manifest without suitable icons makes Chrome's `Page.getInstallabilityErrors`
+  return `manifest-missing-suitable-icon`, and the smoke test fails.
