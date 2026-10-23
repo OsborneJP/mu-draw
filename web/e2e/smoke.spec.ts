@@ -104,7 +104,9 @@ test('online: the editor loads, works, stays on its own origin and is installabl
   ]);
   // Workers get their CSP only from their own response header, never from the page's
   // meta tag: the server (test server or Apache) must send it. Asked of the server
-  // directly: a worker-owned request's response() may never resolve in Playwright.
+  // directly: the response event for a worker's own script (sw.js, the Indigo worker)
+  // can be lost, since the browser fetches it before Playwright attaches to the worker.
+  // Fetches made inside a running worker, like the Indigo wasm, are reported reliably.
   for (const request of [swScript, indigoWorker]) {
     const response = await context.request.get(request.url());
     expect(response.headers()['content-security-policy'], request.url()).toBe(cspPolicy());

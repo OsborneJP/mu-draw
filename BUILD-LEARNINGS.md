@@ -210,9 +210,12 @@ Record why, not just what: the next person (or agent) should not have to redisco
     editor.css; without the rule it shows as `flex`);
   - sw.js and the Indigo worker are served with the CSP header (workers ignore the page's
     meta tag; without the preview header the test fails). First version awaited
-    `request.response()` on the worker-owned requests, which sometimes never resolves in
-    Playwright (it hung to the 3-minute deadline in a check.sh run); the header is now
-    fetched from the server with `context.request`;
+    `request.response()` on the requests for sw.js and the worker script, which sometimes
+    never resolves (it hung to the 3-minute deadline in a check.sh run): the browser
+    fetches a worker's own script before Playwright attaches to that worker, so the
+    response event can be lost. Fetches made inside a running worker (the Indigo wasm)
+    are reported reliably. The header is now fetched from the server with
+    `context.request`;
   - offline, every same-origin response after the reload must come from the service
     worker. With Apache-style `immutable` caching and the icons left out of the
     precache, Chrome answered the icon from its HTTP cache while offline; the old checks

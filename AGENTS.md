@@ -17,7 +17,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 2. No accounts, student identifiers, analytics, or logging of request bodies.
    Enforced by: server/tests/test_privacy.py (a sentinel body never reaches logs), uvicorn
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
-   (it put the drawing in the URL; src/editor/debugHotkeys.ts + online smoke test).
+   (it put the drawing in the URL; web/src/editor/debugHotkeys.ts + online smoke test).
    Accounts and analytics: review only.
 3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, or PubChem: never from an
    LLM and never hand-typed into code or tests.
@@ -25,8 +25,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    scripts/checks/chem_literals.py (no Molfile/CDXML/InChI text in source). SMILES and
    numeric literals in source: review only.
 4. Everything except the naming endpoints works offline.
-   Enforced by: the precache guard (web/scripts/checks/precache.ts, run on every build by
-   web/scripts/verify-dist.ts) and the two "offline:" smoke tests.
+   Enforced by: the precache guard (web/scripts/checks/precache.ts, run by
+   web/scripts/verify-dist.ts in every check.sh and deploy build, not by a bare
+   `npm run build`) and the two "offline:" smoke tests.
 5. ketcher-react, ketcher-standalone, and @rdkit/rdkit are pinned to exact versions.
    Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
 6. Build only what's in "Version 1 features" and the NMR proof of concept. Nothing from

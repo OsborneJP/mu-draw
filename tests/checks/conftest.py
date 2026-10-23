@@ -12,6 +12,7 @@ SAMPLE = SAMPLE_CONFIG
 
 @pytest.fixture
 def repo(tmp_path: Path) -> Path:
+    # The root conftest strips GIT_* variables and global config for the whole session.
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
     (tmp_path / "app.config.json").write_text(json.dumps(SAMPLE))
     return tmp_path
