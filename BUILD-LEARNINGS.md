@@ -50,8 +50,14 @@ Record why, not just what: the next person (or agent) should not have to redisco
   stereo group, which makes Indigo's InChIKey non-standard. The generator sets the flag
   to 1 when a tetrahedral centre is specified; a test proves the flag is present and
   that RDKit's default would be caught.
-- rdChemDraw's CDXML has a DOCTYPE that names an external DTD URL. Parsers don't fetch
-  it, but don't copy that URL anywhere the browser could request it.
+- RDKit's ChemDraw writer (rdChemDraw.MolToChemDrawBlock) emits an empty `BondLength=""`.
+  Indigo 1.46 (Ketcher 3.18) can't parse it: Ketcher's Open dialog reports "Convert error!
+  ... stoi: no conversion". Worse, `ketcher.setMolecule()` on the same text doesn't fail;
+  it silently loads a different molecule (wrong InChIKey). Without that one attribute,
+  the file loads with the correct InChIKey. So the generator writes no CDXML, and the
+  editor test's CDXML leg uses a file saved by Ketcher. Jeff's ChemDraw files are the real
+  cross-tool test. When the Open feature is built, don't trust setMolecule() to reject bad
+  input: check what was loaded.
 
 ## Web toolchain
 

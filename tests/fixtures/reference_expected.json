@@ -64,7 +64,6 @@
         "possible": []
       },
       "files": [
-        "cdxml/aspirin.cdxml",
         "molfiles/aspirin.mol"
       ]
     },
@@ -130,7 +129,6 @@
         ]
       },
       "files": [
-        "cdxml/ibuprofen.cdxml",
         "molfiles/ibuprofen.mol"
       ]
     },
@@ -190,7 +188,6 @@
         "possible": []
       },
       "files": [
-        "cdxml/caffeine.cdxml",
         "molfiles/caffeine.mol"
       ]
     },
@@ -297,7 +294,6 @@
         ]
       },
       "files": [
-        "cdxml/glucose.cdxml",
         "molfiles/glucose.mol"
       ]
     },
@@ -357,7 +353,6 @@
         "possible": []
       },
       "files": [
-        "cdxml/paracetamol.cdxml",
         "molfiles/paracetamol.mol"
       ]
     },
@@ -417,7 +412,6 @@
         "possible": []
       },
       "files": [
-        "cdxml/benzoic-acid.cdxml",
         "molfiles/benzoic-acid.mol"
       ]
     },
@@ -489,7 +483,6 @@
         ]
       },
       "files": [
-        "cdxml/nicotine.cdxml",
         "molfiles/nicotine.mol"
       ]
     },
@@ -631,7 +624,6 @@
         ]
       },
       "files": [
-        "cdxml/cholesterol.cdxml",
         "molfiles/cholesterol.mol"
       ]
     },
@@ -703,7 +695,6 @@
         ]
       },
       "files": [
-        "cdxml/r-2-butanol.cdxml",
         "molfiles/r-2-butanol.mol"
       ]
     },
@@ -805,7 +796,6 @@
         ]
       },
       "files": [
-        "cdxml/aldehydo-d-glucose.cdxml",
         "molfiles/aldehydo-d-glucose.mol"
       ]
     },
@@ -877,7 +867,6 @@
         ]
       },
       "files": [
-        "cdxml/e-cinnamic-acid.cdxml",
         "molfiles/e-cinnamic-acid.mol"
       ]
     }

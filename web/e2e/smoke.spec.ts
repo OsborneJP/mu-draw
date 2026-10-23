@@ -2,11 +2,17 @@ import type { Page } from '@playwright/test';
 import { RDKIT_WASM_FILE } from '../config/rdkitWasm.ts';
 import {
   appManifest,
+  clearCanvas,
   expect,
   fetchAndCompileWasm,
   fixture,
+  fixturePath,
+  goOffline,
+  inchiKey,
   installabilityErrors,
   openEditor,
+  openWithDialog,
+  saveWithDialog,
   referenceCompound,
   test,
   waitForEditor,
@@ -136,4 +142,33 @@ test('offline: after one visit the app loads and works with no network and no se
   expect((await rdkitResponse).fromServiceWorker(), 'RDKit wasm from the cache').toBe(true);
 
   expect(networkAfterReload).toEqual([]);
+});
+
+test("offline: Ketcher's own dialogs open and save Molfile and CDXML", async ({ app }, testInfo) => {
+  const { page } = app;
+  const butanol = referenceCompound('(R)-2-butanol');
+  const molfile = fixturePath(butanol.files.find((f) => f.endsWith('.mol'))!);
+  await goOffline(app);
+
+  // A Molfile written by RDKit opens as the same stereoisomer.
+  await clearCanvas(page);
+  await openWithDialog(app, molfile);
+  expect(await inchiKey(page)).toBe(butanol.inchikey);
+
+  // Save as CDXML, clear, reopen: same structure. (RDKit's own CDXML doesn't load in
+  // Indigo 1.46, see BUILD-LEARNINGS.md, so the file comes from Ketcher's Save dialog.)
+  const cdxmlPath = testInfo.outputPath('saved.cdxml');
+  const cdxml = await saveWithDialog(app, 'CDXML', /<CDXML/, cdxmlPath); // chem-literal-ok: format marker
+  expect(cdxml).toContain('<CDXML'); // chem-literal-ok: format marker
+  await clearCanvas(page);
+  await openWithDialog(app, cdxmlPath);
+  expect(await inchiKey(page)).toBe(butanol.inchikey);
+
+  // Save as Molfile, clear, reopen: same structure.
+  const molPath = testInfo.outputPath('saved.mol');
+  const mol = await saveWithDialog(app, 'MDL Molfile V2000', /V2000/, molPath); // chem-literal-ok: format marker
+  expect(mol).toMatch(/V2000[\s\S]*M {2}END/); // chem-literal-ok: format marker
+  await clearCanvas(page);
+  await openWithDialog(app, molPath);
+  expect(await inchiKey(page)).toBe(butanol.inchikey);
 });

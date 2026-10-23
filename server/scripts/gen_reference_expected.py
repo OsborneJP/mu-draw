@@ -5,12 +5,14 @@
 Reads tests/fixtures/reference_compounds.csv (SMILES from PubChem) and writes:
   tests/fixtures/reference_expected.json   descriptors, formula, InChIKey, stereo
   tests/fixtures/molfiles/<slug>.mol       2D Molfiles for the editor tests
-  tests/fixtures/cdxml/<slug>.cdxml        ChemDraw XML for the editor tests
 
 Everything is raw RDKit output: no rounding and no choices about which values the app
 shows. The descriptor set is rdMolDescriptors.Properties, the same code RDKit.js
 get_descriptors() calls, so web and server can be compared like for like. Output is
 deterministic; tests/test_reference_fixtures.py regenerates it and compares bytes.
+
+No CDXML: RDKit's ChemDraw writer emits BondLength="", which Ketcher 3.18 (Indigo 1.46)
+can't load (BUILD-LEARNINGS.md). The editor tests use CDXML saved by Ketcher instead.
 """
 
 from __future__ import annotations
@@ -22,7 +24,7 @@ from pathlib import Path
 
 import rdkit
 from rdkit import Chem, RDLogger
-from rdkit.Chem import rdChemDraw, rdDepictor, rdMolDescriptors
+from rdkit.Chem import rdDepictor, rdMolDescriptors
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
@@ -85,20 +87,13 @@ def molfile(mol: Chem.Mol, name: str, chiral_flag: bool | None = None) -> str:
     return Chem.MolToMolBlock(drawn)
 
 
-def cdxml(mol: Chem.Mol, name: str) -> str:
-    return rdChemDraw.MolToChemDrawBlock(with_2d_coords(mol, name))
-
-
 def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
     mol = Chem.MolFromSmiles(row["smiles"])
     if mol is None:
         raise ValueError(f"RDKit cannot parse the PubChem SMILES for {row['typed_name']!r}")
     name, key = row["typed_name"], slug(row["typed_name"])
     props = rdMolDescriptors.Properties()
-    files = {
-        f"molfiles/{key}.mol": molfile(mol, name),
-        f"cdxml/{key}.cdxml": cdxml(mol, name),
-    }
+    files = {f"molfiles/{key}.mol": molfile(mol, name)}
     entry = {
         "typed_name": name,
         "pubchem_cid": int(row["pubchem_cid"]),

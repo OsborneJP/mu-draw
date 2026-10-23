@@ -58,9 +58,7 @@ def test_generated_files_match_committed(generated):
 
 def test_no_stale_generated_files(generated):
     on_disk = {
-        p.relative_to(gen.FIXTURES).as_posix()
-        for folder in ("molfiles", "cdxml")
-        for p in (gen.FIXTURES / folder).iterdir()
+        p.relative_to(gen.FIXTURES).as_posix() for p in (gen.FIXTURES / "molfiles").iterdir()
     }
     assert on_disk == {rel for rel in generated if rel != gen.EXPECTED_FILE}
 
