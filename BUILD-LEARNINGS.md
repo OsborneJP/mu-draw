@@ -99,7 +99,10 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - Playwright never reports requests for URLs ending in `/favicon.ico`. A planted
   `fetch('/favicon.ico')` passed the request guard, while `/outside-probe.txt` failed it.
   index.html therefore declares a relative `<link rel=icon>`, so Chrome never asks the site
-  root for a favicon.
+  root for a favicon. Since the smoke tests can't see that request, verify-dist checks the
+  built index.html instead (web/scripts/checks/html.ts): an icon link must exist, and every
+  href/src must stay under the base and name a file in the build. Proven: removing the
+  link fails the build check.
 - Proven: a manifest without suitable icons makes Chrome's `Page.getInstallabilityErrors`
   return `manifest-missing-suitable-icon`, and the smoke test fails.
 - @rdkit/rdkit 2026.9.1 exports only `.` and `./RDKit_minimal.wasm`: no `./package.json`
