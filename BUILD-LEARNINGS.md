@@ -195,8 +195,11 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - Smoke checks added after the milestone review, each proven to fail when broken:
   - the Open dialog's "Open from image" tile exists and is `display: none` (hidden by
     editor.css; without the rule it shows as `flex`);
-  - sw.js and the Indigo worker arrive with the CSP header (workers ignore the page's meta
-    tag; without the preview header the test fails);
+  - sw.js and the Indigo worker are served with the CSP header (workers ignore the page's
+    meta tag; without the preview header the test fails). First version awaited
+    `request.response()` on the worker-owned requests, which sometimes never resolves in
+    Playwright (it hung to the 3-minute deadline in a check.sh run); the header is now
+    fetched from the server with `context.request`;
   - offline, every same-origin response after the reload must come from the service
     worker. With Apache-style `immutable` caching and the icons left out of the
     precache, Chrome answered the icon from its HTTP cache while offline; the old checks

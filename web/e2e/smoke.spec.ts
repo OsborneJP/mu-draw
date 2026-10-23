@@ -103,10 +103,11 @@ test('online: the editor loads, works, stays on its own origin and is installabl
     seen.indigoWasm,
   ]);
   // Workers get their CSP only from their own response header, never from the page's
-  // meta tag: the test server (like Apache) must send it.
+  // meta tag: the server (test server or Apache) must send it. Asked of the server
+  // directly: a worker-owned request's response() may never resolve in Playwright.
   for (const request of [swScript, indigoWorker]) {
-    const headers = (await request.response())?.headers() ?? {};
-    expect(headers['content-security-policy'], request.url()).toBe(cspPolicy());
+    const response = await context.request.get(request.url());
+    expect(response.headers()['content-security-policy'], request.url()).toBe(cspPolicy());
   }
 
   // RDKit.js ships before any code uses it: served as WebAssembly and compilable.
