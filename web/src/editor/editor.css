@@ -1,0 +1,9 @@
+.editor {
+  height: 100%;
+}
+
+/* The Open dialog keeps a disabled "Open from image" tile even when the recognize button
+   is hidden. Structure from image is a "Later version" feature, so hide the tile too. */
+[data-testid='open-from-image-button'] {
+  display: none !important;
+}

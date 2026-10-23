@@ -26,6 +26,7 @@ checks() { PYTHONPATH="$ROOT/scripts" python -m "checks.$1" "$ROOT"; }
 
 use_env
 npm_ci_if_stale
+require_chromium
 # The check must leave the tree as it found it (no fixtures regenerated in
 # place, no stray files outside .gitignore).
 STATUS_BEFORE="$(git status --porcelain)"

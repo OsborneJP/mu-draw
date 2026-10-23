@@ -10,3 +10,5 @@ All notable changes to this project. The format follows
   `scripts/check.sh` as the single gate before every commit and deploy.
 - Naming API skeleton (FastAPI) with `GET /api/health`; no request bodies are logged.
 - AGENTS.md (CLAUDE.md symlink) with the project invariants and common AI failure modes.
+- Ketcher structure editor (standalone, Indigo in the browser). Help, About, the 3D viewer,
+  structure-from-image and the macromolecules mode are hidden for v1.

@@ -62,3 +62,21 @@ Record why, not just what: the next person (or agent) should not have to redisco
   `eslint --max-warnings 0`. Proven: a planted missing dependency fails check.sh.
 - Vitest 5 doesn't look for config in parent directories; its include list is explicit and
   excludes e2e/ so Playwright specs never run under Vitest.
+
+## Ketcher under Vite
+
+- Ketcher 3.18 builds with Vite 8 (Rolldown) using only `define: { global: 'globalThis',
+  'process.env': '{}' }`, the `events` package and `ketcher-standalone/dist/binaryWasm`:
+  no Node polyfill plugin, no worker config. Build: 2.5 s, ~960 MB peak RSS. Output: the
+  11.8 MB `indigo-ketcher-1.46.0-*.wasm`, a 74 kB Indigo worker, a 7.9 MB main chunk.
+- npm prints ERESOLVE "overriding peer dependency" for miew-react (React 19); install works.
+- `npm run dev` works too (Ketcher loads, Indigo answers). The smoke guards flag Vite's HMR
+  websocket there, so the smoke runs only against builds.
+- Ketcher fires `struct-service-initialized` on window when Indigo is ready; our onInit fires
+  `editor-ready`. The smoke's init script arms promises for both before any page script
+  runs, so tests wait on events, not timers.
+- Toolbar test IDs differ from button names: the 3D viewer is `3D Viewer button`,
+  create-monomer is `create-monomer`, macromolecules mode is `polymer-toggler`. Each was
+  confirmed present with hiding switched off, so the absence checks are not vacuous.
+- Indigo's InChIKey for the RDKit (R)-2-butanol Molfile equals RDKit's, once the Molfile
+  carries chiral flag 1.

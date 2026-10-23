@@ -1,12 +1,18 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { ports, resolveBase } from './config/app';
+import { ports, resolveBase } from './config/app.ts';
 
 const base = resolveBase();
 
 export default defineConfig({
   base,
   plugins: [react()],
+  define: {
+    // ketcher-react's dist uses Node's bare `global` (its Redux root reducer writes
+    // global.currentState on every dispatch) and its deps read process.env at load time.
+    global: 'globalThis',
+    'process.env': '{}',
+  },
   server: {
     // The local API (uvicorn main:app on ports.dev) is served at <base>api/ like in production.
     proxy: {
@@ -18,5 +24,8 @@ export default defineConfig({
   },
   build: {
     sourcemap: false,
+    // Ketcher's editor chunk is ~8 MB by design. Offline safety comes from the precache
+    // guard, not from this warning.
+    chunkSizeWarningLimit: 10_000,
   },
 });

@@ -8,3 +8,7 @@ body,
 body {
   font-family: system-ui, sans-serif;
 }
+
+.app {
+  height: 100%;
+}

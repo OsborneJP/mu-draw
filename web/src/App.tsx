@@ -1,3 +1,9 @@
+import KetcherEditor from './editor/KetcherEditor';
+
 export default function App() {
-  return <main className="app">Structure Editor</main>;
+  return (
+    <main className="app">
+      <KetcherEditor />
+    </main>
+  );
 }
