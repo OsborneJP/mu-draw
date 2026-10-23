@@ -139,3 +139,17 @@ Record why, not just what: the next person (or agent) should not have to redisco
   (the duplicated Save button is the positive signal it rendered) and requires each
   control to be absent or `display: none` itself, since "not visible" passes while the
   menu is closed. Proven: against the previous CSS it fails, listing help and about.
+
+## Deploy
+
+- The production build can't be a copy of the staging build: the base path is baked into
+  asset URLs, the manifest scope and the service worker. `deploy.sh --production` rebuilds
+  the commit that staging verified and runs the same `build_and_verify` (guards plus all
+  smoke tests, offline included) before copying anything. First run (2026-10-23): passes
+  locally at `/draw/`.
+- rsync order matters for service workers: everything else, then the manifest, then
+  index.html, then sw.js, then a `--delete` pass (tests/test_deploy_lib.py checks the order
+  from rsync's own transfer log). A client that fetches the new sw.js early finds every
+  file it lists already in place.
+- deploy.sh never uses sudo. When server code changes it records the time, and the live
+  check refuses to mark the commit verified until the unit was restarted after it.
