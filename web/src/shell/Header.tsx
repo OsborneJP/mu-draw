@@ -1,3 +1,4 @@
+import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
 
@@ -8,7 +9,9 @@ export default function Header() {
   const online = useOnline();
   return (
     <header className="app-header">
-      <span className="app-title">{TITLE}</span>
+      <span className="app-title" data-testid="app-title">
+        {TITLE}
+      </span>
       <div className="app-header-items">
         {/* Always in the page, so screen readers announce the badge when it appears. */}
         <span role="status">
@@ -22,6 +25,7 @@ export default function Header() {
             </span>
           )}
         </span>
+        <AboutBox title={TITLE} />
       </div>
     </header>
   );

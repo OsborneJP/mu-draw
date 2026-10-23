@@ -5,6 +5,7 @@ import { ports, resolveBase } from './config/app.ts';
 import { cspPlugin } from './config/csp.ts';
 import { appTitle, htmlTitle, pwaOptions } from './config/pwa.ts';
 import { rdkitWasm } from './config/rdkitWasm.ts';
+import pkg from './package.json' with { type: 'json' };
 
 const base = resolveBase();
 
@@ -16,6 +17,8 @@ export default defineConfig({
     // global.currentState on every dispatch) and its deps read process.env at load time.
     global: 'globalThis',
     'process.env': '{}',
+    // Shown in the About box, so students can say which build they have.
+    __APP_VERSION__: JSON.stringify(pkg.version),
   },
   server: {
     // The local API (uvicorn main:app on ports.dev) is served at <base>api/ like in production.

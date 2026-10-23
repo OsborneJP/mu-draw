@@ -24,3 +24,5 @@ All notable changes to this project. The format follows
   production.
 - A header bar with the app's name. An "Offline" badge shows in it while the device has
   no network.
+- An About box (in the header) shows the version number, so students can say which build
+  they have. Plain text, no links; Ketcher's own About stays hidden.
