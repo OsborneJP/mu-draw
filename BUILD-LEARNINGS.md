@@ -261,6 +261,17 @@ that fails without the fix. Accepted as known limits:
 - Manual install check (Jeff, 2026-10-23): the staging app installs and works offline
   (relaunched with Wi-Fi off, drew, saved and reopened a Molfile) in Chrome and Edge on
   Windows 11. Chrome on macOS: not yet checked.
+- First production run (2026-10-23): `--production` stopped at the health probe (404), as
+  docs/server-setup.md (b) says. Production is campus and VPN only for now
+  (`PRODUCTION_CAMPUS_ONLY`). Jeff applied (b) with two prepared sudo scripts, as for
+  staging: insert the rendered block after the staging block (vhost hash check, backup,
+  configtest-or-restore), and install and start `mu-draw-api`. The service script's first
+  health request printed `curl: (7) ... Couldn't connect`, before uvicorn had bound the
+  port; its retry then got `{"ok":true}`. Recording the campus-only change was a commit,
+  so HEAD had moved past the deployed one: `--smoke-only` refuses that, so staging was
+  redeployed and production promoted again. Production verified at d231cbb: 14 Playwright
+  tests on the production build, then the API, headers and 12 Playwright tests against
+  https://osbornelab.manchester.edu/draw/ (the 2 update-banner tests skip live).
 - Staging installs as "Structure Editor (staging)" and production as "Structure Editor",
   so the two installed apps can't be confused. The name comes from `appTitle(base)`
   (web/config/pwa.ts) and is set in both the manifest and the page title; verify-dist
