@@ -10,6 +10,7 @@ def test_derived_values():
     config = parse(SAMPLE)
     assert config.base("production") == "/zp/"
     assert config.base("staging") == "/zp-staging/"
+    assert config.url("staging") == "https://lab.example.edu/zp-staging/"
     assert config.unit("production") == "zz-app-api"
     assert config.unit("staging") == "zz-app-api-staging"
     assert config.port("staging") == 9101
@@ -24,6 +25,8 @@ def test_derived_values():
         {"name": ""},
         {"path": "../etc"},
         {"path": ""},
+        {"host": "Not A Host"},
+        {"host": "localhost"},
         {"ports": {"production": 80, "staging": 9101, "dev": 9102}},
         {"ports": {"production": 9100, "staging": 9100, "dev": 9102}},
         {"ports": {"production": True, "staging": 9101, "dev": 9102}},

@@ -1,6 +1,7 @@
 {
   "name": "mu-draw",
   "path": "draw",
+  "host": "osbornelab.manchester.edu",
   "ports": {
     "production": 8050,
     "staging": 8051,

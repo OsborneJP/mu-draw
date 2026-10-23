@@ -4,12 +4,10 @@ from pathlib import Path
 
 import pytest
 
+from conftest_sample import SAMPLE_CONFIG
+
 # A synthetic config, so these tests contain no real placeholder literals.
-SAMPLE = {
-    "name": "zz-app",
-    "path": "zp",
-    "ports": {"production": 9100, "staging": 9101, "dev": 9102},
-}
+SAMPLE = SAMPLE_CONFIG
 
 
 @pytest.fixture

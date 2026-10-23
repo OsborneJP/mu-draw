@@ -21,6 +21,9 @@ ROOT = Path(__file__).resolve().parents[2]
 CONFIG_FILE = "app.config.json"
 TARGETS = ("staging", "production")
 _SLUG = re.compile(r"^[a-z][a-z0-9-]*$")
+_HOST = re.compile(
+    r"^(?=.{1,253}$)([a-z0-9]([a-z0-9-]*[a-z0-9])?)(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$"
+)
 
 
 class ConfigError(ValueError):
@@ -31,6 +34,7 @@ class ConfigError(ValueError):
 class AppConfig:
     name: str
     path: str
+    host: str
     ports: dict[str, int]
 
     @property
@@ -43,6 +47,9 @@ class AppConfig:
 
     def base(self, target: str) -> str:
         return f"/{self.url_path(target)}/"
+
+    def url(self, target: str) -> str:
+        return f"https://{self.host}{self.base(target)}"
 
     def unit(self, target: str) -> str:
         _check_target(target)
@@ -66,6 +73,9 @@ class AppConfig:
             "STAGING_PATH": self.staging_path,
             "BASE_PRODUCTION": self.base("production"),
             "BASE_STAGING": self.base("staging"),
+            "APP_HOST": self.host,
+            "URL_PRODUCTION": self.url("production"),
+            "URL_STAGING": self.url("staging"),
             "ENV_NAME": self.name,
             "DEPLOY_ROOT": str(self.deploy_root(home)),
             "PORT_PRODUCTION": str(self.port("production")),
@@ -84,10 +94,12 @@ def _check_target(target: str) -> None:
 def parse(data: object) -> AppConfig:
     if not isinstance(data, dict):
         raise ConfigError("config must be a JSON object")
-    name, path, ports = data.get("name"), data.get("path"), data.get("ports")
+    name, path, host, ports = (data.get(k) for k in ("name", "path", "host", "ports"))
     for key, value in (("name", name), ("path", path)):
         if not isinstance(value, str) or not _SLUG.match(value):
             raise ConfigError(f"{key} must match {_SLUG.pattern}, got {value!r}")
+    if not isinstance(host, str) or not _HOST.match(host):
+        raise ConfigError(f"host must be a lowercase DNS name, got {host!r}")
     if not isinstance(ports, dict):
         raise ConfigError("ports must be an object")
     for key in ("production", "staging", "dev"):
@@ -96,7 +108,7 @@ def parse(data: object) -> AppConfig:
             raise ConfigError(f"ports.{key} must be an integer in 1024-65535, got {port!r}")
     if len({ports["production"], ports["staging"], ports["dev"]}) != 3:
         raise ConfigError("ports must be distinct")
-    return AppConfig(name=name, path=path, ports=dict(ports))
+    return AppConfig(name=name, path=path, host=host, ports=dict(ports))
 
 
 def load(root: Path = ROOT) -> AppConfig:
