@@ -16,3 +16,6 @@ All notable changes to this project. The format follows
 - RDKit.js 2026.9.1 WebAssembly shipped and precached, ready for the properties panel.
 - Ketcher structure editor (standalone, Indigo in the browser). Help, About, the 3D viewer,
   structure-from-image and the macromolecules mode are hidden for v1.
+- Deploy tooling: `scripts/deploy.sh` publishes the checked build to staging and promotes
+  to production only the commit that passed the live staging checks. Apache and systemd
+  setup is rendered into docs/server-setup.md for a person to apply (not applied yet).

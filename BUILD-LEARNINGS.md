@@ -225,3 +225,25 @@ Record why, not just what: the next person (or agent) should not have to redisco
   already-modified file. Proven with a planted test that rewrote CHANGELOG.md.
 - The pin check asserts the exact versions in web/config/pins.ts, not just the x.y.z form,
   so an engine upgrade is a deliberate edit that re-reads the 3.18 workarounds above.
+
+## Review and accepted limits (2026-10-23, end of session 1)
+
+Three capped review rounds ran at this milestone. Round 1 found 7 medium issues, round 2
+found 1 medium, round 3 found incomplete deploy test coverage (closed by the mutation
+sweep rather than another review round). Everything high or medium was fixed with a test
+that fails without the fix. Accepted as known limits:
+- Live checks (`deploy.sh --smoke-only staging`) have not run: the Apache block and the
+  staging unit in docs/server-setup.md (a) are not applied yet. Installing the PWA from
+  Chrome/Edge is a manual check after that.
+- SMILES strings and numbers typed into source are caught by review only (the static
+  check covers Molfile, CDXML, InChI and InChIKey text).
+- No static scan of URL strings in the built bundles (CSP and the request guard enforce
+  invariant 1 at runtime).
+- check.sh's own stages are checked by reading the script (tests/test_check_sh.py), not
+  by running check.sh inside its tests.
+- `require_unchanged` relies on `set -e` to stop after `require_clean_tree`; every caller
+  is a top-level statement in a set -e script.
+- The probe's 403 advice mentions 10.0.0.0/8 even for production, which is public unless
+  the campus-only option is chosen.
+- Until the update banner exists (a v1 feature), a new build activates only after every
+  tab of the app is closed (prompt mode never reloads by itself).
