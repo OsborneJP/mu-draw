@@ -438,3 +438,9 @@ that fails without the fix. Accepted as known limits:
   Playwright tests), then 19 Playwright tests against the live /draw-staging/, all 7 export
   tests included (the offline copy-and-download test, clipboard read back over HTTPS); the
   2 update-banner tests skip there by design.
+- Production verified at 376b80b (2026-10-23): 21 Playwright tests on the production build,
+  then the API, headers and 19 Playwright tests against https://osbornelab.manchester.edu/draw/
+  (all 7 export tests). The first `--production` refused, because the docs commit recording
+  the staging run had moved HEAD past the verified commit; staging was redeployed at HEAD
+  (a docs-only change, same build) and production promoted. Next time, record the staging
+  result after promoting, in one docs commit with the production result.
