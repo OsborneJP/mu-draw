@@ -1,0 +1,885 @@
+{
+  "generator": "server/scripts/gen_reference_expected.py",
+  "rdkit_version": "2026.09.1",
+  "settings": {
+    "legacy_stereo_perception": false,
+    "prefer_coordgen": false,
+    "compute2d_canon_orient": true,
+    "molfile_chiral_flag": "1 when any tetrahedral centre is specified, else 0"
+  },
+  "compounds": [
+    {
+      "typed_name": "aspirin",
+      "pubchem_cid": 2244,
+      "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
+      "formula": "C9H8O4",
+      "inchikey": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 180.042258736,
+        "amw": 180.15899999999996,
+        "lipinskiHBA": 4.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 2.0,
+        "NumHBD": 1.0,
+        "NumHBA": 3.0,
+        "NumHeavyAtoms": 13.0,
+        "NumAtoms": 21.0,
+        "NumHeteroatoms": 4.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.1111111111111111,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 74.75705264447721,
+        "tpsa": 63.60000000000001,
+        "CrippenClogP": 1.3101,
+        "CrippenMR": 44.71030000000002,
+        "chi0v": 6.9813595436500515,
+        "chi1v": 3.6174536478673316,
+        "chi2v": 2.3949556783206725,
+        "chi3v": 1.3711546649445037,
+        "chi4v": 0.8871712192374142,
+        "chi0n": 6.9813595436500515,
+        "chi1n": 3.6174536478673316,
+        "chi2n": 2.3949556783206725,
+        "chi3n": 1.3711546649445037,
+        "chi4n": 0.8871712192374142,
+        "hallKierAlpha": -1.8399999999999999,
+        "kappa1": 9.249605734767023,
+        "kappa2": 3.7092512583454584,
+        "kappa3": 2.297415032519928,
+        "Phi": 2.639162439298765
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "cdxml/aspirin.cdxml",
+        "molfiles/aspirin.mol"
+      ]
+    },
+    {
+      "typed_name": "ibuprofen",
+      "pubchem_cid": 3672,
+      "smiles": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
+      "formula": "C13H18O2",
+      "inchikey": "HEFNNWSXXWATRW-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 206.130679816,
+        "amw": 206.28499999999997,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 4.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 15.0,
+        "NumAtoms": 33.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.46153846153846156,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 1.0,
+        "NumUnspecifiedAtomStereoCenters": 1.0,
+        "labuteASA": 90.94175377251301,
+        "tpsa": 37.3,
+        "CrippenClogP": 3.073200000000001,
+        "CrippenMR": 61.03480000000004,
+        "chi0v": 9.526670282288125,
+        "chi1v": 5.32030090584347,
+        "chi2v": 4.3994781236223774,
+        "chi3v": 2.4940956097181957,
+        "chi4v": 1.556376775771452,
+        "chi0n": 9.526670282288125,
+        "chi1n": 5.32030090584347,
+        "chi2n": 4.3994781236223774,
+        "chi3n": 2.4940956097181957,
+        "chi4n": 1.556376775771452,
+        "hallKierAlpha": -1.31,
+        "kappa1": 11.763046018991963,
+        "kappa2": 4.964460295417243,
+        "kappa3": 3.387630631562938,
+        "Phi": 3.8931449942967644
+      },
+      "stereo": {
+        "strict": [],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 10
+          }
+        ]
+      },
+      "files": [
+        "cdxml/ibuprofen.cdxml",
+        "molfiles/ibuprofen.mol"
+      ]
+    },
+    {
+      "typed_name": "caffeine",
+      "pubchem_cid": 2519,
+      "smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      "formula": "C8H10N4O2",
+      "inchikey": "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 194.08037556,
+        "amw": 194.194,
+        "lipinskiHBA": 6.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 3.0,
+        "NumHeavyAtoms": 14.0,
+        "NumAtoms": 24.0,
+        "NumHeteroatoms": 6.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.375,
+        "NumRings": 2.0,
+        "NumAromaticRings": 2.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 2.0,
+        "NumAromaticHeterocycles": 2.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 79.02895701814933,
+        "tpsa": 61.82,
+        "CrippenClogP": -1.0293,
+        "CrippenMR": 51.19600000000001,
+        "chi0v": 8.182701232117184,
+        "chi1v": 4.107927642957933,
+        "chi2v": 3.233448965575619,
+        "chi3v": 2.3165128954882377,
+        "chi4v": 1.471179885323762,
+        "chi0n": 8.182701232117184,
+        "chi1n": 4.107927642957933,
+        "chi2n": 3.233448965575619,
+        "chi3n": 2.3165128954882377,
+        "chi4n": 1.471179885323762,
+        "hallKierAlpha": -1.85,
+        "kappa1": 8.73523326923911,
+        "kappa2": 2.5679479011227926,
+        "kappa3": 0.8757741627139433,
+        "Phi": 1.6022588528257544
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "cdxml/caffeine.cdxml",
+        "molfiles/caffeine.mol"
+      ]
+    },
+    {
+      "typed_name": "glucose",
+      "pubchem_cid": 5793,
+      "smiles": "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O",
+      "formula": "C6H12O6",
+      "inchikey": "WQZGKKKJIJFFOK-GASJEMHNSA-N",
+      "properties": {
+        "exactmw": 180.063388104,
+        "amw": 180.156,
+        "lipinskiHBA": 6.0,
+        "lipinskiHBD": 5.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 5.0,
+        "NumHBA": 6.0,
+        "NumHeavyAtoms": 12.0,
+        "NumAtoms": 24.0,
+        "NumHeteroatoms": 6.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 1.0,
+        "NumSaturatedRings": 1.0,
+        "NumHeterocycles": 1.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 1.0,
+        "NumAliphaticHeterocycles": 1.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 5.0,
+        "NumUnspecifiedAtomStereoCenters": 1.0,
+        "labuteASA": 68.64284443677028,
+        "tpsa": 110.38000000000001,
+        "CrippenClogP": -3.2213999999999987,
+        "CrippenMR": 35.98599999999999,
+        "chi0v": 6.238174395098331,
+        "chi1v": 3.5620094695937103,
+        "chi2v": 2.7194493173895746,
+        "chi3v": 1.867059489777345,
+        "chi4v": 1.08173381058565,
+        "chi0n": 6.238174395098331,
+        "chi1n": 3.5620094695937103,
+        "chi2n": 2.7194493173895746,
+        "chi3n": 1.867059489777345,
+        "chi4n": 1.08173381058565,
+        "hallKierAlpha": -0.24000000000000002,
+        "kappa1": 9.845034013605442,
+        "kappa2": 3.6489161032347726,
+        "kappa3": 1.5817587586505184,
+        "Phi": 2.9936419290949137
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 3
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 4
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 3
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 4
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 5
+          }
+        ]
+      },
+      "files": [
+        "cdxml/glucose.cdxml",
+        "molfiles/glucose.mol"
+      ]
+    },
+    {
+      "typed_name": "paracetamol",
+      "pubchem_cid": 1983,
+      "smiles": "CC(=O)NC1=CC=C(C=C1)O",
+      "formula": "C8H9NO2",
+      "inchikey": "RZVAJINKPMORJF-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 151.063328528,
+        "amw": 151.165,
+        "lipinskiHBA": 3.0,
+        "lipinskiHBD": 2.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 2.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 11.0,
+        "NumAtoms": 20.0,
+        "NumHeteroatoms": 3.0,
+        "NumAmideBonds": 1.0,
+        "FractionCSP3": 0.125,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 64.66690538413799,
+        "tpsa": 49.33,
+        "CrippenClogP": 1.3505999999999998,
+        "CrippenMR": 42.41050000000002,
+        "chi0v": 6.164862962722325,
+        "chi1v": 3.2490981480278296,
+        "chi2v": 2.228060242189872,
+        "chi3v": 1.1876733148984595,
+        "chi4v": 0.7480265991539318,
+        "chi0n": 6.164862962722325,
+        "chi1n": 3.2490981480278296,
+        "chi2n": 2.228060242189872,
+        "chi3n": 1.1876733148984595,
+        "chi4n": 0.7480265991539318,
+        "hallKierAlpha": -1.51,
+        "kappa1": 7.595374077976819,
+        "kappa2": 3.0531381005525,
+        "kappa3": 2.292303972882069,
+        "Phi": 2.1081569077654403
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "cdxml/paracetamol.cdxml",
+        "molfiles/paracetamol.mol"
+      ]
+    },
+    {
+      "typed_name": "benzoic acid",
+      "pubchem_cid": 243,
+      "smiles": "C1=CC=C(C=C1)C(=O)O",
+      "formula": "C7H6O2",
+      "inchikey": "WPYMKLBDIGXBTP-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 122.036779432,
+        "amw": 122.12299999999996,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 9.0,
+        "NumAtoms": 15.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 52.75210108613335,
+        "tpsa": 37.3,
+        "CrippenClogP": 1.3848,
+        "CrippenMR": 33.4013,
+        "chi0v": 4.7422132319119505,
+        "chi1v": 2.5884145455048704,
+        "chi2v": 1.6711779681929224,
+        "chi3v": 1.0207396434199782,
+        "chi4v": 0.5807298335466442,
+        "chi0n": 4.7422132319119505,
+        "chi1n": 2.5884145455048704,
+        "chi2n": 1.6711779681929224,
+        "chi3n": 1.0207396434199782,
+        "chi4n": 0.5807298335466442,
+        "hallKierAlpha": -1.31,
+        "kappa1": 5.820039011703511,
+        "kappa2": 2.306763635550358,
+        "kappa3": 1.2877050319358112,
+        "Phi": 1.491717149964678
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "cdxml/benzoic-acid.cdxml",
+        "molfiles/benzoic-acid.mol"
+      ]
+    },
+    {
+      "typed_name": "nicotine",
+      "pubchem_cid": 89594,
+      "smiles": "CN1CCC[C@H]1C2=CN=CC=C2",
+      "formula": "C10H14N2",
+      "inchikey": "SNICXCGAKADSCV-JTQLQIEISA-N",
+      "properties": {
+        "exactmw": 162.115698448,
+        "amw": 162.23600000000002,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 0.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 12.0,
+        "NumAtoms": 26.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.5,
+        "NumRings": 2.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 1.0,
+        "NumSaturatedRings": 1.0,
+        "NumHeterocycles": 2.0,
+        "NumAromaticHeterocycles": 1.0,
+        "NumSaturatedHeterocycles": 1.0,
+        "NumAliphaticHeterocycles": 1.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 1.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 73.22976418910068,
+        "tpsa": 16.130000000000003,
+        "CrippenClogP": 1.8483,
+        "CrippenMR": 48.842000000000034,
+        "chi0v": 7.4024988805076894,
+        "chi1v": 4.478978391673248,
+        "chi2v": 3.4249925387477815,
+        "chi3v": 2.5896294359397087,
+        "chi4v": 1.9044874511330434,
+        "chi0n": 7.4024988805076894,
+        "chi1n": 4.478978391673248,
+        "chi2n": 3.4249925387477815,
+        "chi3n": 2.5896294359397087,
+        "chi4n": 1.9044874511330434,
+        "hallKierAlpha": -0.89,
+        "kappa1": 7.743335629015882,
+        "kappa2": 3.2329339260923793,
+        "kappa3": 1.344570624512911,
+        "Phi": 2.0861410380137766
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 5
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 5
+          }
+        ]
+      },
+      "files": [
+        "cdxml/nicotine.cdxml",
+        "molfiles/nicotine.mol"
+      ]
+    },
+    {
+      "typed_name": "cholesterol",
+      "pubchem_cid": 5997,
+      "smiles": "C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C",
+      "formula": "C27H46O",
+      "inchikey": "HVYWMOMLDIMFJA-DPAQBDIFSA-N",
+      "properties": {
+        "exactmw": 386.35486609199995,
+        "amw": 386.66400000000016,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 5.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 28.0,
+        "NumAtoms": 74.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.9259259259259259,
+        "NumRings": 4.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 4.0,
+        "NumSaturatedRings": 3.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 8.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 174.3090521080362,
+        "tpsa": 20.23,
+        "CrippenClogP": 7.38870000000001,
+        "CrippenMR": 119.0528000000001,
+        "chi0v": 19.344190342068988,
+        "chi1v": 12.62984502164988,
+        "chi2v": 12.18636677475323,
+        "chi3v": 10.27908127595862,
+        "chi4v": 8.666244578968591,
+        "chi0n": 19.344190342068988,
+        "chi1n": 12.62984502164988,
+        "chi2n": 12.18636677475323,
+        "chi3n": 10.27908127595862,
+        "chi4n": 8.666244578968591,
+        "hallKierAlpha": -0.3,
+        "kappa1": 20.95200267376842,
+        "kappa2": 7.750696834249698,
+        "kappa3": 3.420973361929967,
+        "Phi": 5.799736456956004
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 8
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 11
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 12
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 15
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 16
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 20
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 23
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 8
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 11
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 12
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 15
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 16
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 20
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 23
+          }
+        ]
+      },
+      "files": [
+        "cdxml/cholesterol.cdxml",
+        "molfiles/cholesterol.mol"
+      ]
+    },
+    {
+      "typed_name": "(R)-2-butanol",
+      "pubchem_cid": 84682,
+      "smiles": "CC[C@@H](C)O",
+      "formula": "C4H10O",
+      "inchikey": "BTANRVKWQNVYAZ-SCSAIBSYSA-N",
+      "properties": {
+        "exactmw": 74.07316494,
+        "amw": 74.12299999999999,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 5.0,
+        "NumAtoms": 15.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 1.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 32.62831112321538,
+        "tpsa": 20.23,
+        "CrippenClogP": 0.7771999999999999,
+        "CrippenMR": 21.971799999999995,
+        "chi0v": 3.731670645876131,
+        "chi1v": 1.9509042305871975,
+        "chi2v": 1.2572696565099426,
+        "chi3v": 0.5908224762989184,
+        "chi4v": 0.0,
+        "chi0n": 3.731670645876131,
+        "chi1n": 1.9509042305871975,
+        "chi2n": 1.2572696565099426,
+        "chi3n": 0.5908224762989184,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.04,
+        "kappa1": 4.960000000000001,
+        "kappa2": 2.212525252525253,
+        "kappa3": 3.9600000000000004,
+        "Phi": 2.1948250505050515
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          }
+        ]
+      },
+      "files": [
+        "cdxml/r-2-butanol.cdxml",
+        "molfiles/r-2-butanol.mol"
+      ]
+    },
+    {
+      "typed_name": "aldehydo-D-glucose",
+      "pubchem_cid": 107526,
+      "smiles": "C([C@H]([C@H]([C@@H]([C@H](C=O)O)O)O)O)O",
+      "formula": "C6H12O6",
+      "inchikey": "GZCGUPFRVQAUEE-SLPGGIOYSA-N",
+      "properties": {
+        "exactmw": 180.063388104,
+        "amw": 180.156,
+        "lipinskiHBA": 6.0,
+        "lipinskiHBD": 5.0,
+        "NumRotatableBonds": 5.0,
+        "NumHBD": 5.0,
+        "NumHBA": 6.0,
+        "NumHeavyAtoms": 12.0,
+        "NumAtoms": 24.0,
+        "NumHeteroatoms": 6.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.8333333333333334,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 4.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 68.69665246083639,
+        "tpsa": 118.22000000000001,
+        "CrippenClogP": -3.3787999999999987,
+        "CrippenMR": 37.17699999999999,
+        "chi0v": 6.238174395098331,
+        "chi1v": 3.3263072091981947,
+        "chi2v": 2.3577820542431085,
+        "chi3v": 1.4205301194696338,
+        "chi4v": 0.6181226000118403,
+        "chi0n": 6.238174395098331,
+        "chi1n": 3.3263072091981947,
+        "chi2n": 2.3577820542431085,
+        "chi3n": 1.4205301194696338,
+        "chi4n": 0.6181226000118403,
+        "hallKierAlpha": -0.5299999999999999,
+        "kappa1": 11.47,
+        "kappa2": 5.175013037303056,
+        "kappa3": 2.8388089924448727,
+        "Phi": 4.946449961488837
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 3
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 4
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 3
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 4
+          }
+        ]
+      },
+      "files": [
+        "cdxml/aldehydo-d-glucose.cdxml",
+        "molfiles/aldehydo-d-glucose.mol"
+      ]
+    },
+    {
+      "typed_name": "(E)-cinnamic acid",
+      "pubchem_cid": 444539,
+      "smiles": "C1=CC=C(C=C1)/C=C/C(=O)O",
+      "formula": "C9H8O2",
+      "inchikey": "WBYWAXJHAXSJNI-VOTSOKGWSA-N",
+      "properties": {
+        "exactmw": 148.052429496,
+        "amw": 148.16099999999997,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 2.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 11.0,
+        "NumAtoms": 19.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 64.79238228274231,
+        "tpsa": 37.3,
+        "CrippenClogP": 1.7844,
+        "CrippenMR": 43.11180000000002,
+        "chi0v": 5.896913770291202,
+        "chi1v": 3.2490981480278296,
+        "chi2v": 2.082254603845159,
+        "chi3v": 1.2179328954690272,
+        "chi4v": 0.7316635652718816,
+        "chi0n": 5.896913770291202,
+        "chi1n": 3.2490981480278296,
+        "chi2n": 2.082254603845159,
+        "chi3n": 1.2179328954690272,
+        "chi4n": 0.7316635652718816,
+        "hallKierAlpha": -1.5699999999999998,
+        "kappa1": 7.536044538706258,
+        "kappa2": 3.562154412456972,
+        "kappa3": 2.667823290461395,
+        "Phi": 2.440414027820433
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Bond_Double",
+            "specified": "Specified",
+            "centered_on": 6
+          }
+        ],
+        "possible": [
+          {
+            "type": "Bond_Double",
+            "specified": "Specified",
+            "centered_on": 6
+          }
+        ]
+      },
+      "files": [
+        "cdxml/e-cinnamic-acid.cdxml",
+        "molfiles/e-cinnamic-acid.mol"
+      ]
+    }
+  ]
+}

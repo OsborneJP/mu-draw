@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/caffeine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-23T16:01:47Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 2519,
+          "SMILES": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+          "Title": "Caffeine"
+        }
+      ]
+    }
+  }
+}

@@ -11,8 +11,10 @@ select = ["E", "F", "W", "I", "B", "UP"]
 # internal socketpair (TestClient, anyio) working.
 addopts = "--disable-socket --allow-unix-socket -p no:cacheprovider"
 testpaths = ["tests", "server/tests"]
-pythonpath = ["server", "scripts"]
+pythonpath = ["server", "scripts", "server/scripts"]
 
 [tool.ruff.lint.isort]
-# Import roots added by pytest's pythonpath (server/, scripts/).
-known-first-party = ["checks", "lib", "main", "conftest"]
+# Import roots added by pytest's pythonpath.
+known-first-party = [
+  "checks", "lib", "main", "conftest", "fetch_reference_smiles", "gen_reference_expected",
+]

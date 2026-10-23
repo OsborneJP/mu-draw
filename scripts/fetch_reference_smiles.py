@@ -1,0 +1,119 @@
+"""Build tests/fixtures/reference_compounds.csv from PubChem.
+
+    python scripts/fetch_reference_smiles.py            # network: re-record, then write CSV
+    python scripts/fetch_reference_smiles.py --offline  # rebuild CSV from the recordings
+
+Each name in tests/fixtures/reference_names.txt is looked up with PUG REST and the raw
+response is saved under tests/fixtures/recorded/pubchem/. The CSV is always built from
+those recordings by parse() and write_csv(), which is what the replay test checks, so
+the CSV's SMILES provably came from PubChem.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import io
+import json
+import re
+import time
+import urllib.parse
+import urllib.request
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
+NAMES_FILE = FIXTURES / "reference_names.txt"
+RECORDINGS = FIXTURES / "recorded" / "pubchem"
+CSV_FILE = FIXTURES / "reference_compounds.csv"
+PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
+# Current PubChem names: SMILES includes stereo. Never IsomericSMILES/CanonicalSMILES.
+PROPERTIES = "SMILES,Title"
+COLUMNS = ("typed_name", "pubchem_cid", "pubchem_title", "smiles")
+MIN_INTERVAL_S = 0.34  # PubChem allows 5 requests/s; stay under 3.
+
+
+def read_names(path: Path = NAMES_FILE) -> list[str]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [line.strip() for line in lines if line.strip() and not line.startswith("#")]
+
+
+def slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def recording_path(name: str, directory: Path = RECORDINGS) -> Path:
+    return directory / f"name-{slug(name)}.json"
+
+
+def name_url(name: str) -> str:
+    quoted = urllib.parse.quote(name, safe="")
+    return f"{PUG}/compound/name/{quoted}/property/{PROPERTIES}/JSON"
+
+
+def record(name: str) -> dict:
+    url = name_url(name)
+    request = urllib.request.Request(url, headers={"Accept": "application/json"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        body = json.loads(response.read().decode("utf-8"))
+        status = response.status
+    return {
+        "request": {"method": "GET", "url": url},
+        "recorded_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "status": status,
+        "body": body,
+    }
+
+
+def parse(name: str, recording: dict) -> dict[str, str]:
+    """One CSV row from one recorded PUG REST response."""
+    rows = recording["body"]["PropertyTable"]["Properties"]
+    if len(rows) != 1:
+        raise ValueError(f"{name!r}: PubChem returned {len(rows)} records; pick a narrower name")
+    row = rows[0]
+    return {
+        "typed_name": name,
+        "pubchem_cid": str(row["CID"]),
+        "pubchem_title": row["Title"],
+        "smiles": row["SMILES"],
+    }
+
+
+def write_csv(rows: list[dict[str, str]]) -> str:
+    out = io.StringIO()
+    writer = csv.DictWriter(out, fieldnames=COLUMNS, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows)
+    return out.getvalue()
+
+
+def build_csv(names: list[str], directory: Path = RECORDINGS) -> str:
+    rows = []
+    for name in names:
+        recording = json.loads(recording_path(name, directory).read_text(encoding="utf-8"))
+        rows.append(parse(name, recording))
+    return write_csv(rows)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--offline", action="store_true", help="only rebuild the CSV")
+    args = parser.parse_args(argv)
+    names = read_names()
+    if not args.offline:
+        RECORDINGS.mkdir(parents=True, exist_ok=True)
+        for i, name in enumerate(names):
+            if i:
+                time.sleep(MIN_INTERVAL_S)
+            recording = record(name)
+            path = recording_path(name)
+            path.write_text(json.dumps(recording, indent=2) + "\n", encoding="utf-8")
+            print(f"recorded {path.relative_to(ROOT)}")
+    CSV_FILE.write_text(build_csv(names), encoding="utf-8")
+    print(f"wrote {CSV_FILE.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

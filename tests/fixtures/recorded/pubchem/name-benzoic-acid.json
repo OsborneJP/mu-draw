@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/benzoic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-23T16:01:49Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 243,
+          "SMILES": "C1=CC=C(C=C1)C(=O)O",
+          "Title": "Benzoic Acid"
+        }
+      ]
+    }
+  }
+}

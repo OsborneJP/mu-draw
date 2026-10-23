@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/glucose/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-23T16:01:48Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5793,
+          "SMILES": "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O",
+          "Title": "D-Glucose"
+        }
+      ]
+    }
+  }
+}

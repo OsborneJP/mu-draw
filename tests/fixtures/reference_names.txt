@@ -1,0 +1,14 @@
+# Reference compounds for the properties panel (spec: "Properties panel + Lipinski card").
+# One name per line, as a student would type it. scripts/fetch_reference_smiles.py asks
+# PubChem for each name and writes reference_compounds.csv; nothing here is a chemistry value.
+aspirin
+ibuprofen
+caffeine
+glucose
+paracetamol
+benzoic acid
+nicotine
+cholesterol
+(R)-2-butanol
+aldehydo-D-glucose
+(E)-cinnamic acid

@@ -36,3 +36,19 @@ Record why, not just what: the next person (or agent) should not have to redisco
   with a stub that always returns `[]`; default contexts are incognito (`in-incognito`).
 - workbox-build fails the build for glob-matched files over the size limit, but silently
   skips files that `globPatterns` doesn't match.
+
+## Reference fixtures
+
+- PubChem resolved every name to exactly one record. Titles differ from typed names
+  ("Acetaminophen", "Ibuprofen, (+-)-", "(-)-2-Butanol"), so the CSV keeps both. "glucose"
+  is cyclic D-glucose (CID 5793), not the open-chain form the spec's checklist describes;
+  that is "aldehydo-D-glucose" (CID 107526).
+- `FindPotentialStereo(flagPossible=False)` lists only definite stereo elements; an
+  unspecified centre (ibuprofen's, glucose's anomeric carbon) shows up only with
+  `flagPossible=True`. The JSON stores both lists raw; the properties panel decides.
+- RDKit writes Molfile chiral flag 0 by default, and Ketcher turns flag 0 into an AND
+  stereo group, which makes Indigo's InChIKey non-standard. The generator sets the flag
+  to 1 when a tetrahedral centre is specified; a test proves the flag is present and
+  that RDKit's default would be caught.
+- rdChemDraw's CDXML has a DOCTYPE that names an external DTD URL. Parsers don't fetch
+  it, but don't copy that URL anywhere the browser could request it.

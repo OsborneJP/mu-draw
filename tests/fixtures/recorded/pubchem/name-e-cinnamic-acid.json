@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28E%29-cinnamic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-23T16:01:52Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 444539,
+          "SMILES": "C1=CC=C(C=C1)/C=C/C(=O)O",
+          "Title": "Cinnamic Acid"
+        }
+      ]
+    }
+  }
+}
