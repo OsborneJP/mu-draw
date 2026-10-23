@@ -245,8 +245,8 @@ that fails without the fix. Accepted as known limits:
   is a top-level statement in a set -e script.
 - The probe's 403 advice mentions 10.0.0.0/8 even for production, which is public unless
   the campus-only option is chosen.
-- Until the update banner exists (a v1 feature), a new build activates only after every
-  tab of the app is closed (prompt mode never reloads by itself).
+- (Closed in session 2: the update banner now lets a student switch to a new build
+  without closing every tab.)
 
 ## First live staging run (2026-10-23)
 
@@ -300,3 +300,34 @@ that fails without the fix. Accepted as known limits:
   `clearHistory` the history after a reload is `{undo: 1}` and the test fails.
 - Ketcher has a second, hidden copy of several test ids (`ketcher-canvas`, `undo`, `redo`)
   in its macromolecules UI; tests use the molecules canvas and visible buttons.
+
+## App shell: update banner, header, About (session 2, 2026-10-23)
+
+- vite-plugin-pwa 2.0's `updateSW()` ignores its `reloadPage` argument: it only posts
+  SKIP_WAITING. The reload comes from the `controlling` listener, which calls our
+  `onNeedReload` (a no-op, so no tab ever reloads by itself). So the banner's
+  `applyUpdate()` reloads the page itself, once the waiting worker reports `activated`
+  (or `redundant`). If another tab's click already made the new build active, nothing is
+  waiting and it reloads at once; otherwise that tab's Reload button would do nothing.
+  Proven: without that branch the two-tab test never sees the second tab reload.
+- Playwright cannot serve a test a second build on a live site: `context.route('**/sw.js')`
+  sees the first fetch of sw.js but not the browser's later update checks (neither
+  `registration.update()` nor the check on navigation is routed or even reported, measured
+  with Playwright 1.64). Vite's preview server reads files from disk per request, so the
+  update tests serve their own copy of dist and edit it (`publishSecondBuild`: a marker in
+  index.html and a new index.html revision in sw.js). They run in check.sh and in the
+  production pre-copy build, and are skipped against SMOKE_URL.
+- Tests call `registration.update()` to make the browser's update check happen at a known
+  point; on a real relaunch the browser checks by itself.
+- Every smoke test now fails if the page navigates away (reload included) or posts
+  SKIP_WAITING to a service worker unless a trusted click on the banner's Reload button came
+  first. A script's `location.reload()` fires the Navigation API's `navigate` event
+  (cancelable, so the guard also stops it); Playwright's own `goto()`/`reload()` fire none
+  in the old document, and Ketcher's Save dialog download carries `downloadRequest`.
+  e2e/guards.spec.ts proves both guards live. Proven against the banner: calling
+  `updateSW()` from `onNeedRefresh` trips the takeover guard; reloading in `onNeedReload`
+  (the plugin's default) trips the navigation guard in the second tab.
+- A tab opened with `context.newPage()` starts on about:blank, which is not a secure
+  context and has no `ServiceWorker`; init scripts must not assume it.
+- The header (title from index.html's `<title>`, so staging says so) costs the editor 36 px;
+  Ketcher's toolbars re-lay out without problems, and the banner adds 40 px while shown.

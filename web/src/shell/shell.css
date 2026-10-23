@@ -80,3 +80,24 @@
   color: #555;
   font-size: 13px;
 }
+
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: #fff4cc;
+  border-bottom: 1px solid #e6d28a;
+  font-size: 14px;
+}
+
+.update-banner button {
+  padding: 3px 14px;
+  border: 1px solid #1f4e79;
+  border-radius: 4px;
+  background: #1f4e79;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}

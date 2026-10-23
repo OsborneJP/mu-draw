@@ -29,3 +29,6 @@ All notable changes to this project. The format follows
 - Autosave: the drawing is kept in this browser (never uploaded) as it changes and comes
   back after a refresh or relaunch, online or offline. Undo can't remove the restored
   drawing. If the browser refuses to store it (too large), the header says "Not autosaved".
+- Update banner: when a new version has been downloaded, "An update is ready. Reload to
+  use it." appears with a Reload button. The app never reloads by itself, and Reload in
+  one tab doesn't reload the others.
