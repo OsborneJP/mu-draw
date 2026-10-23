@@ -232,9 +232,8 @@ Three capped review rounds ran at this milestone. Round 1 found 7 medium issues,
 found 1 medium, round 3 found incomplete deploy test coverage (closed by the mutation
 sweep rather than another review round). Everything high or medium was fixed with a test
 that fails without the fix. Accepted as known limits:
-- Live checks (`deploy.sh --smoke-only staging`) have not run: the Apache block and the
-  staging unit in docs/server-setup.md (a) are not applied yet. Installing the PWA from
-  Chrome/Edge is a manual check after that.
+- Installing the PWA from Chrome and Edge on Windows 11 and Chrome on macOS is a manual
+  check (the automated installability check passes).
 - SMILES strings and numbers typed into source are caught by review only (the static
   check covers Molfile, CDXML, InChI and InChIKey text).
 - No static scan of URL strings in the built bundles (CSP and the request guard enforce
@@ -247,3 +246,13 @@ that fails without the fix. Accepted as known limits:
   the campus-only option is chosen.
 - Until the update banner exists (a v1 feature), a new build activates only after every
   tab of the app is closed (prompt mode never reloads by itself).
+
+## First live staging run (2026-10-23)
+
+- Jeff applied docs/server-setup.md (a) with two prepared sudo scripts: one inserted the
+  staging block into the live vhost (after checking the file's hash, with a backup and
+  configtest-or-restore), one installed and started `mu-draw-api-staging`.
+- `scripts/deploy.sh --smoke-only staging` passed at 613d133: the API through Apache, 8
+  header/type checks, and all 4 Playwright tests against
+  https://osbornelab.manchester.edu/draw-staging/, both offline tests included. This host
+  reaches its own name at 10.95.20.32, inside the campus-only range.
