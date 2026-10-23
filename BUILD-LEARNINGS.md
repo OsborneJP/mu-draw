@@ -18,7 +18,9 @@ Record why, not just what: the next person (or agent) should not have to redisco
   exporter, fastapi-cli). We use `fastapi-core`. FastAPI 0.161 also has native telemetry
   that defaults to on (`logs` records validation failures with messages); server/main.py
   turns every part off.
-- Env size 965 MB. Disk free went from 14 GB to 13 GB.
+- Env size 965 MB; web/node_modules 636 MB; Playwright's Chrome for Testing (chromium-1248,
+  full browser, `--no-shell`) 403 MB in the shared ~/.cache/ms-playwright, next to the
+  base env's chromium-1187 (left alone). Disk free went from 14 GB to 13 GB.
 - pytest's default temp root `/tmp/pytest-of-webadmin` is shared with other projects and
   held 438 MB of leftovers; pruning it made every run take ~33 s for 25 trivial tests.
   The root conftest.py gives each checkout its own temp root (`PYTEST_DEBUG_TEMPROOT`), 0.1 s.
@@ -129,8 +131,9 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - Proven: without `'wasm-unsafe-eval'`, Indigo's wasm fails to compile
   (`CompileError ... violates the following Content Security policy directive`) and the
   smoke tests fail. Before the fail-fast change they hung to the 3-minute deadline,
-  because waiting for "Indigo ready" never resolves. Now every wait races the first guard
-  problem, and the same failure is reported in about 1 s.
+  because waiting for "Indigo ready" never resolves. Now the editor, service-worker and
+  Open-dialog waits race the first guard problem, and the same failure is reported in
+  about 1 s. (The Save dialog and response waits still end at their deadlines.)
 - Each loosening of the CSP, and why: `'wasm-unsafe-eval'` (script-src) to compile the
   WebAssembly engines; `'unsafe-inline'` (style-src) because Ketcher's emotion/MUI UI
   inserts `<style>` elements; `data:` (img-src) because Ketcher's CSS has 17
