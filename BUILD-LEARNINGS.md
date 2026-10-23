@@ -125,3 +125,11 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - Proven: adding `https:` to connect-src fails verify-dist (and so check.sh and deploy).
 - Proven: a planted `url(https://example.com/...)` background is reported twice, as a CSP
   violation and by the request guard (Playwright still reports the blocked request).
+- Ketcher 3.18 honours `buttons: { help: { hidden: true } }` on first render, but when a
+  resize re-lays out the toolbar into its compact form (e.g. 1280x720 to 640x480), Help and
+  About come back inside the collapsed menus and stay after the window grows again. A
+  resize during startup made the smoke test fail once in ~40 runs. Fix: editor.css hides
+  every out-of-scope control by test id. The smoke test now forces the compact layout
+  (the duplicated Save button is the positive signal it rendered) and requires each
+  control to be absent or `display: none` itself, since "not visible" passes while the
+  menu is closed. Proven: against the previous CSS it fails, listing help and about.

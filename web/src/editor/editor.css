@@ -2,6 +2,15 @@
   height: 100%;
 }
 
+/* Belt and braces for HIDDEN_BUTTONS (ketcherUi.ts). Ketcher 3.18 honours buttons.hidden on
+   first render, but when a resize re-lays out the toolbar into its compact form, Help and
+   About come back (and then stay). Both open external sites. Hide every out-of-scope
+   control by test id, in every layout. */
+[data-testid='help-button'],
+[data-testid='about-button'],
+[data-testid='3D Viewer button'],
+[data-testid='create-monomer'],
+[data-testid='polymer-toggler'],
 /* The Open dialog keeps a disabled "Open from image" tile even when the recognize button
    is hidden. Structure from image is a "Later version" feature, so hide the tile too. */
 [data-testid='open-from-image-button'] {
