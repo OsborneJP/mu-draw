@@ -93,3 +93,7 @@ Record why, not just what: the next person (or agent) should not have to redisco
   root for a favicon.
 - Proven: a manifest without suitable icons makes Chrome's `Page.getInstallabilityErrors`
   return `manifest-missing-suitable-icon`, and the smoke test fails.
+- @rdkit/rdkit 2026.9.1 exports only `.` and `./RDKit_minimal.wasm`: no `./package.json`
+  and no `dist/` subpaths. The pin check and the wasm emitter read files by path instead.
+  A small build plugin (config/rdkitWasm.ts) emits `rdkit/RDKit_minimal.wasm` (7.4 MB),
+  so it is precached before any code imports RDKit. Precache is now 18 entries, 28 MB.

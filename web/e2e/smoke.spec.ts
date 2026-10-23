@@ -1,6 +1,8 @@
+import { RDKIT_WASM_FILE } from '../config/rdkitWasm.ts';
 import {
   appManifest,
   expect,
+  fetchAndCompileWasm,
   fixture,
   installabilityErrors,
   openEditor,
@@ -57,6 +59,11 @@ test('online: the editor loads, works, stays on its own origin and is installabl
   await waitForServiceWorker(page);
   // Positive control for the request policy: the requests it judged really happened.
   await Promise.all(Object.values(seen));
+
+  // RDKit.js ships before any code uses it: served as WebAssembly and compilable.
+  const rdkit = await fetchAndCompileWasm(page, new URL(RDKIT_WASM_FILE, server.url).href);
+  expect(rdkit).toMatchObject({ status: 200, contentType: 'application/wasm' });
+  expect(rdkit.exports).toBeGreaterThan(0);
 
   expect(await installabilityErrors(app)).toEqual([]);
   const manifest = await appManifest(app);

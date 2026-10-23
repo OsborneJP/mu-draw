@@ -199,4 +199,14 @@ export async function appManifest(app: App): Promise<{ scope: string; startUrl: 
   return { scope: resolve(raw.scope), startUrl: resolve(raw.start_url), id: resolve(raw.id) };
 }
 
+/** Fetch a WebAssembly file from the page and compile it, as an engine loader would. */
+export async function fetchAndCompileWasm(page: Page, url: string) {
+  return page.evaluate(async (wasmUrl) => {
+    const response = await fetch(wasmUrl);
+    const contentType = response.headers.get('content-type');
+    const module = await WebAssembly.compileStreaming(response);
+    return { status: response.status, contentType, exports: WebAssembly.Module.exports(module).length };
+  }, url);
+}
+
 export { expect };
