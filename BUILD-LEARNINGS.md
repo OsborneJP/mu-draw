@@ -86,8 +86,9 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - `npm run dev` works too (Ketcher loads, Indigo answers). The smoke guards flag Vite's HMR
   websocket there, so the smoke runs only against builds.
 - Ketcher fires `struct-service-initialized` on window when Indigo is ready; our onInit fires
-  `editor-ready`. The smoke's init script arms promises for both before any page script
-  runs, so tests wait on events, not timers.
+  `editor-ready` (since session 2: once the autosaved drawing is back and saving has
+  started). The smoke's init script arms promises for both before any page script runs, so
+  tests wait on events, not timers.
 - Toolbar test IDs differ from button names: the 3D viewer is `3D Viewer button`,
   create-monomer is `create-monomer`, macromolecules mode is `polymer-toggler`. Each was
   confirmed present with hiding switched off, so the absence checks are not vacuous.
@@ -265,3 +266,37 @@ that fails without the fix. Accepted as known limits:
   checks both for the target being built. The manifest `id` didn't change, so an
   installed staging app is renamed rather than duplicated. Chrome may ask to confirm the
   name change when it next updates the app.
+
+## App shell: autosave (session 2, 2026-10-23)
+
+- Probed before building: `setMolecule()` fires Ketcher's change event (it goes through
+  the undo history), and `getKet()` serializes in the page with no Indigo round trip, so a
+  localStorage write made from the change event is done before a reload can start.
+- ketcher-react 3.18's `Editor` calls `onInit` twice for one Ketcher instance: once when
+  the molecules editor is up, and again when its lazily loaded macromolecules editor
+  mounts (it mounts even with `disableMacromoleculesEditor`), up to ~1 s later. The first
+  autosave wiring started twice: every change was saved twice, and the second start
+  restored the drawing again (moving it) and cleared the undo history under the student's
+  first edits. KetcherEditor.tsx now starts once per Ketcher and fires `editor-init` on
+  every call; e2e/autosave.spec.ts waits for the second one and requires one write per
+  change. Proven: without the guard it sees 2 writes.
+- Ketcher moves the whole drawing without a change event: `setMolecule()` centres the
+  structure after its change event fires (`centerStruct` uses `update(action, true)`, no
+  history), and placing a template near the canvas edge shifts everything later. So the
+  saved KET can differ from the live drawing by a translation (and gains
+  `stereoFlagPosition`); Redo also renumbers atoms. Harmless (a restore re-centres anyway),
+  but tests compare drawings by InChIKey plus atom positions relative to the drawing's
+  corner, sorted, never KET text across a load.
+- Ketcher's toolbar state, which also decides whether the Undo/Redo keys act, refreshes
+  through a 100 ms debounce. Two Ctrl+Z presses inside that window call `undo()` on an
+  empty stack, which throws "Undo stack is empty" (a page error; nothing else happens).
+  Tests wait for the Undo/Redo button state before each key press. A student pressing
+  Ctrl+Z twice quickly at the start of the history gets only a console error.
+- `setMolecule()` never rejects: Ketcher's `runAsyncAction` reports a failure on its event
+  bus and resolves `undefined`. autosave.ts treats a throw the same as that (start
+  empty; the next change replaces the unreadable copy).
+- The restore's own undo step is removed with `editor.clearHistory()` (in Ketcher's Editor
+  type). The toolbar's debounced refresh runs after it, so Undo shows disabled. Proven: without
+  `clearHistory` the history after a reload is `{undo: 1}` and the test fails.
+- Ketcher has a second, hidden copy of several test ids (`ketcher-canvas`, `undo`, `redo`)
+  in its macromolecules UI; tests use the molecules canvas and visible buttons.

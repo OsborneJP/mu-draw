@@ -4,6 +4,7 @@ import 'ketcher-react/dist/index.css';
 // binaryWasm: Indigo runs in a worker loaded from a real .wasm file (precacheable, no
 // blob: worker), instead of the default entry's base64-embedded copy.
 import { StandaloneStructServiceProvider } from 'ketcher-standalone/dist/binaryWasm';
+import { autosaveKey, setSaveStatus, startAutosave, type AutosaveEditor } from './autosave';
 import './editor.css';
 import { DISABLE_MACROMOLECULES_EDITOR, HIDDEN_BUTTONS } from './ketcherUi';
 
@@ -23,6 +24,35 @@ function reportError(message: string) {
   window.dispatchEvent(new CustomEvent('editor-error', { detail: message }));
 }
 
+function autosaveEditor(ketcher: Ketcher): AutosaveEditor {
+  return {
+    getKet: () => ketcher.getKet(),
+    setMolecule: (ket) => ketcher.setMolecule(ket),
+    clearHistory: () => ketcher.editor.clearHistory(),
+    onChange: (handler) => ketcher.changeEvent.add(handler),
+  };
+}
+
+// ketcher-react 3.18 calls onInit twice for one Ketcher: once the molecules editor is
+// up, and again when its lazily loaded macromolecules editor mounts (even though that
+// mode is disabled), up to a second later. Starting autosave twice would restore the
+// drawing over the student's first edits, wipe the undo history and save every change
+// twice. So: once per Ketcher. Each call is announced ('editor-init') so a test can wait
+// for the second one.
+const started = new WeakSet<Ketcher>();
+
+function onInit(ketcher: Ketcher) {
+  window.dispatchEvent(new Event('editor-init'));
+  if (started.has(ketcher)) return;
+  started.add(ketcher);
+  window.ketcher = ketcher;
+  // Ready once the last drawing is back on the canvas and changes are being saved.
+  const key = autosaveKey(import.meta.env.BASE_URL);
+  void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus).then(() =>
+    window.dispatchEvent(new Event('editor-ready')),
+  );
+}
+
 export default function KetcherEditor() {
   return (
     <div className="editor">
@@ -32,10 +62,7 @@ export default function KetcherEditor() {
         errorHandler={reportError}
         buttons={HIDDEN_BUTTONS}
         disableMacromoleculesEditor={DISABLE_MACROMOLECULES_EDITOR}
-        onInit={(ketcher) => {
-          window.ketcher = ketcher;
-          window.dispatchEvent(new Event('editor-ready'));
-        }}
+        onInit={onInit}
       />
     </div>
   );

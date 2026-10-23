@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from 'react';
+import { getSaveStatus, subscribeSaveStatus } from '../editor/autosave';
 import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
@@ -7,14 +9,24 @@ const TITLE = document.title;
 
 export default function Header() {
   const online = useOnline();
+  const saveStatus = useSyncExternalStore(subscribeSaveStatus, getSaveStatus);
   return (
     <header className="app-header">
       <span className="app-title" data-testid="app-title">
         {TITLE}
       </span>
       <div className="app-header-items">
-        {/* Always in the page, so screen readers announce the badge when it appears. */}
-        <span role="status">
+        {/* Always in the page, so screen readers announce a badge when it appears. */}
+        <span role="status" className="app-header-items">
+          {saveStatus === 'failed' && (
+            <span
+              className="warning-badge"
+              data-testid="autosave-failed-badge"
+              title="This browser would not store the drawing (it may be too large). Save it to a file to keep it."
+            >
+              Not autosaved
+            </span>
+          )}
           {!online && (
             <span
               className="offline-badge"

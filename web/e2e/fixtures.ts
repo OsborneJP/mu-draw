@@ -20,6 +20,7 @@ import { preview } from 'vite';
 import { resolveBase } from '../config/app.ts';
 import { cspPolicy } from '../config/csp.ts';
 import { requestProblem } from '../config/requestPolicy.ts';
+import { autosaveKey } from '../src/editor/autosave.ts';
 
 const WEB_DIR = fileURLToPath(new URL('..', import.meta.url));
 const FIXTURES_DIR = fileURLToPath(new URL('../../tests/fixtures/', import.meta.url));
@@ -131,7 +132,15 @@ function installPageGuards(reloadButtonTestId: string) {
     (e) => keysAtDocument.push(`${e.altKey ? 'Alt+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.code}`),
     true,
   );
+  // Ketcher calls the app's onInit twice (src/editor/KetcherEditor.tsx).
+  let inits = 0;
+  const secondInit = new Promise<true>((resolve) =>
+    addEventListener('editor-init', () => {
+      if (++inits === 2) resolve(true);
+    }),
+  );
   Object.assign(window, {
+    __secondInit: secondInit,
     __keysAtDocument: keysAtDocument,
     __editorReady: once('editor-ready'),
     __indigoReady: once('struct-service-initialized'),
@@ -141,6 +150,7 @@ function installPageGuards(reloadButtonTestId: string) {
 
 export interface App {
   server: AppServer;
+  /** The current browser and its page; relaunch() replaces both. */
   context: BrowserContext;
   page: Page;
   /** Every request seen (page, workers and service worker), in order. */
@@ -150,19 +160,15 @@ export interface App {
   /** Rejects on the first problem, so a wait on an event that will never come (e.g. Indigo
    * readiness after its wasm was blocked) fails at once instead of at the test deadline. */
   failed: Promise<never>;
+  /** Close the browser and start it again on the same profile, as a student quitting and
+   * relaunching the app would. The new page is blank; every guard applies to it. */
+  relaunch(): Promise<void>;
 }
 
 export const test = base.extend<{ app: App }>({
   // eslint-disable-next-line no-empty-pattern
   app: async ({}, use, testInfo) => {
     const server = await startServer();
-    // A fresh persistent profile: not incognito (Chrome reports 'in-incognito' as not
-    // installable) and with no service worker left over from an earlier run. Full
-    // Chromium, because the headless shell stubs the installability check.
-    const context = await chromium.launchPersistentContext(testInfo.outputPath('profile'), {
-      channel: 'chromium',
-      headless: true,
-    });
     const problems: string[] = [];
     let failNow: (error: Error) => void = () => {};
     const failed = new Promise<never>((_resolve, reject) => {
@@ -175,32 +181,51 @@ export const test = base.extend<{ app: App }>({
     };
     const requests: Request[] = [];
     const origin = new URL(server.url).origin;
-    await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
-      addProblem(`${kind}: ${detail}`);
-    });
-    await context.addInitScript(installPageGuards, RELOAD_BUTTON_TEST_ID);
-    context.on('request', (request) => {
-      requests.push(request);
-      const problem = requestProblem(request.url(), server.url);
-      if (problem) addProblem(`request (${problem}): ${request.url()}`);
-    });
-    context.on('response', (response) => {
-      if (new URL(response.url()).origin === origin && response.status() >= 400) {
-        addProblem(`HTTP ${response.status()}: ${response.url()}`);
-      }
-    });
     const watch = (page: Page) => {
       page.on('pageerror', (error) => addProblem(`pageerror: ${error.message}`));
       page.on('websocket', (ws) => addProblem(`websocket: ${ws.url()}`));
     };
-    const page = context.pages()[0] ?? (await context.newPage());
-    watch(page);
-    context.on('page', (popup) => {
-      addProblem(`popup: ${popup.url()}`);
-      watch(popup);
-    });
-    await use({ server, context, page, requests, problems, failed });
-    await context.close();
+    const profile = testInfo.outputPath('profile');
+    const launch = async () => {
+      // A fresh persistent profile: not incognito (Chrome reports 'in-incognito' as not
+      // installable) and with no service worker left over from an earlier run. Full
+      // Chromium, because the headless shell stubs the installability check.
+      const context = await chromium.launchPersistentContext(profile, { channel: 'chromium', headless: true });
+      await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
+        addProblem(`${kind}: ${detail}`);
+      });
+      await context.addInitScript(installPageGuards, RELOAD_BUTTON_TEST_ID);
+      context.on('request', (request) => {
+        requests.push(request);
+        const problem = requestProblem(request.url(), server.url);
+        if (problem) addProblem(`request (${problem}): ${request.url()}`);
+      });
+      context.on('response', (response) => {
+        if (new URL(response.url()).origin === origin && response.status() >= 400) {
+          addProblem(`HTTP ${response.status()}: ${response.url()}`);
+        }
+      });
+      const page = context.pages()[0] ?? (await context.newPage());
+      watch(page);
+      context.on('page', (popup) => {
+        addProblem(`popup: ${popup.url()}`);
+        watch(popup);
+      });
+      return { context, page };
+    };
+    const app: App = {
+      server,
+      ...(await launch()),
+      requests,
+      problems,
+      failed,
+      relaunch: async () => {
+        await app.context.close();
+        Object.assign(app, await launch());
+      },
+    };
+    await use(app);
+    await app.context.close();
     await server.close();
     expect(problems, 'guards').toEqual([]);
   },
@@ -286,6 +311,28 @@ export async function goOffline(app: App): Promise<void> {
   await app.context.setOffline(true);
   await app.page.reload();
   await waitForEditor(app);
+}
+
+/** Call before a change to the drawing; the function it returns resolves with the text
+ * autosave stores for that change, under this build's own key. */
+export async function nextAutosave(page: Page): Promise<() => Promise<string>> {
+  await page.evaluate((key) => {
+    (window as unknown as { __nextSave: Promise<string> }).__nextSave = new Promise((resolve) => {
+      const setItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (this: Storage, name: string, value: string) {
+        setItem.call(this, name, value);
+        if (name !== key) return;
+        Storage.prototype.setItem = setItem;
+        resolve(value);
+      };
+    });
+  }, autosaveKey(resolveBase()));
+  return () => page.evaluate(() => (window as unknown as { __nextSave: Promise<string> }).__nextSave);
+}
+
+/** The whole drawing in Ketcher's own format (what autosave stores). */
+export async function ket(page: Page): Promise<string> {
+  return page.evaluate(() => window.ketcher!.getKet());
 }
 
 export async function inchiKey(page: Page): Promise<string> {

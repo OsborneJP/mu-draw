@@ -23,13 +23,19 @@
   gap: 10px;
 }
 
-.offline-badge {
+.offline-badge,
+.warning-badge {
   padding: 2px 10px;
   border-radius: 999px;
   background: #ffd166;
   color: #3d2c00;
   font-size: 12px;
   font-weight: 600;
+}
+
+.warning-badge {
+  background: #f4a3a3;
+  color: #4a0000;
 }
 
 .header-button {

@@ -26,3 +26,6 @@ All notable changes to this project. The format follows
   no network.
 - An About box (in the header) shows the version number, so students can say which build
   they have. Plain text, no links; Ketcher's own About stays hidden.
+- Autosave: the drawing is kept in this browser (never uploaded) as it changes and comes
+  back after a refresh or relaunch, online or offline. Undo can't remove the restored
+  drawing. If the browser refuses to store it (too large), the header says "Not autosaved".
