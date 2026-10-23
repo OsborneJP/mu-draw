@@ -6,6 +6,7 @@
 set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/lib/config.sh"
+source "$ROOT/scripts/lib/web.sh"
 cd "$ROOT"
 exec > >(tee "$ROOT/.check.log") 2>&1
 
@@ -24,6 +25,7 @@ stage() {
 checks() { PYTHONPATH="$ROOT/scripts" python -m "checks.$1" "$ROOT"; }
 
 use_env
+npm_ci_if_stale
 # The check must leave the tree as it found it (no fixtures regenerated in
 # place, no stray files outside .gitignore).
 STATUS_BEFORE="$(git status --porcelain)"
@@ -33,6 +35,10 @@ stage "chemistry literals" checks chem_literals
 stage "AGENTS.md" checks agents_md
 stage "ruff" bash -c 'ruff check . && ruff format --check .'
 stage "pytest" python -m pytest -q
+stage "tsc" web npx --no-install tsc -b
+stage "eslint" web npx --no-install eslint . --max-warnings 0
+stage "vitest" web npx --no-install vitest run
+stage "build + verify (staging)" build_and_verify "$BASE_STAGING" dist
 
 CURRENT_STAGE="tree unchanged"
 if [[ "$(git status --porcelain)" != "$STATUS_BEFORE" ]]; then

@@ -52,3 +52,13 @@ Record why, not just what: the next person (or agent) should not have to redisco
   that RDKit's default would be caught.
 - rdChemDraw's CDXML has a DOCTYPE that names an external DTD URL. Parsers don't fetch
   it, but don't copy that URL anywhere the browser could request it.
+
+## Web toolchain
+
+- TypeScript is 6.0.3: typescript-eslint 8.72 supports `>=4.8.4 <6.1.0`, so not TS 7.
+- The root tsconfig.json is solution-style (`files: []` + references); `tsc --noEmit` on it
+  checks nothing. check.sh runs `tsc -b`. Proven: a planted type error fails check.sh.
+- eslint-plugin-react-hooks 7 reports `exhaustive-deps` as a warning; check.sh runs
+  `eslint --max-warnings 0`. Proven: a planted missing dependency fails check.sh.
+- Vitest 5 doesn't look for config in parent directories; its include list is explicit and
+  excludes e2e/ so Playwright specs never run under Vitest.
