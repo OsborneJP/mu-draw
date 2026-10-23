@@ -434,3 +434,7 @@ that fails without the fix. Accepted as known limits:
   assertion deadline rather than at once. Pasting into Word and Google Docs (Windows 11
   Chrome and Edge, macOS Chrome), inserting a 4x PNG into Word (same size as 1x, sharper),
   opening the SVG in PowerPoint and printing a 4x PNG are checked by hand.
+- `scripts/deploy.sh staging` passed at 4171645 (2026-10-23): check.sh (108 unit tests, 21
+  Playwright tests), then 19 Playwright tests against the live /draw-staging/, all 7 export
+  tests included (the offline copy-and-download test, clipboard read back over HTTPS); the
+  2 update-banner tests skip there by design.
