@@ -54,7 +54,7 @@ Alias /draw-staging /home/webadmin/srv/mu-draw/staging/web
     # index.html, sw.js, the manifest and the RDKit wasm: always revalidate, so a new
     # build is seen on the next launch.
     Header set Cache-Control "no-cache"
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
     Header set X-Content-Type-Options "nosniff"
 </Directory>
 # Hashed build files never change; cache them for a year.
@@ -144,7 +144,7 @@ Alias /draw /home/webadmin/srv/mu-draw/production/web
     # index.html, sw.js, the manifest and the RDKit wasm: always revalidate, so a new
     # build is seen on the next launch.
     Header set Cache-Control "no-cache"
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
     Header set X-Content-Type-Options "nosniff"
 </Directory>
 # Hashed build files never change; cache them for a year.

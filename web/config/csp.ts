@@ -5,7 +5,7 @@
 //
 // Why each loosening exists:
 // - script-src 'wasm-unsafe-eval': compiling WebAssembly (Indigo, RDKit) needs it.
-// - img-src data: blob:  Ketcher's CSS uses data: SVG cursors and icons; previews use blob:.
+// - img-src data:  Ketcher's CSS uses data: SVG cursors and icons; placed images are data: URLs.
 // - style-src 'unsafe-inline': Ketcher's UI (emotion/MUI) injects <style> elements.
 import type { Plugin } from 'vite';
 import directives from '../csp.json' with { type: 'json' };

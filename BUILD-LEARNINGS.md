@@ -128,8 +128,19 @@ Record why, not just what: the next person (or agent) should not have to redisco
   smoke tests fail. Before the fail-fast change they hung to the 3-minute deadline,
   because waiting for "Indigo ready" never resolves. Now every wait races the first guard
   problem, and the same failure is reported in about 1 s.
-- Ketcher's CSS has 17 `url(data:...)` images (modal overlay, cursors, checkboxes, radio
-  buttons), hence `img-src data:`. The online and offline tests don't render any of them
+- Each loosening of the CSP, and why: `'wasm-unsafe-eval'` (script-src) to compile the
+  WebAssembly engines; `'unsafe-inline'` (style-src) because Ketcher's emotion/MUI UI
+  inserts `<style>` elements; `data:` (img-src) because Ketcher's CSS has 17
+  `url(data:...)` images (modal overlay, cursors, checkboxes, radio buttons) and placed
+  images load as data: URLs. `blob:` was in img-src at first, but Ketcher's only blob:
+  image is the structure-from-image preview, which v1 hides, so it was dropped.
+- The CSP checker (web/scripts/checks/csp.ts) is an allowlist per directive, compared
+  case-insensitively. Its first version was a denylist and let a bare host such as
+  `fonts.gstatic.com`, `host:443`, `wss:` or `HTTPS:` through (milestone review).
+- Accepted limit: no static scan of URL strings in dist. Bundles contain many URLs that are
+  never requested (XML namespaces, licence text, links in hidden UI). Invariant 1 is
+  enforced at runtime by the CSP and by the smoke tests' request guard.
+- Ketcher's CSS has 17 `url(data:...)` images (see above), hence `img-src data:`. The online and offline tests don't render any of them
   (dropping `data:` passed both); the Open/Save test opens modals and does.
 - Proven: adding `https:` to connect-src fails verify-dist (and so check.sh and deploy).
 - Proven: a planted `url(https://example.com/...)` background is reported twice, as a CSP

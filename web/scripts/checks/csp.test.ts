@@ -9,15 +9,46 @@ describe('checkCspPolicy', () => {
     expect(checkCspPolicy(POLICY)).toEqual([]);
   });
 
+  // Each case loosens one existing directive in place.
+  const loosen = (directive: string, extra: string) => {
+    const at = POLICY.indexOf(`${directive} `);
+    expect(at).toBeGreaterThanOrEqual(0);
+    const end = POLICY.indexOf(';', at);
+    return `${POLICY.slice(0, end)} ${extra}${POLICY.slice(end)}`;
+  };
+
   it.each([
-    ['another host', `${POLICY}; img-src 'self' https://cdn.example.com`, "img-src allows https://cdn.example.com"],
-    ['https: anywhere', POLICY.replace("connect-src 'self'", "connect-src 'self' https:"), 'connect-src allows https:'],
-    ['a wildcard', POLICY.replace("font-src 'self'", 'font-src *'), 'font-src allows *'],
-    ['unsafe-eval', POLICY.replace("'wasm-unsafe-eval'", "'unsafe-eval'"), "script-src allows 'unsafe-eval'"],
-    ['blob: workers', POLICY.replace("worker-src 'self'", "worker-src 'self' blob:"), 'worker-src allows blob:'],
-    ['a missing directive', POLICY.replace("object-src 'none'; ", ''), 'missing object-src'],
-  ])('fails on %s', (_name, policy, error) => {
-    expect(checkCspPolicy(policy)).toContain(error);
+    ['another host with a scheme', 'img-src', 'https://cdn.example.com'],
+    ['a bare host', 'font-src', 'fonts.gstatic.com'],
+    ['a host with a port', 'img-src', 'cdn.example.com:443'],
+    ['a bare host for scripts', 'script-src', 'cdn.example.com'],
+    ['https: anywhere', 'default-src', 'https:'],
+    ['https: in upper case', 'img-src', 'HTTPS:'],
+    ['websockets', 'img-src', 'wss:'],
+    ['a wildcard', 'font-src', '*'],
+    ['unsafe-eval', 'script-src', "'unsafe-eval'"],
+    ['inline scripts', 'script-src', "'unsafe-inline'"],
+    ['blob: workers', 'worker-src', 'blob:'],
+    ['blob: images', 'img-src', 'blob:'],
+    ['data: scripts', 'script-src', 'data:'],
+  ])('fails on %s', (_name, directive, extra) => {
+    expect(checkCspPolicy(loosen(directive, extra))).toContain(`${directive} allows ${extra}`);
+  });
+
+  it('fails on a missing directive', () => {
+    expect(checkCspPolicy(POLICY.replace("object-src 'none'; ", ''))).toContain('missing object-src');
+  });
+
+  it('fails on a repeated directive', () => {
+    expect(checkCspPolicy(`${POLICY}; img-src 'self'`)).toContain(
+      'img-src appears twice (browsers ignore all but the first)',
+    );
+  });
+
+  it('fails when connect-src is not exactly self', () => {
+    expect(checkCspPolicy(POLICY.replace("connect-src 'self'", "connect-src 'none'"))).toContain(
+      "connect-src must be exactly 'self', not 'none'",
+    );
   });
 });
 
