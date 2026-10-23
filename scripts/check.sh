@@ -30,6 +30,7 @@ STATUS_BEFORE="$(git status --porcelain)"
 
 stage "placeholder literals" checks placeholders
 stage "chemistry literals" checks chem_literals
+stage "AGENTS.md" checks agents_md
 stage "ruff" bash -c 'ruff check . && ruff format --check .'
 stage "pytest" python -m pytest -q
 
