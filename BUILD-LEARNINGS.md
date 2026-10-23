@@ -108,3 +108,20 @@ Record why, not just what: the next person (or agent) should not have to redisco
 - Offline test: Playwright does report the Indigo dedicated worker's wasm response, and
   `fromServiceWorker()` is true after the reload with the server stopped and the context
   offline. No service-worker network requests and no failed requests after the reload.
+
+## Content Security Policy
+
+- One source, web/csp.json: the build injects it as a meta tag (build only, since Vite's
+  dev server needs inline scripts), the test server sends it as a header (covering sw.js
+  and the Indigo worker, which a meta tag can't), and Apache will send the same header.
+- Proven: without `'wasm-unsafe-eval'`, Indigo's wasm fails to compile
+  (`CompileError ... violates the following Content Security policy directive`) and the
+  smoke tests fail. Before the fail-fast change they hung to the 3-minute deadline,
+  because waiting for "Indigo ready" never resolves. Now every wait races the first guard
+  problem, and the same failure is reported in about 1 s.
+- Ketcher's CSS has 17 `url(data:...)` images (modal overlay, cursors, checkboxes, radio
+  buttons), hence `img-src data:`. The online and offline tests don't render any of them
+  (dropping `data:` passed both); the Open/Save test opens modals and does.
+- Proven: adding `https:` to connect-src fails verify-dist (and so check.sh and deploy).
+- Proven: a planted `url(https://example.com/...)` background is reported twice, as a CSP
+  violation and by the request guard (Playwright still reports the blocked request).

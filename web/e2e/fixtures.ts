@@ -17,6 +17,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { preview } from 'vite';
 import { resolveBase } from '../config/app.ts';
+import { cspPolicy } from '../config/csp.ts';
 import { requestProblem } from '../config/requestPolicy.ts';
 
 const WEB_DIR = fileURLToPath(new URL('..', import.meta.url));
@@ -41,7 +42,13 @@ export async function startServer(): Promise<AppServer> {
     appType: 'mpa',
     logLevel: 'warn',
     build: { outDir: process.env.DIST_DIR ?? 'dist' },
-    preview: { host: '127.0.0.1', port: 0, strictPort: true },
+    // Like Apache: the CSP header covers every file, including sw.js and the Indigo worker.
+    preview: {
+      host: '127.0.0.1',
+      port: 0,
+      strictPort: true,
+      headers: { 'Content-Security-Policy': cspPolicy() },
+    },
   });
   const url = server.resolvedUrls?.local[0];
   if (!url) throw new Error('preview server did not report a URL');
@@ -95,6 +102,9 @@ export interface App {
   requests: Request[];
   /** Every problem the guards saw; the fixture asserts it is empty after the test. */
   problems: string[];
+  /** Rejects on the first problem, so a wait on an event that will never come (e.g. Indigo
+   * readiness after its wasm was blocked) fails at once instead of at the test deadline. */
+  failed: Promise<never>;
 }
 
 export const test = base.extend<{ app: App }>({
@@ -109,33 +119,42 @@ export const test = base.extend<{ app: App }>({
       headless: true,
     });
     const problems: string[] = [];
+    let failNow: (error: Error) => void = () => {};
+    const failed = new Promise<never>((_resolve, reject) => {
+      failNow = reject;
+    });
+    failed.catch(() => {}); // only observed when a test races against it
+    const addProblem = (problem: string) => {
+      problems.push(problem);
+      failNow(new Error(`guard tripped: ${problem}`));
+    };
     const requests: Request[] = [];
     const origin = new URL(server.url).origin;
     await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
-      problems.push(`${kind}: ${detail}`);
+      addProblem(`${kind}: ${detail}`);
     });
     await context.addInitScript(installPageGuards);
     context.on('request', (request) => {
       requests.push(request);
       const problem = requestProblem(request.url(), server.url);
-      if (problem) problems.push(`request (${problem}): ${request.url()}`);
+      if (problem) addProblem(`request (${problem}): ${request.url()}`);
     });
     context.on('response', (response) => {
       if (new URL(response.url()).origin === origin && response.status() >= 400) {
-        problems.push(`HTTP ${response.status()}: ${response.url()}`);
+        addProblem(`HTTP ${response.status()}: ${response.url()}`);
       }
     });
     const watch = (page: Page) => {
-      page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
-      page.on('websocket', (ws) => problems.push(`websocket: ${ws.url()}`));
+      page.on('pageerror', (error) => addProblem(`pageerror: ${error.message}`));
+      page.on('websocket', (ws) => addProblem(`websocket: ${ws.url()}`));
     };
     const page = context.pages()[0] ?? (await context.newPage());
     watch(page);
     context.on('page', (popup) => {
-      problems.push(`popup: ${popup.url()}`);
+      addProblem(`popup: ${popup.url()}`);
       watch(popup);
     });
-    await use({ server, context, page, requests, problems });
+    await use({ server, context, page, requests, problems, failed });
     await context.close();
     await server.close();
     expect(problems, 'guards').toEqual([]);
@@ -145,20 +164,21 @@ export const test = base.extend<{ app: App }>({
 /** Load the app and wait until Ketcher and its Indigo engine are both ready. */
 export async function openEditor(app: App): Promise<void> {
   await app.page.goto(app.server.url);
-  await waitForEditor(app.page);
+  await waitForEditor(app);
 }
 
-export async function waitForEditor(page: Page): Promise<void> {
-  await page.evaluate(() => {
+export async function waitForEditor(app: App): Promise<void> {
+  const ready = app.page.evaluate(() => {
     const w = window as unknown as { __editorReady: Promise<true>; __indigoReady: Promise<true> };
     return Promise.all([w.__editorReady, w.__indigoReady]);
   });
+  await Promise.race([ready, app.failed]);
 }
 
 /** Wait until the service worker is installed (precache complete) and active. Fails at
  * once if the install fails, instead of hanging like navigator.serviceWorker.ready. */
-export async function waitForServiceWorker(page: Page): Promise<void> {
-  await page.evaluate(async () => {
+export async function waitForServiceWorker(app: App): Promise<void> {
+  const installed = app.page.evaluate(async () => {
     await (window as unknown as { __swRegistered: Promise<true> }).__swRegistered;
     const registration = await navigator.serviceWorker.getRegistration();
     if (!registration) throw new Error('service worker registered but no registration found');
@@ -174,6 +194,7 @@ export async function waitForServiceWorker(page: Page): Promise<void> {
       settle();
     });
   });
+  await Promise.race([installed, app.failed]);
 }
 
 export interface InstallabilityError {

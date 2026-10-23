@@ -4,6 +4,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolveBase } from '../config/app.ts';
+import { cspPolicy } from '../config/csp.ts';
+import { checkBuiltHtml, checkCspPolicy } from './checks/csp.ts';
 import { checkManifest, checkPromptMode } from './checks/manifest.ts';
 import { checkPrecache, parseSwManifest, type DistFile } from './checks/precache.ts';
 
@@ -20,6 +22,8 @@ const errors = [
   ...checkManifest(JSON.parse(read('manifest.webmanifest')), base).map((e) => `manifest.webmanifest: ${e}`),
   ...checkPromptMode(sw).map((e) => `sw.js: ${e}`),
   ...checkPrecache(files, parseSwManifest(sw)).map((e) => `precache: ${e}`),
+  ...checkCspPolicy(cspPolicy()).map((e) => `csp.json: ${e}`),
+  ...checkBuiltHtml(read('index.html'), cspPolicy()).map((e) => `index.html: ${e}`),
 ];
 
 if (errors.length > 0) {

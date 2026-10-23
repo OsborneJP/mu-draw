@@ -57,7 +57,7 @@ test('online: the editor loads, works, stays on its own origin and is installabl
     await expect(page.getByTestId(id), id).toHaveCount(0);
   }
 
-  await waitForServiceWorker(page);
+  await waitForServiceWorker(app);
   // Positive control for the request policy: the requests it judged really happened.
   await Promise.all(Object.values(seen));
 
@@ -78,7 +78,7 @@ test('offline: after one visit the app loads and works with no network and no se
   const rdkitUrl = new URL(RDKIT_WASM_FILE, server.url).href;
 
   await openEditor(app);
-  await waitForServiceWorker(page); // installed = every precache entry fetched and stored
+  await waitForServiceWorker(app); // installed = every precache entry fetched and stored
 
   // Take the server away as well as the network: nothing can come from anywhere but the
   // service worker's cache. (Against a deployed site only the network can be cut.)
@@ -96,7 +96,7 @@ test('offline: after one visit the app loads and works with no network and no se
   );
 
   await page.reload();
-  await waitForEditor(page);
+  await waitForEditor(app);
 
   expect((await documentResponse).fromServiceWorker(), 'index.html from the cache').toBe(true);
   expect((await indigoWasm).fromServiceWorker(), 'Indigo wasm from the cache').toBe(true);

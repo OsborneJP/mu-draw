@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { ports, resolveBase } from './config/app.ts';
+import { cspPlugin } from './config/csp.ts';
 import { pwaOptions } from './config/pwa.ts';
 import { rdkitWasm } from './config/rdkitWasm.ts';
 
@@ -9,7 +10,7 @@ const base = resolveBase();
 
 export default defineConfig({
   base,
-  plugins: [react(), rdkitWasm(), VitePWA(pwaOptions(base))],
+  plugins: [react(), cspPlugin(), rdkitWasm(), VitePWA(pwaOptions(base))],
   define: {
     // ketcher-react's dist uses Node's bare `global` (its Redux root reducer writes
     // global.currentState on every dispatch) and its deps read process.env at load time.
