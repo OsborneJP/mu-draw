@@ -1,4 +1,4 @@
-import type { Ketcher } from 'ketcher-core';
+import type { Ketcher, StructServiceOptions } from 'ketcher-core';
 import { Editor } from 'ketcher-react';
 import 'ketcher-react/dist/index.css';
 // binaryWasm: Indigo runs in a worker loaded from a real .wasm file (precacheable, no
@@ -6,6 +6,7 @@ import 'ketcher-react/dist/index.css';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone/dist/binaryWasm';
 import { autosaveKey, setSaveStatus, startAutosave, type AutosaveEditor } from './autosave';
 import './editor.css';
+import { imageQueue } from './imageQueue';
 import { DISABLE_MACROMOLECULES_EDITOR, HIDDEN_BUTTONS } from './ketcherUi';
 
 declare global {
@@ -14,8 +15,17 @@ declare global {
   }
 }
 
+// Every service this provider creates asks Indigo for images one at a time (imageQueue.ts).
+class QueuedImageProvider extends StandaloneStructServiceProvider {
+  private readonly queueImages = imageQueue();
+
+  createStructService(options: StructServiceOptions) {
+    return this.queueImages(super.createStructService(options));
+  }
+}
+
 // One provider for the page: Ketcher's standalone services share a single Indigo worker.
-const structServiceProvider = new StandaloneStructServiceProvider();
+const structServiceProvider = new QueuedImageProvider();
 
 // Ketcher reports problems (bad file, Indigo failure) here. Tests listen for the event,
 // and for 'editor-ready' below, instead of polling.
