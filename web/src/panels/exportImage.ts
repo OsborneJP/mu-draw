@@ -50,7 +50,9 @@ export async function saveSvg(ketcher: Ketcher): Promise<Outcome> {
 export function copyDrawing(ketcher: Ketcher): Promise<Outcome> {
   if (isEmpty(ketcher)) return Promise.resolve('empty');
   const png = drawingPng(ketcher, COPY_SCALE, false);
-  png.catch(() => {}); // a failure arrives through the clipboard write instead
+  // A browser that refuses the write never reads the PNG, so its failure would go unhandled;
+  // otherwise the failure arrives through the write.
+  png.catch(() => {});
   return navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => 'done');
 }
 

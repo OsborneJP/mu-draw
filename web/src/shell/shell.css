@@ -24,7 +24,8 @@
 }
 
 .offline-badge,
-.warning-badge {
+.warning-badge,
+.info-badge {
   padding: 2px 10px;
   border-radius: 999px;
   background: #ffd166;
@@ -36,6 +37,11 @@
 .warning-badge {
   background: #f4a3a3;
   color: #4a0000;
+}
+
+.info-badge {
+  background: #b9e4c3;
+  color: #0d3b17;
 }
 
 .header-button {

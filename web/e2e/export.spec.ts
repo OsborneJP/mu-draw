@@ -118,6 +118,44 @@ async function svgFacts(page: Page, text: string) {
   }, text);
 }
 
+/** What the clipboard holds: each item's types, and its PNG if it has one. */
+async function clipboardContents(page: Page) {
+  const items = await page.evaluate(async () => {
+    const read = await navigator.clipboard.read();
+    return Promise.all(
+      read.map(async (item) => {
+        if (!item.types.includes('image/png')) return { types: item.types, png: '' };
+        const bytes = new Uint8Array(await (await item.getType('image/png')).arrayBuffer());
+        let binary = '';
+        for (const byte of bytes) binary += String.fromCharCode(byte);
+        return { types: item.types, png: btoa(binary) };
+      }),
+    );
+  });
+  return items.map((item) => ({ types: item.types, png: Buffer.from(item.png, 'base64') }));
+}
+
+function grantClipboard(app: App): Promise<void> {
+  return app.context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+    origin: new URL(app.server.url).origin,
+  });
+}
+
+/** Count the app's clipboard writes from here on. */
+async function countClipboardWrites(page: Page): Promise<() => Promise<number>> {
+  await page.evaluate(() => {
+    const w = window as unknown as { __clipboardWrites: number };
+    const clipboard = navigator.clipboard;
+    const write = clipboard.write.bind(clipboard);
+    w.__clipboardWrites = 0;
+    clipboard.write = (items) => {
+      w.__clipboardWrites += 1;
+      return write(items);
+    };
+  });
+  return () => page.evaluate(() => (window as unknown as { __clipboardWrites: number }).__clipboardWrites);
+}
+
 // 96, 192 and 384 dpi in pixels per metre (rounded), as PNG measures density.
 const PER_METRE = { 1: 3780, 2: 7559, 4: 15118 } as const;
 
@@ -174,15 +212,35 @@ test('Export: PNG at 1x, 2x and 4x is exactly scale × the SVG, white unless tra
   await expect(dialog.getByTestId('export-message')).toHaveText('');
 });
 
-test('offline: PNG and SVG downloads work with no network and no server', async ({ app }) => {
+test('offline: Copy image puts a 2x PNG on the clipboard, and both downloads work', async ({ app }) => {
   const { context, page } = app;
+  await grantClipboard(app);
   await goOffline(app);
   const failed: string[] = [];
   context.on('requestfailed', (request) => failed.push(request.url()));
+  await loadCompound(page, 'caffeine');
+  const caffeine = await svgFacts(page, await indigoSvg(page));
+
+  const status = page.getByTestId('copy-status');
+  await expect(status).toHaveAttribute('data-state', 'idle');
+  await page.getByTestId('app-copy-image-button').click();
+  await guarded(app, expect(status).toHaveAttribute('data-state', /^(done|empty|failed)$/));
+  await expect(status).toHaveText('Image copied');
+  const items = await clipboardContents(page);
+  expect(items.map((item) => item.types)).toEqual([['image/png']]);
+  const copied = pngFacts(items[0].png);
+  expect([copied.width, copied.height]).toEqual([caffeine.width * 2, caffeine.height * 2]);
+  const pixels = await pngPixels(page, items[0].png);
+  expect(pixels.corner).toEqual([255, 255, 255, 255]);
+  expect(pixels.notWhite).toBeGreaterThan(0);
+
+  // "Image copied" is about the drawing that was copied: it goes when the drawing changes.
   await loadCompound(page, 'aspirin');
+  await expect(status).toHaveAttribute('data-state', 'idle');
+  await expect(status).toHaveText('');
+
   const expectedSvg = await indigoSvg(page);
   const svg = await svgFacts(page, expectedSvg);
-
   await page.getByTestId('app-export-button').click();
   expect((await downloadVia(app, 'Download SVG')).bytes.toString('utf8')).toBe(expectedSvg);
   const png = pngFacts((await downloadVia(app, 'Download PNG')).bytes);
@@ -190,12 +248,17 @@ test('offline: PNG and SVG downloads work with no network and no server', async 
   expect(failed).toEqual([]);
 });
 
-test('an empty drawing: nothing is saved, and the student is told why', async ({ app }) => {
+test('an empty drawing: nothing is copied or saved, and the student is told why', async ({ app }) => {
   const { page } = app;
+  await grantClipboard(app);
   await openEditor(app);
   await clearCanvas(page);
   const downloads: string[] = [];
   page.on('download', (download) => downloads.push(download.suggestedFilename()));
+  const clipboardWrites = await countClipboardWrites(page);
+
+  await page.getByTestId('app-copy-image-button').click();
+  await expect(page.getByTestId('copy-status')).toHaveText('Nothing to copy: the drawing is empty');
 
   await page.getByTestId('app-export-button').click();
   const dialog = exportDialog(page);
@@ -210,10 +273,12 @@ test('an empty drawing: nothing is saved, and the student is told why', async ({
   await guarded(app, expect(message).toHaveText(EMPTY_EXPORT));
 
   expect(downloads).toEqual([]);
+  expect(await clipboardWrites()).toBe(0);
 });
 
 test("a PNG the browser can't make: the student is told, nothing is saved, and SVG still works", async ({ app }) => {
   const { page } = app;
+  await grantClipboard(app);
   await openEditor(app);
   await loadCompound(page, 'caffeine');
   // As when a big drawing at 4x is more than the browser's canvas can hold.
@@ -225,6 +290,11 @@ test("a PNG the browser can't make: the student is told, nothing is saved, and S
   const downloads: string[] = [];
   page.on('download', (download) => downloads.push(download.suggestedFilename()));
 
+  const status = page.getByTestId('copy-status');
+  await page.getByTestId('app-copy-image-button').click();
+  await guarded(app, expect(status).toHaveAttribute('data-state', /^(done|empty|failed)$/));
+  await expect(status).toHaveText("Couldn't copy the image");
+
   await page.getByTestId('app-export-button').click();
   const dialog = exportDialog(page);
   await dialog.getByRole('button', { name: 'Download PNG' }).click();
@@ -233,6 +303,84 @@ test("a PNG the browser can't make: the student is told, nothing is saved, and S
 
   expect((await downloadVia(app, 'Download SVG')).name).toBe('structure.svg');
   await expect(dialog.getByTestId('export-message')).toHaveText('');
+});
+
+test('a browser that refuses the clipboard: the student is told, and the unread PNG raises no error', async ({
+  app,
+}) => {
+  const { page } = app;
+  await openEditor(app);
+  await loadCompound(page, 'caffeine');
+  // The browser refuses the write outright, so it never reads the PNG it was handed, and
+  // that PNG fails too (as one too large for a canvas would). Its failure must not go
+  // unhandled. Rejections are recorded here instead of tripping the page-error guard.
+  await page.evaluate(() => {
+    const w = window as unknown as { __unhandled: string[]; __pngFailed: Promise<void> };
+    let failed!: () => void;
+    w.__pngFailed = new Promise((resolve) => (failed = resolve));
+    w.__unhandled = [];
+    addEventListener('unhandledrejection', (event) => {
+      event.preventDefault();
+      w.__unhandled.push(event.reason instanceof Error ? event.reason.message : String(event.reason));
+    });
+    navigator.clipboard.write = () => Promise.reject(new DOMException('Write permission denied.', 'NotAllowedError'));
+    HTMLCanvasElement.prototype.toBlob = function (callback: BlobCallback) {
+      callback(null);
+      failed();
+    };
+  });
+  const status = page.getByTestId('copy-status');
+  await page.getByTestId('app-copy-image-button').click();
+  await guarded(app, expect(status).toHaveAttribute('data-state', /^(done|empty|failed)$/));
+  await expect(status).toHaveText("Couldn't copy the image");
+
+  // Once toBlob has answered null, the PNG has failed (in the same microtask checkpoint).
+  // The browser reports unhandled rejections in the order they happen, so once a later,
+  // deliberate one has been reported, an unhandled PNG failure would have been reported too.
+  await page.evaluate(() => (window as unknown as { __pngFailed: Promise<void> }).__pngFailed);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        addEventListener('unhandledrejection', (event) => {
+          if (event.reason instanceof Error && event.reason.message === 'control') resolve();
+        });
+        void Promise.reject(new Error('control'));
+      }),
+  );
+  expect(await page.evaluate(() => (window as unknown as { __unhandled: string[] }).__unhandled)).toEqual([
+    'control',
+  ]);
+});
+
+test('"Image copied" never shows for a drawing that changed while it was being copied', async ({ app }) => {
+  const { page } = app;
+  await grantClipboard(app);
+  await openEditor(app);
+  await loadCompound(page, 'caffeine');
+  // Hold the clipboard write until the test lets it go.
+  await page.evaluate(() => {
+    const w = window as unknown as { __writeStarted: Promise<void>; __releaseWrite: () => void };
+    const clipboard = navigator.clipboard;
+    const write = clipboard.write.bind(clipboard);
+    let started!: () => void;
+    w.__writeStarted = new Promise((resolve) => (started = resolve));
+    clipboard.write = (items) => {
+      started();
+      return new Promise((resolve, reject) => {
+        w.__releaseWrite = () => void write(items).then(resolve, reject);
+      });
+    };
+  });
+  const status = page.getByTestId('copy-status');
+  await page.getByTestId('app-copy-image-button').click();
+  await page.evaluate(() => (window as unknown as { __writeStarted: Promise<void> }).__writeStarted);
+  await expect(status).toHaveAttribute('data-state', 'copying');
+
+  await loadCompound(page, 'aspirin'); // the drawing changes before the copy has finished
+  await page.evaluate(() => (window as unknown as { __releaseWrite: () => void }).__releaseWrite());
+  await guarded(app, expect(status).toHaveAttribute('data-state', /^(idle|done|empty|failed)$/));
+  expect(await status.getAttribute('data-state')).toBe('idle');
+  await expect(status).toHaveText('');
 });
 
 test("Ketcher's own image request for another drawing can't swallow the next one", async ({ app }) => {
