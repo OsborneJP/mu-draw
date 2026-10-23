@@ -22,3 +22,5 @@ All notable changes to this project. The format follows
 - Staging is live at /draw-staging/ (campus and VPN only) and passes the live checks.
 - The staging app installs as "Structure Editor (staging)", so it can't be mistaken for
   production.
+- A header bar with the app's name. An "Offline" badge shows in it while the device has
+  no network.

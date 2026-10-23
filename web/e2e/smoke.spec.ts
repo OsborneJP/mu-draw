@@ -160,6 +160,8 @@ test('offline: after one visit the app loads and works with no network and no se
   expect((await documentResponse).fromServiceWorker(), 'index.html from the cache').toBe(true);
   expect((await indigoWasm).fromServiceWorker(), 'Indigo wasm from the cache').toBe(true);
   expect(await page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
+  // Loaded while offline: the header says so from the start.
+  await expect(page.getByTestId('offline-badge')).toHaveText('Offline');
 
   // Indigo works offline.
   const key = await page.evaluate(async (mol) => {

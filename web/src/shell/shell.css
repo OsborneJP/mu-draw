@@ -1,0 +1,33 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 36px;
+  padding: 0 12px;
+  background: #1f4e79;
+  color: #fff;
+  font-size: 15px;
+}
+
+.app-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-header-items {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.offline-badge {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #ffd166;
+  color: #3d2c00;
+  font-size: 12px;
+  font-weight: 600;
+}
