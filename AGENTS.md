@@ -59,14 +59,17 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
-- `web/src/editor/`: Ketcher wrapper, hidden UI, debug-key blocker; highlight helpers later.
+- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker; highlight
+  helpers later.
 - `web/src/chem/`: later: RDKit.js loader, descriptors, functional groups.
 - `web/src/panels/`: later: properties, Lipinski, naming, export UI.
 - `web/src/api.ts`: later: calls to `<base>api/*`.
-- `web/src/pwa/`: service-worker registration (prompt mode).
+- `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
+- `web/src/shell/`: header, offline badge, About box, update banner.
 - `web/public/`: icons; later functional-groups.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
-- `web/e2e/`: Playwright smoke tests.
+- `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
+  for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
 - `server/main.py`: FastAPI (`/api/health`; later `/api/name`, `/api/structure`).
 - `server/{pubchem,opsin,cache}.py`, `server/opsin/opsin.jar`: later.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
@@ -91,7 +94,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Server: SMILES and names arrive in POST bodies only; never log bodies or put user input
   in exceptions. When RDKit or httpx is first used, call `RDLogger.DisableLog('rdApp.*')`
   and set the `httpx` logger to WARNING (both echo input).
-- The update banner reloads only when the student clicks it.
+- The update banner reloads only when the student clicks it; every smoke test fails on a
+  reload or SKIP_WAITING without that click (web/e2e/fixtures.ts, guards.spec.ts).
 - Don't touch the chem-tutor project or its env. Don't install system packages.
 
 ## Common AI failure modes (each one has bitten or nearly bitten this project)
@@ -110,7 +114,12 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   `ketcher-standalone/dist/binaryWasm`. No React StrictMode around the Editor.
 - Trusting Ketcher's `buttons.hidden` (its compact toolbar ignores it) or its config to
   disable debug shortcuts. Trusting `setMolecule()` to reject bad input (it can silently
-  load a different molecule). Molfiles with chiral flag 0 open as AND enantiomers.
+  load a different molecule; it never rejects). Molfiles with chiral flag 0 open as AND
+  enantiomers.
+- Assuming Ketcher calls `onInit` once (3.18 calls it twice, the second up to ~1 s later),
+  or that saved KET equals the live drawing (Ketcher moves drawings without a change
+  event; compare InChIKey and relative positions). Pressing Undo/Redo keys in a test
+  without waiting for the button state (Ketcher refreshes it 100 ms after a change).
 - RDKit's CDXML (`BondLength=""`) doesn't load in Indigo 1.46.
 - `tsc --noEmit` on the solution-style tsconfig checks zero files; use `tsc -b`.
 - Playwright's default headless shell always reports a page as installable; it never
@@ -118,6 +127,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   `navigator.serviceWorker.ready` never rejects (race it against `redundant`).
 - `eval "$(cmd)"` under `set -e` ignores cmd failing; assign first, then eval.
 - Calling `updateSW()` or posting SKIP_WAITING without the student clicking the banner.
+  Expecting `updateSW()` to reload: in vite-plugin-pwa 2.0 it only posts SKIP_WAITING.
 - Sleeps, retries or real network calls in tests.
 - Editing Apache or systemd directly instead of rendering docs/server-setup.md.
 - Building After-v1 or Later features (3D view, practice mode, mechanism arrows, ...).

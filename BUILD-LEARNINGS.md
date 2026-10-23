@@ -331,3 +331,5 @@ that fails without the fix. Accepted as known limits:
   context and has no `ServiceWorker`; init scripts must not assume it.
 - The header (title from index.html's `<title>`, so staging says so) costs the editor 36 px;
   Ketcher's toolbars re-lay out without problems, and the banner adds 40 px while shown.
+- `context.setOffline()` flips `navigator.onLine` and fires `offline`/`online`, so the badge
+  test waits on the badge itself. Proven: without the event listeners it fails.
