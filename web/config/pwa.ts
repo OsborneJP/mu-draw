@@ -17,6 +17,9 @@ export function pwaOptions(base: string): Partial<VitePWAOptions> {
     registerType: 'prompt',
     // src/pwa/register.ts registers the worker itself.
     injectRegister: false,
+    // The icons (and the manifest, which the plugin always adds) come from globPatterns, so
+    // each file is listed in the precache once.
+    includeManifestIcons: false,
     strategies: 'generateSW',
     manifest: {
       id: base,
@@ -38,7 +41,7 @@ export function pwaOptions(base: string): Partial<VitePWAOptions> {
     workbox: {
       // Setting globPatterns replaces Workbox's default; anything not matched here is left
       // out of the precache silently (scripts/verify-dist.ts fails the build instead).
-      globPatterns: ['**/*.{html,js,css,wasm,png,svg,ico,webmanifest,json,woff,woff2,ttf}'],
+      globPatterns: ['**/*.{html,js,css,wasm,png,svg,ico,json,woff,woff2,ttf}'],
       maximumFileSizeToCacheInBytes: MAX_PRECACHE_BYTES,
       navigateFallback: 'index.html',
       // The naming API is never answered from the cache.

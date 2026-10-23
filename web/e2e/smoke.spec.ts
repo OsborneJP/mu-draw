@@ -8,6 +8,7 @@ import {
   openEditor,
   referenceCompound,
   test,
+  waitForEditor,
   waitForServiceWorker,
 } from './fixtures.ts';
 
@@ -68,4 +69,51 @@ test('online: the editor loads, works, stays on its own origin and is installabl
   expect(await installabilityErrors(app)).toEqual([]);
   const manifest = await appManifest(app);
   expect(manifest).toEqual({ scope: server.url, startUrl: server.url, id: server.url });
+});
+
+test('offline: after one visit the app loads and works with no network and no server', async ({ app }) => {
+  const { context, page, server } = app;
+  const butanol = referenceCompound('(R)-2-butanol');
+  const molfile = fixture(butanol.files.find((f) => f.endsWith('.mol'))!);
+  const rdkitUrl = new URL(RDKIT_WASM_FILE, server.url).href;
+
+  await openEditor(app);
+  await waitForServiceWorker(page); // installed = every precache entry fetched and stored
+
+  // Take the server away as well as the network: nothing can come from anywhere but the
+  // service worker's cache. (Against a deployed site only the network can be cut.)
+  if (server.local) await server.close();
+  await context.setOffline(true);
+  const networkAfterReload: string[] = [];
+  context.on('request', (r) => {
+    if (r.serviceWorker()) networkAfterReload.push(`service worker fetched ${r.url()}`);
+  });
+  context.on('requestfailed', (r) => networkAfterReload.push(`failed ${r.url()}`));
+  // Created before the reload so no response can be missed.
+  const documentResponse = page.waitForResponse((r) => r.url() === server.url);
+  const indigoWasm = context.waitForEvent('response', (r) =>
+    /\/assets\/indigo-ketcher-[^/]+\.wasm$/.test(r.url()),
+  );
+
+  await page.reload();
+  await waitForEditor(page);
+
+  expect((await documentResponse).fromServiceWorker(), 'index.html from the cache').toBe(true);
+  expect((await indigoWasm).fromServiceWorker(), 'Indigo wasm from the cache').toBe(true);
+  expect(await page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
+
+  // Indigo works offline.
+  const key = await page.evaluate(async (mol) => {
+    await window.ketcher!.setMolecule(mol);
+    return window.ketcher!.getInChIKey();
+  }, molfile);
+  expect(key).toBe(butanol.inchikey);
+
+  // RDKit's wasm is served from the cache, as WebAssembly, and compiles.
+  const rdkitResponse = page.waitForResponse((r) => r.url() === rdkitUrl);
+  const rdkit = await fetchAndCompileWasm(page, rdkitUrl);
+  expect(rdkit).toMatchObject({ status: 200, contentType: 'application/wasm' });
+  expect((await rdkitResponse).fromServiceWorker(), 'RDKit wasm from the cache').toBe(true);
+
+  expect(networkAfterReload).toEqual([]);
 });

@@ -48,3 +48,11 @@ describe('checkPromptMode', () => {
     expect(checkPromptMode(`self.skipWaiting();${prompt}`)).toHaveLength(1);
   });
 });
+
+describe('checkPromptMode on a real build', () => {
+  it('passes the committed sw.js', async () => {
+    const { readFileSync } = await import('node:fs');
+    const sw = readFileSync(new URL('./fixtures/sw.js', import.meta.url), 'utf8');
+    expect(checkPromptMode(sw)).toEqual([]);
+  });
+});

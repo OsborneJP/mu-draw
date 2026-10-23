@@ -97,3 +97,14 @@ Record why, not just what: the next person (or agent) should not have to redisco
   and no `dist/` subpaths. The pin check and the wasm emitter read files by path instead.
   A small build plugin (config/rdkitWasm.ts) emits `rdkit/RDKit_minimal.wasm` (7.4 MB),
   so it is precached before any code imports RDKit. Precache is now 18 entries, 28 MB.
+- With the plugin's `includeManifestIcons` on and png/webmanifest in globPatterns, the
+  manifest and icons were each precached twice (18 entries; identical revisions, so
+  Workbox tolerated it). `includeManifestIcons: false` and no webmanifest glob gives 14
+  unique entries; the guard's test asserts uniqueness on a real sw.js.
+- The precache guard (web/scripts/checks/precache.ts) evaluates only the bracket-matched
+  array literal from the minified sw.js in `node:vm` (unquoted keys, so not JSON).
+  Proven on a real build: dropping `wasm` from globPatterns makes check.sh fail and name
+  both wasm files. Refresh its fixture with `node scripts/capture-sw-fixture.ts`.
+- Offline test: Playwright does report the Indigo dedicated worker's wasm response, and
+  `fromServiceWorker()` is true after the reload with the server stopped and the context
+  offline. No service-worker network requests and no failed requests after the reload.

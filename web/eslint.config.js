@@ -6,7 +6,8 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist*', 'test-results', 'playwright-report', 'blob-report', '.vitest']),
+  // scripts/checks/fixtures/ holds captured build output (sw.js), not source.
+  globalIgnores(['dist*', 'test-results', 'playwright-report', 'blob-report', '.vitest', 'scripts/checks/fixtures']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [js.configs.recommended, tseslint.configs.recommended],

@@ -1,0 +1,66 @@
+[
+  {
+    "path": "assets/index-C7rR7sul.css",
+    "size": 180997
+  },
+  {
+    "path": "assets/index-DUU5YcL_.js",
+    "size": 7882095
+  },
+  {
+    "path": "assets/index.modern-55d8e3ef-B2egK89f.js",
+    "size": 425354
+  },
+  {
+    "path": "assets/index.modern-DKFtyn1s.js",
+    "size": 1220456
+  },
+  {
+    "path": "assets/indigo-ketcher-1.46.0-f_xBxuuS.wasm",
+    "size": 11803444
+  },
+  {
+    "path": "assets/indigoWorker-d22340fa-CfkaByZ9.js",
+    "size": 73996
+  },
+  {
+    "path": "assets/lodash-BvBZBh6l.js",
+    "size": 80318
+  },
+  {
+    "path": "assets/workbox-window.prod.es5-Bd17z0YL.js",
+    "size": 5653
+  },
+  {
+    "path": "icons/icon-192.png",
+    "size": 12996
+  },
+  {
+    "path": "icons/icon-512.png",
+    "size": 32809
+  },
+  {
+    "path": "icons/icon-maskable-512.png",
+    "size": 21994
+  },
+  {
+    "path": "index.html",
+    "size": 781
+  },
+  {
+    "path": "manifest.webmanifest",
+    "size": 533
+  },
+  {
+    "path": "rdkit/RDKit_minimal.wasm",
+    "size": 7379879
+  },
+  {
+    "path": "sw.js",
+    "size": 1782
+  },
+  {
+    "path": "workbox-2fbc6a65.js",
+    "size": 15026
+  }
+]
