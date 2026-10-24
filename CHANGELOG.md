@@ -45,6 +45,11 @@ All notable changes to this project. The format follows
   this device by RDKit as the drawing changes, offline too; nothing about the drawing
   leaves the device. Several structures get values for the whole drawing; a reaction, an
   empty canvas, R-groups or query atoms, and an impossible valence get a message instead.
+- Stereochemistry in the properties panel: stereocenters and stereogenic double bonds
+  (every potential one, defined or not), how many are undefined (flagged), and at most
+  2ⁿ stereoisomers, with a note that meso forms can make fewer. Clicking a count
+  highlights them on the canvas (undefined ones in amber); clicking again, or any change
+  to the drawing, removes the highlight. It is not an edit: Undo and autosave ignore it.
 
 ### Fixed
 - Ketcher's image previews and exports could hang when two were made at once; they now

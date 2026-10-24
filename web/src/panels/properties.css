@@ -32,7 +32,8 @@
 
 /* While a newer drawing is worked out (a few milliseconds), the older values stay. */
 .properties-panel[data-state='updating'] .properties-list,
-.properties-panel[data-state='updating'] .lipinski {
+.properties-panel[data-state='updating'] .lipinski,
+.properties-panel[data-state='updating'] .stereo {
   opacity: 0.6;
 }
 
@@ -90,4 +91,36 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+.count-button {
+  min-width: 2.2em;
+  padding: 0 6px;
+  border: 1px solid #8c959f;
+  border-radius: 4px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.count-button:hover:not(:disabled) {
+  background: #eef4ff;
+}
+
+.count-button[aria-pressed='true'] {
+  border-color: #1f4e79;
+  background: #9ecbff;
+}
+
+.count-button:disabled {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.stereo-flag {
+  color: #8a4b00;
+  font-weight: 600;
 }

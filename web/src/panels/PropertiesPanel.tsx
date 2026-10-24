@@ -1,9 +1,10 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
-import type { Ketcher } from 'ketcher-core';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import type { Action, Ketcher } from 'ketcher-core';
 import { createTracker, type PanelState } from '../chem/tracker';
 import type { PanelValues } from '../chem/properties';
 import { readDrawing } from '../editor/drawing';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
+import { addHighlight, removeHighlight } from '../editor/stereoHighlight';
 import './properties.css';
 
 // Properties panel (spec section 2): RDKit's values for the drawing as it changes, worked
@@ -68,7 +69,63 @@ function Formula({ formula }: { formula: string }) {
   );
 }
 
-function Values({ values }: { values: PanelValues }) {
+interface StereoProps {
+  stereo: PanelValues['stereo'];
+  /** The values are for the drawing as it is now, so its atoms can be highlighted. */
+  current: boolean;
+  highlighted: boolean;
+  onToggle: () => void;
+}
+
+// Clicking either count highlights every stereo element on the canvas: defined ones blue,
+// undefined ones amber (src/editor/stereoHighlight.ts); clicking again, or any change to
+// the drawing, takes the highlight away.
+function Stereo({ stereo, current, highlighted, onToggle }: StereoProps) {
+  const total = stereo.centres + stereo.doubleBonds;
+  const count = (n: number, testId: string, what: string) => (
+    <button
+      type="button"
+      className="count-button"
+      data-testid={testId}
+      aria-pressed={highlighted}
+      disabled={!current || n === 0}
+      title={highlighted ? 'Hide them on the canvas' : `Show the ${what} on the canvas`}
+      onClick={onToggle}
+    >
+      {n}
+    </button>
+  );
+  return (
+    <section className="stereo" aria-label="Stereochemistry">
+      <h3>Stereochemistry</h3>
+      <dl className="properties-list">
+        <dt>Stereocenters</dt>
+        <dd>{count(stereo.centres, 'stereo-centres', 'stereocenters and stereogenic double bonds')}</dd>
+        <dt>Stereogenic double bonds</dt>
+        <dd>{count(stereo.doubleBonds, 'stereo-double-bonds', 'stereocenters and stereogenic double bonds')}</dd>
+        <dt>Undefined</dt>
+        <dd className={stereo.undefined > 0 ? 'stereo-flag' : undefined}>
+          {stereo.undefined > 0 && <span aria-hidden="true">⚠ </span>}
+          <span data-testid="stereo-undefined">{stereo.undefined}</span>
+        </dd>
+        <dt>Stereoisomers, at most</dt>
+        <dd data-testid="stereo-max">{stereo.maxStereoisomers}</dd>
+      </dl>
+      {stereo.undefined > 0 && (
+        <p className="properties-note" data-testid="stereo-undefined-note">
+          Undefined ones are drawn without a wedge, a hash or a fixed double-bond geometry.
+        </p>
+      )}
+      {total >= 2 && (
+        <p className="properties-note" data-testid="stereo-meso-note">
+          Meso forms can make the real number of stereoisomers smaller.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function Values({ values, children }: { values: PanelValues; children: ReactNode }) {
   return (
     <>
       {values.fragments > 1 && (
@@ -112,6 +169,7 @@ function Values({ values }: { values: PanelValues }) {
         </ul>
         <p data-testid="lipinski-summary">{values.lipinskiSummary}</p>
       </section>
+      {children}
     </>
   );
 }
@@ -119,13 +177,44 @@ function Values({ values }: { values: PanelValues }) {
 export default function PropertiesPanel() {
   const ketcher = useSyncExternalStore(subscribeKetcher, getKetcher);
   const [state, setState] = useState<PanelState>({ kind: 'working', drawing: 0 });
+  // The highlight on the canvas, and the drawing it was made for.
+  const highlight = useRef<{ removal: Action; drawing: number } | null>(null);
+  const [highlighted, setHighlighted] = useState(false);
 
   useEffect(() => {
     if (!ketcher) return;
-    return startTracking(ketcher, setState);
+    const unhighlight = () => {
+      if (!highlight.current) return;
+      removeHighlight(ketcher, highlight.current.removal);
+      highlight.current = null;
+      setHighlighted(false);
+    };
+    // The tracker calls this once Ketcher has finished applying a change, so the highlight
+    // goes with the drawing it was made for, before anything else can happen.
+    const show = (next: PanelState) => {
+      if (highlight.current && highlight.current.drawing !== next.drawing) unhighlight();
+      setState(next);
+    };
+    const stop = startTracking(ketcher, show);
+    return () => {
+      stop();
+      unhighlight();
+    };
   }, [ketcher]);
 
   const current = state.kind === 'ready' && state.revision === state.drawing;
+  // The count buttons are disabled unless the values are for the drawing as it is now.
+  const toggle = () => {
+    if (!ketcher || state.kind !== 'ready') return;
+    if (highlight.current) {
+      removeHighlight(ketcher, highlight.current.removal);
+      highlight.current = null;
+      setHighlighted(false);
+    } else {
+      highlight.current = { removal: addHighlight(ketcher, state.stereo), drawing: state.drawing };
+      setHighlighted(true);
+    }
+  };
   const dataState = state.kind === 'ready' ? (current ? 'ready' : 'updating') : state.kind;
   const text = message(state);
   return (
@@ -141,7 +230,11 @@ export default function PropertiesPanel() {
       <p role="status" className="properties-message" data-testid="properties-message">
         {text}
       </p>
-      {state.kind === 'ready' && <Values values={state.values} />}
+      {state.kind === 'ready' && (
+        <Values values={state.values}>
+          <Stereo stereo={state.values.stereo} current={current} highlighted={highlighted} onToggle={toggle} />
+        </Values>
+      )}
     </aside>
   );
 }

@@ -6,10 +6,12 @@ import type { Page } from '@playwright/test';
 import { cspPolicy } from '../config/csp.ts';
 import { RDKIT_WORKER_FILE } from '../config/rdkitWasm.ts';
 import { lipinskiSummary } from '../src/chem/properties.ts';
+import { DEFINED_COLOR, UNDEFINED_COLOR } from '../src/editor/stereoHighlight.ts';
 import {
   clearCanvas,
   expect,
   fixture,
+  inchiKey,
   openEditor,
   test,
   waitForEditor,
@@ -28,12 +30,15 @@ interface Panel {
   tpsa: string;
   logp: string;
   lipinski: Record<'mw' | 'logp' | 'hbd' | 'hba', boolean>;
+  stereo: { centres: string; double_bonds: string; undefined: string; max_stereoisomers: string };
 }
 
 interface Compound {
   typed_name: string;
   smiles: string;
+  inchikey: string;
   files: string[];
+  stereo: { possible: { type: string; specified: string; centered_on: number }[] };
   properties: { NumHeavyAtoms: number; NumAtoms: number };
   panel: Panel;
 }
@@ -75,6 +80,14 @@ function readPanel(page: Page) {
       logp: text('prop-logp'),
       lipinski: { mw: rule('mw'), logp: rule('logp'), hbd: rule('hbd'), hba: rule('hba') },
       summary: text('lipinski-summary'),
+      stereo: {
+        centres: text('stereo-centres'),
+        double_bonds: text('stereo-double-bonds'),
+        undefined: text('stereo-undefined'),
+        max_stereoisomers: text('stereo-max'),
+      },
+      undefinedNote: panel.querySelector('[data-testid="stereo-undefined-note"]') !== null,
+      mesoNote: panel.querySelector('[data-testid="stereo-meso-note"]') !== null,
     };
   });
 }
@@ -104,6 +117,10 @@ function expected(c: Compound, atoms = c.properties.NumHeavyAtoms) {
       hba: { pass: p.lipinski.hba, value: p.hba },
     },
     summary: lipinskiSummary(breaks),
+    stereo: p.stereo,
+    // Undefined ones are flagged; with two or more elements, meso forms may make fewer.
+    undefinedNote: p.stereo.undefined !== '0',
+    mesoNote: Number(p.stereo.centres) + Number(p.stereo.double_bonds) >= 2,
   };
 }
 
@@ -120,6 +137,9 @@ async function expectMessage(page: Page, state: string, message: string): Promis
 
 const EMPTY = 'Draw a structure to see its properties';
 
+// Includes the testing checklist's stereo lines, read from the fixtures, never typed:
+// (R)-2-butanol, open-chain glucose (aldehydo-D-glucose), cyclic glucose (one undefined
+// anomeric centre) and ibuprofen (undefined).
 test("every reference compound shows the server's values", async ({ app }) => {
   const { page } = app;
   await openEditor(app);
@@ -243,4 +263,217 @@ test('if RDKit cannot start, the panel says so and the editor carries on', async
   await load(page, molfile(compound('aspirin')));
   expect(await page.evaluate(() => window.ketcher!.editor.struct().atoms.size)).toBe(compound('aspirin').properties.NumHeavyAtoms);
   await expectMessage(page, 'unavailable', 'Properties are unavailable: RDKit could not start.');
+});
+
+interface HighlightAttributes {
+  atoms: number[];
+  bonds: number[];
+  rgroupAttachmentPoints: number[];
+  color: string;
+}
+
+/** ketcher-react's editor has a highlights list; ketcher-core's Editor type doesn't say so. */
+interface Highlights {
+  highlights: {
+    getAll(): { id: number; highlight: HighlightAttributes }[];
+    create(...highlights: HighlightAttributes[]): void;
+  };
+}
+
+/** Ketcher's highlights: ours (by colour) and any others, with their atoms and bonds. */
+function highlights(page: Page) {
+  return page.evaluate(() =>
+    (window.ketcher!.editor as unknown as Highlights).highlights.getAll().map(({ highlight: h }) => ({
+      color: h.color,
+      atoms: [...h.atoms].sort((a, b) => a - b),
+      bonds: [...h.bonds].sort((a, b) => a - b),
+    })),
+  );
+}
+
+/** The fixture's stereo elements as the highlight should show them, for a drawing whose
+ * Ketcher atom ids equal the Molfile's atom indices (checked by the caller). */
+function expectedHighlight(c: Compound, bondIds: Map<number, number>) {
+  const ofKind = (defined: boolean, color: string) => {
+    const els = c.stereo.possible.filter((e) => (e.specified === 'Specified') === defined);
+    const atoms = els.filter((e) => e.type.startsWith('Atom_')).map((e) => e.centered_on);
+    const bonds = els.filter((e) => e.type.startsWith('Bond_')).map((e) => bondIds.get(e.centered_on)!);
+    return { color, atoms: atoms.sort((a, b) => a - b), bonds: bonds.sort((a, b) => a - b) };
+  };
+  return [ofKind(true, DEFINED_COLOR), ofKind(false, UNDEFINED_COLOR)].filter(
+    (g) => g.atoms.length + g.bonds.length > 0,
+  );
+}
+
+/** Load a fixture compound and check Ketcher numbered its atoms and bonds in Molfile order,
+ * so fixture indices are Ketcher ids. */
+async function loadInOrder(page: Page, c: Compound): Promise<void> {
+  await load(page, molfile(c));
+  const ids = await page.evaluate(() => {
+    const struct = window.ketcher!.editor.struct();
+    return { atoms: [...struct.atoms.keys()], bonds: [...struct.bonds.keys()] };
+  });
+  expect(ids.atoms).toEqual(ids.atoms.map((_, i) => i));
+  expect(ids.bonds).toEqual(ids.bonds.map((_, i) => i));
+}
+
+const identity = (c: Compound) => new Map(c.stereo.possible.map((e) => [e.centered_on, e.centered_on]));
+
+test('clicking a stereo count highlights exactly those elements, and clicking again removes them', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  for (const name of ['glucose', '(E)-cinnamic acid']) {
+    const c = compound(name);
+    await clearCanvas(page);
+    await loadInOrder(page, c);
+    await expectShows(page, c);
+    const history = await page.evaluate(() => {
+      const w = window as unknown as { __changes: number };
+      w.__changes = 0;
+      window.ketcher!.changeEvent.add(() => (w.__changes += 1));
+      return (window.ketcher!.editor as unknown as { historySize(): unknown }).historySize();
+    });
+    const button = page.getByTestId(c.panel.stereo.centres !== '0' ? 'stereo-centres' : 'stereo-double-bonds');
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    expect(await highlights(page)).toEqual(expectedHighlight(c, identity(c)));
+    // Highlighting is not an edit: no change event (so no autosave), nothing to undo.
+    const after = () =>
+      page.evaluate(() => [
+        (window as unknown as { __changes: number }).__changes,
+        (window.ketcher!.editor as unknown as { historySize(): unknown }).historySize(),
+      ]);
+    expect(await after()).toEqual([0, history]);
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+    expect(await highlights(page)).toEqual([]);
+    expect(await after()).toEqual([0, history]);
+  }
+});
+
+test("a change to the drawing takes the highlight away, and the student's own highlights stay", async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  const glucose = compound('glucose');
+  await loadInOrder(page, glucose);
+  await expectShows(page, glucose);
+  // A highlight the student made (Ketcher's own Highlight menu uses the same list).
+  const own = { color: '#00ff00', atoms: [0], bonds: [] as number[] };
+  await page.evaluate(
+    (h) => (window.ketcher!.editor as unknown as Highlights).highlights.create({ ...h, rgroupAttachmentPoints: [] }),
+    own,
+  );
+  await page.getByTestId('stereo-centres').click();
+  expect(await highlights(page)).toEqual([own, ...expectedHighlight(glucose, identity(glucose))]);
+
+  // Any edit: here, a benzene ring placed with Ketcher's template tool, away from glucose.
+  // (Not Add explicit hydrogens: Ketcher rebuilds the drawing for that and drops every
+  // highlight, the student's too.)
+  await page.getByTestId('template-0').click();
+  await page.locator('[data-testid="ketcher-canvas"][data-canvasmode="molecules-mode"]').click({ position: { x: 120, y: 120 } });
+  const atoms = await page.evaluate(() => window.ketcher!.editor.struct().atoms.size);
+  expect(atoms).toBeGreaterThan(glucose.properties.NumHeavyAtoms);
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-atoms', String(atoms));
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'ready');
+  await expect(page.getByTestId('stereo-centres')).toHaveAttribute('aria-pressed', 'false');
+  expect(await highlights(page)).toEqual([own]);
+});
+
+test("highlights land on the right atoms when Ketcher's atom ids are out of order", async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  const butanol = compound('(R)-2-butanol');
+  await loadInOrder(page, butanol);
+  await expectShows(page, butanol);
+  const [centre] = butanol.stereo.possible.map((e) => e.centered_on);
+  // Delete the stereocentre and undo: Ketcher restores the atom under its old id but at
+  // the end of its atom list, so Molfile atom order no longer matches the ids.
+  await page.evaluate((id) => window.ketcher!.editor.selection({ atoms: [id] }), centre);
+  await page.locator('.Ketcher-root').focus();
+  await page.keyboard.press('Delete');
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-atoms', String(butanol.properties.NumHeavyAtoms - 1));
+  const undo = page.getByTestId('undo').filter({ visible: true });
+  await expect(undo).toBeEnabled();
+  await page.keyboard.press('Control+z');
+  await expectShows(page, butanol);
+  const ids = await page.evaluate(() => [...window.ketcher!.editor.struct().atoms.keys()]);
+  expect(ids[ids.length - 1]).toBe(centre);
+  expect(await inchiKey(page)).toBe(butanol.inchikey);
+  await page.getByTestId('stereo-centres').click();
+  expect(await highlights(page)).toEqual(expectedHighlight(butanol, identity(butanol)));
+});
+
+// Runs before the app: the RDKit worker's replies reach the app only while not held, so a
+// test decides when RDKit "answers".
+function holdableRdkitReplies() {
+  const RealWorker = window.Worker;
+  window.Worker = class extends RealWorker {
+    constructor(url: string | URL, options?: WorkerOptions) {
+      super(url, options);
+      if (options?.name !== 'rdkit') return;
+      const held: MessageEvent[] = [];
+      let holding = false;
+      let appHandler: ((event: MessageEvent) => void) | null = null;
+      // The app sets worker.onmessage after construction; deliver through this filter.
+      RealWorker.prototype.addEventListener.call(this, 'message', (event: Event) => {
+        if (holding) held.push(event as MessageEvent);
+        else appHandler?.(event as MessageEvent);
+      });
+      Object.defineProperty(this, 'onmessage', {
+        get: () => appHandler,
+        set: (handler: ((event: MessageEvent) => void) | null) => (appHandler = handler),
+      });
+      Object.assign(window, {
+        __holdRdkit: () => (holding = true),
+        __releaseRdkit: () => {
+          holding = false;
+          held.splice(0).forEach((event) => appHandler?.(event));
+        },
+      });
+    }
+  };
+}
+
+test('while RDKit works on a newer drawing, older values can\'t be highlighted and a late reply is never shown', async ({ app }) => {
+  const { context, page } = app;
+  await context.addInitScript(holdableRdkitReplies);
+  await openEditor(app);
+  const glucose = compound('glucose');
+  const aspirin = compound('aspirin');
+  const butanol = compound('(R)-2-butanol');
+  await load(page, molfile(glucose));
+  await expectShows(page, glucose);
+  const panel = page.getByTestId('properties-panel');
+  const count = page.getByTestId('stereo-centres');
+  await expect(count).toBeEnabled();
+
+  // Every formula the panel shows from here on, starting with glucose's.
+  await page.evaluate(() => {
+    const formula = () => document.querySelector('[data-testid="prop-formula"]')?.getAttribute('data-formula') ?? null;
+    const seen: (string | null)[] = [formula()];
+    Object.assign(window, { __formulas: seen });
+    new MutationObserver(() => {
+      const shown = formula();
+      if (seen[seen.length - 1] !== shown) seen.push(shown);
+    }).observe(document.querySelector('[data-testid="properties-panel"]')!, { subtree: true, childList: true, attributes: true });
+  });
+
+  await page.evaluate(() => (window as unknown as { __holdRdkit(): void }).__holdRdkit());
+  await load(page, molfile(aspirin));
+  // Glucose's values stay, marked out of date, and can't be highlighted on aspirin.
+  await expect(panel).toHaveAttribute('data-state', 'updating');
+  await expect(panel.getByTestId('prop-formula')).toHaveAttribute('data-formula', glucose.panel.formula);
+  await expect(count).toBeDisabled();
+  // Another change while RDKit still has aspirin: it waits, as one request.
+  await load(page, molfile(butanol));
+  await expect(panel).toHaveAttribute('data-state', 'updating');
+
+  await page.evaluate(() => (window as unknown as { __releaseRdkit(): void }).__releaseRdkit());
+  await expectShows(page, butanol);
+  await expect(count).toBeEnabled();
+  // Aspirin's reply came after the drawing had moved on: never shown.
+  expect(await page.evaluate(() => (window as unknown as { __formulas: (string | null)[] }).__formulas)).toEqual([
+    glucose.panel.formula,
+    butanol.panel.formula,
+  ]);
 });
