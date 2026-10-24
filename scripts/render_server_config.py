@@ -181,6 +181,10 @@ def systemd_unit(t: Target, uvicorn: Path) -> str:
             "# Runs the deployed copy, never the working tree.",
             f"WorkingDirectory={t.server}",
             "Environment=PYTHONDONTWRITEBYTECODE=1",
+            "# Get name's cache (SQLite, chemistry only): systemd makes /var/lib/<unit>, owned",
+            "# by the user above, and passes it as $STATE_DIRECTORY. No start without it.",
+            f"StateDirectory={t.unit}",
+            "StateDirectoryMode=0700",
             "# Loopback only; Apache is the front door. No access log: no per-student records.",
             f"ExecStart={uvicorn} main:app --host 127.0.0.1 --port {t.port} "
             "--workers 1 --no-access-log",
@@ -332,14 +336,19 @@ Only after staging has passed (`scripts/deploy.sh --production` refuses otherwis
 - **Restarting after server changes.** deploy.sh can't restart services (no sudo). When
   `server/` or `environment.yml` changed it prints the command, for example
   `sudo systemctl restart {staging.unit}`, and verifies only after the restart.
+- **Changing an installed unit.** When a unit above changes (Get name added
+  `StateDirectory=`), run its install block again, then restart it (`enable --now` doesn't
+  restart a running service): `sudo systemctl restart {staging.unit}`. Apply the production
+  unit before promoting server code that needs it.
 - **OPSIN (name to structure).** Needs Java, which isn't installed. Options: the system
   package `openjdk-21-jre-headless` (apt, applied by a person), OpenJDK from conda-forge
   inside the project env, or the EBI web service first. Undecided.
 - **Rolling back.** Redeploy the last good commit through the normal path, so the files,
   server code and markers stay consistent: `git checkout <commit>`,
   `scripts/deploy.sh staging`, then `scripts/deploy.sh --production`.
-- **Lookup cache.** The SQLite cache will live in `<target>/data`, outside the deployed
-  code (deploys replace `server/`). Its unit will then need `ReadWritePaths=` for it.
+- **Name cache.** Get name keeps PubChem's answers for 30 days in
+  `/var/lib/<unit>/name-cache.sqlite` (outside the deployed code, which deploys replace).
+  Chemistry only: canonical SMILES, CID, names, time looked up. Deleting it is harmless.
 - **Renaming the app.** Edit `app.config.json`, re-render this file, create the new conda
   env (`conda env create -n <new name> -f environment.yml`), redeploy to the new folders,
   apply the new Apache blocks and units, then remove the old ones.

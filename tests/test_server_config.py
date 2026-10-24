@@ -42,6 +42,15 @@ def test_units_bind_loopback_without_access_log(name):
 
 
 @pytest.mark.parametrize("name", ["staging", "production"])
+def test_units_give_the_name_cache_a_private_state_directory(name):
+    # server/main.py reads $STATE_DIRECTORY, which systemd sets from StateDirectory=.
+    t = target(name)
+    lines = rsc.systemd_unit(t, UVICORN).splitlines()
+    assert f"StateDirectory={t.unit}" in lines
+    assert "StateDirectoryMode=0700" in lines
+
+
+@pytest.mark.parametrize("name", ["staging", "production"])
 def test_apache_block_routes_api_and_caches_correctly(name):
     t = target(name)
     block = rsc.apache_block(t, POLICY)
