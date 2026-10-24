@@ -86,8 +86,9 @@ All notable changes to this project. The format follows
 
 ### Changed
 - Header buttons look greyed while they can't be used.
-- The source is under the MIT licence (LICENSE), with third-party parts under their own;
-  NMRShiftDB2's data requires prediction software built on it to be open source.
+- The source is public under the MIT licence (LICENSE); THIRD-PARTY-NOTICES.md lists the
+  parts under their own. NMRShiftDB2's data requires prediction software built on it to be
+  open source.
 
 ### Fixed
 - Ketcher's image previews and exports could hang when two were made at once; they now
