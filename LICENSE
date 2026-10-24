@@ -1,0 +1,35 @@
+MIT License
+
+Copyright (c) 2026 Jeff Osborne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Parts of this repository are not covered by the licence above and keep their own:
+
+- server/opsin/opsin.jar: OPSIN, under the MIT licence in server/opsin/LICENSE.txt.
+- web/public/nmr/carbon-shifts.bin and tests/fixtures/nmr/excerpt.sd and
+  reference_spectra.json: contain information from nmrshiftdb2 (www.nmrshiftdb.org),
+  which is made available here under the nmrshiftdb2 Database License
+  (web/public/nmr/LICENSE-nmrshiftdb2.txt;
+  https://nmrshiftdb.nmr.uni-koeln.de/nmrshiftdbhtml/nmrshiftdb2datalicense.txt).
+  web/scripts/build-carbon-table.ts shows how the shift table is derived from it.
+- tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
+- Packages installed by npm and conda are under their own licences.
