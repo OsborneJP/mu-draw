@@ -602,3 +602,19 @@ that fails without the fix. Accepted as known limits:
   fragments are looked up as one (salts work, unrelated molecules usually get "no record");
   the live Get name checks ask PubChem (or the cache) and fail if PubChem renames aspirin
   (then re-record); most UI mutations fail at the 30 s assertion deadline, not at once.
+- Staging and production, together with the properties panel (2026-10-24, db66dbb):
+  `scripts/deploy.sh staging` ran check.sh (257 pytest, 267 Vitest, 45 Playwright tests,
+  the live-only one skipped), shipped, and stopped for the API restart. Jeff then ran two
+  prepared sudo scripts: the properties session's staging Apache block (rdkit/worker.js gets
+  its own CSP; vhost hash checked, backup, configtest or restore) and the re-rendered staging
+  unit (`StateDirectory=`) with a restart. That script's first health request came before
+  uvicorn listened; its retry got `{"ok":true}`. `--smoke-only staging` passed: check_live's
+  10 checks (POST api/name for aspirin answered as recorded, through Apache and PubChem; the
+  worker's CSP), then 43 Playwright tests against /draw-staging/, all 14 Get name tests with
+  the real lookup among them. 3 skip by design: the 2 update-banner tests and the properties
+  panel's "if RDKit cannot start" (local only).
+- Production verified at db66dbb: `--production` ran the same 45 Playwright tests on the
+  production build before copying, then stopped for the restart. Jeff ran the production
+  Apache block and unit scripts the same way (a dry run on a copy of the vhost changed only
+  the 7-line rdkit section). `--smoke-only production` passed the same 10 checks and 43
+  Playwright tests against /draw/. Recorded after promoting, in one docs commit.
