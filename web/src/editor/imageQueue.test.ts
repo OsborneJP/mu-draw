@@ -1,3 +1,4 @@
+import type { ConvertData, ConvertResult } from 'ketcher-core';
 import { describe, expect, it } from 'vitest';
 import { imageQueue } from './imageQueue';
 
@@ -18,6 +19,13 @@ class FakeService {
   signals = new Map<string, ReturnType<typeof deferred<void>>>();
 
   generateImageAsBase64(data: string): Promise<string> {
+    return this.start(data);
+  }
+  /** A conversion request, keyed and answered the same way (by its `struct`). */
+  convert(data: ConvertData): Promise<ConvertResult> {
+    return this.start(data.struct).then((struct) => ({ struct, format: data.output_format }));
+  }
+  private start(data: string): Promise<string> {
     this.started.push(data);
     this.whenStarted(data).resolve();
     const answer = deferred<string>();
@@ -83,5 +91,24 @@ describe('imageQueue', () => {
     await two.whenStarted('second').promise;
     two.answers.get('second')!.resolve('image 2');
     expect(await second).toBe('image 2');
+  });
+
+  it('queues conversions with images, so a conversion waits for an image and the reverse', async () => {
+    const service = imageQueue()(new FakeService());
+    const image = service.generateImageAsBase64('image');
+    const conversion = service.convert({ struct: 'conversion' } as ConvertData);
+    const another = service.generateImageAsBase64('another image');
+    await service.whenStarted('image').promise;
+    // Unqueued, the conversion would have started already.
+    expect(service.started).toEqual(['image']);
+    service.answers.get('image')!.resolve('image 1');
+    await image;
+    await service.whenStarted('conversion').promise;
+    expect(service.started).toEqual(['image', 'conversion']);
+    service.answers.get('conversion')!.resolve('smiles');
+    expect((await conversion).struct).toBe('smiles');
+    await service.whenStarted('another image').promise;
+    service.answers.get('another image')!.resolve('image 2');
+    expect(await another).toBe('image 2');
   });
 });

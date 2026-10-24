@@ -16,7 +16,8 @@ declare global {
   }
 }
 
-// Every service this provider creates asks Indigo for images one at a time (imageQueue.ts).
+// Every service this provider creates asks Indigo for images and conversions one at a time
+// (imageQueue.ts).
 class QueuedImageProvider extends StandaloneStructServiceProvider {
   private readonly queueImages = imageQueue();
 

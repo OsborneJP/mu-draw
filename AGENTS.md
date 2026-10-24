@@ -130,10 +130,10 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   event; compare InChIKey and relative positions). Pressing Undo/Redo keys in a test
   without waiting for the button state (Ketcher refreshes it 100 ms after a change).
 - RDKit's CDXML (`BondLength=""`) doesn't load in Indigo 1.46.
-- Asking Indigo for two images at once: with different drawings one never settles
-  (src/editor/imageQueue.ts queues them; keep the provider). Its converter (`getSmiles`,
-  `getMolfile()` without 'v2000') has the same flaw. `exportImage('svg')` copies the
-  canvas offset by Ketcher's toolbar, so the app's header clips it; use `generateImage`.
+- Asking Indigo for two images, or two conversions (`getSmiles`, `getMolfile()` without
+  'v2000'), at once: with different drawings one never settles (src/editor/imageQueue.ts
+  queues both; keep the provider). `exportImage('svg')` copies the canvas offset by
+  Ketcher's toolbar, so the app's header clips it; use `generateImage`.
 - RDKit.js needs `'unsafe-eval'` (embind's `new Function`): it runs only in rdkit/worker.js,
   never on the page. It defaults to legacy stereo perception (`configureRdkit` turns it off).
 - `tsc --noEmit` on the solution-style tsconfig checks zero files; use `tsc -b`.

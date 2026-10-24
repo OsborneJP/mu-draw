@@ -65,3 +65,5 @@ All notable changes to this project. The format follows
 ### Fixed
 - Ketcher's image previews and exports could hang when two were made at once; they now
   take turns.
+- Get name could wait forever if Ketcher was converting another drawing at the same moment
+  (its Save dialog preview, say); Indigo's conversions now take turns too.

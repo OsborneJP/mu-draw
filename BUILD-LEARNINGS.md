@@ -566,6 +566,15 @@ that fails without the fix. Accepted as known limits:
   `app.failed`, so later `guarded()` waits would fail). The link test accepts the popup and
   its request the same way: the student's click is the only way out, and the guards still
   report it.
+- ketcher-standalone's `convert` (behind `getSmiles()`, `getMolfile()`, the Save dialog's
+  preview) has the image bug (above, Export and copy): one shared `Convert` event, a `once`
+  listener per request that drops answers for other input. The properties session found it;
+  measured here: asking for another drawing's conversion and this drawing's SMILES in one
+  task, then the SMILES again, the third request settled and the second never did. Get name
+  would then sit at "Naming…" (its 8 s deadline starts after the SMILES). imageQueue.ts now
+  queues `convert` with the images; proven by e2e (`'third'` wins without it, 2 s) and a
+  unit test. Ketcher's other worker commands (layout, clean, CIP, check...) share the
+  pattern and stay unqueued (accepted: one at a time from the toolbar).
 - MutationObserver's `attributeFilter` can't name a namespaced attribute, so the link guard
   reads `xlink:href` only when its element is added (accepted).
 - This session shared the folder with the properties-panel session, so it worked in a git

@@ -249,6 +249,28 @@ test('Get name: no answer within 8 s means "not responding", and a late answer i
   await expect(panel).toHaveAttribute('data-state', 'not-responding');
 });
 
+test("a conversion of another drawing can't swallow Get name's SMILES", async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await load(page, 'caffeine');
+  // getSmiles() asks Indigo's worker to convert the drawing (src/editor/imageQueue.ts). Ask
+  // for another drawing's conversion, as Ketcher's Save dialog preview does, and at once for
+  // this drawing's SMILES; once the first has answered, ask for the SMILES again. Unqueued,
+  // the first answer removes the second request's listener, so the second's answer goes to
+  // the third request (same drawing), which settles while the second never does.
+  const other = fixture(compound('aspirin').files.find((f) => f.endsWith('.mol'))!);
+  const winner = await page.evaluate(async (molfile) => {
+    const ketcher = window.ketcher!;
+    // Asked together, in one task: the worker can't have answered the first yet.
+    const first = ketcher.indigo.convert(molfile);
+    const second = ketcher.getSmiles().then(() => 'second');
+    await first;
+    const third = ketcher.getSmiles().then(() => 'third');
+    return Promise.race([second, third]);
+  }, other);
+  expect(winner).toBe('second');
+});
+
 test('Get name: a failed request means "not responding"', async ({ app }) => {
   await openEditor(app);
   const names = await holdNames(app.page);
