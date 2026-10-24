@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "CC1CCC(C)CC1"
+    }
+  },
+  "recorded_at": "2026-10-24T13:31:28Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 11523,
+          "IUPACName": "1,4-dimethylcyclohexane",
+          "Title": "1,4-Dimethylcyclohexane"
+        }
+      ]
+    }
+  }
+}

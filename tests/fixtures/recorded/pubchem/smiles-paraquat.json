@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "C[n+]1ccc(-c2cc[n+](C)cc2)cc1"
+    }
+  },
+  "recorded_at": "2026-10-24T13:26:37Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 15939,
+          "IUPACName": "1-methyl-4-(1-methylpyridin-1-ium-4-yl)pyridin-1-ium",
+          "Title": "Paraquat"
+        }
+      ]
+    }
+  }
+}

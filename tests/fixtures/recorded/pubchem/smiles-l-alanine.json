@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "C[C@H](N)C(=O)O"
+    }
+  },
+  "recorded_at": "2026-10-24T12:43:27Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5950,
+          "IUPACName": "(2S)-2-aminopropanoic acid",
+          "Title": "L-Alanine"
+        }
+      ]
+    }
+  }
+}

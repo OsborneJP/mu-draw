@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "CC(=O)Nc1ccc(O)cc1"
+    }
+  },
+  "recorded_at": "2026-10-24T12:43:20Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1983,
+          "IUPACName": "N-(4-hydroxyphenyl)acetamide",
+          "Title": "Acetaminophen"
+        }
+      ]
+    }
+  }
+}

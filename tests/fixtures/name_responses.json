@@ -1,0 +1,245 @@
+{
+  "generator": "server/scripts/record_pubchem_names.py",
+  "responses": {
+    "aspirin": {
+      "found": true,
+      "iupac": "2-acetyloxybenzoic acid",
+      "title": "Aspirin",
+      "cid": 2244,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/2244",
+      "undefined_stereo": 0
+    },
+    "ibuprofen": {
+      "found": true,
+      "iupac": "2-[4-(2-methylpropyl)phenyl]propanoic acid",
+      "title": "Ibuprofen, (+-)-",
+      "cid": 3672,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/3672",
+      "undefined_stereo": 1
+    },
+    "caffeine": {
+      "found": true,
+      "iupac": "1,3,7-trimethylpurine-2,6-dione",
+      "title": "Caffeine",
+      "cid": 2519,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/2519",
+      "undefined_stereo": 0
+    },
+    "glucose": {
+      "found": true,
+      "iupac": "(3R,4S,5S,6R)-6-(hydroxymethyl)oxane-2,3,4,5-tetrol",
+      "title": "D-Glucose",
+      "cid": 5793,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5793",
+      "undefined_stereo": 1
+    },
+    "paracetamol": {
+      "found": true,
+      "iupac": "N-(4-hydroxyphenyl)acetamide",
+      "title": "Acetaminophen",
+      "cid": 1983,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1983",
+      "undefined_stereo": 0
+    },
+    "benzoic acid": {
+      "found": true,
+      "iupac": "benzoic acid",
+      "title": "Benzoic Acid",
+      "cid": 243,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/243",
+      "undefined_stereo": 0
+    },
+    "nicotine": {
+      "found": true,
+      "iupac": "3-[(2S)-1-methylpyrrolidin-2-yl]pyridine",
+      "title": "Nicotine",
+      "cid": 89594,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/89594",
+      "undefined_stereo": 0
+    },
+    "cholesterol": {
+      "found": true,
+      "iupac": "(3S,8S,9S,10R,13R,14S,17R)-10,13-dimethyl-17-[(2R)-6-methylheptan-2-yl]-2,3,4,7,8,9,11,12,14,15,16,17-dodecahydro-1H-cyclopenta[a]phenanthren-3-ol",
+      "title": "Cholesterol",
+      "cid": 5997,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5997",
+      "undefined_stereo": 0
+    },
+    "(R)-2-butanol": {
+      "found": true,
+      "iupac": "(2R)-butan-2-ol",
+      "title": "(-)-2-Butanol",
+      "cid": 84682,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/84682",
+      "undefined_stereo": 0
+    },
+    "aldehydo-D-glucose": {
+      "found": true,
+      "iupac": "(2R,3S,4R,5R)-2,3,4,5,6-pentahydroxyhexanal",
+      "title": "(2R,3S,4R,5R)-2,3,4,5,6-pentahydroxyhexanal",
+      "cid": 107526,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/107526",
+      "undefined_stereo": 0
+    },
+    "(E)-cinnamic acid": {
+      "found": true,
+      "iupac": "(E)-3-phenylprop-2-enoic acid",
+      "title": "Cinnamic Acid",
+      "cid": 444539,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/444539",
+      "undefined_stereo": 0
+    },
+    "ethanol": {
+      "found": true,
+      "iupac": "ethanol",
+      "title": "Ethanol",
+      "cid": 702,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/702",
+      "undefined_stereo": 0
+    },
+    "acetone": {
+      "found": true,
+      "iupac": "propan-2-one",
+      "title": "Acetone",
+      "cid": 180,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/180",
+      "undefined_stereo": 0
+    },
+    "ethyl acetate": {
+      "found": true,
+      "iupac": "ethyl acetate",
+      "title": "Ethyl Acetate",
+      "cid": 8857,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/8857",
+      "undefined_stereo": 0
+    },
+    "toluene": {
+      "found": true,
+      "iupac": "toluene",
+      "title": "Toluene",
+      "cid": 1140,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1140",
+      "undefined_stereo": 0
+    },
+    "pyridine": {
+      "found": true,
+      "iupac": "pyridine",
+      "title": "Pyridine",
+      "cid": 1049,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1049",
+      "undefined_stereo": 0
+    },
+    "(S)-2-butanol": {
+      "found": true,
+      "iupac": "(2S)-butan-2-ol",
+      "title": "(+)-2-Butanol",
+      "cid": 444683,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/444683",
+      "undefined_stereo": 0
+    },
+    "L-alanine": {
+      "found": true,
+      "iupac": "(2S)-2-aminopropanoic acid",
+      "title": "L-Alanine",
+      "cid": 5950,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5950",
+      "undefined_stereo": 0
+    },
+    "maleic acid": {
+      "found": true,
+      "iupac": "(Z)-but-2-enedioic acid",
+      "title": "Maleic Acid",
+      "cid": 444266,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/444266",
+      "undefined_stereo": 0
+    },
+    "aniline": {
+      "found": true,
+      "iupac": "aniline",
+      "title": "Aniline",
+      "cid": 6115,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6115",
+      "undefined_stereo": 0
+    },
+    "sodium benzoate": {
+      "found": true,
+      "iupac": "sodium benzoate",
+      "title": "Sodium Benzoate",
+      "cid": 517055,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/517055",
+      "undefined_stereo": 0
+    },
+    "tetramethylammonium": {
+      "found": true,
+      "iupac": "tetramethylazanium",
+      "title": "Tetramethylammonium",
+      "cid": 6380,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6380",
+      "undefined_stereo": 0
+    },
+    "paraquat": {
+      "found": true,
+      "iupac": "1-methyl-4-(1-methylpyridin-1-ium-4-yl)pyridin-1-ium",
+      "title": "Paraquat",
+      "cid": 15939,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/15939",
+      "undefined_stereo": 0
+    },
+    "bromobenzene": {
+      "found": true,
+      "iupac": "bromobenzene",
+      "title": "Bromobenzene",
+      "cid": 7961,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7961",
+      "undefined_stereo": 0
+    },
+    "dimethyl sulfoxide": {
+      "found": true,
+      "iupac": "methylsulfinylmethane",
+      "title": "Dimethyl Sulfoxide",
+      "cid": 679,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/679",
+      "undefined_stereo": 0
+    },
+    "boric acid": {
+      "found": true,
+      "iupac": "boric acid",
+      "title": "Boric Acid",
+      "cid": 7628,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7628",
+      "undefined_stereo": 0
+    },
+    "1,4-dimethylcyclohexane": {
+      "found": true,
+      "iupac": "1,4-dimethylcyclohexane",
+      "title": "1,4-Dimethylcyclohexane",
+      "cid": 11523,
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11523",
+      "undefined_stereo": 2
+    },
+    "invented: cholesterol + caffeine": {
+      "found": false,
+      "iupac": null,
+      "title": null,
+      "cid": null,
+      "url": null,
+      "undefined_stereo": 1
+    },
+    "invented: nicotine + ibuprofen": {
+      "found": false,
+      "iupac": null,
+      "title": null,
+      "cid": null,
+      "url": null,
+      "undefined_stereo": 2
+    },
+    "invented: aspirin + (E)-cinnamic acid": {
+      "found": false,
+      "iupac": null,
+      "title": null,
+      "cid": null,
+      "url": null,
+      "undefined_stereo": 0
+    }
+  }
+}

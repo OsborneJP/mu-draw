@@ -16,11 +16,16 @@ pythonpath = ["server", "scripts", "server/scripts", "tests"]
 [tool.ruff.lint.isort]
 # Import roots added by pytest's pythonpath.
 known-first-party = [
+  "cache",
   "checks",
+  "chem",
   "lib",
   "main",
+  "pubchem",
+  "record_pubchem_names",
   "conftest",
   "conftest_sample",
+  "fakes",
   "fetch_reference_smiles",
   "gen_reference_expected",
   "render_server_config",

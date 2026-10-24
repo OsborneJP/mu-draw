@@ -20,5 +20,11 @@ Rules:
 - Current recordings: `pubchem/name-*.json`, made by `scripts/fetch_reference_smiles.py`
   (PUG REST `compound/name/{name}/property/SMILES,Title/JSON`). They are the source of
   tests/fixtures/reference_compounds.csv.
-- The naming endpoints (POST /api/name, /api/structure) will add recordings here
-  (PubChem structure-to-name, OPSIN), replayed with respx in pytest.
+- `pubchem/smiles-*.json`, made by `server/scripts/record_pubchem_names.py` through the
+  server's own PubChem client (PUG REST POST `compound/smiles/property/IUPACName,Title/JSON`,
+  the canonical SMILES in the form body, kept under `request.form`). One per Get name test
+  compound: every reference compound and the 3 invented structures (answered `CID 0`).
+  pytest replays them with `httpx.MockTransport` (`replay()` in that script), and the same
+  script rebuilds tests/fixtures/name_responses.json, the server's answers that the browser
+  tests replay.
+- Name to structure (POST /api/structure) will add OPSIN and PubChem name recordings.

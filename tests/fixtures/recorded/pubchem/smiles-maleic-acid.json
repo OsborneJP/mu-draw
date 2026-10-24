@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "O=C(O)/C=C\\C(=O)O"
+    }
+  },
+  "recorded_at": "2026-10-24T12:43:28Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 444266,
+          "IUPACName": "(Z)-but-2-enedioic acid",
+          "Title": "Maleic Acid"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "O=C([O-])c1ccccc1.[Na+]"
+    }
+  },
+  "recorded_at": "2026-10-24T13:26:36Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 517055,
+          "IUPACName": "sodium benzoate",
+          "Title": "Sodium Benzoate"
+        }
+      ]
+    }
+  }
+}
