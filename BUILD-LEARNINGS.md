@@ -394,8 +394,8 @@ that fails without the fix. Accepted as known limits:
   guard lets it through, and Playwright reports no request for `data:` images or `blob:`
   downloads, so the request guard sees nothing new.
 - Each PNG carries a pHYs chunk of 96 × scale dpi (3780, 7559, 15118 pixels per metre), so
-  that Word places 1x, 2x and 4x at the same size (not yet seen in Word: one of Jeff's
-  manual checks). The clipboard can't carry it: Chromium
+  that Word places 1x, 2x and 4x at the same size (Jeff, 2026-10-24: the three PNGs
+  inserted into Word looked as expected). The clipboard can't carry it: Chromium
   re-encodes a copied PNG (a white RGBA PNG read back as colour type 2, no pHYs), so a
   pasted image's size follows its pixels; Copy image uses 2x.
 - Copy image calls `navigator.clipboard.write` inside the click, with a promise for the PNG
@@ -432,8 +432,8 @@ that fails without the fix. Accepted as known limits:
   the drawing at that moment; the clipboard read back with `navigator.clipboard.read()`.
 - Accepted limits: the empty-drawing and clear-on-change mutations fail at the 30 s
   assertion deadline rather than at once. Pasting into Word and Google Docs (Windows 11
-  Chrome and Edge, macOS Chrome), inserting a 4x PNG into Word (same size as 1x, sharper),
-  opening the SVG in PowerPoint and printing a 4x PNG are checked by hand.
+  Chrome and Edge, macOS Chrome), opening the SVG in PowerPoint and printing a 4x PNG are
+  checked by hand (inserting 1x, 2x and 4x PNGs into Word: done, see above).
 - `scripts/deploy.sh staging` passed at 4171645 (2026-10-23): check.sh (108 unit tests, 21
   Playwright tests), then 19 Playwright tests against the live /draw-staging/, all 7 export
   tests included (the offline copy-and-download test, clipboard read back over HTTPS); the
