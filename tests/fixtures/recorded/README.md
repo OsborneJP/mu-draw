@@ -27,4 +27,10 @@ Rules:
   pytest replays them with `httpx.MockTransport` (`replay()` in that script), and the same
   script rebuilds tests/fixtures/name_responses.json, the server's answers that the browser
   tests replay.
-- Name to structure (POST /api/structure) will add OPSIN and PubChem name recordings.
+- `pubchem/byname-*.json` and `pubchem/roundtrip-*.json`, made by
+  `server/scripts/record_name_lookups.py` for each name in
+  tests/fixtures/name_to_structure_names.txt: PubChem's name lookup (POST
+  `compound/name/property/SMILES,Title/JSON`, the name in the form body; an unknown name is
+  a 404 `PUGREST.NotFound`) and the structure-to-name answer for what the server draws.
+  OPSIN isn't recorded: it runs locally from the pinned jar, so tests run the real thing.
+  The script rebuilds tests/fixtures/structure_responses.json from these and OPSIN.

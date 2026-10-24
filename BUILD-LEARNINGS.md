@@ -618,3 +618,62 @@ that fails without the fix. Accepted as known limits:
   Apache block and unit scripts the same way (a dry run on a copy of the vhost changed only
   the 7-line rdkit section). `--smoke-only production` passed the same 10 checks and 43
   Playwright tests against /draw/. Recorded after promoting, in one docs commit.
+
+## Name to structure (session 6, 2026-10-24)
+
+- Measured before building:
+  - No Java on the host; conda-forge has OpenJDK 21 and 25, but no OPSIN. OPSIN 2.9.0 is the
+    latest release: opsin-core-2.9.0-jar-with-dependencies.jar, 5.1 MB, SHA-256 equal to the
+    digest GitHub publishes for it, kept as server/opsin/opsin.jar with its MIT licence.
+  - `conda env update --prune` has no dry run (conda 24.11), so it was rehearsed on a clone
+    (`conda create --clone`, update, compare `--explicit` lists, remove). Re-solving would
+    also have upgraded fastapi-core 0.161.1 to 0.162.0; it is now pinned (Jeff). The real
+    update added only openjdk 21.0.10, 8 small libraries and a newer ca-certificates.
+  - OPSIN as a child process (server/opsin/OpsinLines.java, run from source by the env's
+    `java`): ready in about 1 s, 150 MB at rest, 242 MB at most under a flood of 3,800 names
+    a second, with `-Xmx128m -XX:+UseSerialGC`. With the API's Python (about 86 MB with
+    RDKit) that fits the unit's 512 MB, so the unit is unchanged. The jar's log4j has no
+    provider and says so on stderr, which is discarded, like any OPSIN logging.
+  - OPSIN reads most common names too (ibuprofen, caffeine, vanillin, dopamine, citric acid);
+    only aspirin, Tylenol and DMSO fell through to PubChem. But its trivial names carry no
+    stereo: "nicotine" and "adrenaline" came out with their centre undefined, while PubChem's
+    records for those names are the natural (S) and (R) forms. Jeff decided (2026-10-24):
+    when OPSIN leaves stereo undefined, the server checks PubChem's record for the name and
+    draws it if it is the same compound (InChIKey's first block) with less undefined; the
+    panel says so. Ibuprofen and hex-1-yn-3-ol keep OPSIN's (PubChem's are undefined too).
+  - PubChem's name lookup takes the name in a POST form, so names stay out of URLs; an
+    unknown name is a 404 with `PUGREST.NotFound` (the structure search says `CID 0` instead).
+  - Ketcher 3.18's `addFragment()` puts a structure beside the drawing without overlap
+    (checked three in a row) and is one Undo step; `setMolecule()` is one Undo step too.
+    Each fires Ketcher's change event exactly once, before its promise resolves, so the
+    panel ignores change events only while its own insertion is awaited.
+  - For all 30 names, the Molfile the server draws (RDKit, chiral flag 1 when a centre is
+    specified) loads in Ketcher with Indigo's InChIKey equal to RDKit's, stereo included.
+  - 20 systematic names: OPSIN read all, and each equals PubChem's record for the name;
+    PubChem doesn't know "(2R,3S)-2-bromo-3-chlorobutane" by name, but its round trip gives
+    exactly that name. The misnumbered "4-methyl-3-pentanol" round-trips to
+    2-methylpentan-3-ol, as the spec says.
+- Fixture rebuilds through the app replayed PubChem at its real rate limit (5 a second), so
+  rebuilding 60 answers took 8 s; replays now use an unpaced limiter (fresh per app, as an
+  asyncio.Lock binds to one event loop). The Python suite is back to about 10 s.
+- Each guard removed in turn, and the test that failed:
+  - server (pytest, about 1 s each): the JVM's stderr discarded; the READY version check;
+    killing a stuck or dead OPSIN (the test now checks the stuck process was killed, so the
+    mutation fails at once instead of hanging the next parse); refusing a garbled answer;
+    one name at a time; one-line names; the length limit; OPSIN first; the PubChem stereo
+    check, its connectivity test, its "less undefined" test, and its tolerance of PubChem
+    trouble; caching names, case-insensitively; only `PUGREST.NotFound` meaning no compound;
+    the chiral flag; the CoordGen setting (RDKit's default is already off, so the test turns
+    it on first); purging and expiring the structures table; check_live's structure check;
+  - web, rebuilt each time (Playwright at the 30 s assertion deadline): the panel surviving
+    its own insertion (first at the 3-minute test deadline: the test waited for a round
+    trip that never comes; it now checks the drawn state first); the insertion flag being
+    cleared; Add using `addFragment`; Enter adding to a drawing; greyed offline; a change
+    during the lookup dropping the answer; Get name greyed during a lookup (first SURVIVED:
+    the canvas was empty, so Get name was greyed anyway; the test now starts from a
+    drawing); the PubChem-stereo note; OPSIN's message; the check mark; the round trip naming
+    the server's SMILES. Vitest, at once: case-insensitive matching; refusing an unknown source.
+- Accepted limits: the 30 names are provisional until Jeff sends CHEM-312's; OPSIN's messages
+  are its own English, technical for a student; a name PubChem matches several ways gets its
+  first record (the panel says how many); the name box's width (190 px) shows short names
+  whole, long ones scroll; most UI mutations fail at the 30 s assertion deadline.

@@ -243,9 +243,10 @@ systemctl status mu-draw-api --no-pager
   `StateDirectory=`), run its install block again, then restart it (`enable --now` doesn't
   restart a running service): `sudo systemctl restart mu-draw-api-staging`. Apply the production
   unit before promoting server code that needs it.
-- **OPSIN (name to structure).** Needs Java, which isn't installed. Options: the system
-  package `openjdk-21-jre-headless` (apt, applied by a person), OpenJDK from conda-forge
-  inside the project env, or the EBI web service first. Undecided.
+- **OPSIN (name to structure).** Java is OpenJDK 21 from the project env (environment.yml),
+  so nothing is installed system-wide. Each API service starts one OPSIN process itself
+  (server/opsin.py, about 150 MB at rest, 240 MB under a flood), inside the unit's memory
+  limit. Changing the env needs a restart of both services, like a server change.
 - **Rolling back.** Redeploy the last good commit through the normal path, so the files,
   server code and markers stay consistent: `git checkout <commit>`,
   `scripts/deploy.sh staging`, then `scripts/deploy.sh --production`.
