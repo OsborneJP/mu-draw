@@ -47,8 +47,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   `cd web && npm ci && npx playwright install --no-shell chromium`.
 - Check (before every commit and deploy): `scripts/check.sh`. Ends with `CHECK PASSED`;
   the full log is in `.check.log`. Run it as its own command; read its exit status.
-- Dev server: API `uvicorn main:app --app-dir server --port <ports.dev>`; web
-  `cd web && npm run dev` (proxies `<base>api/` to the API). Both with the env on PATH.
+- Dev server: API `STATE_DIRECTORY=<dir> uvicorn main:app --app-dir server --port <port>`
+  (ports.dev); web `cd web && npm run dev` (proxies `<base>api/`). Both with the env on PATH.
 - Build: `cd web && npm run build` (staging base unless `BASE` is set).
 - Deploy: `scripts/deploy.sh staging`, `scripts/deploy.sh --production`,
   `scripts/deploy.sh --smoke-only <staging|production>`. Production promotes only the
@@ -57,8 +57,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   (~5 min) must report every line covered.
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
-- Fixtures: `python scripts/fetch_reference_smiles.py` (network; only when the compound list
-  changes), then `python server/scripts/gen_reference_expected.py`.
+- Fixtures (network for new compounds only): `python scripts/fetch_reference_smiles.py
+  --missing`, then `server/scripts/gen_reference_expected.py`, `record_pubchem_names.py`.
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
@@ -66,8 +66,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   queue, the ready Ketcher (instance.ts), drawing.ts (Molfile + atom ids), stereoHighlight.ts.
 - `web/src/chem/`: rdkitWorker.ts, compute.ts (RDKit values), properties.ts (display rules),
   tracker.ts (request ordering); later: functional groups.
-- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel; later: naming.
-- `web/src/api.ts`: later: calls to `<base>api/*`.
+- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel, Get name
+  (naming.ts holds its state; NamePanel floats over `.canvas-area`).
+- `web/src/api.ts`: calls to `<base>api/*` (Get name, with its 8 s deadline).
 - `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
 - `web/public/`: icons; later functional-groups.json.
@@ -75,11 +76,13 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
   export.spec.ts reads PNG headers, pixels and the clipboard back; properties.spec.ts holds
-  RDKit's replies (`holdableRdkitReplies`) to force orderings.
-- `server/main.py`: FastAPI (`/api/health`; later `/api/name`, `/api/structure`).
-- `server/{pubchem,opsin,cache}.py`, `server/opsin/opsin.jar`: later.
+  RDKit's replies (`holdableRdkitReplies`); getname.spec.ts holds API answers.
+- `server/main.py`: FastAPI `/api/health`, `/api/name` (`create_app()` takes test fakes);
+  `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
+  `$STATE_DIRECTORY`). Later: `/api/structure`, `opsin.py`, `opsin/opsin.jar`.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
-- `tests/fixtures/`: generated chemistry, `recorded/` API responses, `chemdraw/` (Jeff's files).
+- `tests/fixtures/`: generated chemistry, `recorded/` API responses, `name_responses.json`
+  (server answers e2e replays), `chemdraw/` (Jeff's files).
 - `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit).
 
 ## Conventions
@@ -107,8 +110,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 ## Common AI failure modes (each one has bitten or nearly bitten this project)
 - Typing a SMILES, InChIKey, mass or count from memory, or copying the spec's checklist
   numbers ("glucose shows 4") into a test. Generate it with RDKit/PubChem; read the fixture.
-- PubChem property names: `IsomericSMILES`/`CanonicalSMILES` are legacy. PubChem silently
-  answers with `SMILES`/`ConnectivitySMILES`, so old code fails with KeyError.
+- PubChem: `IsomericSMILES`/`CanonicalSMILES` are legacy (it silently answers `SMILES`/
+  `ConnectivitySMILES`, so old code gets KeyError); an unknown structure is 200, `CID 0`.
 - Using the base conda env's Python (older rdkit with a chi2v/chi2n bug) or the system
   Node 18. check.sh puts the env first on PATH and asserts both versions.
 - Adding a CDN, web font, analytics or any external URL, or loosening web/csp.json.

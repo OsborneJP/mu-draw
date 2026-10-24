@@ -534,3 +534,62 @@ that fails without the fix. Accepted as known limits:
   to start, the panel says so until the app is reloaded. Stereo counts are RDKit's potential
   stereo elements, so atropisomers (not perceived from 2D) aren't counted. The meso note
   shows for any two or more stereo elements.
+
+## Get name (session 5, 2026-10-24, alongside the properties panel)
+
+- Measured before building:
+  - For all 27 reference compounds (20 for Get name, then the properties panel's 7 edge
+    cases, a salt, two cations and boric acid among them), PubChem's structure search (POST
+    with RDKit's canonical SMILES) returned the same CID and title as its name lookup. Unknown structures: 200 with
+    `CID 0` (see Reference fixtures).
+  - Ketcher 3.18's `getSmiles()` for each of the 30 generated Molfiles (Kekulé, its own atom
+    order) canonicalizes with RDKit to exactly the fixture's canonical SMILES, stereo
+    included (glucose's undefined anomeric centre, E and Z double bonds). The server
+    canonicalizes before the cache and PubChem see anything, so recordings replay for any
+    way of writing the structure.
+  - Ketcher's DOM has no links out of the app, with its dialogs open and in the compact
+    toolbar too: only the app's files and in-SVG `#fragment` references. The link guard
+    needs no exception for Ketcher.
+  - RDKit.js 2026.9.1 loads in Playwright's Node process (`createRequire`) and, with
+    `use_legacy_stereo_perception(false)`, canonicalizes like the server (a test checks all 30).
+  - The API unit has `ProtectHome=read-only` and deploys live under ~/srv, so the cache
+    can't sit beside the code: `StateDirectory=` gives each unit /var/lib/<unit> as
+    `$STATE_DIRECTORY`, and the service refuses to start without it.
+- httpx's default timeout is also 5 s, so the first timeout test passed with the setting
+  removed. It now patches `TIMEOUT_S` to 4 and checks the client gets 4.
+- Playwright's `page.clock.install()` leaves time running, so checking "still waiting" after
+  `fastForward(7999)` raced the real clock by 1 ms. The 8 s test installs the clock once the
+  drawing is loaded, pauses it (`pauseAt`), then steps `runFor(7999)` and `runFor(1)`. The
+  click, `getSmiles()` (Indigo's worker) and React need no page timers, so nothing stalls.
+- A route-fulfilled 400 or 503 is a same-origin HTTP error to the guards. The busy and
+  invalid tests accept exactly that problem, last (the first problem also rejects
+  `app.failed`, so later `guarded()` waits would fail). The link test accepts the popup and
+  its request the same way: the student's click is the only way out, and the guards still
+  report it.
+- MutationObserver's `attributeFilter` can't name a namespaced attribute, so the link guard
+  reads `xlink:href` only when its element is added (accepted).
+- This session shared the folder with the properties-panel session, so it worked in a git
+  worktree (branch get-name, its own node_modules and dist), so their check.sh runs and builds
+  couldn't collide; the fixture commit landed on main first.
+- Each guard removed in turn, and the test that failed:
+  - server (pytest, about 1 s each): `RDLogger.DisableLog` (test_privacy: RDKit echoed the
+    sentinel to stderr); the stereo-perception setting; the httpx WARNING level; the rate
+    limit (request times not [0]*5 + [1]*2); one of its windows; the retry; its 1 s wait;
+    the second try; `CID 0` as no record; the cache write; the 30-day age; deleting expired
+    rows; caching a busy answer; the `STATE_DIRECTORY` check; asking PubChem with the raw
+    SMILES; sending an invalid structure; the length limit; the timeout (once fixed, above);
+    `StateDirectory=` in the unit; check_live's Get name check;
+  - link guard (Playwright, at the 30 s assertion deadline): the observer; `linkProblem()`
+    allowing everything; no PubChem exception; attribute changes; form actions;
+  - web, rebuilt each time (Playwright at the 30 s deadline): not greyed offline (in
+    getname.spec and the offline smoke test); not greyed on an empty canvas; clickable while
+    naming; a change not closing the panel; no 8 s deadline; a reaction sent; the link
+    without `noopener noreferrer`; no stereo note; busy and invalid shown as not responding.
+    Vitest, at once: a late answer not dropped; any link trusted; a deadline of 8001 ms; a
+    request made after a change (this one at Vitest's 5 s timeout: the held fetch never ends).
+- Accepted limits: two identical requests before either is cached each ask PubChem (both
+  rate-limited); staging and production limit separately but share this host's IP;
+  not-found answers are kept 30 days; enhanced stereo (AND/OR) is sent as absolute; several
+  fragments are looked up as one (salts work, unrelated molecules usually get "no record");
+  the live Get name checks ask PubChem (or the cache) and fail if PubChem renames aspirin
+  (then re-record); most UI mutations fail at the 30 s assertion deadline, not at once.
