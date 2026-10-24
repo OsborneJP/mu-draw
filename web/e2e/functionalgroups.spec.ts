@@ -330,15 +330,20 @@ async function expectProblems(app: App, expected: string[]): Promise<void> {
 test('a pattern file the server cannot find: the section says so and the properties still show', async ({ app }) => {
   const { context, page, server } = app;
   test.skip(!server.local, 'changes what the server sends');
-  // The RDKit worker's request is held until the editor is up, so the 404 (which the guards
-  // report) can't fail the start. The service worker's precache request goes through.
-  const asked = new Promise<Route>((resolve) => {
+  // Both requests for the file are held until the editor is up, so the 404s (which the
+  // guards report) can't fail the start. Holding the service worker's precache request
+  // also keeps it from taking over: a worker started under an active service worker is
+  // answered from the precache, and the RDKit worker must ask the server.
+  let workerAsked: (route: Route) => void = () => {};
+  const asked = new Promise<Route>((resolve) => (workerAsked = resolve));
+  const precache = new Promise<Route>((resolve) => {
     void context.route(`**/${PATTERNS_FILE}`, (route) =>
-      route.request().serviceWorker() ? route.continue() : resolve(route),
+      route.request().serviceWorker() ? resolve(route) : workerAsked(route),
     );
   });
   await openEditor(app);
   await (await asked).fulfill({ status: 404, body: 'Not Found' });
+  await (await precache).fulfill({ status: 404, body: 'Not Found' });
   const name = 'aspirin';
   await loadInOrder(page, name);
   await expectReady(page, compound(name).heavy_atoms);
@@ -348,16 +353,18 @@ test('a pattern file the server cannot find: the section says so and the propert
     `Functional groups are unavailable: ${PATTERNS_FILE} could not be loaded (Error: HTTP 404).`,
   );
   expect(await highlights(page)).toEqual([]);
-  await expectProblems(app, [`HTTP 404: ${server.url}${PATTERNS_FILE}`]);
+  const missing = `HTTP 404: ${server.url}${PATTERNS_FILE}`;
+  await expectProblems(app, [missing, missing]); // the RDKit worker's request, then the service worker's
 });
 
 test.describe('a pattern file that is changed or broken', () => {
   // Each test serves its own copy of the build and edits the pattern file in it, as a
-  // person editing it on the server would.
+  // person editing it on the server would. A deployed site can't serve a copy, so these
+  // skip there before the copy is made (a skip inside the test comes too late).
+  test.skip(Boolean(process.env.SMOKE_URL), 'needs a server the test owns, to serve an edited copy of the build');
   test.use({ buildCopy: true });
 
   async function publishPatterns(app: App, text: string): Promise<void> {
-    test.skip(!app.server.local, 'changes what the server sends');
     writeFileSync(join(app.server.copy!, PATTERNS_FILE), text);
   }
 

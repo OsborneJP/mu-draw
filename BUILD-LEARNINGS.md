@@ -718,6 +718,13 @@ that fails without the fix. Accepted as known limits:
   pattern file and the RDKit worker's own; `route.request().serviceWorker()` tells them
   apart. The 404 test holds the worker's request until the editor is up (the guards report
   the 404, which would otherwise fail the start) and lets the precache request through.
+- A dedicated worker started once the service worker is active is controlled by it
+  (matched by its own URL), so its fetches come from the precache even on a first visit.
+  The 404 test therefore also holds the service worker's precache request for the file,
+  so it can't take over; without that the test depended on the RDKit worker starting first.
+- The edited-copy tests (`buildCopy`) first skipped live runs inside the test body, after
+  the fixture had already refused to copy a deployed site: the first live staging run
+  failed both. They now skip at the describe level, as the update tests do.
 - Ketcher ignores keys once a form control (the checkbox) has had the focus; tests click
   an empty corner of the canvas first. Ketcher's Add explicit hydrogens finishes after the
   click returns, so the test waits for RDKit's exact atom count, not the next state.
