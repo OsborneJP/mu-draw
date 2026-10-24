@@ -116,3 +116,66 @@ def test_invented_structures_join_two_reference_compounds(generated):
         assert joined.GetNumHeavyAtoms() == sum(m.GetNumHeavyAtoms() for m in parts)
         assert len(Chem.GetMolFrags(joined)) == 1
         assert entry["canonical_smiles"] == Chem.MolToSmiles(joined)
+
+
+def test_degree_of_unsaturation_equals_rings_plus_pi_bonds(generated):
+    # The panel's formula rule checked against the structure itself. Sulfur is left out:
+    # the formula counts S like O, so DMSO's S=O is not a degree of unsaturation.
+    data = json.loads(generated[gen.EXPECTED_FILE])
+    checked = 0
+    for compound in data["compounds"]:
+        shown = compound["panel"]["degree_of_unsaturation"]
+        mol = Chem.MolFromSmiles(compound["smiles"])
+        if shown == gen.NO_VALUE or any(a.GetSymbol() == "S" for a in mol.GetAtoms()):
+            continue
+        Chem.Kekulize(mol, clearAromaticFlags=True)
+        rings = mol.GetNumBonds() - mol.GetNumAtoms() + len(Chem.GetMolFrags(mol))
+        pi_bonds = sum(int(b.GetBondTypeAsDouble()) - 1 for b in mol.GetBonds())
+        assert int(shown) == rings + pi_bonds, compound["typed_name"]
+        checked += 1
+    assert checked >= 20
+
+
+def test_degree_of_unsaturation_has_no_value_for_ions_and_other_elements(generated):
+    data = json.loads(generated[gen.EXPECTED_FILE])
+    reasons = set()
+    for compound in data["compounds"]:
+        mol = Chem.MolFromSmiles(compound["smiles"])
+        charged = Chem.GetFormalCharge(mol) != 0
+        other = {a.GetSymbol() for a in mol.GetAtoms()} - gen.DOU_ELEMENTS
+        no_value = compound["panel"]["degree_of_unsaturation"] == gen.NO_VALUE
+        assert no_value == (charged or bool(other)), compound["typed_name"]
+        reasons |= {"charge"} if charged else set()
+        reasons |= {"element"} if other else set()
+    assert reasons == {"charge", "element"}  # the fixtures cover both rules
+
+
+def test_shown_values_never_read_minus_zero():
+    assert gen.shown(-0.0014, 2) == "0.00"
+    assert gen.shown(-0.005, 2) == "-0.01"
+    assert gen.shown(0.0, 1) == "0.0"
+
+
+def test_panel_covers_the_cases_the_spec_names(generated):
+    # Several fragments, a Lipinski failure, an undefined stereocentre and a stereogenic
+    # double bond each appear at least once, so the browser tests exercise them.
+    panels = [c["panel"] for c in json.loads(generated[gen.EXPECTED_FILE])["compounds"]]
+    assert any(p["fragments"] != "1" for p in panels)
+    assert any(not all(p["lipinski"].values()) for p in panels)
+    assert any(p["stereo"]["undefined"] != "0" for p in panels)
+    assert any(p["stereo"]["double_bonds"] != "0" for p in panels)
+
+
+def test_degree_of_unsaturation_has_no_value_for_radicals():
+    # No PubChem fixture is a radical, so make one from ethanol: its methyl becomes a
+    # carbene (one H, two radical electrons), whose formula alone would give a whole number.
+    gen.configure()
+    smiles = next(r["smiles"] for r in gen.read_rows() if r["typed_name"] == "ethanol")
+    assert gen.degree_of_unsaturation(Chem.MolFromSmiles(smiles)) != gen.NO_VALUE
+    mol = Chem.RWMol(Chem.MolFromSmiles(smiles))
+    methyl = next(a for a in mol.GetAtoms() if a.GetSymbol() == "C" and a.GetTotalNumHs() == 3)
+    methyl.SetNoImplicit(True)
+    methyl.SetNumExplicitHs(1)
+    methyl.SetNumRadicalElectrons(2)
+    Chem.SanitizeMol(mol)
+    assert gen.degree_of_unsaturation(mol) == gen.NO_VALUE

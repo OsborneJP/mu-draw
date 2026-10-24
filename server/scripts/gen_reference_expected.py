@@ -11,10 +11,15 @@ by one C-C bond (INVENTED), so RDKit makes them and nobody types them. They are 
 under "invented", apart from "compounds"; the recorded PubChem answers show PubChem has
 no record of them.
 
-Everything is raw RDKit output: no rounding and no choices about which values the app
-shows. The descriptor set is rdMolDescriptors.Properties, the same code RDKit.js
+Everything else is raw RDKit output: no rounding and no choices about which values the
+app shows. The descriptor set is rdMolDescriptors.Properties, the same code RDKit.js
 get_descriptors() calls, so web and server can be compared like for like. Output is
 deterministic; tests/test_reference_fixtures.py regenerates it and compares bytes.
+
+The one exception is each compound's "panel": the text the properties panel must show,
+made here from the raw values by the rules Jeff decided (docs/SPEC.md, "2. Properties
+panel + Lipinski card"). The app applies the same rules in TypeScript; the browser tests
+compare its text with this, so the two implementations check each other.
 
 No CDXML: RDKit's ChemDraw writer emits BondLength="", which Ketcher 3.18 (Indigo 1.46)
 can't load (BUILD-LEARNINGS.md). The editor tests use CDXML saved by Ketcher instead.
@@ -25,6 +30,7 @@ from __future__ import annotations
 import csv
 import json
 import re
+from collections import Counter
 from pathlib import Path
 
 import rdkit
@@ -51,6 +57,20 @@ SETTINGS = {
     # which Ketcher reads as an AND (relative) stereo group.
     "molfile_chiral_flag": "1 when any tetrahedral centre is specified, else 0",
 }
+
+# The properties panel's display rules (docs/SPEC.md, decided by Jeff on Oct 24, 2026).
+DECIMALS = {"amw": 2, "exactmw": 4, "CrippenClogP": 2, "tpsa": 1}
+# Lipinski's rule of 5, judged on the value as displayed so the card never contradicts it.
+LIPINSKI_LIMITS = {
+    "mw": ("amw", 500),
+    "logp": ("CrippenClogP", 5),
+    "hbd": ("lipinskiHBD", 5),
+    "hba": ("lipinskiHBA", 10),
+}
+# Degree of unsaturation only for neutral molecules made of these elements; else "—".
+HALOGENS = {"F", "Cl", "Br", "I"}
+DOU_ELEMENTS = {"C", "H", "N", "O", "S"} | HALOGENS
+NO_VALUE = "—"
 
 
 def configure() -> None:
@@ -145,12 +165,71 @@ def invented(rows: list[dict[str, str]]) -> tuple[list[dict[str, object]], dict[
     return entries, files
 
 
+def shown(value: float, decimals: int) -> str:
+    """Rounded for display; a value that rounds to zero has no sign (ethanol's logP)."""
+    text = f"{value:.{decimals}f}"
+    return text.removeprefix("-") if float(text) == 0 else text
+
+
+def degree_of_unsaturation(mol: Chem.Mol) -> str:
+    """C - H/2 - X/2 + N/2 + 1 from the formula, for neutral C/H/N/O/S/halogen molecules."""
+    counts: Counter[str] = Counter()
+    for atom in mol.GetAtoms():
+        counts[atom.GetSymbol()] += 1
+        counts["H"] += atom.GetTotalNumHs()
+    charge = sum(atom.GetFormalCharge() for atom in mol.GetAtoms())
+    radicals = sum(atom.GetNumRadicalElectrons() for atom in mol.GetAtoms())
+    if charge or radicals or not set(counts) <= DOU_ELEMENTS:
+        return NO_VALUE
+    halogens = sum(counts[x] for x in HALOGENS)
+    doubled = 2 * counts["C"] - counts["H"] - halogens + counts["N"] + 2
+    if doubled % 2:
+        return NO_VALUE
+    return str(doubled // 2)
+
+
+def panel(mol: Chem.Mol, props: dict[str, float], possible: list[dict[str, object]]) -> dict:
+    """What the properties panel shows for this compound, as text."""
+    numbers = {name: shown(props[name], places) for name, places in DECIMALS.items()}
+    counts = {
+        name: str(int(props[name])) for name in ("lipinskiHBD", "lipinskiHBA", "NumRotatableBonds")
+    }
+    as_shown = {
+        **{k: float(v) for k, v in numbers.items()},
+        **{k: float(v) for k, v in counts.items()},
+    }
+    elements = len(possible)
+    return {
+        "formula": rdMolDescriptors.CalcMolFormula(mol),
+        "fragments": str(len(Chem.GetMolFrags(mol))),
+        "average_mw": numbers["amw"],
+        "exact_mass": numbers["exactmw"],
+        "degree_of_unsaturation": degree_of_unsaturation(mol),
+        "hbd": counts["lipinskiHBD"],
+        "hba": counts["lipinskiHBA"],
+        "rotatable_bonds": counts["NumRotatableBonds"],
+        "tpsa": numbers["tpsa"],
+        "logp": numbers["CrippenClogP"],
+        "lipinski": {
+            rule: as_shown[name] <= limit for rule, (name, limit) in LIPINSKI_LIMITS.items()
+        },
+        "stereo": {
+            "centres": str(sum(str(e["type"]).startswith("Atom_") for e in possible)),
+            "double_bonds": str(sum(str(e["type"]).startswith("Bond_") for e in possible)),
+            "undefined": str(sum(e["specified"] == "Unspecified" for e in possible)),
+            "max_stereoisomers": str(2**elements),
+        },
+    }
+
+
 def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
     mol = Chem.MolFromSmiles(row["smiles"])
     if mol is None:
         raise ValueError(f"RDKit cannot parse the PubChem SMILES for {row['typed_name']!r}")
     name, key = row["typed_name"], slug(row["typed_name"])
     props = rdMolDescriptors.Properties()
+    values = dict(zip(props.GetPropertyNames(), props.ComputeProperties(mol), strict=True))
+    possible = stereo_elements(mol, flag_possible=True)
     files = {f"molfiles/{key}.mol": molfile(mol, name)}
     entry = {
         "typed_name": name,
@@ -160,13 +239,12 @@ def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
         "canonical_smiles": Chem.MolToSmiles(mol),
         "formula": rdMolDescriptors.CalcMolFormula(mol),
         "inchikey": Chem.MolToInchiKey(mol),
-        "properties": dict(
-            zip(props.GetPropertyNames(), props.ComputeProperties(mol), strict=True)
-        ),
+        "properties": values,
         "stereo": {
             "strict": stereo_elements(mol, flag_possible=False),
-            "possible": stereo_elements(mol, flag_possible=True),
+            "possible": possible,
         },
+        "panel": panel(mol, values, possible),
         "files": sorted(files),
     }
     return entry, files

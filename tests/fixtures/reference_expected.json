@@ -64,6 +64,30 @@
         "strict": [],
         "possible": []
       },
+      "panel": {
+        "formula": "C9H8O4",
+        "fragments": "1",
+        "average_mw": "180.16",
+        "exact_mass": "180.0423",
+        "degree_of_unsaturation": "6",
+        "hbd": "1",
+        "hba": "4",
+        "rotatable_bonds": "2",
+        "tpsa": "63.6",
+        "logp": "1.31",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
       "files": [
         "molfiles/aspirin.mol"
       ]
@@ -130,6 +154,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C13H18O2",
+        "fragments": "1",
+        "average_mw": "206.28",
+        "exact_mass": "206.1307",
+        "degree_of_unsaturation": "5",
+        "hbd": "1",
+        "hba": "2",
+        "rotatable_bonds": "4",
+        "tpsa": "37.3",
+        "logp": "3.07",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "1",
+          "double_bonds": "0",
+          "undefined": "1",
+          "max_stereoisomers": "2"
+        }
+      },
       "files": [
         "molfiles/ibuprofen.mol"
       ]
@@ -189,6 +237,30 @@
       "stereo": {
         "strict": [],
         "possible": []
+      },
+      "panel": {
+        "formula": "C8H10N4O2",
+        "fragments": "1",
+        "average_mw": "194.19",
+        "exact_mass": "194.0804",
+        "degree_of_unsaturation": "6",
+        "hbd": "0",
+        "hba": "6",
+        "rotatable_bonds": "0",
+        "tpsa": "61.8",
+        "logp": "-1.03",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
       },
       "files": [
         "molfiles/caffeine.mol"
@@ -297,6 +369,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C6H12O6",
+        "fragments": "1",
+        "average_mw": "180.16",
+        "exact_mass": "180.0634",
+        "degree_of_unsaturation": "1",
+        "hbd": "5",
+        "hba": "6",
+        "rotatable_bonds": "1",
+        "tpsa": "110.4",
+        "logp": "-3.22",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "5",
+          "double_bonds": "0",
+          "undefined": "1",
+          "max_stereoisomers": "32"
+        }
+      },
       "files": [
         "molfiles/glucose.mol"
       ]
@@ -357,6 +453,30 @@
         "strict": [],
         "possible": []
       },
+      "panel": {
+        "formula": "C8H9NO2",
+        "fragments": "1",
+        "average_mw": "151.16",
+        "exact_mass": "151.0633",
+        "degree_of_unsaturation": "5",
+        "hbd": "2",
+        "hba": "3",
+        "rotatable_bonds": "1",
+        "tpsa": "49.3",
+        "logp": "1.35",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
       "files": [
         "molfiles/paracetamol.mol"
       ]
@@ -416,6 +536,30 @@
       "stereo": {
         "strict": [],
         "possible": []
+      },
+      "panel": {
+        "formula": "C7H6O2",
+        "fragments": "1",
+        "average_mw": "122.12",
+        "exact_mass": "122.0368",
+        "degree_of_unsaturation": "5",
+        "hbd": "1",
+        "hba": "2",
+        "rotatable_bonds": "1",
+        "tpsa": "37.3",
+        "logp": "1.38",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
       },
       "files": [
         "molfiles/benzoic-acid.mol"
@@ -488,6 +632,30 @@
             "centered_on": 5
           }
         ]
+      },
+      "panel": {
+        "formula": "C10H14N2",
+        "fragments": "1",
+        "average_mw": "162.24",
+        "exact_mass": "162.1157",
+        "degree_of_unsaturation": "5",
+        "hbd": "0",
+        "hba": "2",
+        "rotatable_bonds": "1",
+        "tpsa": "16.1",
+        "logp": "1.85",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "1",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "2"
+        }
       },
       "files": [
         "molfiles/nicotine.mol"
@@ -631,6 +799,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C27H46O",
+        "fragments": "1",
+        "average_mw": "386.66",
+        "exact_mass": "386.3549",
+        "degree_of_unsaturation": "5",
+        "hbd": "1",
+        "hba": "1",
+        "rotatable_bonds": "5",
+        "tpsa": "20.2",
+        "logp": "7.39",
+        "lipinski": {
+          "mw": true,
+          "logp": false,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "8",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "256"
+        }
+      },
       "files": [
         "molfiles/cholesterol.mol"
       ]
@@ -702,6 +894,30 @@
             "centered_on": 2
           }
         ]
+      },
+      "panel": {
+        "formula": "C4H10O",
+        "fragments": "1",
+        "average_mw": "74.12",
+        "exact_mass": "74.0732",
+        "degree_of_unsaturation": "0",
+        "hbd": "1",
+        "hba": "1",
+        "rotatable_bonds": "1",
+        "tpsa": "20.2",
+        "logp": "0.78",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "1",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "2"
+        }
       },
       "files": [
         "molfiles/r-2-butanol.mol"
@@ -805,6 +1021,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C6H12O6",
+        "fragments": "1",
+        "average_mw": "180.16",
+        "exact_mass": "180.0634",
+        "degree_of_unsaturation": "1",
+        "hbd": "5",
+        "hba": "6",
+        "rotatable_bonds": "5",
+        "tpsa": "118.2",
+        "logp": "-3.38",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "4",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "16"
+        }
+      },
       "files": [
         "molfiles/aldehydo-d-glucose.mol"
       ]
@@ -877,6 +1117,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C9H8O2",
+        "fragments": "1",
+        "average_mw": "148.16",
+        "exact_mass": "148.0524",
+        "degree_of_unsaturation": "6",
+        "hbd": "1",
+        "hba": "2",
+        "rotatable_bonds": "2",
+        "tpsa": "37.3",
+        "logp": "1.78",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "1",
+          "undefined": "0",
+          "max_stereoisomers": "2"
+        }
+      },
       "files": [
         "molfiles/e-cinnamic-acid.mol"
       ]
@@ -936,6 +1200,30 @@
       "stereo": {
         "strict": [],
         "possible": []
+      },
+      "panel": {
+        "formula": "C2H6O",
+        "fragments": "1",
+        "average_mw": "46.07",
+        "exact_mass": "46.0419",
+        "degree_of_unsaturation": "0",
+        "hbd": "1",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "20.2",
+        "logp": "0.00",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
       },
       "files": [
         "molfiles/ethanol.mol"
@@ -997,6 +1285,30 @@
         "strict": [],
         "possible": []
       },
+      "panel": {
+        "formula": "C3H6O",
+        "fragments": "1",
+        "average_mw": "58.08",
+        "exact_mass": "58.0419",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "17.1",
+        "logp": "0.60",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
       "files": [
         "molfiles/acetone.mol"
       ]
@@ -1056,6 +1368,30 @@
       "stereo": {
         "strict": [],
         "possible": []
+      },
+      "panel": {
+        "formula": "C4H8O2",
+        "fragments": "1",
+        "average_mw": "88.11",
+        "exact_mass": "88.0524",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "2",
+        "rotatable_bonds": "1",
+        "tpsa": "26.3",
+        "logp": "0.57",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
       },
       "files": [
         "molfiles/ethyl-acetate.mol"
@@ -1117,6 +1453,30 @@
         "strict": [],
         "possible": []
       },
+      "panel": {
+        "formula": "C7H8",
+        "fragments": "1",
+        "average_mw": "92.14",
+        "exact_mass": "92.0626",
+        "degree_of_unsaturation": "4",
+        "hbd": "0",
+        "hba": "0",
+        "rotatable_bonds": "0",
+        "tpsa": "0.0",
+        "logp": "2.00",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
       "files": [
         "molfiles/toluene.mol"
       ]
@@ -1176,6 +1536,30 @@
       "stereo": {
         "strict": [],
         "possible": []
+      },
+      "panel": {
+        "formula": "C5H5N",
+        "fragments": "1",
+        "average_mw": "79.10",
+        "exact_mass": "79.0422",
+        "degree_of_unsaturation": "4",
+        "hbd": "0",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "12.9",
+        "logp": "1.08",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
       },
       "files": [
         "molfiles/pyridine.mol"
@@ -1249,6 +1633,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C4H10O",
+        "fragments": "1",
+        "average_mw": "74.12",
+        "exact_mass": "74.0732",
+        "degree_of_unsaturation": "0",
+        "hbd": "1",
+        "hba": "1",
+        "rotatable_bonds": "1",
+        "tpsa": "20.2",
+        "logp": "0.78",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "1",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "2"
+        }
+      },
       "files": [
         "molfiles/s-2-butanol.mol"
       ]
@@ -1320,6 +1728,30 @@
             "centered_on": 1
           }
         ]
+      },
+      "panel": {
+        "formula": "C3H7NO2",
+        "fragments": "1",
+        "average_mw": "89.09",
+        "exact_mass": "89.0477",
+        "degree_of_unsaturation": "1",
+        "hbd": "3",
+        "hba": "3",
+        "rotatable_bonds": "1",
+        "tpsa": "63.3",
+        "logp": "-0.58",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "1",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "2"
+        }
       },
       "files": [
         "molfiles/l-alanine.mol"
@@ -1393,6 +1825,30 @@
           }
         ]
       },
+      "panel": {
+        "formula": "C4H4O4",
+        "fragments": "1",
+        "average_mw": "116.07",
+        "exact_mass": "116.0110",
+        "degree_of_unsaturation": "3",
+        "hbd": "2",
+        "hba": "4",
+        "rotatable_bonds": "2",
+        "tpsa": "74.6",
+        "logp": "-0.29",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "1",
+          "undefined": "0",
+          "max_stereoisomers": "2"
+        }
+      },
       "files": [
         "molfiles/maleic-acid.mol"
       ]
@@ -1453,8 +1909,536 @@
         "strict": [],
         "possible": []
       },
+      "panel": {
+        "formula": "C6H7N",
+        "fragments": "1",
+        "average_mw": "93.13",
+        "exact_mass": "93.0578",
+        "degree_of_unsaturation": "4",
+        "hbd": "2",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "26.0",
+        "logp": "1.27",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
       "files": [
         "molfiles/aniline.mol"
+      ]
+    },
+    {
+      "typed_name": "sodium benzoate",
+      "pubchem_cid": 517055,
+      "smiles": "C1=CC=C(C=C1)C(=O)[O-].[Na+]",
+      "canonical_smiles": "O=C([O-])c1ccccc1.[Na+]",
+      "formula": "C7H5NaO2",
+      "inchikey": "WXMKPNITSTVMEF-UHFFFAOYSA-M",
+      "properties": {
+        "exactmw": 144.01872368,
+        "amw": 144.10499999999996,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 0.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 10.0,
+        "NumAtoms": 15.0,
+        "NumHeteroatoms": 3.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 81.1655007088453,
+        "tpsa": 40.129999999999995,
+        "CrippenClogP": -2.945899999999999,
+        "CrippenMR": 30.772499999999997,
+        "chi0v": 7.703247926875855,
+        "chi1v": 2.568931892986823,
+        "chi2v": 1.653482882349704,
+        "chi3v": 1.0094913287441554,
+        "chi4v": 0.5742356160406284,
+        "chi0n": 5.703247926875855,
+        "chi1n": 2.568931892986823,
+        "chi2n": 1.653482882349704,
+        "chi3n": 1.0094913287441554,
+        "chi4n": 0.5742356160406284,
+        "hallKierAlpha": -0.31000000000000005,
+        "kappa1": 9.689999999999998,
+        "kappa2": 4.496939508786177,
+        "kappa3": 2.5185440606017586,
+        "Phi": 4.357534384013805
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "panel": {
+        "formula": "C7H5NaO2",
+        "fragments": "2",
+        "average_mw": "144.10",
+        "exact_mass": "144.0187",
+        "degree_of_unsaturation": "—",
+        "hbd": "0",
+        "hba": "2",
+        "rotatable_bonds": "1",
+        "tpsa": "40.1",
+        "logp": "-2.95",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
+      "files": [
+        "molfiles/sodium-benzoate.mol"
+      ]
+    },
+    {
+      "typed_name": "tetramethylammonium",
+      "pubchem_cid": 6380,
+      "smiles": "C[N+](C)(C)C",
+      "canonical_smiles": "C[N+](C)(C)C",
+      "formula": "C4H12N+",
+      "inchikey": "QEMXHQIAXOOASZ-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 74.09642580408999,
+        "amw": 74.14699999999999,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 0.0,
+        "NumHeavyAtoms": 5.0,
+        "NumAtoms": 17.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 33.80388252781807,
+        "tpsa": 0.0,
+        "CrippenClogP": 0.3224,
+        "CrippenMR": 23.95639999999999,
+        "chi0v": 4.447213595499958,
+        "chi1v": 1.7888543819998317,
+        "chi2v": 2.6832815729997477,
+        "chi3v": 0.0,
+        "chi4v": 0.0,
+        "chi0n": 4.447213595499958,
+        "chi1n": 1.7888543819998317,
+        "chi2n": 2.6832815729997477,
+        "chi3n": 0.0,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.04,
+        "kappa1": 4.960000000000001,
+        "kappa2": 0.9767560019818928,
+        "kappa3": 9507.96,
+        "Phi": 0.9689419539660378
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "panel": {
+        "formula": "C4H12N+",
+        "fragments": "1",
+        "average_mw": "74.15",
+        "exact_mass": "74.0964",
+        "degree_of_unsaturation": "—",
+        "hbd": "0",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "0.0",
+        "logp": "0.32",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
+      "files": [
+        "molfiles/tetramethylammonium.mol"
+      ]
+    },
+    {
+      "typed_name": "paraquat",
+      "pubchem_cid": 15939,
+      "smiles": "C[N+]1=CC=C(C=C1)C2=CC=[N+](C=C2)C",
+      "canonical_smiles": "C[n+]1ccc(-c2cc[n+](C)cc2)cc1",
+      "formula": "C12H14N2+2",
+      "inchikey": "INFDPOAKFNIJBF-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 186.11460128817998,
+        "amw": 186.258,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 0.0,
+        "NumHBA": 0.0,
+        "NumHeavyAtoms": 14.0,
+        "NumAtoms": 28.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.16666666666666666,
+        "NumRings": 2.0,
+        "NumAromaticRings": 2.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 2.0,
+        "NumAromaticHeterocycles": 2.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 84.07762048943788,
+        "tpsa": 7.76,
+        "CrippenClogP": 1.0025999999999997,
+        "CrippenMR": 54.23000000000003,
+        "chi0v": 8.513229344516924,
+        "chi1v": 4.665256621701147,
+        "chi2v": 3.504573019178186,
+        "chi3v": 2.2902592234558816,
+        "chi4v": 1.3868708714003595,
+        "chi0n": 8.513229344516924,
+        "chi1n": 4.665256621701147,
+        "chi2n": 3.504573019178186,
+        "chi3n": 2.2902592234558816,
+        "chi4n": 1.3868708714003595,
+        "hallKierAlpha": -1.7000000000000002,
+        "kappa1": 8.87889083611284,
+        "kappa2": 3.5797336438830665,
+        "kappa3": 1.79140340646303,
+        "Phi": 2.2702903033141557
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "panel": {
+        "formula": "C12H14N2+2",
+        "fragments": "1",
+        "average_mw": "186.26",
+        "exact_mass": "186.1146",
+        "degree_of_unsaturation": "—",
+        "hbd": "0",
+        "hba": "2",
+        "rotatable_bonds": "1",
+        "tpsa": "7.8",
+        "logp": "1.00",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
+      "files": [
+        "molfiles/paraquat.mol"
+      ]
+    },
+    {
+      "typed_name": "bromobenzene",
+      "pubchem_cid": 7961,
+      "smiles": "C1=CC=C(C=C1)Br",
+      "canonical_smiles": "Brc1ccccc1",
+      "formula": "C6H5Br",
+      "inchikey": "QARVLSVVCXYDNA-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 155.95746226,
+        "amw": 157.01,
+        "lipinskiHBA": 0.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 0.0,
+        "NumHeavyAtoms": 7.0,
+        "NumAtoms": 12.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 51.298950725138326,
+        "tpsa": 0.0,
+        "CrippenClogP": 2.4491000000000005,
+        "CrippenMR": 34.142,
+        "chi0v": 5.350712358072061,
+        "chi1v": 2.8926641085849254,
+        "chi2v": 2.211243688217308,
+        "chi3v": 1.2617760723899503,
+        "chi4v": 0.7198922806969638,
+        "chi0n": 3.7647158189573564,
+        "chi1n": 2.099665839027573,
+        "chi2n": 1.2955681594256188,
+        "chi3n": 0.7331105593517154,
+        "chi4n": 0.4146671044330672,
+        "hallKierAlpha": -0.30000000000000004,
+        "kappa1": 4.849253731343284,
+        "kappa2": 2.123680215888008,
+        "kappa3": 1.3161241356046551,
+        "Phi": 1.4711806015821192
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "panel": {
+        "formula": "C6H5Br",
+        "fragments": "1",
+        "average_mw": "157.01",
+        "exact_mass": "155.9575",
+        "degree_of_unsaturation": "4",
+        "hbd": "0",
+        "hba": "0",
+        "rotatable_bonds": "0",
+        "tpsa": "0.0",
+        "logp": "2.45",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
+      "files": [
+        "molfiles/bromobenzene.mol"
+      ]
+    },
+    {
+      "typed_name": "dimethyl sulfoxide",
+      "pubchem_cid": 679,
+      "smiles": "CS(=O)C",
+      "canonical_smiles": "CS(C)=O",
+      "formula": "C2H6OS",
+      "inchikey": "IAZDPXIOMUYVGZ-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 78.013935812,
+        "amw": 78.13600000000001,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 4.0,
+        "NumAtoms": 10.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 28.478447345802074,
+        "tpsa": 17.07,
+        "CrippenClogP": -0.005299999999999971,
+        "CrippenMR": 19.990399999999998,
+        "chi0v": 3.632993161855452,
+        "chi1v": 2.949489742783178,
+        "chi2v": 2.224744871391589,
+        "chi3v": 0.0,
+        "chi4v": 0.0,
+        "chi0n": 2.8164965809277263,
+        "chi1n": 0.9831632475943928,
+        "chi2n": 0.7415816237971965,
+        "chi3n": 0.0,
+        "chi4n": 0.0,
+        "hallKierAlpha": 0.14999999999999997,
+        "kappa1": 4.150000000000002,
+        "kappa2": 1.4674603174603182,
+        "kappa3": 126.37222222222238,
+        "Phi": 1.5224900793650809
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "panel": {
+        "formula": "C2H6OS",
+        "fragments": "1",
+        "average_mw": "78.14",
+        "exact_mass": "78.0139",
+        "degree_of_unsaturation": "0",
+        "hbd": "0",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "17.1",
+        "logp": "-0.01",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
+      "files": [
+        "molfiles/dimethyl-sulfoxide.mol"
+      ]
+    },
+    {
+      "typed_name": "boric acid",
+      "pubchem_cid": 7628,
+      "smiles": "B(O)(O)O",
+      "canonical_smiles": "OB(O)O",
+      "formula": "H3BO3",
+      "inchikey": "KGBXLFKZBHKPEV-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 62.017524355999996,
+        "amw": 61.833000000000006,
+        "lipinskiHBA": 3.0,
+        "lipinskiHBD": 3.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 3.0,
+        "NumHBA": 3.0,
+        "NumHeavyAtoms": 4.0,
+        "NumAtoms": 7.0,
+        "NumHeteroatoms": 4.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 23.684517280895907,
+        "tpsa": 60.69,
+        "CrippenClogP": -2.0518,
+        "CrippenMR": 12.4104,
+        "chi0v": 1.9189910556894996,
+        "chi1v": 0.7745966692414834,
+        "chi2v": 0.34641016151377546,
+        "chi3v": 0.0,
+        "chi4v": 0.0,
+        "chi0n": 1.9189910556894996,
+        "chi1n": 0.7745966692414834,
+        "chi2n": 0.34641016151377546,
+        "chi3n": 0.0,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.05506493506493516,
+        "kappa1": 3.944935064935065,
+        "kappa2": 1.2845011259687569,
+        "kappa3": 572.7416598780339,
+        "Phi": 1.2668183831956805
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "panel": {
+        "formula": "H3BO3",
+        "fragments": "1",
+        "average_mw": "61.83",
+        "exact_mass": "62.0175",
+        "degree_of_unsaturation": "—",
+        "hbd": "3",
+        "hba": "3",
+        "rotatable_bonds": "0",
+        "tpsa": "60.7",
+        "logp": "-2.05",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      },
+      "files": [
+        "molfiles/boric-acid.mol"
       ]
     }
   ],

@@ -23,3 +23,12 @@ pyridine
 L-alanine
 maleic acid
 aniline
+# Edge cases for the properties panel's rules: two fragments, net charges (paraquat's +2
+# gives a whole number from the formula, so only the charge rule hides it), a halogen,
+# sulfur, and no carbon at all (degree of unsaturation shows "—" for some of these).
+sodium benzoate
+tetramethylammonium
+paraquat
+bromobenzene
+dimethyl sulfoxide
+boric acid

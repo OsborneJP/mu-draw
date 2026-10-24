@@ -19,3 +19,9 @@ pyridine,1049,Pyridine,C1=CC=NC=C1
 L-alanine,5950,L-Alanine,C[C@@H](C(=O)O)N
 maleic acid,444266,Maleic Acid,C(=C\C(=O)O)\C(=O)O
 aniline,6115,Aniline,C1=CC=C(C=C1)N
+sodium benzoate,517055,Sodium Benzoate,C1=CC=C(C=C1)C(=O)[O-].[Na+]
+tetramethylammonium,6380,Tetramethylammonium,C[N+](C)(C)C
+paraquat,15939,Paraquat,C[N+]1=CC=C(C=C1)C2=CC=[N+](C=C2)C
+bromobenzene,7961,Bromobenzene,C1=CC=C(C=C1)Br
+dimethyl sulfoxide,679,Dimethyl Sulfoxide,CS(=O)C
+boric acid,7628,Boric Acid,B(O)(O)O
