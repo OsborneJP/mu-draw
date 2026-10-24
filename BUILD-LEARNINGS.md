@@ -677,3 +677,15 @@ that fails without the fix. Accepted as known limits:
   are its own English, technical for a student; a name PubChem matches several ways gets its
   first record (the panel says how many); the name box's width (190 px) shows short names
   whole, long ones scroll; most UI mutations fail at the 30 s assertion deadline.
+- Staging and production (2026-10-24, f638f12): `scripts/deploy.sh staging` ran check.sh
+  (412 pytest, 289 Vitest, 57 Playwright tests, 2 live-only ones skipped), shipped server/
+  with opsin/ (jar, helper, licence), and stopped for the API restart. No unit or Apache
+  change was needed. After Jeff's `sudo systemctl restart mu-draw-api-staging` the service
+  ran its OPSIN JVM from the deployed copy (131 MiB for the whole unit at rest), and
+  `--smoke-only staging` passed: check_live's 11 checks (the new POST api/structure draws a
+  systematic name, which proves Java and OPSIN run there), then 56 Playwright tests against
+  /draw-staging/, the live Name to structure test (one OPSIN name, one PubChem name) among
+  them; 3 skip by design. Production verified at f638f12 the same way: `--production` ran
+  the 57 Playwright tests on the production build before copying, Jeff restarted
+  mu-draw-api, and `--smoke-only production` passed the same 11 checks and 56 tests against
+  /draw/. Recorded after promoting, in one docs commit.
