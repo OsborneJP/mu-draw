@@ -107,3 +107,12 @@
   font: inherit;
   cursor: pointer;
 }
+
+.header-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.header-button:disabled:hover {
+  background: transparent;
+}

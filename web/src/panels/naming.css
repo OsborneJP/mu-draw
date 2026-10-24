@@ -1,0 +1,69 @@
+/* Over the canvas's top-right corner (.canvas-area, index.css), below Ketcher's top toolbar
+   and left of its right one. */
+.name-panel {
+  position: absolute;
+  top: 64px;
+  right: 64px;
+  z-index: 20;
+  box-sizing: border-box;
+  width: min(380px, calc(100% - 160px));
+  padding: 10px 14px 12px;
+  border: 1px solid #c8d3df;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 18%);
+  color: #1b1b1b;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.name-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.name-panel h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.name-panel-close {
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  color: #555;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.name-panel dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 10px;
+  margin: 0 0 8px;
+}
+
+.name-panel dt {
+  color: #555;
+}
+
+.name-panel dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.name-message {
+  margin: 0;
+}
+
+.name-note {
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: #fff4cc;
+  color: #4a3a00;
+}

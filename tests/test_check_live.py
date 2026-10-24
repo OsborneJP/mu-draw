@@ -1,5 +1,7 @@
 """scripts/check_live.py's rules, on canned responses (no network)."""
 
+import json
+
 import check_live as cl
 import pytest
 
@@ -35,7 +37,7 @@ def good_results() -> dict[str, cl.Fetched]:
             headers["content-security-policy"] = [POLICY]
         if e.worker_csp:
             headers["content-security-policy"] = [WORKERS[e.path]]
-        body = b'{"ok":true}' if e.body_json is not None else b""
+        body = json.dumps(e.body_json).encode() if e.body_json is not None else b""
         results[e.path] = cl.Fetched(200, headers, body)
     return results
 
@@ -84,3 +86,16 @@ def test_api_must_answer_through_apache():
     assert cl.check(results, cl.expectations(FILES), POLICY, WORKERS) == ["api/health: HTTP 503"]
     results["api/health"] = cl.Fetched(200, {}, b"<html>proxy error</html>")
     assert "api/health: body" in cl.check(results, cl.expectations(FILES), POLICY, WORKERS)[0]
+
+
+def test_get_name_must_answer_as_recorded():
+    expected = cl.expectations(FILES)
+    (name,) = [e for e in expected if e.path == "api/name"]
+    assert name.post_json == {"smiles": name.post_json["smiles"]}
+    assert name.body_json["found"] is True
+    results = good_results()
+    results["api/name"] = cl.Fetched(502, {}, b'{"error":"unavailable"}')
+    assert cl.check(results, expected, POLICY, WORKERS) == ["api/name: HTTP 502"]
+    wrong = {**name.body_json, "cid": name.body_json["cid"] + 1}
+    results["api/name"] = cl.Fetched(200, {}, json.dumps(wrong).encode())
+    assert "api/name: body" in cl.check(results, expected, POLICY, WORKERS)[0]

@@ -2,8 +2,10 @@
 
     python scripts/check_live.py <app-url> <dist-dir>
 
-Confirms what docs/server-setup.md promises: the API answers through Apache; index.html,
-sw.js, the manifest and the RDKit files revalidate (no-cache); hashed assets are immutable;
+Confirms what docs/server-setup.md promises: the API answers through Apache, and names a
+reference compound (aspirin) as recorded, which needs PubChem or the server's cache;
+index.html, sw.js, the manifest and the RDKit files revalidate (no-cache); hashed assets
+are immutable;
 WebAssembly and the manifest have the right types; every page and worker script carries
 the build's CSP, exactly once, and the RDKit worker its own (web/csp-workers.json).
 """
@@ -40,6 +42,23 @@ class Expect:
     csp: bool = False  # the page's policy (web/csp.json)
     worker_csp: bool = False  # this worker's own policy (web/csp-workers.json)
     body_json: object = None
+    post_json: object = None  # POST this as JSON instead of a GET
+
+
+FIXTURES = ROOT / "tests" / "fixtures"
+
+
+def name_check() -> Expect:
+    """Get name through Apache and the API: aspirin's PubChem SMILES (from the reference
+    fixtures) must get the answer recorded for it (tests/fixtures/name_responses.json)."""
+    expected = json.loads((FIXTURES / "reference_expected.json").read_text(encoding="utf-8"))
+    aspirin = next(c for c in expected["compounds"] if c["typed_name"] == "aspirin")
+    responses = json.loads((FIXTURES / "name_responses.json").read_text(encoding="utf-8"))
+    return Expect(
+        "api/name",
+        body_json=responses["responses"]["aspirin"],
+        post_json={"smiles": aspirin["smiles"]},
+    )
 
 
 def expectations(dist_files: list[str]) -> list[Expect]:
@@ -63,6 +82,7 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         Expect("rdkit/RDKit_minimal.wasm", cache="no-cache", content_type="application/wasm"),
         Expect("rdkit/worker.js", cache="no-cache", worker_csp=True),
         Expect("api/health", body_json={"ok": True}),
+        name_check(),
     ]
 
 
@@ -101,8 +121,13 @@ def check(
     return problems
 
 
-def fetch(url: str, with_body: bool) -> Fetched:
-    request = urllib.request.Request(url, method="GET" if with_body else "HEAD")
+def fetch(url: str, with_body: bool, post_json: object = None) -> Fetched:
+    if post_json is not None:
+        data = json.dumps(post_json).encode("utf-8")
+        headers = {"Content-Type": "application/json"}
+        request = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    else:
+        request = urllib.request.Request(url, method="GET" if with_body else "HEAD")
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             status, headers = response.status, response.headers
@@ -122,7 +147,10 @@ def main(argv: list[str]) -> int:
     url, dist = argv[1].rstrip("/") + "/", Path(argv[2])
     files = [p.relative_to(dist).as_posix() for p in sorted(dist.rglob("*")) if p.is_file()]
     expected = expectations(files)
-    results = {e.path: fetch(url + e.path, with_body=e.body_json is not None) for e in expected}
+    results = {
+        e.path: fetch(url + e.path, with_body=e.body_json is not None, post_json=e.post_json)
+        for e in expected
+    }
     problems = check(results, expected, csp_policy(ROOT / "web" / "csp.json"), worker_policies())
     for problem in problems:
         print(f"live: {problem}")

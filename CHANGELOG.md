@@ -50,6 +50,17 @@ All notable changes to this project. The format follows
   2ⁿ stereoisomers, with a note that meso forms can make fewer. Clicking a count
   highlights them on the canvas (undefined ones in amber); clicking again, or any change
   to the drawing, removes the highlight. It is not an edit: Undo and autosave ignore it.
+- Get name (in the header): looks the drawn structure up in PubChem, through the app's own
+  server, and shows its IUPAC name, PubChem title and CID, with a link that opens its
+  PubChem page in a new tab. If PubChem has no record of the structure, it says so plainly;
+  if the drawing leaves stereochemistry undefined, it notes that a specific stereoisomer may
+  have a different name. A busy PubChem or a naming service that doesn't answer within 8 s
+  gets its own message, and the drawing is never at risk. Greyed while offline ("Needs an
+  internet connection") and while the canvas is empty. Only the structure (as SMILES) leaves
+  the device; the server keeps PubChem's answers, chemistry only, for 30 days.
+
+### Changed
+- Header buttons look greyed while they can't be used.
 
 ### Fixed
 - Ketcher's image previews and exports could hang when two were made at once; they now
