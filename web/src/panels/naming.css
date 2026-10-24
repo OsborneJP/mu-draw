@@ -67,3 +67,20 @@
   background: #fff4cc;
   color: #4a3a00;
 }
+
+.name-source,
+.name-opsin,
+.name-differs {
+  margin: 0 0 6px;
+}
+
+.name-opsin {
+  color: #555;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.name-match {
+  color: #1a7f37;
+  font-weight: 600;
+}

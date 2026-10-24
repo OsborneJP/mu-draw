@@ -99,3 +99,16 @@ def test_get_name_must_answer_as_recorded():
     wrong = {**name.body_json, "cid": name.body_json["cid"] + 1}
     results["api/name"] = cl.Fetched(200, {}, json.dumps(wrong).encode())
     assert "api/name: body" in cl.check(results, expected, POLICY, WORKERS)[0]
+
+
+def test_name_to_structure_must_answer_as_recorded():
+    expected = cl.expectations(FILES)
+    (structure,) = [e for e in expected if e.path == "api/structure"]
+    assert structure.body_json["source"] == "OPSIN"
+    assert set(structure.post_json) == {"name"}
+    results = good_results()
+    results["api/structure"] = cl.Fetched(502, {}, b'{"error":"unavailable"}')
+    assert cl.check(results, expected, POLICY, WORKERS) == ["api/structure: HTTP 502"]
+    wrong = {**structure.body_json, "source": "PubChem"}
+    results["api/structure"] = cl.Fetched(200, {}, json.dumps(wrong).encode())
+    assert "api/structure: body" in cl.check(results, expected, POLICY, WORKERS)[0]

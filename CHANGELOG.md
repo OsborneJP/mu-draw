@@ -58,6 +58,14 @@ All notable changes to this project. The format follows
   gets its own message, and the drawing is never at risk. Greyed while offline ("Needs an
   internet connection") and while the canvas is empty. Only the structure (as SMILES) leaves
   the device; the server keeps PubChem's answers, chemistry only, for 30 days.
+- Name to structure (in the header): type a name, then Add (beside the drawing) or Replace;
+  Enter adds when there is a drawing. OPSIN, running on the app's own server, reads
+  systematic names; common and trade names (aspirin, Tylenol) come from PubChem, and the
+  panel says which answered, with OPSIN's message when it couldn't read the name. When
+  OPSIN leaves the stereochemistry of a well-known compound undefined (nicotine), PubChem's
+  record for it is drawn instead, and the panel says so. Then Get name runs on the result:
+  "You typed" beside "PubChem's IUPAC name", with a check mark when they match. One Undo
+  removes an addition or brings back what Replace cleared. Greyed offline.
 
 ### Changed
 - Header buttons look greyed while they can't be used.

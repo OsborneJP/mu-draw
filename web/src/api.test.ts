@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { NAMING_DEADLINE_MS, nameOutcome, pubchemCompoundPage, requestName } from './api';
+import {
+  NAMING_DEADLINE_MS,
+  nameOutcome,
+  pubchemCompoundPage,
+  requestName,
+  requestStructure,
+  structureOutcome,
+} from './api';
 
 const ANSWER = { found: true, iupac: 'i', title: 't', cid: 7, url: pubchemCompoundPage(7), undefined_stereo: 1 };
 const FOUND = { kind: 'found', iupac: 'i', title: 't', cid: 7, url: pubchemCompoundPage(7), undefinedStereo: 1 };
@@ -141,5 +148,84 @@ describe('requestName', () => {
   it('an answer that is not JSON is judged by its status', async () => {
     vi.stubGlobal('fetch', () => Promise.resolve(new Response('<html>Proxy Error</html>', { status: 502 })));
     expect(await requestName('s', new AbortController().signal)).toEqual(NOT_RESPONDING);
+  });
+});
+
+const DRAWN_ANSWER = {
+  found: true,
+  smiles: 'S',
+  molfile: 'M',
+  source: 'PubChem',
+  message: 'opsin said',
+  title: 'T',
+  cid: 9,
+  matches: 2,
+  stereo_from_pubchem: true,
+};
+const DRAWN = {
+  kind: 'drawn',
+  smiles: 'S',
+  molfile: 'M',
+  source: 'PubChem',
+  opsinMessage: 'opsin said',
+  title: 'T',
+  cid: 9,
+  matches: 2,
+  stereoFromPubchem: true,
+};
+
+describe('structureOutcome', () => {
+  it('a drawn name', () => {
+    expect(structureOutcome(200, DRAWN_ANSWER)).toEqual(DRAWN);
+  });
+
+  it('drawn by OPSIN: no PubChem record', () => {
+    const answer = { ...DRAWN_ANSWER, source: 'OPSIN', message: null, title: null, cid: null, matches: 0 };
+    expect(structureOutcome(200, answer)).toMatchObject({ kind: 'drawn', source: 'OPSIN', cid: null });
+  });
+
+  it('no compound by that name keeps OPSIN’s words', () => {
+    const answer = { ...DRAWN_ANSWER, found: false, smiles: null, molfile: null, source: null, title: null, cid: null, matches: 0, stereo_from_pubchem: false };
+    expect(structureOutcome(200, answer)).toEqual({ kind: 'no-compound', opsinMessage: 'opsin said' });
+  });
+
+  it.each([
+    [503, { error: 'busy' }, 'busy'],
+    [422, { detail: [] }, 'bad-name'],
+    [502, { error: 'unavailable' }, 'not-responding'],
+    [500, null, 'not-responding'],
+    [200, null, 'not-responding'],
+  ])('HTTP %i %j -> %s', (status, body, kind) => {
+    expect(structureOutcome(status, body)).toEqual({ kind });
+  });
+
+  it.each([
+    ['another source', { source: 'EBI' }],
+    ['no molfile', { molfile: null }],
+    ['an empty SMILES', { smiles: '' }],
+    ['CID 0', { cid: 0 }],
+    ['a stereo flag that is not true or false', { stereo_from_pubchem: 'yes' }],
+    ['a negative record count', { matches: -1 }],
+  ])('%s is not trusted', (_, change) => {
+    expect(structureOutcome(200, { ...DRAWN_ANSWER, ...change })).toEqual(NOT_RESPONDING);
+  });
+});
+
+describe('requestStructure', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("posts only the typed name, as JSON, to the app's own API, with the 8 s deadline", async () => {
+    vi.useFakeTimers();
+    const requests = holdFetch();
+    const outcome = requestStructure('a name', new AbortController().signal);
+    expect(requests[0].url).toBe(`${import.meta.env.BASE_URL}api/structure`);
+    expect(requests[0].init.method).toBe('POST');
+    expect(requests[0].init.body).toBe(JSON.stringify({ name: 'a name' }));
+    await vi.advanceTimersByTimeAsync(NAMING_DEADLINE_MS);
+    expect(await outcome).toEqual(NOT_RESPONDING);
+    expect(requests[0].init.signal!.aborted).toBe(true);
   });
 });

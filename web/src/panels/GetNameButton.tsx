@@ -1,30 +1,23 @@
-import { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { useOnline } from '../shell/useOnline';
-import { closeName, getNameState, nameDrawing, subscribeNameState } from './naming';
+import { drawingChanged, getNameState, isBusy, nameDrawing, subscribeNameState } from './naming';
+import { useHasAtoms } from './useHasAtoms';
 
 // Get name (header): greyed while offline (it needs the server and PubChem), while the canvas
-// has no atoms, and while a name is on its way. Any change to the drawing closes the panel.
+// has no atoms, and while a request is on its way. Any change to the drawing closes the panel
+// (src/panels/naming.ts).
 export default function GetNameButton() {
   const ketcher = useSyncExternalStore(subscribeKetcher, getKetcher);
   const online = useOnline();
   const naming = useSyncExternalStore(subscribeNameState, getNameState).kind === 'naming';
-  const subscribeDrawing = useCallback(
-    (onChange: () => void) => {
-      if (!ketcher) return () => {};
-      ketcher.changeEvent.add(onChange);
-      return () => ketcher.changeEvent.remove(onChange);
-    },
-    [ketcher],
-  );
-  const hasAtoms = useSyncExternalStore(subscribeDrawing, () =>
-    ketcher ? ketcher.editor.struct().atoms.size > 0 : false,
-  );
+  const busy = useSyncExternalStore(subscribeNameState, isBusy);
+  const hasAtoms = useHasAtoms(ketcher);
 
   useEffect(() => {
     if (!ketcher) return;
-    ketcher.changeEvent.add(closeName);
-    return () => ketcher.changeEvent.remove(closeName);
+    ketcher.changeEvent.add(drawingChanged);
+    return () => ketcher.changeEvent.remove(drawingChanged);
   }, [ketcher]);
 
   const reason = !online ? 'Needs an internet connection' : !hasAtoms ? 'Draw a structure to name it' : null;
@@ -33,7 +26,7 @@ export default function GetNameButton() {
       type="button"
       className="header-button"
       data-testid="app-get-name-button"
-      disabled={!ketcher || reason !== null || naming}
+      disabled={!ketcher || reason !== null || busy}
       title={reason ?? "Look up this structure's name in PubChem"}
       onClick={() => ketcher && void nameDrawing(ketcher)}
     >

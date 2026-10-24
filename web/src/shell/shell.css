@@ -116,3 +116,24 @@
 .header-button:disabled:hover {
   background: transparent;
 }
+
+.name-to-structure {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.name-to-structure-input {
+  width: 190px;
+  padding: 2px 8px;
+  border: 1px solid rgb(255 255 255 / 60%);
+  border-radius: 4px;
+  background: #fff;
+  color: #1b1b1b;
+  font: inherit;
+  font-size: 13px;
+}
+
+.name-to-structure-input:disabled {
+  opacity: 0.6;
+}

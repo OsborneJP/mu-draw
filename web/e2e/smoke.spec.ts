@@ -181,6 +181,9 @@ test('offline: after one visit the app loads and works with no network and no se
   const getName = page.getByTestId('app-get-name-button');
   await expect(getName).toBeDisabled();
   await expect(getName).toHaveAttribute('title', 'Needs an internet connection');
+  const nameBox = page.getByTestId('name-to-structure-input');
+  await expect(nameBox).toBeDisabled();
+  await expect(nameBox).toHaveAttribute('title', 'Needs an internet connection');
 
   // RDKit's wasm is served from the cache, as WebAssembly, and compiles.
   const rdkitResponse = page.waitForResponse((r) => r.url() === rdkitUrl);

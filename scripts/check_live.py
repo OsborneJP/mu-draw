@@ -2,8 +2,9 @@
 
     python scripts/check_live.py <app-url> <dist-dir>
 
-Confirms what docs/server-setup.md promises: the API answers through Apache, and names a
-reference compound (aspirin) as recorded, which needs PubChem or the server's cache;
+Confirms what docs/server-setup.md promises: the API answers through Apache, names a
+reference compound (aspirin) as recorded, which needs PubChem or the server's cache, and
+draws a systematic name as recorded, which needs OPSIN (Java) on the server;
 index.html, sw.js, the manifest and the RDKit files revalidate (no-cache); hashed assets
 are immutable;
 WebAssembly and the manifest have the right types; every page and worker script carries
@@ -61,6 +62,19 @@ def name_check() -> Expect:
     )
 
 
+def structure_check() -> Expect:
+    """Name to structure through Apache and the API: the first systematic name OPSIN draws
+    must get the answer recorded for it (tests/fixtures/structure_responses.json). OPSIN
+    runs on the server, so this proves Java and OPSIN run there, with no PubChem needed."""
+    responses = json.loads((FIXTURES / "structure_responses.json").read_text(encoding="utf-8"))
+    name, answer = next(
+        (name, r["structure"])
+        for name, r in responses["responses"].items()
+        if r["kind"] == "systematic" and r["structure"]["source"] == "OPSIN"
+    )
+    return Expect("api/structure", body_json=answer, post_json={"name": name})
+
+
 def expectations(dist_files: list[str]) -> list[Expect]:
     def one(pattern: str) -> str:
         found = [f for f in dist_files if re.fullmatch(pattern, f)]
@@ -83,6 +97,7 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         Expect("rdkit/worker.js", cache="no-cache", worker_csp=True),
         Expect("api/health", body_json={"ok": True}),
         name_check(),
+        structure_check(),
     ]
 
 

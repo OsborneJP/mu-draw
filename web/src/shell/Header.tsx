@@ -3,6 +3,7 @@ import { getSaveStatus, subscribeSaveStatus } from '../editor/autosave';
 import CopyImageButton from '../panels/CopyImageButton';
 import ExportDialog from '../panels/ExportDialog';
 import GetNameButton from '../panels/GetNameButton';
+import NameToStructure from '../panels/NameToStructure';
 import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
@@ -40,6 +41,7 @@ export default function Header() {
             </span>
           )}
         </span>
+        <NameToStructure />
         <GetNameButton />
         <CopyImageButton />
         <ExportDialog />
