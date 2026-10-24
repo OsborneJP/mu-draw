@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/aniline/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T12:37:17Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 6115,
+          "SMILES": "C1=CC=C(C=C1)N",
+          "Title": "Aniline"
+        }
+      ]
+    }
+  }
+}

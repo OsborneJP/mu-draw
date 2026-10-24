@@ -45,6 +45,13 @@ def test_recordings_ask_for_current_property_names():
         assert recording["status"] == 200, path.name
 
 
+def test_missing_mode_records_only_names_without_a_recording(tmp_path):
+    names = ["first name", "second name"]
+    fetch.recording_path(names[0], tmp_path).write_text("{}", encoding="utf-8")
+    assert fetch.to_record(names, missing_only=True, directory=tmp_path) == names[1:]
+    assert fetch.to_record(names, missing_only=False, directory=tmp_path) == names
+
+
 def test_parse_rejects_more_than_one_record():
     two = [{"CID": 1, "SMILES": "a", "Title": "A"}, {"CID": 2, "SMILES": "b", "Title": "B"}]
     with pytest.raises(ValueError, match="2 records"):
@@ -72,8 +79,9 @@ def test_expected_values_come_from_the_pinned_rdkit(generated):
 def test_molfiles_carry_the_chiral_flag_for_specified_centres(generated):
     data = json.loads(generated[gen.EXPECTED_FILE])
     flagged = 0
-    for compound in data["compounds"]:
-        path = gen.FIXTURES / "molfiles" / f"{gen.slug(compound['typed_name'])}.mol"
+    for compound in data["compounds"] + data["invented"]:
+        (rel,) = compound["files"]
+        path = gen.FIXTURES / rel
         mol = Chem.MolFromMolFile(str(path))
         specified = any(
             e["type"] == "Atom_Tetrahedral" and e["specified"] == "Specified"
@@ -93,3 +101,18 @@ def test_rdkit_default_chiral_flag_would_be_caught():
     assert not drawn.HasProp("_MolFileChiralFlag")
     reread = Chem.MolFromMolBlock(Chem.MolToMolBlock(drawn))
     assert reread.GetIntProp("_MolFileChiralFlag") == 0
+
+
+def test_invented_structures_join_two_reference_compounds(generated):
+    data = json.loads(generated[gen.EXPECTED_FILE])
+    by_name = {c["typed_name"]: c for c in data["compounds"]}
+    known = {c["inchikey"] for c in data["compounds"]}
+    assert len(data["invented"]) == len(gen.INVENTED) == 3
+    for entry, pair in zip(data["invented"], gen.INVENTED, strict=True):
+        assert entry["made_from"] == list(pair)
+        assert entry["inchikey"] not in known
+        parts = [Chem.MolFromSmiles(by_name[name]["smiles"]) for name in pair]
+        joined = Chem.MolFromSmiles(entry["smiles"])
+        assert joined.GetNumHeavyAtoms() == sum(m.GetNumHeavyAtoms() for m in parts)
+        assert len(Chem.GetMolFrags(joined)) == 1
+        assert entry["canonical_smiles"] == Chem.MolToSmiles(joined)

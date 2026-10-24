@@ -12,6 +12,7 @@
       "typed_name": "aspirin",
       "pubchem_cid": 2244,
       "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
+      "canonical_smiles": "CC(=O)Oc1ccccc1C(=O)O",
       "formula": "C9H8O4",
       "inchikey": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
       "properties": {
@@ -71,6 +72,7 @@
       "typed_name": "ibuprofen",
       "pubchem_cid": 3672,
       "smiles": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
+      "canonical_smiles": "CC(C)Cc1ccc(C(C)C(=O)O)cc1",
       "formula": "C13H18O2",
       "inchikey": "HEFNNWSXXWATRW-UHFFFAOYSA-N",
       "properties": {
@@ -136,6 +138,7 @@
       "typed_name": "caffeine",
       "pubchem_cid": 2519,
       "smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      "canonical_smiles": "Cn1c(=O)c2c(ncn2C)n(C)c1=O",
       "formula": "C8H10N4O2",
       "inchikey": "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
       "properties": {
@@ -195,6 +198,7 @@
       "typed_name": "glucose",
       "pubchem_cid": 5793,
       "smiles": "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O",
+      "canonical_smiles": "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O",
       "formula": "C6H12O6",
       "inchikey": "WQZGKKKJIJFFOK-GASJEMHNSA-N",
       "properties": {
@@ -301,6 +305,7 @@
       "typed_name": "paracetamol",
       "pubchem_cid": 1983,
       "smiles": "CC(=O)NC1=CC=C(C=C1)O",
+      "canonical_smiles": "CC(=O)Nc1ccc(O)cc1",
       "formula": "C8H9NO2",
       "inchikey": "RZVAJINKPMORJF-UHFFFAOYSA-N",
       "properties": {
@@ -360,6 +365,7 @@
       "typed_name": "benzoic acid",
       "pubchem_cid": 243,
       "smiles": "C1=CC=C(C=C1)C(=O)O",
+      "canonical_smiles": "O=C(O)c1ccccc1",
       "formula": "C7H6O2",
       "inchikey": "WPYMKLBDIGXBTP-UHFFFAOYSA-N",
       "properties": {
@@ -419,6 +425,7 @@
       "typed_name": "nicotine",
       "pubchem_cid": 89594,
       "smiles": "CN1CCC[C@H]1C2=CN=CC=C2",
+      "canonical_smiles": "CN1CCC[C@H]1c1cccnc1",
       "formula": "C10H14N2",
       "inchikey": "SNICXCGAKADSCV-JTQLQIEISA-N",
       "properties": {
@@ -490,6 +497,7 @@
       "typed_name": "cholesterol",
       "pubchem_cid": 5997,
       "smiles": "C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C",
+      "canonical_smiles": "CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C",
       "formula": "C27H46O",
       "inchikey": "HVYWMOMLDIMFJA-DPAQBDIFSA-N",
       "properties": {
@@ -631,6 +639,7 @@
       "typed_name": "(R)-2-butanol",
       "pubchem_cid": 84682,
       "smiles": "CC[C@@H](C)O",
+      "canonical_smiles": "CC[C@@H](C)O",
       "formula": "C4H10O",
       "inchikey": "BTANRVKWQNVYAZ-SCSAIBSYSA-N",
       "properties": {
@@ -702,6 +711,7 @@
       "typed_name": "aldehydo-D-glucose",
       "pubchem_cid": 107526,
       "smiles": "C([C@H]([C@H]([C@@H]([C@H](C=O)O)O)O)O)O",
+      "canonical_smiles": "O=C[C@H](O)[C@@H](O)[C@H](O)[C@H](O)CO",
       "formula": "C6H12O6",
       "inchikey": "GZCGUPFRVQAUEE-SLPGGIOYSA-N",
       "properties": {
@@ -803,6 +813,7 @@
       "typed_name": "(E)-cinnamic acid",
       "pubchem_cid": 444539,
       "smiles": "C1=CC=C(C=C1)/C=C/C(=O)O",
+      "canonical_smiles": "O=C(O)/C=C/c1ccccc1",
       "formula": "C9H8O2",
       "inchikey": "WBYWAXJHAXSJNI-VOTSOKGWSA-N",
       "properties": {
@@ -868,6 +879,759 @@
       },
       "files": [
         "molfiles/e-cinnamic-acid.mol"
+      ]
+    },
+    {
+      "typed_name": "ethanol",
+      "pubchem_cid": 702,
+      "smiles": "CCO",
+      "canonical_smiles": "CCO",
+      "formula": "C2H6O",
+      "inchikey": "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 46.041864812,
+        "amw": 46.069,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 3.0,
+        "NumAtoms": 9.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 19.89842689442217,
+        "tpsa": 20.23,
+        "CrippenClogP": -0.0014000000000000123,
+        "CrippenMR": 12.759800000000002,
+        "chi0v": 2.1543203766865053,
+        "chi1v": 1.0233345472033855,
+        "chi2v": 0.3162277660168379,
+        "chi3v": 0.0,
+        "chi4v": 0.0,
+        "chi0n": 2.1543203766865053,
+        "chi1n": 1.0233345472033855,
+        "chi2n": 0.3162277660168379,
+        "chi3n": 0.0,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.04,
+        "kappa1": 2.9600000000000004,
+        "kappa2": 1.96,
+        "kappa3": 1.9600000000000033,
+        "Phi": 1.9338666666666668
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "molfiles/ethanol.mol"
+      ]
+    },
+    {
+      "typed_name": "acetone",
+      "pubchem_cid": 180,
+      "smiles": "CC(=O)C",
+      "canonical_smiles": "CC(C)=O",
+      "formula": "C3H6O",
+      "inchikey": "CSCPPACGZOOCGX-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 58.041864812,
+        "amw": 58.08,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 4.0,
+        "NumAtoms": 10.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.6666666666666666,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 25.63065735666653,
+        "tpsa": 17.07,
+        "CrippenClogP": 0.5952999999999999,
+        "CrippenMR": 16.355,
+        "chi0v": 2.908248290463863,
+        "chi1v": 1.2041241452319316,
+        "chi2v": 0.9082482904638631,
+        "chi3v": 0.0,
+        "chi4v": 0.0,
+        "chi0n": 2.908248290463863,
+        "chi1n": 1.2041241452319316,
+        "chi2n": 0.9082482904638631,
+        "chi3n": 0.0,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.33,
+        "kappa1": 3.67,
+        "kappa2": 1.0445318352059925,
+        "kappa3": 6.883957759412302,
+        "Phi": 0.9583579588014981
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "molfiles/acetone.mol"
+      ]
+    },
+    {
+      "typed_name": "ethyl acetate",
+      "pubchem_cid": 8857,
+      "smiles": "CCOC(=O)C",
+      "canonical_smiles": "CCOC(C)=O",
+      "formula": "C4H8O2",
+      "inchikey": "XEKOWRVHYACXOJ-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 88.052429496,
+        "amw": 88.106,
+        "lipinskiHBA": 2.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 0.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 6.0,
+        "NumAtoms": 14.0,
+        "NumHeteroatoms": 2.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.75,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 37.10914470057002,
+        "tpsa": 26.3,
+        "CrippenClogP": 0.5694,
+        "CrippenMR": 22.30699999999999,
+        "chi0v": 4.023603362114274,
+        "chi1v": 1.9040302062452235,
+        "chi2v": 0.9245943256894159,
+        "chi3v": 0.3476006996936919,
+        "chi4v": 0.20326313239628543,
+        "chi0n": 4.023603362114274,
+        "chi1n": 1.9040302062452235,
+        "chi2n": 0.9245943256894159,
+        "chi3n": 0.3476006996936919,
+        "chi4n": 0.20326313239628543,
+        "hallKierAlpha": -0.53,
+        "kappa1": 5.469999999999999,
+        "kappa2": 2.693713646532438,
+        "kappa3": 3.4699999999999998,
+        "Phi": 2.455768941088739
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "molfiles/ethyl-acetate.mol"
+      ]
+    },
+    {
+      "typed_name": "toluene",
+      "pubchem_cid": 1140,
+      "smiles": "CC1=CC=CC=C1",
+      "canonical_smiles": "Cc1ccccc1",
+      "formula": "C7H8",
+      "inchikey": "YXFVVABEGXRONW-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 92.062600256,
+        "amw": 92.14099999999999,
+        "lipinskiHBA": 0.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 0.0,
+        "NumHeavyAtoms": 7.0,
+        "NumAtoms": 15.0,
+        "NumHeteroatoms": 0.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.14285714285714285,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 43.79634523389357,
+        "tpsa": 0.0,
+        "CrippenClogP": 1.99502,
+        "CrippenMR": 31.17899999999999,
+        "chi0v": 4.386751345948129,
+        "chi1v": 2.4106836025229597,
+        "chi2v": 1.654700538379252,
+        "chi3v": 0.9404557350153064,
+        "chi4v": 0.5343778974176118,
+        "chi0n": 4.386751345948129,
+        "chi1n": 2.4106836025229597,
+        "chi2n": 1.654700538379252,
+        "chi3n": 0.9404557350153064,
+        "chi4n": 0.5343778974176118,
+        "hallKierAlpha": -0.78,
+        "kappa1": 4.380771704180065,
+        "kappa2": 1.7832860398554335,
+        "kappa3": 1.0382641324115067,
+        "Phi": 1.1160241462654295
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "molfiles/toluene.mol"
+      ]
+    },
+    {
+      "typed_name": "pyridine",
+      "pubchem_cid": 1049,
+      "smiles": "C1=CC=NC=C1",
+      "canonical_smiles": "c1ccncc1",
+      "formula": "C5H5N",
+      "inchikey": "JUJWROOIHBZHMG-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 79.04219916,
+        "amw": 79.10199999999998,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 6.0,
+        "NumAtoms": 11.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 1.0,
+        "NumAromaticHeterocycles": 1.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 36.651051100443475,
+        "tpsa": 12.89,
+        "CrippenClogP": 1.0816,
+        "CrippenMR": 24.236999999999995,
+        "chi0v": 3.333964941448087,
+        "chi1v": 1.8497311128276561,
+        "chi2v": 1.024563864689584,
+        "chi3v": 0.5664874085517706,
+        "chi4v": 0.31260202740993526,
+        "chi0n": 3.333964941448087,
+        "chi1n": 1.8497311128276561,
+        "chi2n": 1.024563864689584,
+        "chi3n": 0.5664874085517706,
+        "chi4n": 0.31260202740993526,
+        "hallKierAlpha": -0.8500000000000001,
+        "kappa1": 3.3441747572815532,
+        "kappa2": 1.5525827127910268,
+        "kappa3": 0.5490008483363183,
+        "Phi": 0.8653513194512445
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "molfiles/pyridine.mol"
+      ]
+    },
+    {
+      "typed_name": "(S)-2-butanol",
+      "pubchem_cid": 444683,
+      "smiles": "CC[C@H](C)O",
+      "canonical_smiles": "CC[C@H](C)O",
+      "formula": "C4H10O",
+      "inchikey": "BTANRVKWQNVYAZ-BYPYZUCNSA-N",
+      "properties": {
+        "exactmw": 74.07316494,
+        "amw": 74.12299999999999,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 1.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 5.0,
+        "NumAtoms": 15.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 1.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 32.62831112321538,
+        "tpsa": 20.23,
+        "CrippenClogP": 0.7771999999999999,
+        "CrippenMR": 21.971799999999995,
+        "chi0v": 3.731670645876131,
+        "chi1v": 1.9509042305871975,
+        "chi2v": 1.2572696565099426,
+        "chi3v": 0.5908224762989184,
+        "chi4v": 0.0,
+        "chi0n": 3.731670645876131,
+        "chi1n": 1.9509042305871975,
+        "chi2n": 1.2572696565099426,
+        "chi3n": 0.5908224762989184,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.04,
+        "kappa1": 4.960000000000001,
+        "kappa2": 2.212525252525253,
+        "kappa3": 3.9600000000000004,
+        "Phi": 2.1948250505050515
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 2
+          }
+        ]
+      },
+      "files": [
+        "molfiles/s-2-butanol.mol"
+      ]
+    },
+    {
+      "typed_name": "L-alanine",
+      "pubchem_cid": 5950,
+      "smiles": "C[C@@H](C(=O)O)N",
+      "canonical_smiles": "C[C@H](N)C(=O)O",
+      "formula": "C3H7NO2",
+      "inchikey": "QNAYBMKLOCPYGJ-REOHCLBHSA-N",
+      "properties": {
+        "exactmw": 89.047678464,
+        "amw": 89.09400000000001,
+        "lipinskiHBA": 3.0,
+        "lipinskiHBD": 3.0,
+        "NumRotatableBonds": 1.0,
+        "NumHBD": 2.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 6.0,
+        "NumAtoms": 13.0,
+        "NumHeteroatoms": 3.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.6666666666666666,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 1.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 35.76478180587526,
+        "tpsa": 63.31999999999999,
+        "CrippenClogP": -0.5817999999999999,
+        "CrippenMR": 21.285200000000003,
+        "chi0v": 3.5101624243430725,
+        "chi1v": 1.6270896800996828,
+        "chi2v": 1.1269128025836794,
+        "chi3v": 0.38952755606530876,
+        "chi4v": 0.0,
+        "chi0n": 3.5101624243430725,
+        "chi1n": 1.6270896800996828,
+        "chi2n": 1.1269128025836794,
+        "chi3n": 0.38952755606530876,
+        "chi4n": 0.0,
+        "hallKierAlpha": -0.5700000000000001,
+        "kappa1": 5.43,
+        "kappa2": 1.7676338396942162,
+        "kappa3": 1.7215451895043727,
+        "Phi": 1.5997086249232655
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 1
+          }
+        ]
+      },
+      "files": [
+        "molfiles/l-alanine.mol"
+      ]
+    },
+    {
+      "typed_name": "maleic acid",
+      "pubchem_cid": 444266,
+      "smiles": "C(=C\\C(=O)O)\\C(=O)O",
+      "canonical_smiles": "O=C(O)/C=C\\C(=O)O",
+      "formula": "C4H4O4",
+      "inchikey": "VZCYOOQTPOCHFL-UPHRSURJSA-N",
+      "properties": {
+        "exactmw": 116.01095860800001,
+        "amw": 116.07199999999997,
+        "lipinskiHBA": 4.0,
+        "lipinskiHBD": 2.0,
+        "NumRotatableBonds": 2.0,
+        "NumHBD": 2.0,
+        "NumHBA": 2.0,
+        "NumHeavyAtoms": 8.0,
+        "NumAtoms": 12.0,
+        "NumHeteroatoms": 4.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 0.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 45.05598604331467,
+        "tpsa": 74.6,
+        "CrippenClogP": -0.28819999999999985,
+        "CrippenMR": 24.411599999999993,
+        "chi0v": 3.8656243103068935,
+        "chi1v": 1.7661454884867802,
+        "chi2v": 1.009808669311066,
+        "chi3v": 0.3684872953212738,
+        "chi4v": 0.1425769809939702,
+        "chi0n": 3.8656243103068935,
+        "chi1n": 1.7661454884867802,
+        "chi2n": 1.009808669311066,
+        "chi3n": 0.3684872953212738,
+        "chi4n": 0.1425769809939702,
+        "hallKierAlpha": -1.32,
+        "kappa1": 6.68,
+        "kappa2": 2.7879637132919783,
+        "kappa3": 4.68,
+        "Phi": 2.327949700598802
+      },
+      "stereo": {
+        "strict": [
+          {
+            "type": "Bond_Double",
+            "specified": "Specified",
+            "centered_on": 0
+          }
+        ],
+        "possible": [
+          {
+            "type": "Bond_Double",
+            "specified": "Specified",
+            "centered_on": 0
+          }
+        ]
+      },
+      "files": [
+        "molfiles/maleic-acid.mol"
+      ]
+    },
+    {
+      "typed_name": "aniline",
+      "pubchem_cid": 6115,
+      "smiles": "C1=CC=C(C=C1)N",
+      "canonical_smiles": "Nc1ccccc1",
+      "formula": "C6H7N",
+      "inchikey": "PAYRUJLWNCNPSJ-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 93.057849224,
+        "amw": 93.12899999999999,
+        "lipinskiHBA": 1.0,
+        "lipinskiHBD": 2.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 1.0,
+        "NumHBA": 1.0,
+        "NumHeavyAtoms": 7.0,
+        "NumAtoms": 14.0,
+        "NumHeteroatoms": 1.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 0.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 1.0,
+        "NumAliphaticRings": 0.0,
+        "NumSaturatedRings": 0.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 0.0,
+        "NumUnspecifiedAtomStereoCenters": 0.0,
+        "labuteASA": 42.77129381650968,
+        "tpsa": 26.02,
+        "CrippenClogP": 1.2687999999999997,
+        "CrippenMR": 30.854400000000002,
+        "chi0v": 3.964101615137755,
+        "chi1v": 2.1993587371177723,
+        "chi2v": 1.4106836025229597,
+        "chi3v": 0.7995724914118484,
+        "chi4v": 0.4530389187988476,
+        "chi0n": 3.964101615137755,
+        "chi1n": 2.1993587371177723,
+        "chi2n": 1.4106836025229597,
+        "chi3n": 0.7995724914118484,
+        "chi4n": 0.4530389187988476,
+        "hallKierAlpha": -0.98,
+        "kappa1": 4.18611295681063,
+        "kappa2": 1.6461962159398054,
+        "kappa3": 0.9290591797144502,
+        "Phi": 0.9844519012854642
+      },
+      "stereo": {
+        "strict": [],
+        "possible": []
+      },
+      "files": [
+        "molfiles/aniline.mol"
+      ]
+    }
+  ],
+  "invented": [
+    {
+      "name": "invented: cholesterol + caffeine",
+      "made_from": [
+        "cholesterol",
+        "caffeine"
+      ],
+      "smiles": "CC(CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C)CCn1c(=O)c2c(ncn2C)n(C)c1=O",
+      "canonical_smiles": "CC(CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C)CCn1c(=O)c2c(ncn2C)n(C)c1=O",
+      "formula": "C35H54N4O3",
+      "inchikey": "HXDIFMYVZUBIDE-VWOCKECWSA-N",
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 5
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 7
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 10
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 11
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 16
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 20
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 22
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 25
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 5
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 7
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 10
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 11
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 16
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 20
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 22
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 25
+          }
+        ]
+      },
+      "files": [
+        "molfiles/invented-cholesterol-caffeine.mol"
+      ]
+    },
+    {
+      "name": "invented: nicotine + ibuprofen",
+      "made_from": [
+        "nicotine",
+        "ibuprofen"
+      ],
+      "smiles": "CC(CCN1CCC[C@H]1c1cccnc1)Cc1ccc(C(C)C(=O)O)cc1",
+      "canonical_smiles": "CC(CCN1CCC[C@H]1c1cccnc1)Cc1ccc(C(C)C(=O)O)cc1",
+      "formula": "C23H30N2O2",
+      "inchikey": "BLSDMVDTHQLVQW-IRZJEQJZSA-N",
+      "stereo": {
+        "strict": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 8
+          }
+        ],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Specified",
+            "centered_on": 8
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 20
+          }
+        ]
+      },
+      "files": [
+        "molfiles/invented-nicotine-ibuprofen.mol"
+      ]
+    },
+    {
+      "name": "invented: aspirin + (E)-cinnamic acid",
+      "made_from": [
+        "aspirin",
+        "(E)-cinnamic acid"
+      ],
+      "smiles": "O=C(C/C(=C\\c1ccccc1)C(=O)O)Oc1ccccc1C(=O)O",
+      "canonical_smiles": "O=C(C/C(=C\\c1ccccc1)C(=O)O)Oc1ccccc1C(=O)O",
+      "formula": "C18H14O6",
+      "inchikey": "OKTCFCDFPONZIM-JLHYYAGUSA-N",
+      "stereo": {
+        "strict": [
+          {
+            "type": "Bond_Double",
+            "specified": "Specified",
+            "centered_on": 3
+          }
+        ],
+        "possible": [
+          {
+            "type": "Bond_Double",
+            "specified": "Specified",
+            "centered_on": 3
+          }
+        ]
+      },
+      "files": [
+        "molfiles/invented-aspirin-e-cinnamic-acid.mol"
       ]
     }
   ]

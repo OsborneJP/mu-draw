@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/toluene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T12:35:43Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1140,
+          "SMILES": "CC1=CC=CC=C1",
+          "Title": "Toluene"
+        }
+      ]
+    }
+  }
+}

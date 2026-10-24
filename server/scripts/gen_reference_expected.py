@@ -6,6 +6,11 @@ Reads tests/fixtures/reference_compounds.csv (SMILES from PubChem) and writes:
   tests/fixtures/reference_expected.json   descriptors, formula, InChIKey, stereo
   tests/fixtures/molfiles/<slug>.mol       2D Molfiles for the editor tests
 
+It also invents structures for Get name's not-found check: two reference compounds joined
+by one C-C bond (INVENTED), so RDKit makes them and nobody types them. They are listed
+under "invented", apart from "compounds"; the recorded PubChem answers show PubChem has
+no record of them.
+
 Everything is raw RDKit output: no rounding and no choices about which values the app
 shows. The descriptor set is rdMolDescriptors.Properties, the same code RDKit.js
 get_descriptors() calls, so web and server can be compared like for like. Output is
@@ -30,6 +35,13 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
 CSV_FILE = FIXTURES / "reference_compounds.csv"
 EXPECTED_FILE = "reference_expected.json"
+
+# Pairs of reference compounds (typed names) to join; see join().
+INVENTED = (
+    ("cholesterol", "caffeine"),
+    ("nicotine", "ibuprofen"),
+    ("aspirin", "(E)-cinnamic acid"),
+)
 
 SETTINGS = {
     "legacy_stereo_perception": False,
@@ -87,6 +99,52 @@ def molfile(mol: Chem.Mol, name: str, chiral_flag: bool | None = None) -> str:
     return Chem.MolToMolBlock(drawn)
 
 
+def join_atom(mol: Chem.Mol) -> int:
+    """The carbon with the lowest canonical rank that carries an implicit H."""
+    ranks = list(Chem.CanonicalRankAtoms(mol))
+    candidates = [
+        a.GetIdx()
+        for a in mol.GetAtoms()
+        if a.GetSymbol() == "C" and a.GetNumExplicitHs() == 0 and a.GetTotalNumHs() > 0
+    ]
+    return min(candidates, key=lambda i: ranks[i])
+
+
+def join(first: Chem.Mol, second: Chem.Mol) -> Chem.Mol:
+    """first and second joined by one single bond, each giving up one H at join_atom()."""
+    a, b = join_atom(first), join_atom(second)
+    combined = Chem.RWMol(Chem.CombineMols(first, second))
+    combined.AddBond(a, first.GetNumAtoms() + b, Chem.BondType.SINGLE)
+    joined = combined.GetMol()
+    Chem.SanitizeMol(joined)
+    return Chem.MolFromSmiles(Chem.MolToSmiles(joined))
+
+
+def invented(rows: list[dict[str, str]]) -> tuple[list[dict[str, object]], dict[str, str]]:
+    by_name = {row["typed_name"]: Chem.MolFromSmiles(row["smiles"]) for row in rows}
+    entries, files = [], {}
+    for first, second in INVENTED:
+        mol = join(by_name[first], by_name[second])
+        name, key = f"invented: {first} + {second}", slug(f"invented {first} {second}")
+        files[f"molfiles/{key}.mol"] = molfile(mol, name)
+        entries.append(
+            {
+                "name": name,
+                "made_from": [first, second],
+                "smiles": Chem.MolToSmiles(mol),
+                "canonical_smiles": Chem.MolToSmiles(mol),
+                "formula": rdMolDescriptors.CalcMolFormula(mol),
+                "inchikey": Chem.MolToInchiKey(mol),
+                "stereo": {
+                    "strict": stereo_elements(mol, flag_possible=False),
+                    "possible": stereo_elements(mol, flag_possible=True),
+                },
+                "files": [f"molfiles/{key}.mol"],
+            }
+        )
+    return entries, files
+
+
 def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
     mol = Chem.MolFromSmiles(row["smiles"])
     if mol is None:
@@ -98,6 +156,8 @@ def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
         "typed_name": name,
         "pubchem_cid": int(row["pubchem_cid"]),
         "smiles": row["smiles"],
+        # RDKit's canonical isomeric SMILES: Get name's cache key and what it sends PubChem.
+        "canonical_smiles": Chem.MolToSmiles(mol),
         "formula": rdMolDescriptors.CalcMolFormula(mol),
         "inchikey": Chem.MolToInchiKey(mol),
         "properties": dict(
@@ -121,11 +181,14 @@ def generate(rows: list[dict[str, str]]) -> dict[str, str]:
         entry, files = compound(row)
         compounds.append(entry)
         outputs.update(files)
+    made_up, files = invented(rows)
+    outputs.update(files)
     expected = {
         "generator": "server/scripts/gen_reference_expected.py",
         "rdkit_version": rdkit.__version__,
         "settings": SETTINGS,
         "compounds": compounds,
+        "invented": made_up,
     }
     outputs[EXPECTED_FILE] = json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
     return outputs

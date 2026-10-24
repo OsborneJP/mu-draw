@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ethanol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T12:35:41Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 702,
+          "SMILES": "CCO",
+          "Title": "Ethanol"
+        }
+      ]
+    }
+  }
+}

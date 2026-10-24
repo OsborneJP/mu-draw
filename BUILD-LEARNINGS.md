@@ -65,6 +65,17 @@ Record why, not just what: the next person (or agent) should not have to redisco
   editor test's CDXML leg uses a file saved by Ketcher. Jeff's ChemDraw files are the real
   cross-tool test. When the Open feature is built, don't trust setMolecule() to reject bad
   input: check what was loaded.
+- 2026-10-24 (Get name): 9 more names make 20 (`fetch_reference_smiles.py --missing` records
+  only the new ones). "sodium acetate" was tried and dropped: PubChem has two records with
+  the same InChIKey and SMILES, CID 31372 (its name lookup) and 517045 (its structure
+  search), so it can't pass the check that a structure lookup returns the name's CID.
+  Aniline replaced it. Salts and other duplicates get whichever record the structure search
+  picks.
+- PubChem's structure-to-name lookup (POST `compound/smiles/property/IUPACName,Title/JSON`)
+  answers a structure it has no record of with HTTP 200 and `{"CID": 0}` (no name), not 404.
+- The 3 invented structures join two reference compounds at each one's lowest-ranked carbon
+  with an implicit H (a methyl). Two gain an undefined stereocentre at the join (the old
+  isopropyl CH). PubChem answered `CID 0` for all three.
 
 ## Web toolchain
 

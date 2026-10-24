@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/maleic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T12:35:45Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 444266,
+          "SMILES": "C(=C\\C(=O)O)\\C(=O)O",
+          "Title": "Maleic Acid"
+        }
+      ]
+    }
+  }
+}

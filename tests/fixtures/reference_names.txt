@@ -1,6 +1,8 @@
 # Reference compounds for the properties panel (spec: "Properties panel + Lipinski card").
 # One name per line, as a student would type it. scripts/fetch_reference_smiles.py asks
 # PubChem for each name and writes reference_compounds.csv; nothing here is a chemistry value.
+# The first 11 are the properties panel's; with the 9 after them they are also Get name's 20
+# known compounds (spec: "5. Get name"). (S)-2-butanol pairs with (R) for the stereo check.
 aspirin
 ibuprofen
 caffeine
@@ -12,3 +14,12 @@ cholesterol
 (R)-2-butanol
 aldehydo-D-glucose
 (E)-cinnamic acid
+ethanol
+acetone
+ethyl acetate
+toluene
+pyridine
+(S)-2-butanol
+L-alanine
+maleic acid
+aniline

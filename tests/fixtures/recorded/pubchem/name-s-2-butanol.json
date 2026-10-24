@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28S%29-2-butanol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T12:35:44Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 444683,
+          "SMILES": "CC[C@H](C)O",
+          "Title": "(+)-2-Butanol"
+        }
+      ]
+    }
+  }
+}

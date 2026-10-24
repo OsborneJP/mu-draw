@@ -10,3 +10,12 @@ cholesterol,5997,Cholesterol,C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]
 (R)-2-butanol,84682,(-)-2-Butanol,CC[C@@H](C)O
 aldehydo-D-glucose,107526,"(2R,3S,4R,5R)-2,3,4,5,6-pentahydroxyhexanal",C([C@H]([C@H]([C@@H]([C@H](C=O)O)O)O)O)O
 (E)-cinnamic acid,444539,Cinnamic Acid,C1=CC=C(C=C1)/C=C/C(=O)O
+ethanol,702,Ethanol,CCO
+acetone,180,Acetone,CC(=O)C
+ethyl acetate,8857,Ethyl Acetate,CCOC(=O)C
+toluene,1140,Toluene,CC1=CC=CC=C1
+pyridine,1049,Pyridine,C1=CC=NC=C1
+(S)-2-butanol,444683,(+)-2-Butanol,CC[C@H](C)O
+L-alanine,5950,L-Alanine,C[C@@H](C(=O)O)N
+maleic acid,444266,Maleic Acid,C(=C\C(=O)O)\C(=O)O
+aniline,6115,Aniline,C1=CC=C(C=C1)N

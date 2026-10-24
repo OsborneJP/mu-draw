@@ -1,6 +1,7 @@
 """Build tests/fixtures/reference_compounds.csv from PubChem.
 
     python scripts/fetch_reference_smiles.py            # network: re-record, then write CSV
+    python scripts/fetch_reference_smiles.py --missing  # network: record only new names
     python scripts/fetch_reference_smiles.py --offline  # rebuild CSV from the recordings
 
 Each name in tests/fixtures/reference_names.txt is looked up with PUG REST and the raw
@@ -96,14 +97,23 @@ def build_csv(names: list[str], directory: Path = RECORDINGS) -> str:
     return write_csv(rows)
 
 
+def to_record(names: list[str], missing_only: bool, directory: Path = RECORDINGS) -> list[str]:
+    """The names to look up: all of them, or only those without a recording yet."""
+    if not missing_only:
+        return list(names)
+    return [name for name in names if not recording_path(name, directory).exists()]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--offline", action="store_true", help="only rebuild the CSV")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--offline", action="store_true", help="only rebuild the CSV")
+    mode.add_argument("--missing", action="store_true", help="record only names not yet recorded")
     args = parser.parse_args(argv)
     names = read_names()
     if not args.offline:
         RECORDINGS.mkdir(parents=True, exist_ok=True)
-        for i, name in enumerate(names):
+        for i, name in enumerate(to_record(names, args.missing)):
             if i:
                 time.sleep(MIN_INTERVAL_S)
             recording = record(name)
