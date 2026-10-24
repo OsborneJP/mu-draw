@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "CNC[C@H](O)c1ccc(O)c(O)c1"
+    }
+  },
+  "recorded_at": "2026-10-24T15:35:13Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5816,
+          "IUPACName": "4-[(1R)-1-hydroxy-2-(methylamino)ethyl]benzene-1,2-diol",
+          "Title": "Epinephrine"
+        }
+      ]
+    }
+  }
+}

@@ -43,6 +43,11 @@ RESPONSES_FILE = FIXTURES / "name_responses.json"
 MIN_INTERVAL_S = 0.34  # PubChem allows 5 requests/s; stay under 3.
 
 
+def unpaced() -> RateLimit:
+    """Replays never reach PubChem, so they needn't wait for its rate limit."""
+    return RateLimit(((sys.maxsize, 1.0),))
+
+
 def slug(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
@@ -122,7 +127,7 @@ def build_responses(compounds: list[dict[str, str]], recordings: list[dict]) -> 
     """What the server answers for each test compound, replaying the recordings."""
     responses = {}
     with tempfile.TemporaryDirectory() as folder:
-        app = create_app(state_dir=Path(folder), transport=replay(recordings))
+        app = create_app(state_dir=Path(folder), transport=replay(recordings), limit=unpaced())
         with TestClient(app) as client:
             for c in compounds:
                 response = client.post("/api/name", json={"smiles": c["smiles"]})

@@ -1,8 +1,11 @@
-"""SQLite cache of PubChem's structure-to-name answers, kept 30 days.
+"""SQLite cache of PubChem's answers, kept 30 days.
 
-Chemistry only: a canonical SMILES and what PubChem said about it (CID and names, or that
-it has no record), with the time PubChem said it. Nothing about who asked. Busy and
-unavailable answers are never stored, so the next request asks PubChem again.
+Chemistry only. `names` (Get name): a canonical SMILES and what PubChem said about it (CID
+and names, or that it has no record). `structures` (Name to structure's fallback): a
+lowercased name and PubChem's first record for it (CID, SMILES, title, how many records), or
+that it has none. Each with the time PubChem said it; nothing about who asked. Busy and
+unavailable answers are never stored, so the next request asks PubChem again. OPSIN's answers
+aren't cached: OPSIN runs here and answers in milliseconds.
 """
 
 from __future__ import annotations
@@ -13,17 +16,28 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from pubchem import Record
+from pubchem import NameRecord, Record
 
 MAX_AGE_S = 30 * 24 * 60 * 60
 COLUMNS = ("smiles", "cid", "iupac", "title", "stored_at")
-SCHEMA = """CREATE TABLE IF NOT EXISTS names (
+STRUCTURE_COLUMNS = ("name", "cid", "smiles", "title", "matches", "stored_at")
+SCHEMA = (
+    """CREATE TABLE IF NOT EXISTS names (
     smiles TEXT PRIMARY KEY,
     cid INTEGER,
     iupac TEXT,
     title TEXT,
     stored_at REAL NOT NULL
-)"""
+)""",
+    """CREATE TABLE IF NOT EXISTS structures (
+    name TEXT PRIMARY KEY,
+    cid INTEGER,
+    smiles TEXT,
+    title TEXT,
+    matches INTEGER,
+    stored_at REAL NOT NULL
+)""",
+)
 
 
 @dataclass(frozen=True)
@@ -31,11 +45,17 @@ class Hit:
     record: Record | None  # None: PubChem has no record of this structure
 
 
+@dataclass(frozen=True)
+class StructureHit:
+    record: NameRecord | None  # None: PubChem has no compound by this name
+
+
 class NameCache:
     def __init__(self, path: Path, clock: Callable[[], float] = time.time):
         self._clock = clock
         self._db = sqlite3.connect(path, check_same_thread=False, isolation_level=None)
-        self._db.execute(SCHEMA)
+        for table in SCHEMA:
+            self._db.execute(table)
 
     def get(self, smiles: str) -> Hit | None:
         row = self._db.execute(
@@ -53,6 +73,30 @@ class NameCache:
         self._db.execute("DELETE FROM names WHERE stored_at <= ?", (now - MAX_AGE_S,))
         self._db.execute(
             "INSERT OR REPLACE INTO names VALUES (?, ?, ?, ?, ?)", (smiles, *values, now)
+        )
+
+    def get_structure(self, name: str) -> StructureHit | None:
+        """`name` is the cache key: the name as typed, lowercased."""
+        row = self._db.execute(
+            "SELECT cid, smiles, title, matches FROM structures WHERE name = ? AND stored_at > ?",
+            (name, self._clock() - MAX_AGE_S),
+        ).fetchone()
+        if row is None:
+            return None
+        cid, smiles, title, matches = row
+        found = cid is not None
+        return StructureHit(NameRecord(cid, smiles, title, matches) if found else None)
+
+    def put_structure(self, name: str, record: NameRecord | None) -> None:
+        now = self._clock()
+        values = (
+            (None, None, None, 0)
+            if record is None
+            else (record.cid, record.smiles, record.title, record.matches)
+        )
+        self._db.execute("DELETE FROM structures WHERE stored_at <= ?", (now - MAX_AGE_S,))
+        self._db.execute(
+            "INSERT OR REPLACE INTO structures VALUES (?, ?, ?, ?, ?, ?)", (name, *values, now)
         )
 
     def close(self) -> None:

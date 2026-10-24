@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "4-methylpent-3-en-2-one"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:41Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 8858,
+          "SMILES": "CC(=CC(=O)C)C",
+          "Title": "Mesityl oxide"
+        }
+      ]
+    }
+  }
+}

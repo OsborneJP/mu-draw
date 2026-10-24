@@ -1,7 +1,7 @@
 import sqlite3
 
-from cache import COLUMNS, MAX_AGE_S, Hit, NameCache
-from pubchem import Record
+from cache import COLUMNS, MAX_AGE_S, STRUCTURE_COLUMNS, Hit, NameCache, StructureHit
+from pubchem import NameRecord, Record
 
 RECORD = Record(cid=1, iupac="one", title="One")
 
@@ -18,9 +18,12 @@ def test_the_cache_holds_chemistry_only(tmp_path):
     NameCache(tmp_path / "c.sqlite").close()
     db = sqlite3.connect(tmp_path / "c.sqlite")
     tables = [row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")]
-    columns = tuple(row[1] for row in db.execute("PRAGMA table_info(names)"))
-    assert tables == ["names"]
-    assert columns == COLUMNS == ("smiles", "cid", "iupac", "title", "stored_at")
+    names = tuple(row[1] for row in db.execute("PRAGMA table_info(names)"))
+    structures = tuple(row[1] for row in db.execute("PRAGMA table_info(structures)"))
+    assert tables == ["names", "structures"]
+    assert names == COLUMNS == ("smiles", "cid", "iupac", "title", "stored_at")
+    assert structures == STRUCTURE_COLUMNS
+    assert STRUCTURE_COLUMNS == ("name", "cid", "smiles", "title", "matches", "stored_at")
 
 
 def test_found_and_not_found_come_back(tmp_path):
@@ -65,3 +68,30 @@ def test_expired_entries_are_deleted(tmp_path):
 def test_the_cache_survives_a_restart(tmp_path):
     NameCache(tmp_path / "c.sqlite").put("a", RECORD)
     assert NameCache(tmp_path / "c.sqlite").get("a") == Hit(RECORD)
+
+
+NAME_RECORD = NameRecord(cid=2, smiles="s", title="Two", matches=3)
+
+
+def test_structures_by_name_come_back_and_expire(tmp_path):
+    clock = Clock()
+    cache = NameCache(tmp_path / "c.sqlite", clock=clock)
+    cache.put_structure("a name", NAME_RECORD)
+    cache.put_structure("unknown", None)
+    assert cache.get_structure("a name") == StructureHit(NAME_RECORD)
+    assert cache.get_structure("unknown") == StructureHit(None)
+    assert cache.get_structure("other") is None
+    clock.now += MAX_AGE_S - 1
+    assert cache.get_structure("a name") == StructureHit(NAME_RECORD)
+    clock.now += 1
+    assert cache.get_structure("a name") is None
+
+
+def test_expired_structures_are_deleted(tmp_path):
+    clock = Clock()
+    cache = NameCache(tmp_path / "c.sqlite", clock=clock)
+    cache.put_structure("old", NAME_RECORD)
+    clock.now += MAX_AGE_S
+    cache.put_structure("new", NAME_RECORD)
+    rows = sqlite3.connect(tmp_path / "c.sqlite").execute("SELECT name FROM structures").fetchall()
+    assert rows == [("new",)]

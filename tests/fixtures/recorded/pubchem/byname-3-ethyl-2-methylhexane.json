@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "3-ethyl-2-methylhexane"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:40Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 86067,
+          "SMILES": "CCCC(CC)C(C)C",
+          "Title": "3-Ethyl-2-methylhexane"
+        }
+      ]
+    }
+  }
+}

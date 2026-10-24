@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "CCCC(CC)C(C)C"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:02Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 86067,
+          "IUPACName": "3-ethyl-2-methylhexane",
+          "Title": "3-Ethyl-2-methylhexane"
+        }
+      ]
+    }
+  }
+}

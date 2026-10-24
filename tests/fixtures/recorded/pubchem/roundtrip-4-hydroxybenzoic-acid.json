@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "O=C(O)c1ccc(O)cc1"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:10Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 135,
+          "IUPACName": "4-hydroxybenzoic acid",
+          "Title": "4-Hydroxybenzoic Acid"
+        }
+      ]
+    }
+  }
+}

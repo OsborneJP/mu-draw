@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "4-hydroxybenzoic acid"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:42Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 135,
+          "SMILES": "C1=CC(=CC=C1C(=O)O)O",
+          "Title": "4-Hydroxybenzoic Acid"
+        }
+      ]
+    }
+  }
+}

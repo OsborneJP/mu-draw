@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "DMSO"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:46Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 679,
+          "SMILES": "CS(=O)C",
+          "Title": "Dimethyl Sulfoxide"
+        }
+      ]
+    }
+  }
+}

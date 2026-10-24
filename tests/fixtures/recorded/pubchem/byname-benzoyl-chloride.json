@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "benzoyl chloride"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:43Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 7412,
+          "SMILES": "C1=CC=C(C=C1)C(=O)Cl",
+          "Title": "Benzoyl chloride"
+        }
+      ]
+    }
+  }
+}

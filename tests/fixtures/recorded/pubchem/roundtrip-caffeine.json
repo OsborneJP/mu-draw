@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "Cn1c(=O)c2c(ncn2C)n(C)c1=O"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:17Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 2519,
+          "IUPACName": "1,3,7-trimethylpurine-2,6-dione",
+          "Title": "Caffeine"
+        }
+      ]
+    }
+  }
+}

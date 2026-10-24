@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "O=[N+]([O-])c1cccc(Br)c1"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:10Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 11457,
+          "IUPACName": "1-bromo-3-nitrobenzene",
+          "Title": "Benzene, 1-bromo-3-nitro-"
+        }
+      ]
+    }
+  }
+}

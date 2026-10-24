@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "(2R,3S)-2-bromo-3-chlorobutane"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:43Z",
+  "status": 404,
+  "body": {
+    "Fault": {
+      "Code": "PUGREST.NotFound",
+      "Message": "No CID found",
+      "Details": [
+        "No CID found that matches the given name"
+      ]
+    }
+  }
+}

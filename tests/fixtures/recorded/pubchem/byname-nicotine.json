@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "nicotine"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:45Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 89594,
+          "SMILES": "CN1CCC[C@H]1C2=CN=CC=C2",
+          "Title": "Nicotine"
+        }
+      ]
+    }
+  }
+}

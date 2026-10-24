@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "vanillin"
+    }
+  },
+  "recorded_at": "2026-10-24T15:29:45Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1183,
+          "SMILES": "COC1=C(C=CC(=C1)C=O)O",
+          "Title": "Vanillin"
+        }
+      ]
+    }
+  }
+}

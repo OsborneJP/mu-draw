@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "CCC#N"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:14Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 7854,
+          "IUPACName": "propanenitrile",
+          "Title": "Propionitrile"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "CC(C)Cc1ccc(C(C)C(=O)O)cc1"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:16Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 3672,
+          "IUPACName": "2-[4-(2-methylpropyl)phenyl]propanoic acid",
+          "Title": "Ibuprofen, (+-)-"
+        }
+      ]
+    }
+  }
+}

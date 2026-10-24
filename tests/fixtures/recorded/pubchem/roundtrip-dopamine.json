@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName,Title/JSON",
+    "form": {
+      "smiles": "NCCc1ccc(O)c(O)c1"
+    }
+  },
+  "recorded_at": "2026-10-24T15:30:19Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 681,
+          "IUPACName": "4-(2-aminoethyl)benzene-1,2-diol",
+          "Title": "Dopamine"
+        }
+      ]
+    }
+  }
+}

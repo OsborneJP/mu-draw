@@ -1,0 +1,36 @@
+# Names for Name to structure (spec "6. Name to structure"), as a student would type them.
+# Provisional list (Jeff, 2026-10-24): replace with CHEM-312's nomenclature exercises when
+# they come. server/scripts/record_name_lookups.py asks PubChem for each name and runs OPSIN
+# on each; nothing here is a chemistry value.
+[systematic]
+(R)-butan-2-ol
+(S)-butan-2-ol
+4-methyl-3-pentanol
+3-ethyl-2-methylhexane
+2,2-dimethylpropane
+cyclohexanol
+(E)-pent-2-ene
+(Z)-but-2-enoic acid
+4-methylpent-3-en-2-one
+3-methylbutanal
+ethyl propanoate
+N,N-dimethylacetamide
+2-chloro-2-methylpropane
+1-bromo-3-nitrobenzene
+4-hydroxybenzoic acid
+(2R,3S)-2-bromo-3-chlorobutane
+hex-1-yn-3-ol
+propanenitrile
+benzoyl chloride
+2-methylpropan-2-amine
+[common]
+aspirin
+ibuprofen
+caffeine
+Tylenol
+nicotine
+vanillin
+dopamine
+adrenaline
+DMSO
+citric acid

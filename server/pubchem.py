@@ -1,9 +1,9 @@
-"""PubChem PUG REST client for Get name.
+"""PubChem PUG REST client for Get name and Name to structure.
 
 Every request, from every student at once, passes one rate limit (PubChem allows 5 requests
 a second and 400 a minute). A 429 or 503 is retried once, after 1 s; a second one means
-PubChem is busy. Anything else unexpected means it is unavailable. The SMILES goes in the
-POST body, so it is never in a URL, and nothing here logs it or puts it in an exception.
+PubChem is busy. Anything else unexpected means it is unavailable. The SMILES or name goes
+in the POST body, so it is never in a URL, and nothing here logs it or puts it in an exception.
 """
 
 from __future__ import annotations
@@ -23,6 +23,8 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 # Current property names (never IsomericSMILES/CanonicalSMILES; not used here anyway).
 NAME_URL = f"{PUG}/compound/smiles/property/IUPACName,Title/JSON"
+# Name to structure's fallback: SMILES (with stereo) and title for a name, POSTed as `name`.
+STRUCTURE_URL = f"{PUG}/compound/name/property/SMILES,Title/JSON"
 COMPOUND_PAGE = "https://pubchem.ncbi.nlm.nih.gov/compound/{cid}"
 # (requests, seconds): at most this many requests start in any window this long.
 LIMITS = ((5, 1.0), (400, 60.0))
@@ -80,6 +82,40 @@ class RateLimit:
                 self._starts.popleft()
 
 
+@dataclass(frozen=True)
+class NameRecord:
+    cid: int
+    smiles: str
+    title: str | None
+    matches: int  # how many records PubChem has for the name; this is its first
+
+
+def parse_structure(body: object) -> NameRecord:
+    """PubChem's first record in a name-to-structure answer."""
+    try:
+        rows = body["PropertyTable"]["Properties"]  # type: ignore[index]
+        row = rows[0]
+        cid, smiles = row["CID"], row["SMILES"]
+    except (KeyError, TypeError, IndexError):
+        raise Unavailable("unexpected answer") from None
+    if not isinstance(cid, int) or isinstance(cid, bool) or cid <= 0:
+        raise Unavailable("unexpected CID")
+    title = row.get("Title")
+    if not isinstance(smiles, str) or not smiles or not (title is None or isinstance(title, str)):
+        raise Unavailable("unexpected record")
+    return NameRecord(cid=cid, smiles=smiles, title=title, matches=len(rows))
+
+
+def not_found(response: httpx.Response) -> bool:
+    """PubChem's answer for a name it doesn't know: 404 with PUGREST.NotFound."""
+    try:
+        return (
+            response.status_code == 404 and response.json()["Fault"]["Code"] == "PUGREST.NotFound"
+        )
+    except (ValueError, KeyError, TypeError):
+        return False
+
+
 def parse_name(body: object) -> Record | None:
     """The record in a structure-to-name answer, or None for CID 0 (PubChem has none)."""
     try:
@@ -104,28 +140,42 @@ class PubChem:
         self._limit = limit
         self._sleep = sleep
 
-    async def _post(self, smiles: str) -> httpx.Response:
+    async def _post(self, url: str, form: dict[str, str]) -> httpx.Response:
         await self._limit.acquire()
         try:
-            return await self._http.post(NAME_URL, data={"smiles": smiles})
+            return await self._http.post(url, data=form)
         except httpx.HTTPError as error:
             raise Unavailable(type(error).__name__) from None
 
-    async def name(self, smiles: str) -> Record | None:
-        """PubChem's record for this exact structure, or None if it has none."""
-        response = await self._post(smiles)
+    async def _ask(self, url: str, form: dict[str, str]) -> httpx.Response:
+        """POST, retrying once after RETRY_AFTER_S on 429 or 503."""
+        response = await self._post(url, form)
         if response.status_code in RETRY_STATUSES:
             await self._sleep(RETRY_AFTER_S)
-            response = await self._post(smiles)
+            response = await self._post(url, form)
             if response.status_code in RETRY_STATUSES:
                 raise Busy()
+        return response
+
+    @staticmethod
+    def _json(response: httpx.Response) -> object:
         if response.status_code != 200:
             raise Unavailable(f"HTTP {response.status_code}")
         try:
-            body = response.json()
+            return response.json()
         except ValueError:
             raise Unavailable("not JSON") from None
-        return parse_name(body)
+
+    async def name(self, smiles: str) -> Record | None:
+        """PubChem's record for this exact structure, or None if it has none."""
+        return parse_name(self._json(await self._ask(NAME_URL, {"smiles": smiles})))
+
+    async def structure(self, name: str) -> NameRecord | None:
+        """PubChem's first record for a name (common or trade names), or None if none."""
+        response = await self._ask(STRUCTURE_URL, {"name": name})
+        if not_found(response):
+            return None
+        return parse_structure(self._json(response))
 
 
 def new_http(transport: httpx.AsyncBaseTransport | None = None) -> httpx.AsyncClient:

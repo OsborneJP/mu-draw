@@ -11,7 +11,7 @@ from rdkit import Chem
 
 import chem
 import main
-from fakes import FakePubChem
+from fakes import FAKE_OPSIN, FakePubChem
 from pubchem import COMPOUND_PAGE, RateLimit
 
 SERVER = Path(main.__file__).parent
@@ -30,6 +30,7 @@ def app_with(tmp_path, fake_time, answers):
         limit=RateLimit(clock=fake_time.clock, sleep=fake_time.sleep),
         sleep=fake_time.sleep,
         clock=fake_time.clock,
+        opsin_command=FAKE_OPSIN,
     )
     return server, app
 
