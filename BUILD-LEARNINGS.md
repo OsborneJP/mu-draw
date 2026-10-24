@@ -455,3 +455,82 @@ that fails without the fix. Accepted as known limits:
   the staging run had moved HEAD past the verified commit; staging was redeployed at HEAD
   (a docs-only change, same build) and production promoted. Next time, record the staging
   result after promoting, in one docs commit with the production result.
+
+## Properties panel (session 4, 2026-10-24)
+
+- RDKit.js 2026.9.1 can't start under the app's CSP. Emscripten's embind builds every
+  binding with `new Function` (`createJsInvoker`, and the emval method callers), with no
+  fallback, so `initRDKitModule()` rejects with an EvalError on the page and in a worker
+  served with the page's policy (measured in Chromium with web/csp.json). Decided with Jeff
+  (2026-10-24): RDKit runs in `rdkit/worker.js`, the one file served with the page's policy
+  plus `'unsafe-eval'` (web/csp-workers.json); the page's policy is unchanged. Apache:
+  `<Directory .../rdkit><Files "worker.js">Header set ...`, since `<Files>` applies after
+  `<Directory>`, so its `Header set` replaces the page's. The test server sets the header
+  per path in a `configurePreviewServer` middleware (config/csp.ts `cspHeaders`), which runs
+  before the static files. Proven: the worker served with the page's policy shows
+  "Properties are unavailable" and the panel tests fail.
+- Playwright's `page.evaluate` is exempt from the page's eval rule (DevTools evaluation):
+  `new Function` inside it works under the page's CSP, while a string `setTimeout` is
+  blocked. So no test probes the page's policy that way; tests compare headers.
+- Vite 8 names worker bundles with `worker.rolldownOptions.output.entryFileNames` (a
+  function of the chunk name; the Indigo worker keeps its hashed name). Every build warns
+  that RDKit's `node:fs` and `node:crypto` (its Node-only branches) were externalized.
+- Measured in the worker: RDKit starts in about 60 ms with the wasm cached; cholesterol
+  takes about 3 ms per drawing (67 ms the first time). No debounce: one request in flight,
+  later changes collapse into one request for the newest drawing, stale replies dropped
+  (src/chem/tracker.ts). All 27 compounds load and show in the browser in about 5 s.
+- RDKit.js `get_descriptors()` equals the server's `rdMolDescriptors.Properties` bit for bit
+  (27 compounds). It has no formula and no `FindPotentialStereo`. The formula is built from
+  RDKit's atoms, with element symbols from RDKit itself (`[#z]`), in RDKit's order: C, then
+  H, then alphabetical, and H stays second without carbon (`HCl`, boric acid `H3BO3`). Stereo
+  elements come from `get_stereo_tags()` and whether each is defined from `get_json()`
+  (atom `cw`/`ccw`, bond `cis`/`trans`); this matches `FindPotentialStereo(flagPossible=True)`
+  on all 27 compounds and the 3 invented ones.
+- RDKit.js defaults to the legacy stereo perception (`use_legacy_stereo_perception(false)`
+  returns the old value, true). Legacy finds no centres in 1,4-dimethylcyclohexane (ring
+  cis/trans), the current one finds 2, as the server does. It joined the fixtures as the
+  proof; legacy and current agree on every other compound.
+- With hydrogens drawn as atoms, RDKit counts the bond to a methyl as rotatable (the methyl
+  carbon is no longer terminal). The worker parses twice: hydrogens folded in for
+  descriptors, kept (`removeHs: false`) for atom indices, so stereo maps to Ketcher's atoms.
+- Ketcher's `getMolfile()` without a format and `getSmiles()` go through Indigo's converter,
+  which answers through one shared event with `once` listeners, like its images (see
+  "Export and copy"): two conversions in flight can lose one. `getMolfile('v2000')`
+  and `MolSerializer` write in the page. The writer clones the drawing in the order of
+  `struct.atoms`, so Molfile atom i is the i-th key. Delete and Undo put the restored atom
+  last under its old id; a test highlights through that order.
+- Ketcher fires its change event once the action is applied: valence warnings and implicit
+  hydrogens are current (measured: a ring attached to a carbon with four bonds; the warning
+  was set at the event). A microtask deferral was written first, on the opposite
+  assumption; removing it failed no test, so it was dropped.
+- Ketcher underlines a sodium ion whose Molfile gives it an explicit valence of 0
+  (`Na+(0)`), as RDKit's writer does for ions; RDKit reads it as the valid ion it is. So the
+  panel gives Ketcher's valence warning only when RDKit can't read the drawing (a
+  pentavalent carbon); otherwise it shows the values. Found by the sodium benzoate fixture.
+- Fixtures: sodium benzoate replaced sodium acetate (two PubChem records, see above).
+  Paraquat (+2) is the case where only the charge rule hides the degree of unsaturation
+  (its formula gives a whole number); tetramethylammonium's single charge gives a half.
+- Highlights: ketcher-react's `editor.highlights` goes through `update(action, true)`: no
+  undo step, no change event, not in the KET autosave stores. `HighlightDelete` isn't
+  exported, but `fromHighlightCreate` returns the performed action's inverse, which deletes
+  exactly those highlights by id (an id already gone is skipped). Ketcher's Add explicit
+  hydrogens rebuilds the drawing and drops every highlight, the student's included.
+- The autosave test placed a ring at canvas x = 1000; with the 280 px panel that is off the
+  canvas, and the test hung to its 3-minute deadline (it waits for a save). Moved to 600.
+- Guard proofs (each removed in turn; its test failed): worker given the page's policy
+  (panel tests 33 s, smoke header check 4 s); no `{failed}` message (the "cannot start"
+  test); legacy perception left on (unit tests); descriptors with hydrogens as atoms
+  (explicit-hydrogens test); no reaction, empty or not-elements check (messages test);
+  Ketcher's valence flag alone stopping the values (sodium benzoate); stale replies shown,
+  no coalescing, ids not mapped (tracker tests); Lipinski on raw values, minus zero, plain
+  alphabetical formula, degree of unsaturation for ions (unit tests); the precache and
+  worker-extras checks, the worker built elsewhere (verify-dist), the Apache worker section
+  and check_live's worker policy (their tests); the highlight kept after a change, removed by
+  clearing the shared list, made through the undo history, clickable while out of date,
+  placed by Molfile index, undefined ones not set apart, double bonds skipped, the meso note
+  at one element, the undefined count. The browser mutations fail at the 30 s assertion
+  deadline unless a guard trips first.
+- Accepted limits: values for polymer brackets are for the atoms as drawn. Once RDKit fails
+  to start, the panel says so until the app is reloaded. Stereo counts are RDKit's potential
+  stereo elements, so atropisomers (not perceived from 2D) aren't counted. The meso note
+  shows for any two or more stereo elements.
