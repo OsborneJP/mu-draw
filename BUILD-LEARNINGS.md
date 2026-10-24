@@ -29,6 +29,11 @@ Record why, not just what: the next person (or agent) should not have to redisco
   lock-protected run folders under the per-checkout root avoid that (tests/test_pytest_temp.py,
   which skips only when the caller chose the location: an earlier version keyed the skip on
   a flag the conftest set, so deleting the conftest block skipped the test instead of failing it).
+- 2026-10-24: web/test-results kept every Playwright test's browser profile (about 50 MB
+  each, about 4 GB a run, in each checkout). With two checkouts the disk reached 97% full
+  (3.9 GB free), Chrome's storage quota shrank, and three service-worker tests failed with
+  "service worker registered but no registration found". playwright.config.ts now keeps
+  output for failures only (`preserveOutput`); a passing run leaves 8 kB. 12 GB free after.
 - pytest-socket with `--disable-socket` alone breaks TestClient (asyncio needs an AF_UNIX
   socketpair); `--allow-unix-socket` fixes it. It also blocks `getaddrinfo`, so a test
   can't leak a hostname through DNS either.
