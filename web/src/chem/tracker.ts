@@ -28,6 +28,15 @@ export interface StereoAtoms {
   defined: boolean;
 }
 
+/** The functional groups found, in Ketcher's own atom ids (a bond as its two atoms). */
+export type GroupsView =
+  | {
+      kind: 'found';
+      groups: { name: string; color: string; instances: { atoms: number[]; bonds: [number, number][] }[] }[];
+      problems: string[];
+    }
+  | { kind: 'unavailable'; reason: string };
+
 /** What the panel shows. `drawing` counts the drawing's changes: a ready state with
  * `revision !== drawing` describes an earlier drawing while a newer one is worked out. */
 export type PanelState =
@@ -41,6 +50,7 @@ export type PanelState =
       atoms: number;
       values: PanelValues;
       stereo: StereoAtoms[];
+      groups: GroupsView;
     };
 
 export interface Tracker {
@@ -97,10 +107,22 @@ export function createTracker(
       if (request.revision === drawing) {
         if (message.computed) {
           const atomIds = request.atomIds;
-          const toKetcher = (e: { atoms: number[]; defined: boolean }) => ({
-            atoms: e.atoms.map((i) => atomIds[i]),
-            defined: e.defined,
-          });
+          const ids = (atoms: number[]) => atoms.map((i) => atomIds[i]);
+          const toKetcher = (e: { atoms: number[]; defined: boolean }) => ({ atoms: ids(e.atoms), defined: e.defined });
+          const found = message.computed.groups;
+          const groups: GroupsView =
+            found.kind === 'found'
+              ? {
+                  ...found,
+                  groups: found.groups.map((g) => ({
+                    ...g,
+                    instances: g.instances.map((i) => ({
+                      atoms: ids(i.atoms),
+                      bonds: i.bonds.map(([a, b]): [number, number] => [atomIds[a], atomIds[b]]),
+                    })),
+                  })),
+                }
+              : found;
           lastReady = {
             kind: 'ready',
             drawing,
@@ -108,6 +130,7 @@ export function createTracker(
             atoms: atomIds.length,
             values: panelValues(message.computed),
             stereo: [...message.computed.centres, ...message.computed.doubleBonds].map(toKetcher),
+            groups,
           };
           showingLocal = false;
           show(lastReady);

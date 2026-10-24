@@ -486,4 +486,62 @@ export async function saveWithDialog(app: App, format: string, marker: RegExp, p
   return readFileSync(path, 'utf8');
 }
 
+export interface HighlightAttributes {
+  atoms: number[];
+  bonds: number[];
+  rgroupAttachmentPoints: number[];
+  color: string;
+}
+
+/** ketcher-react's editor has a highlights list; ketcher-core's Editor type doesn't say so. */
+export interface Highlights {
+  highlights: {
+    getAll(): { id: number; highlight: HighlightAttributes }[];
+    create(...highlights: HighlightAttributes[]): void;
+  };
+}
+
+/** Ketcher's highlights: ours (by colour) and any others, with their atoms and bonds. */
+export function highlights(page: Page) {
+  return page.evaluate(() =>
+    (window.ketcher!.editor as unknown as Highlights).highlights.getAll().map(({ highlight: h }) => ({
+      color: h.color,
+      atoms: [...h.atoms].sort((a, b) => a - b),
+      bonds: [...h.bonds].sort((a, b) => a - b),
+    })),
+  );
+}
+
+/** An init script (context.addInitScript): the RDKit worker's replies reach the app only
+ * while not held, so a test decides when RDKit "answers" (window.__holdRdkit(),
+ * window.__releaseRdkit()). */
+export function holdableRdkitReplies() {
+  const RealWorker = window.Worker;
+  window.Worker = class extends RealWorker {
+    constructor(url: string | URL, options?: WorkerOptions) {
+      super(url, options);
+      if (options?.name !== 'rdkit') return;
+      const held: MessageEvent[] = [];
+      let holding = false;
+      let appHandler: ((event: MessageEvent) => void) | null = null;
+      // The app sets worker.onmessage after construction; deliver through this filter.
+      RealWorker.prototype.addEventListener.call(this, 'message', (event: Event) => {
+        if (holding) held.push(event as MessageEvent);
+        else appHandler?.(event as MessageEvent);
+      });
+      Object.defineProperty(this, 'onmessage', {
+        get: () => appHandler,
+        set: (handler: ((event: MessageEvent) => void) | null) => (appHandler = handler),
+      });
+      Object.assign(window, {
+        __holdRdkit: () => (holding = true),
+        __releaseRdkit: () => {
+          holding = false;
+          held.splice(0).forEach((event) => appHandler?.(event));
+        },
+      });
+    }
+  };
+}
+
 export { expect };

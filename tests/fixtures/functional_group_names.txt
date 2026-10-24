@@ -1,0 +1,31 @@
+# The functional-group highlighter's 25-molecule test set (spec "3. Functional group
+# highlighter"). Provisional: chosen by Claude on 2026-10-24 for Jeff to check against
+# CHEM-312 (he delegated the choice). One name per line, as a student would type it.
+# scripts/fetch_reference_smiles.py asks PubChem for each name and writes
+# functional_group_compounds.csv; nothing here is a chemistry value. The expected groups
+# are in functional_groups_expected.json.
+ethyl acetate
+aspirin
+4-methoxybenzoic acid
+methylparaben
+acetic anhydride
+vanillin
+4-hydroxybenzyl alcohol
+paracetamol
+lidocaine
+procaine
+N,N-dimethylformamide
+glycerol
+2-butanol
+tert-butanol
+propargyl alcohol
+cholesterol
+diethylamine
+L-cysteine
+benzoyl chloride
+2-chloro-2-methylpropane
+epichlorohydrin
+benzonitrile
+carvone
+cinnamaldehyde
+acetophenone

@@ -1,0 +1,26 @@
+typed_name,pubchem_cid,pubchem_title,smiles
+ethyl acetate,8857,Ethyl Acetate,CCOC(=O)C
+aspirin,2244,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O
+4-methoxybenzoic acid,7478,4-Methoxybenzoic Acid,COC1=CC=C(C=C1)C(=O)O
+methylparaben,7456,Methylparaben,COC(=O)C1=CC=C(C=C1)O
+acetic anhydride,7918,Acetic Anhydride,CC(=O)OC(=O)C
+vanillin,1183,Vanillin,COC1=C(C=CC(=C1)C=O)O
+4-hydroxybenzyl alcohol,125,4-Hydroxybenzyl Alcohol,C1=CC(=CC=C1CO)O
+paracetamol,1983,Acetaminophen,CC(=O)NC1=CC=C(C=C1)O
+lidocaine,3676,Lidocaine,CCN(CC)CC(=O)NC1=C(C=CC=C1C)C
+procaine,4914,Procaine,CCN(CC)CCOC(=O)C1=CC=C(C=C1)N
+"N,N-dimethylformamide",6228,Dimethylformamide,CN(C)C=O
+glycerol,753,Glycerol,C(C(CO)O)O
+2-butanol,6568,(+-)-2-Butanol,CCC(C)O
+tert-butanol,6386,tert-Butanol,CC(C)(C)O
+propargyl alcohol,7859,Propargyl alcohol,C#CCO
+cholesterol,5997,Cholesterol,C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C
+diethylamine,8021,Diethylamine,CCNCC
+L-cysteine,5862,L-(+)-Cysteine,C([C@@H](C(=O)O)N)S
+benzoyl chloride,7412,Benzoyl chloride,C1=CC=C(C=C1)C(=O)Cl
+2-chloro-2-methylpropane,10486,tert-BUTYL CHLORIDE,CC(C)(C)Cl
+epichlorohydrin,7835,Epichlorohydrin,C1C(O1)CCl
+benzonitrile,7505,Benzonitrile,C1=CC=C(C=C1)C#N
+carvone,7439,"Carvone, (+-)-",CC1=CCC(CC1=O)C(=C)C
+cinnamaldehyde,637511,Cinnamaldehyde,C1=CC=C(C=C1)/C=C/C=O
+acetophenone,7410,Acetophenone,CC(=O)C1=CC=CC=C1

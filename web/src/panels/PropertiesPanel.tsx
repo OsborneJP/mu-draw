@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
 import type { Action, Ketcher } from 'ketcher-core';
 import { createTracker, type PanelState } from '../chem/tracker';
 import type { PanelValues } from '../chem/properties';
 import { readDrawing } from '../editor/drawing';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
-import { addHighlight, removeHighlight } from '../editor/stereoHighlight';
+import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
+import FunctionalGroups from './FunctionalGroups';
 import './properties.css';
 
 // Properties panel (spec section 2): RDKit's values for the drawing as it changes, worked
@@ -125,6 +126,29 @@ function Stereo({ stereo, current, highlighted, onToggle }: StereoProps) {
   );
 }
 
+/** A highlight on the canvas, and the drawing it was made for. */
+type Held = RefObject<{ removal: Action; drawing: number } | null>;
+
+function drop(ketcher: Ketcher, held: Held): void {
+  if (!held.current) return;
+  removeHighlight(ketcher, held.current.removal);
+  held.current = null;
+}
+
+/** Colour the functional groups of `state` on the canvas, if it describes the drawing as it
+ * is now and they aren't coloured already. Called as each state arrives and when the
+ * checkbox is ticked, both in step with the drawing, so the colours are never for another. */
+function colourGroups(ketcher: Ketcher, held: Held, state: PanelState): void {
+  if (held.current || state.kind !== 'ready' || state.revision !== state.drawing) return;
+  if (state.groups.kind !== 'found') return;
+  const parts = state.groups.groups.map((g) => ({
+    atoms: g.instances.flatMap((i) => i.atoms),
+    bonds: g.instances.flatMap((i) => i.bonds),
+    color: g.color,
+  }));
+  held.current = { removal: addColoured(ketcher, parts), drawing: state.drawing };
+}
+
 function Values({ values, children }: { values: PanelValues; children: ReactNode }) {
   return (
     <>
@@ -180,6 +204,12 @@ export default function PropertiesPanel() {
   // The highlight on the canvas, and the drawing it was made for.
   const highlight = useRef<{ removal: Action; drawing: number } | null>(null);
   const [highlighted, setHighlighted] = useState(false);
+  // The functional groups' colours, whether they are wanted, and the newest state (refs, so
+  // the tracker's callback and the checkbox see them at once, not at the next render).
+  const groupColours = useRef<{ removal: Action; drawing: number } | null>(null);
+  const [groupsShown, setGroupsShown] = useState(false);
+  const groupsWanted = useRef(false);
+  const latest = useRef<PanelState>(state);
 
   useEffect(() => {
     if (!ketcher) return;
@@ -189,18 +219,31 @@ export default function PropertiesPanel() {
       highlight.current = null;
       setHighlighted(false);
     };
-    // The tracker calls this once Ketcher has finished applying a change, so the highlight
-    // goes with the drawing it was made for, before anything else can happen.
+    // The tracker calls this once Ketcher has finished applying a change, so the highlights
+    // go with the drawing they were made for, before anything else can happen, and the
+    // groups of a new drawing are coloured the moment its values arrive.
     const show = (next: PanelState) => {
+      latest.current = next;
       if (highlight.current && highlight.current.drawing !== next.drawing) unhighlight();
+      if (groupColours.current && groupColours.current.drawing !== next.drawing) drop(ketcher, groupColours);
+      if (groupsWanted.current) colourGroups(ketcher, groupColours, next);
       setState(next);
     };
     const stop = startTracking(ketcher, show);
     return () => {
       stop();
       unhighlight();
+      drop(ketcher, groupColours);
     };
   }, [ketcher]);
+
+  const showGroups = (shown: boolean) => {
+    groupsWanted.current = shown;
+    setGroupsShown(shown);
+    if (!ketcher) return;
+    if (shown) colourGroups(ketcher, groupColours, latest.current);
+    else drop(ketcher, groupColours);
+  };
 
   const current = state.kind === 'ready' && state.revision === state.drawing;
   // The count buttons are disabled unless the values are for the drawing as it is now.
@@ -233,6 +276,7 @@ export default function PropertiesPanel() {
       {state.kind === 'ready' && (
         <Values values={state.values}>
           <Stereo stereo={state.values.stereo} current={current} highlighted={highlighted} onToggle={toggle} />
+          <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
         </Values>
       )}
     </aside>

@@ -71,6 +71,8 @@ def test_two_cache_control_headers_fail():
             "differs from web/csp-workers.json",
         ),
         ("rdkit/worker.js", "cache-control", [IMMUTABLE], "rdkit/worker.js: Cache-Control"),
+        ("functional-groups.json", "cache-control", [IMMUTABLE], "functional-groups.json: Cache"),
+        ("functional-groups.json", "content-type", ["text/html"], "functional-groups.json: Cont"),
     ],
 )
 def test_wrong_headers_fail(path, header, value, problem):
@@ -112,3 +114,16 @@ def test_name_to_structure_must_answer_as_recorded():
     wrong = {**structure.body_json, "source": "PubChem"}
     results["api/structure"] = cl.Fetched(200, {}, json.dumps(wrong).encode())
     assert "api/structure: body" in cl.check(results, expected, POLICY, WORKERS)[0]
+
+
+def test_functional_group_patterns_must_be_this_commits():
+    expected = cl.expectations(FILES)
+    (patterns,) = [e for e in expected if e.path == cl.PATTERNS]
+    assert patterns.body_json["groups"]  # the repo's file, parsed
+    results = good_results()
+    results[cl.PATTERNS] = cl.Fetched(404)
+    assert cl.check(results, expected, POLICY, WORKERS) == [f"{cl.PATTERNS}: HTTP 404"]
+    edited = {**patterns.body_json, "groups": patterns.body_json["groups"][1:]}
+    results = good_results()
+    results[cl.PATTERNS].body = json.dumps(edited).encode()
+    assert f"{cl.PATTERNS}: body" in cl.check(results, expected, POLICY, WORKERS)[0]

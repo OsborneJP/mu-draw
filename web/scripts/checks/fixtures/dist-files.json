@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-2rfAkruI.js",
-    "size": 7899185
+    "path": "assets/index-DzzkeRfa.js",
+    "size": 7913532
   },
   {
-    "path": "assets/index-Cnvdo-ZW.css",
-    "size": 184280
+    "path": "assets/index-WbDcwp5J.css",
+    "size": 186654
   },
   {
-    "path": "assets/index.modern-55d8e3ef-BL2uGmrh.js",
+    "path": "assets/index.modern-55d8e3ef-Dxa1a5Uw.js",
     "size": 425354
   },
   {
@@ -30,6 +30,10 @@
   {
     "path": "assets/workbox-window.prod.es5-Bd17z0YL.js",
     "size": 5653
+  },
+  {
+    "path": "functional-groups.json",
+    "size": 2980
   },
   {
     "path": "icons/icon-192.png",
@@ -57,11 +61,11 @@
   },
   {
     "path": "rdkit/worker.js",
-    "size": 65111
+    "size": 67066
   },
   {
     "path": "sw.js",
-    "size": 1850
+    "size": 1925
   },
   {
     "path": "workbox-2fbc6a65.js",

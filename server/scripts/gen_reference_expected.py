@@ -5,6 +5,10 @@
 Reads tests/fixtures/reference_compounds.csv (SMILES from PubChem) and writes:
   tests/fixtures/reference_expected.json   descriptors, formula, InChIKey, stereo
   tests/fixtures/molfiles/<slug>.mol       2D Molfiles for the editor tests
+and, from tests/fixtures/functional_group_compounds.csv (the highlighter's test set):
+  tests/fixtures/functional_groups/<slug>.mol, and compounds.json listing them
+Only structures: the groups each one should show are a person's judgement
+(functional_groups_expected.json), never generated.
 
 It also invents structures for Get name's not-found check: two reference compounds joined
 by one C-C bond (INVENTED), so RDKit makes them and nobody types them. They are listed
@@ -41,6 +45,9 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
 CSV_FILE = FIXTURES / "reference_compounds.csv"
 EXPECTED_FILE = "reference_expected.json"
+FG_CSV_FILE = FIXTURES / "functional_group_compounds.csv"
+FG_DIR = "functional_groups"
+FG_INDEX = f"{FG_DIR}/compounds.json"
 
 # Pairs of reference compounds (typed names) to join; see join().
 INVENTED = (
@@ -250,9 +257,45 @@ def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
     return entry, files
 
 
-def generate(rows: list[dict[str, str]]) -> dict[str, str]:
+def functional_group_set(rows: list[dict[str, str]]) -> dict[str, str]:
+    """The highlighter's test set: one Molfile per compound, and an index of them."""
+    outputs: dict[str, str] = {}
+    compounds = []
+    for row in rows:
+        mol = Chem.MolFromSmiles(row["smiles"])
+        if mol is None:
+            raise ValueError(f"RDKit cannot parse the PubChem SMILES for {row['typed_name']!r}")
+        name = row["typed_name"]
+        rel = f"{FG_DIR}/{slug(name)}.mol"
+        outputs[rel] = molfile(mol, name)
+        compounds.append(
+            {
+                "typed_name": name,
+                "pubchem_cid": int(row["pubchem_cid"]),
+                "pubchem_title": row["pubchem_title"],
+                "canonical_smiles": Chem.MolToSmiles(mol),
+                "inchikey": Chem.MolToInchiKey(mol),
+                "heavy_atoms": mol.GetNumHeavyAtoms(),
+                "file": rel,
+            }
+        )
+    index = {
+        "generator": "server/scripts/gen_reference_expected.py",
+        "rdkit_version": rdkit.__version__,
+        "settings": SETTINGS,
+        "compounds": compounds,
+    }
+    outputs[FG_INDEX] = json.dumps(index, indent=2, ensure_ascii=False) + "\n"
+    return outputs
+
+
+def generate(
+    rows: list[dict[str, str]], fg_rows: list[dict[str, str]] | None = None
+) -> dict[str, str]:
     """All generated files, keyed by path relative to tests/fixtures/."""
     configure()
+    if fg_rows is None:
+        fg_rows = read_rows(FG_CSV_FILE)
     outputs: dict[str, str] = {}
     compounds = []
     for row in rows:
@@ -269,6 +312,7 @@ def generate(rows: list[dict[str, str]]) -> dict[str, str]:
         "invented": made_up,
     }
     outputs[EXPECTED_FILE] = json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
+    outputs.update(functional_group_set(fg_rows))
     return outputs
 
 

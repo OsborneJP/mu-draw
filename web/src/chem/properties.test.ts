@@ -75,6 +75,7 @@ describe('Lipinski', () => {
     fragments: 1,
     centres: [],
     doubleBonds: [],
+    groups: { kind: 'found', groups: [], problems: [] },
   });
 
   it('judges each rule on the value as displayed, limits included', () => {
@@ -103,6 +104,7 @@ describe('stereoisomers', () => {
       fragments: 1,
       centres: Array.from({ length: 60 }, () => element),
       doubleBonds: [{ atoms: [0, 1], defined: true }],
+      groups: { kind: 'found', groups: [], problems: [] },
     });
     expect(values.stereo).toEqual({
       centres: 60,

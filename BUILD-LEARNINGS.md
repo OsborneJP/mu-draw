@@ -689,3 +689,52 @@ that fails without the fix. Accepted as known limits:
   the 57 Playwright tests on the production build before copying, Jeff restarted
   mu-draw-api, and `--smoke-only production` passed the same 11 checks and 56 tests against
   /draw/. Recorded after promoting, in one docs commit.
+
+## Functional-group highlighter (session 7, 2026-10-24)
+
+- Plan and acceptance bar: docs/plans/functional-groups.md, written before building. The 25
+  molecules and their expected groups (tests/fixtures/functional_groups_expected.json) were
+  chosen by Claude (Jeff delegated it) and are provisional until he checks them against
+  CHEM-312. The expectations were written by reading the structures before any pattern was
+  run on them; all 25 matched on the first run, so no pattern was tuned to the set.
+- Measured before building (RDKit.js 2026.9.1):
+  - A query molecule's JSON (`get_qmol(...).get_json()`) has no atom map numbers, so a
+    SMARTS can't mark "the group's atoms" with `:1` without a hand-written SMARTS parser.
+    The convention instead: every atom the SMARTS matches is the group's (coloured,
+    claimed); context sits inside recursive SMARTS `$(...)`.
+  - `get_substruct_matches` answers `{}`, not `[]`, when nothing matches.
+  - SMARTS `H` and `X` count drawn hydrogen atoms (`[CX4;H2][OX2H]` matches with every H
+    drawn), so matching runs on the Molfile's own atoms and indices map to Ketcher's ids.
+- The patterns are kept textbook-simple and the overlap rule separates them: on its own the
+  ether pattern matches an ester's, an anhydride's and an epoxide's O, the ester pattern an
+  anhydride, the amine patterns an amide's N (unit tests show each, so the rule is not
+  vacuous). Matches of one group that share atoms merge (a carbonate is one ester, a
+  fused ring system one arene).
+- The worker's first version left the pattern fetch's rejection without a handler until
+  RDKit had started; with a file that isn't JSON that was an unhandled rejection, which
+  Playwright reports from a worker as a page error. Found by the "not JSON" test; the fetch
+  is now settled at once.
+- Playwright's `context.route` sees both the service worker's precache request for the
+  pattern file and the RDKit worker's own; `route.request().serviceWorker()` tells them
+  apart. The 404 test holds the worker's request until the editor is up (the guards report
+  the 404, which would otherwise fail the start) and lets the precache request through.
+- Ketcher ignores keys once a form control (the checkbox) has had the focus; tests click
+  an empty corner of the canvas first. Ketcher's Add explicit hydrogens finishes after the
+  click returns, so the test waits for RDKit's exact atom count, not the next state.
+- Precache: 16 entries, 28.5 MB (the pattern file adds 3 kB).
+- Each guard removed in turn, and the test that failed (Vitest at once; Playwright, rebuilt
+  each time, at once): the overlap rule (8 tests: the molecules, the overlap tests, one
+  colour per atom); merging; the priority sort; bonds only between a group's own atoms;
+  each format check (colour, duplicate name, priority, unreadable SMARTS, no list);
+  mapping groups' atoms and bonds to Ketcher ids (tracker); passing "unavailable" through;
+  the precache check for the file; check_live's pattern check; dropping colours at a
+  change ("follow the drawing"); colouring a new drawing's groups when its values arrive
+  (the 25-molecule browser test); colouring only values for the drawing as it is now (the
+  recorded highlight states show the old groups on the new drawing); unticking; the HTTP
+  status check; settling the fetch at once; showing skipped patterns; colouring bonds.
+- Accepted limits: 1°/2°/3° alcohols by the hydrogens on the carbinol carbon (methanol is
+  1°; a hemiacetal OH is an alcohol and its ring O an ether); aryl halides, enols, imides
+  (one amide), nitro groups and heteroaromatic rings (pyridine is not an arene) are not
+  groups of their own; where the stereo highlight and a group mark the same bond (a
+  stereogenic C=C is also an alkene), one colour covers the other; on a first visit the
+  properties wait for the 3 kB pattern file.

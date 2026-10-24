@@ -1,0 +1,237 @@
+{
+  "generator": "server/scripts/gen_reference_expected.py",
+  "rdkit_version": "2026.09.1",
+  "settings": {
+    "legacy_stereo_perception": false,
+    "prefer_coordgen": false,
+    "compute2d_canon_orient": true,
+    "molfile_chiral_flag": "1 when any tetrahedral centre is specified, else 0"
+  },
+  "compounds": [
+    {
+      "typed_name": "ethyl acetate",
+      "pubchem_cid": 8857,
+      "pubchem_title": "Ethyl Acetate",
+      "canonical_smiles": "CCOC(C)=O",
+      "inchikey": "XEKOWRVHYACXOJ-UHFFFAOYSA-N",
+      "heavy_atoms": 6,
+      "file": "functional_groups/ethyl-acetate.mol"
+    },
+    {
+      "typed_name": "aspirin",
+      "pubchem_cid": 2244,
+      "pubchem_title": "Aspirin",
+      "canonical_smiles": "CC(=O)Oc1ccccc1C(=O)O",
+      "inchikey": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
+      "heavy_atoms": 13,
+      "file": "functional_groups/aspirin.mol"
+    },
+    {
+      "typed_name": "4-methoxybenzoic acid",
+      "pubchem_cid": 7478,
+      "pubchem_title": "4-Methoxybenzoic Acid",
+      "canonical_smiles": "COc1ccc(C(=O)O)cc1",
+      "inchikey": "ZEYHEAKUIGZSGI-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "file": "functional_groups/4-methoxybenzoic-acid.mol"
+    },
+    {
+      "typed_name": "methylparaben",
+      "pubchem_cid": 7456,
+      "pubchem_title": "Methylparaben",
+      "canonical_smiles": "COC(=O)c1ccc(O)cc1",
+      "inchikey": "LXCFILQKKLGQFO-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "file": "functional_groups/methylparaben.mol"
+    },
+    {
+      "typed_name": "acetic anhydride",
+      "pubchem_cid": 7918,
+      "pubchem_title": "Acetic Anhydride",
+      "canonical_smiles": "CC(=O)OC(C)=O",
+      "inchikey": "WFDIJRYMOXRFFG-UHFFFAOYSA-N",
+      "heavy_atoms": 7,
+      "file": "functional_groups/acetic-anhydride.mol"
+    },
+    {
+      "typed_name": "vanillin",
+      "pubchem_cid": 1183,
+      "pubchem_title": "Vanillin",
+      "canonical_smiles": "COc1cc(C=O)ccc1O",
+      "inchikey": "MWOOGOJBHIARFG-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "file": "functional_groups/vanillin.mol"
+    },
+    {
+      "typed_name": "4-hydroxybenzyl alcohol",
+      "pubchem_cid": 125,
+      "pubchem_title": "4-Hydroxybenzyl Alcohol",
+      "canonical_smiles": "OCc1ccc(O)cc1",
+      "inchikey": "BVJSUAQZOZWCKN-UHFFFAOYSA-N",
+      "heavy_atoms": 9,
+      "file": "functional_groups/4-hydroxybenzyl-alcohol.mol"
+    },
+    {
+      "typed_name": "paracetamol",
+      "pubchem_cid": 1983,
+      "pubchem_title": "Acetaminophen",
+      "canonical_smiles": "CC(=O)Nc1ccc(O)cc1",
+      "inchikey": "RZVAJINKPMORJF-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "file": "functional_groups/paracetamol.mol"
+    },
+    {
+      "typed_name": "lidocaine",
+      "pubchem_cid": 3676,
+      "pubchem_title": "Lidocaine",
+      "canonical_smiles": "CCN(CC)CC(=O)Nc1c(C)cccc1C",
+      "inchikey": "NNJVILVZKWQKPM-UHFFFAOYSA-N",
+      "heavy_atoms": 17,
+      "file": "functional_groups/lidocaine.mol"
+    },
+    {
+      "typed_name": "procaine",
+      "pubchem_cid": 4914,
+      "pubchem_title": "Procaine",
+      "canonical_smiles": "CCN(CC)CCOC(=O)c1ccc(N)cc1",
+      "inchikey": "MFDFERRIHVXMIY-UHFFFAOYSA-N",
+      "heavy_atoms": 17,
+      "file": "functional_groups/procaine.mol"
+    },
+    {
+      "typed_name": "N,N-dimethylformamide",
+      "pubchem_cid": 6228,
+      "pubchem_title": "Dimethylformamide",
+      "canonical_smiles": "CN(C)C=O",
+      "inchikey": "ZMXDDKWLCZADIW-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "file": "functional_groups/n-n-dimethylformamide.mol"
+    },
+    {
+      "typed_name": "glycerol",
+      "pubchem_cid": 753,
+      "pubchem_title": "Glycerol",
+      "canonical_smiles": "OCC(O)CO",
+      "inchikey": "PEDCQBHIVMGVHV-UHFFFAOYSA-N",
+      "heavy_atoms": 6,
+      "file": "functional_groups/glycerol.mol"
+    },
+    {
+      "typed_name": "2-butanol",
+      "pubchem_cid": 6568,
+      "pubchem_title": "(+-)-2-Butanol",
+      "canonical_smiles": "CCC(C)O",
+      "inchikey": "BTANRVKWQNVYAZ-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "file": "functional_groups/2-butanol.mol"
+    },
+    {
+      "typed_name": "tert-butanol",
+      "pubchem_cid": 6386,
+      "pubchem_title": "tert-Butanol",
+      "canonical_smiles": "CC(C)(C)O",
+      "inchikey": "DKGAVHZHDRPRBM-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "file": "functional_groups/tert-butanol.mol"
+    },
+    {
+      "typed_name": "propargyl alcohol",
+      "pubchem_cid": 7859,
+      "pubchem_title": "Propargyl alcohol",
+      "canonical_smiles": "C#CCO",
+      "inchikey": "TVDSBUOJIPERQY-UHFFFAOYSA-N",
+      "heavy_atoms": 4,
+      "file": "functional_groups/propargyl-alcohol.mol"
+    },
+    {
+      "typed_name": "cholesterol",
+      "pubchem_cid": 5997,
+      "pubchem_title": "Cholesterol",
+      "canonical_smiles": "CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C",
+      "inchikey": "HVYWMOMLDIMFJA-DPAQBDIFSA-N",
+      "heavy_atoms": 28,
+      "file": "functional_groups/cholesterol.mol"
+    },
+    {
+      "typed_name": "diethylamine",
+      "pubchem_cid": 8021,
+      "pubchem_title": "Diethylamine",
+      "canonical_smiles": "CCNCC",
+      "inchikey": "HPNMFZURTQLUMO-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "file": "functional_groups/diethylamine.mol"
+    },
+    {
+      "typed_name": "L-cysteine",
+      "pubchem_cid": 5862,
+      "pubchem_title": "L-(+)-Cysteine",
+      "canonical_smiles": "N[C@@H](CS)C(=O)O",
+      "inchikey": "XUJNEKJLAYXESH-REOHCLBHSA-N",
+      "heavy_atoms": 7,
+      "file": "functional_groups/l-cysteine.mol"
+    },
+    {
+      "typed_name": "benzoyl chloride",
+      "pubchem_cid": 7412,
+      "pubchem_title": "Benzoyl chloride",
+      "canonical_smiles": "O=C(Cl)c1ccccc1",
+      "inchikey": "PASDCCFISLVPSO-UHFFFAOYSA-N",
+      "heavy_atoms": 9,
+      "file": "functional_groups/benzoyl-chloride.mol"
+    },
+    {
+      "typed_name": "2-chloro-2-methylpropane",
+      "pubchem_cid": 10486,
+      "pubchem_title": "tert-BUTYL CHLORIDE",
+      "canonical_smiles": "CC(C)(C)Cl",
+      "inchikey": "NBRKLOOSMBRFMH-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "file": "functional_groups/2-chloro-2-methylpropane.mol"
+    },
+    {
+      "typed_name": "epichlorohydrin",
+      "pubchem_cid": 7835,
+      "pubchem_title": "Epichlorohydrin",
+      "canonical_smiles": "ClCC1CO1",
+      "inchikey": "BRLQWZUYTZBJKN-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "file": "functional_groups/epichlorohydrin.mol"
+    },
+    {
+      "typed_name": "benzonitrile",
+      "pubchem_cid": 7505,
+      "pubchem_title": "Benzonitrile",
+      "canonical_smiles": "N#Cc1ccccc1",
+      "inchikey": "JFDZBHWFFUWGJE-UHFFFAOYSA-N",
+      "heavy_atoms": 8,
+      "file": "functional_groups/benzonitrile.mol"
+    },
+    {
+      "typed_name": "carvone",
+      "pubchem_cid": 7439,
+      "pubchem_title": "Carvone, (+-)-",
+      "canonical_smiles": "C=C(C)C1CC=C(C)C(=O)C1",
+      "inchikey": "ULDHMXUKGWMISQ-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "file": "functional_groups/carvone.mol"
+    },
+    {
+      "typed_name": "cinnamaldehyde",
+      "pubchem_cid": 637511,
+      "pubchem_title": "Cinnamaldehyde",
+      "canonical_smiles": "O=C/C=C/c1ccccc1",
+      "inchikey": "KJPRLNWUNMBNBZ-QPJJXVBHSA-N",
+      "heavy_atoms": 10,
+      "file": "functional_groups/cinnamaldehyde.mol"
+    },
+    {
+      "typed_name": "acetophenone",
+      "pubchem_cid": 7410,
+      "pubchem_title": "Acetophenone",
+      "canonical_smiles": "CC(=O)c1ccccc1",
+      "inchikey": "KWOLFJPFCHCOCG-UHFFFAOYSA-N",
+      "heavy_atoms": 9,
+      "file": "functional_groups/acetophenone.mol"
+    }
+  ]
+}

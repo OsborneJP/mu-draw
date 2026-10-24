@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/4-hydroxybenzyl%20alcohol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:12:50Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 125,
+          "SMILES": "C1=CC(=CC=C1CO)O",
+          "Title": "4-Hydroxybenzyl Alcohol"
+        }
+      ]
+    }
+  }
+}

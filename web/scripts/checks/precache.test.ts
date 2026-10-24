@@ -63,6 +63,13 @@ describe('checkPrecache', () => {
     expect(checkPrecache(files, urls)).toEqual([`RDKit ${what} missing: ${path}`]);
   });
 
+  it('fails when the functional-group patterns are missing from the build', () => {
+    const files = FILES.filter((f) => f.path !== 'functional-groups.json');
+    expect(files.length).toBe(FILES.length - 1);
+    const urls = parseSwManifest(SW).filter((url) => url !== 'functional-groups.json');
+    expect(checkPrecache(files, urls)).toEqual(['functional-group patterns missing: functional-groups.json']);
+  });
+
   it('fails when Indigo is missing (e.g. the base64 build was used)', () => {
     const files = FILES.filter((f) => f.path !== INDIGO);
     const urls = parseSwManifest(SW).filter((url) => url !== INDIGO);

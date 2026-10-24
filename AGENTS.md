@@ -65,25 +65,25 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker, image request
   queue, the ready Ketcher (instance.ts), drawing.ts (Molfile + atom ids), stereoHighlight.ts.
 - `web/src/chem/`: rdkitWorker.ts, compute.ts (RDKit values), properties.ts (display rules),
-  tracker.ts (request ordering); later: functional groups.
-- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel, Get name and Name
-  to structure (naming.ts: their shared state; NamePanel floats over `.canvas-area`).
+  tracker.ts (request ordering), functionalGroups.ts (SMARTS matching, overlap rule).
+- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel (+ FunctionalGroups),
+  Get name, Name to structure (naming.ts: shared state; NamePanel floats over `.canvas-area`).
 - `web/src/api.ts`: calls to `<base>api/*` (name, structure), with the 8 s deadline.
 - `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; later functional-groups.json.
+- `web/public/`: icons; functional-groups.json (patterns anyone may edit; the worker fetches it).
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
-  export.spec.ts reads PNG headers, pixels and the clipboard back; properties.spec.ts holds
-  RDKit's replies (`holdableRdkitReplies`); getname and nametostructure specs hold API answers.
+  export.spec.ts reads PNG headers, pixels and the clipboard back; `holdableRdkitReplies()` (in
+  fixtures.ts) holds RDKit's replies; getname and nametostructure specs hold API answers.
 - `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
   test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
   `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
-- `tests/fixtures/`: generated chemistry, `recorded/` API responses, `name_responses.json` and
-  `structure_responses.json` (server answers e2e replays), `chemdraw/` (Jeff's files).
-- `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit).
+- `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (server
+  answers e2e replays), `functional_group*` (25-molecule set; groups by judgement), `chemdraw/`.
+- `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit), plans/ (acceptance bars).
 
 ## Conventions
 - Never write the name or URL path literally; derive them from app.config.json via

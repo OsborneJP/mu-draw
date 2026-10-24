@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2-chloro-2-methylpropane/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:12:57Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 10486,
+          "SMILES": "CC(C)(C)Cl",
+          "Title": "tert-BUTYL CHLORIDE"
+        }
+      ]
+    }
+  }
+}

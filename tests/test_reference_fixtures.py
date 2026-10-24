@@ -29,13 +29,18 @@ def generated() -> dict[str, str]:
     return gen.generate(gen.read_rows())
 
 
-def test_csv_rebuilds_from_recordings():
-    assert fetch.build_csv(fetch.read_names()) == fetch.CSV_FILE.read_text(encoding="utf-8")
+@pytest.mark.parametrize("names_file, csv_file", fetch.SETS, ids=lambda p: p.name)
+def test_csv_rebuilds_from_recordings(names_file, csv_file):
+    names = fetch.read_names(names_file)
+    assert fetch.build_csv(names) == csv_file.read_text(encoding="utf-8")
 
 
 def test_one_recording_per_name():
-    wanted = {fetch.recording_path(name).name for name in fetch.read_names()}
+    wanted = {fetch.recording_path(name).name for name in fetch.all_names()}
     assert {p.name for p in fetch.RECORDINGS.glob("name-*.json")} == wanted
+    # Both sets are recorded; names they share (aspirin) are recorded once.
+    assert len(fetch.SETS) == 2
+    assert len(fetch.all_names()) < sum(len(fetch.read_names(n)) for n, _ in fetch.SETS)
 
 
 def test_recordings_ask_for_current_property_names():
@@ -65,7 +70,9 @@ def test_generated_files_match_committed(generated):
 
 def test_no_stale_generated_files(generated):
     on_disk = {
-        p.relative_to(gen.FIXTURES).as_posix() for p in (gen.FIXTURES / "molfiles").iterdir()
+        p.relative_to(gen.FIXTURES).as_posix()
+        for folder in ("molfiles", gen.FG_DIR)
+        for p in (gen.FIXTURES / folder).iterdir()
     }
     assert on_disk == {rel for rel in generated if rel != gen.EXPECTED_FILE}
 

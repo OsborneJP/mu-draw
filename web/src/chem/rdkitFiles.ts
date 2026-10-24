@@ -12,3 +12,7 @@ export const RDKIT_WORKER_FILE = 'rdkit/worker.js';
 
 /** The worker's chunk name: its source file's name, which Vite uses as the chunk name. */
 export const RDKIT_WORKER_CHUNK = 'rdkitWorker';
+
+/** The functional-group patterns (web/public/), which the RDKit worker fetches once. Not
+ * hashed, so anyone can edit it; the precache revision picks up a change. */
+export const PATTERNS_FILE = 'functional-groups.json';

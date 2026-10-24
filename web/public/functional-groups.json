@@ -1,0 +1,32 @@
+{
+  "about": [
+    "Patterns for the functional-group highlighter (docs/SPEC.md, section 3). Edit freely: no code change is needed, and the tests check this file (web/src/chem/functionalGroups.test.ts).",
+    "Each group has a name (shown in the panel), smarts (RDKit SMARTS), color (#rrggbb, drawn behind the atoms) and priority (a number; higher wins).",
+    "Every atom the SMARTS matches belongs to the group: it is coloured, and no lower-priority group may use it. Atoms that only have to be nearby go inside $(...), so an alcohol is its O and an ester its C(=O)O.",
+    "Groups are applied from the highest priority down. A match that needs an atom a higher-priority group already has is dropped (an ester's O is not also an ether). Matches of one group that share atoms count as one."
+  ],
+  "groups": [
+    { "name": "Anhydride", "smarts": "[CX3](=[OX1])[OX2][CX3]=[OX1]", "color": "#f2b9a6", "priority": 100 },
+    { "name": "Acid chloride", "smarts": "[CX3](=[OX1])Cl", "color": "#c7f19d", "priority": 95 },
+    { "name": "Carboxylic acid", "smarts": "[CX3](=[OX1])[OX2H1]", "color": "#f2a6a6", "priority": 90 },
+    { "name": "Ester", "smarts": "[CX3](=[OX1])[OX2;$(O(C=O)[#6])]", "color": "#f4afdd", "priority": 85 },
+    { "name": "Amide", "smarts": "[NX3][CX3]=[OX1]", "color": "#d9a6f2", "priority": 80 },
+    { "name": "Nitrile", "smarts": "[CX2]#[NX1]", "color": "#a6b3f2", "priority": 75 },
+    { "name": "Aldehyde", "smarts": "[CX3;$([CH1][#6]),$([CH2])]=[OX1]", "color": "#efe78f", "priority": 70 },
+    { "name": "Ketone", "smarts": "[CX3;$(C([#6])[#6])]=[OX1]", "color": "#f0c594", "priority": 65 },
+    { "name": "Epoxide", "smarts": "C1OC1", "color": "#82edd8", "priority": 60 },
+    { "name": "Thiol", "smarts": "[SX2H1;$(S[#6])]", "color": "#d8ed82", "priority": 55 },
+    { "name": "Phenol", "smarts": "[OX2H1;$(Oc)]", "color": "#c0aff4", "priority": 50 },
+    { "name": "Alcohol (1°)", "smarts": "[OX2H1;$(O[CX4;H2,H3])]", "color": "#b8e0f5", "priority": 47 },
+    { "name": "Alcohol (2°)", "smarts": "[OX2H1;$(O[CX4;H1])]", "color": "#8bcdee", "priority": 46 },
+    { "name": "Alcohol (3°)", "smarts": "[OX2H1;$(O[CX4;H0])]", "color": "#5ebae8", "priority": 45 },
+    { "name": "Ether", "smarts": "[OX2;$(O([#6])[#6])]", "color": "#8be6ee", "priority": 40 },
+    { "name": "Amine (1°)", "smarts": "[NX3;H2;+0;!$(N~[!#6;!#1])]", "color": "#a6f2b9", "priority": 35 },
+    { "name": "Amine (2°)", "smarts": "[NX3;H1;+0;!$(N~[!#6;!#1])]", "color": "#79ec96", "priority": 34 },
+    { "name": "Amine (3°)", "smarts": "[NX3;H0;+0;!$(N~[!#6;!#1])]", "color": "#4ce673", "priority": 33 },
+    { "name": "Alkyl halide", "smarts": "[F,Cl,Br,I;$(*[CX4])]", "color": "#c6af9f", "priority": 30 },
+    { "name": "Alkyne", "smarts": "[CX2]#[CX2]", "color": "#eed68b", "priority": 20 },
+    { "name": "Alkene", "smarts": "[CX3]=[CX3]", "color": "#b3e08a", "priority": 15 },
+    { "name": "Arene", "smarts": "c1ccccc1", "color": "#ced6de", "priority": 10 }
+  ]
+}

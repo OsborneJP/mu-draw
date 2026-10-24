@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/tert-butanol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:12:54Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 6386,
+          "SMILES": "CC(C)(C)O",
+          "Title": "tert-Butanol"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/propargyl%20alcohol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:12:54Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 7859,
+          "SMILES": "C#CCO",
+          "Title": "Propargyl alcohol"
+        }
+      ]
+    }
+  }
+}

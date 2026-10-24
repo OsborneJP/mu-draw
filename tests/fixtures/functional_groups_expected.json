@@ -1,0 +1,132 @@
+{
+  "status": "provisional",
+  "chosen_by": "Claude, 2026-10-24 (Jeff delegated the choice of the 25 molecules); for Jeff to check against CHEM-312",
+  "how": "The groups and counts a second-year organic student should find in each structure, written by reading the structure, before any pattern was run on it. Never generated from web/public/functional-groups.json, which is what this file tests. Names are those in functional-groups.json; a group not listed must not be shown.",
+  "molecules": [
+    {
+      "name": "ethyl acetate",
+      "checks": "an ester's single-bonded O is not also an ether",
+      "groups": { "Ester": 1 }
+    },
+    {
+      "name": "aspirin",
+      "checks": "ester and acid side by side; the ester O on the ring is neither an ether nor a phenol",
+      "groups": { "Carboxylic acid": 1, "Ester": 1, "Arene": 1 }
+    },
+    {
+      "name": "4-methoxybenzoic acid",
+      "checks": "an aryl ether beside an acid; the acid's OH is not an alcohol",
+      "groups": { "Carboxylic acid": 1, "Ether": 1, "Arene": 1 }
+    },
+    {
+      "name": "methylparaben",
+      "checks": "ester vs phenol vs ether: the methoxy O belongs to the ester",
+      "groups": { "Ester": 1, "Phenol": 1, "Arene": 1 }
+    },
+    {
+      "name": "acetic anhydride",
+      "checks": "one anhydride, not two esters, and its central O is not an ether",
+      "groups": { "Anhydride": 1 }
+    },
+    {
+      "name": "vanillin",
+      "checks": "phenol and ether on the same ring, with an aldehyde",
+      "groups": { "Aldehyde": 1, "Phenol": 1, "Ether": 1, "Arene": 1 }
+    },
+    {
+      "name": "4-hydroxybenzyl alcohol",
+      "checks": "an OH on the ring is a phenol; on the CH2 it is a 1° alcohol",
+      "groups": { "Phenol": 1, "Alcohol (1°)": 1, "Arene": 1 }
+    },
+    {
+      "name": "paracetamol",
+      "checks": "an N on the ring that carries a C=O is an amide, not an amine",
+      "groups": { "Amide": 1, "Phenol": 1, "Arene": 1 }
+    },
+    {
+      "name": "lidocaine",
+      "checks": "amide and 3° amine in one molecule",
+      "groups": { "Amide": 1, "Amine (3°)": 1, "Arene": 1 }
+    },
+    {
+      "name": "procaine",
+      "checks": "an aryl NH2 is a 1° amine and the NEt2 a 3° amine; the ester O is not an ether",
+      "groups": { "Ester": 1, "Amine (1°)": 1, "Amine (3°)": 1, "Arene": 1 }
+    },
+    {
+      "name": "N,N-dimethylformamide",
+      "checks": "a formyl C-H on N is an amide, not an aldehyde, and its N is not a 3° amine",
+      "groups": { "Amide": 1 }
+    },
+    {
+      "name": "glycerol",
+      "checks": "counts: two 1° alcohols and one 2°",
+      "groups": { "Alcohol (1°)": 2, "Alcohol (2°)": 1 }
+    },
+    {
+      "name": "2-butanol",
+      "checks": "2° alcohol",
+      "groups": { "Alcohol (2°)": 1 }
+    },
+    {
+      "name": "tert-butanol",
+      "checks": "3° alcohol",
+      "groups": { "Alcohol (3°)": 1 }
+    },
+    {
+      "name": "propargyl alcohol",
+      "checks": "terminal alkyne beside a 1° alcohol",
+      "groups": { "Alkyne": 1, "Alcohol (1°)": 1 }
+    },
+    {
+      "name": "cholesterol",
+      "checks": "a ring 2° alcohol and a ring alkene in a large molecule with stereocentres",
+      "groups": { "Alcohol (2°)": 1, "Alkene": 1 }
+    },
+    {
+      "name": "diethylamine",
+      "checks": "2° amine",
+      "groups": { "Amine (2°)": 1 }
+    },
+    {
+      "name": "L-cysteine",
+      "checks": "thiol; an amine on the carbon next to an acid is not an amide",
+      "groups": { "Carboxylic acid": 1, "Thiol": 1, "Amine (1°)": 1 }
+    },
+    {
+      "name": "benzoyl chloride",
+      "checks": "Cl on a C=O is an acid chloride: not an alkyl halide, not a ketone",
+      "groups": { "Acid chloride": 1, "Arene": 1 }
+    },
+    {
+      "name": "2-chloro-2-methylpropane",
+      "checks": "a tertiary alkyl halide",
+      "groups": { "Alkyl halide": 1 }
+    },
+    {
+      "name": "epichlorohydrin",
+      "checks": "the three-membered ring's O is an epoxide, not an ether; the CH2Cl is an alkyl halide",
+      "groups": { "Epoxide": 1, "Alkyl halide": 1 }
+    },
+    {
+      "name": "benzonitrile",
+      "checks": "C≡N is a nitrile, not an alkyne or an amine",
+      "groups": { "Nitrile": 1, "Arene": 1 }
+    },
+    {
+      "name": "carvone",
+      "checks": "α,β-unsaturated ketone: the ring C=C and the isopropenyl C=C are two alkenes",
+      "groups": { "Ketone": 1, "Alkene": 2 }
+    },
+    {
+      "name": "cinnamaldehyde",
+      "checks": "the C=C between ring and aldehyde is an alkene, not part of the arene",
+      "groups": { "Aldehyde": 1, "Alkene": 1, "Arene": 1 }
+    },
+    {
+      "name": "acetophenone",
+      "checks": "an aryl ketone",
+      "groups": { "Ketone": 1, "Arene": 1 }
+    }
+  ]
+}

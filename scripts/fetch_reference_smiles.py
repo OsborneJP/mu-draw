@@ -1,13 +1,14 @@
-"""Build tests/fixtures/reference_compounds.csv from PubChem.
+"""Build the compound CSVs in tests/fixtures/ from PubChem.
 
-    python scripts/fetch_reference_smiles.py            # network: re-record, then write CSV
+    python scripts/fetch_reference_smiles.py            # network: re-record, then write CSVs
     python scripts/fetch_reference_smiles.py --missing  # network: record only new names
-    python scripts/fetch_reference_smiles.py --offline  # rebuild CSV from the recordings
+    python scripts/fetch_reference_smiles.py --offline  # rebuild CSVs from the recordings
 
-Each name in tests/fixtures/reference_names.txt is looked up with PUG REST and the raw
-response is saved under tests/fixtures/recorded/pubchem/. The CSV is always built from
-those recordings by parse() and write_csv(), which is what the replay test checks, so
-the CSV's SMILES provably came from PubChem.
+Each name in a names file (SETS: the reference compounds, the functional-group test set)
+is looked up with PUG REST and the raw response is saved under
+tests/fixtures/recorded/pubchem/ (one recording per name, shared by the sets). Each CSV is
+always built from those recordings by parse() and write_csv(), which is what the replay
+test checks, so the CSVs' SMILES provably came from PubChem.
 """
 
 from __future__ import annotations
@@ -28,6 +29,10 @@ FIXTURES = ROOT / "tests" / "fixtures"
 NAMES_FILE = FIXTURES / "reference_names.txt"
 RECORDINGS = FIXTURES / "recorded" / "pubchem"
 CSV_FILE = FIXTURES / "reference_compounds.csv"
+FG_NAMES_FILE = FIXTURES / "functional_group_names.txt"
+FG_CSV_FILE = FIXTURES / "functional_group_compounds.csv"
+# (names file, CSV built from its recordings)
+SETS = ((NAMES_FILE, CSV_FILE), (FG_NAMES_FILE, FG_CSV_FILE))
 PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 # Current PubChem names: SMILES includes stereo. Never IsomericSMILES/CanonicalSMILES.
 PROPERTIES = "SMILES,Title"
@@ -97,6 +102,11 @@ def build_csv(names: list[str], directory: Path = RECORDINGS) -> str:
     return write_csv(rows)
 
 
+def all_names() -> list[str]:
+    """Every name in every set, each once, in order."""
+    return list(dict.fromkeys(name for names_file, _ in SETS for name in read_names(names_file)))
+
+
 def to_record(names: list[str], missing_only: bool, directory: Path = RECORDINGS) -> list[str]:
     """The names to look up: all of them, or only those without a recording yet."""
     if not missing_only:
@@ -110,18 +120,18 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--offline", action="store_true", help="only rebuild the CSV")
     mode.add_argument("--missing", action="store_true", help="record only names not yet recorded")
     args = parser.parse_args(argv)
-    names = read_names()
     if not args.offline:
         RECORDINGS.mkdir(parents=True, exist_ok=True)
-        for i, name in enumerate(to_record(names, args.missing)):
+        for i, name in enumerate(to_record(all_names(), args.missing)):
             if i:
                 time.sleep(MIN_INTERVAL_S)
             recording = record(name)
             path = recording_path(name)
             path.write_text(json.dumps(recording, indent=2) + "\n", encoding="utf-8")
             print(f"recorded {path.relative_to(ROOT)}")
-    CSV_FILE.write_text(build_csv(names), encoding="utf-8")
-    print(f"wrote {CSV_FILE.relative_to(ROOT)}")
+    for names_file, csv_file in SETS:
+        csv_file.write_text(build_csv(read_names(names_file)), encoding="utf-8")
+        print(f"wrote {csv_file.relative_to(ROOT)}")
     return 0
 
 

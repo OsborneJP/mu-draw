@@ -2,10 +2,15 @@
 // drawing is at each moment and when (and whether) each reply arrives.
 import { describe, expect, it } from 'vitest';
 import type { Computed } from './compute';
+import type { GroupsResult } from './functionalGroups';
 import { createTracker, type Drawing, type PanelState, type WorkerRequest } from './tracker';
 
 /** A made-up result whose average MW tells the drawings apart (not a real compound). */
-function result(amw: number, centres: number[] = []): Computed {
+function result(
+  amw: number,
+  centres: number[] = [],
+  groups: GroupsResult = { kind: 'found', groups: [], problems: [] },
+): Computed {
   return {
     descriptors: { amw, exactmw: amw, lipinskiHBD: 0, lipinskiHBA: 0, NumRotatableBonds: 0, tpsa: 0, CrippenClogP: 0 },
     elements: { C: 1 },
@@ -14,6 +19,7 @@ function result(amw: number, centres: number[] = []): Computed {
     fragments: 1,
     centres: centres.map((i) => ({ atoms: [i], defined: true })),
     doubleBonds: [],
+    groups,
   };
 }
 
@@ -166,6 +172,27 @@ describe('tracker', () => {
       { atoms: [3], defined: true },
       { atoms: [2], defined: true },
     ]);
+  });
+
+  it("maps functional groups to Ketcher's atom ids, bonds as their two atoms", () => {
+    const t = setup();
+    t.draw(structure('A', [0, 1, 3, 2]));
+    const found: GroupsResult = {
+      kind: 'found',
+      groups: [{ name: 'G', color: '#123456', instances: [{ atoms: [2, 3], bonds: [[2, 3]] }, { atoms: [0], bonds: [] }] }],
+      problems: ['"H": it has no SMARTS'],
+    };
+    t.tracker.reply({ id: 1, computed: result(1, [], found) });
+    const last = t.last();
+    expect(last.kind === 'ready' && last.groups).toEqual({
+      kind: 'found',
+      groups: [{ name: 'G', color: '#123456', instances: [{ atoms: [3, 2], bonds: [[3, 2]] }, { atoms: [0], bonds: [] }] }],
+      problems: ['"H": it has no SMARTS'],
+    });
+    t.draw(structure('B', [5]));
+    t.tracker.reply({ id: 2, computed: result(2, [], { kind: 'unavailable', reason: 'HTTP 404' }) });
+    const next = t.last();
+    expect(next.kind === 'ready' && next.groups).toEqual({ kind: 'unavailable', reason: 'HTTP 404' });
   });
 
   it('ignores a reply it did not ask for', () => {

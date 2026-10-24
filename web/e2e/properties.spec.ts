@@ -11,7 +11,10 @@ import {
   clearCanvas,
   expect,
   fixture,
+  highlights,
+  holdableRdkitReplies,
   inchiKey,
+  type Highlights,
   openEditor,
   test,
   waitForEditor,
@@ -265,32 +268,6 @@ test('if RDKit cannot start, the panel says so and the editor carries on', async
   await expectMessage(page, 'unavailable', 'Properties are unavailable: RDKit could not start.');
 });
 
-interface HighlightAttributes {
-  atoms: number[];
-  bonds: number[];
-  rgroupAttachmentPoints: number[];
-  color: string;
-}
-
-/** ketcher-react's editor has a highlights list; ketcher-core's Editor type doesn't say so. */
-interface Highlights {
-  highlights: {
-    getAll(): { id: number; highlight: HighlightAttributes }[];
-    create(...highlights: HighlightAttributes[]): void;
-  };
-}
-
-/** Ketcher's highlights: ours (by colour) and any others, with their atoms and bonds. */
-function highlights(page: Page) {
-  return page.evaluate(() =>
-    (window.ketcher!.editor as unknown as Highlights).highlights.getAll().map(({ highlight: h }) => ({
-      color: h.color,
-      atoms: [...h.atoms].sort((a, b) => a - b),
-      bonds: [...h.bonds].sort((a, b) => a - b),
-    })),
-  );
-}
-
 /** The fixture's stereo elements as the highlight should show them, for a drawing whose
  * Ketcher atom ids equal the Molfile's atom indices (checked by the caller). */
 function expectedHighlight(c: Compound, bondIds: Map<number, number>) {
@@ -402,37 +379,6 @@ test("highlights land on the right atoms when Ketcher's atom ids are out of orde
   await page.getByTestId('stereo-centres').click();
   expect(await highlights(page)).toEqual(expectedHighlight(butanol, identity(butanol)));
 });
-
-// Runs before the app: the RDKit worker's replies reach the app only while not held, so a
-// test decides when RDKit "answers".
-function holdableRdkitReplies() {
-  const RealWorker = window.Worker;
-  window.Worker = class extends RealWorker {
-    constructor(url: string | URL, options?: WorkerOptions) {
-      super(url, options);
-      if (options?.name !== 'rdkit') return;
-      const held: MessageEvent[] = [];
-      let holding = false;
-      let appHandler: ((event: MessageEvent) => void) | null = null;
-      // The app sets worker.onmessage after construction; deliver through this filter.
-      RealWorker.prototype.addEventListener.call(this, 'message', (event: Event) => {
-        if (holding) held.push(event as MessageEvent);
-        else appHandler?.(event as MessageEvent);
-      });
-      Object.defineProperty(this, 'onmessage', {
-        get: () => appHandler,
-        set: (handler: ((event: MessageEvent) => void) | null) => (appHandler = handler),
-      });
-      Object.assign(window, {
-        __holdRdkit: () => (holding = true),
-        __releaseRdkit: () => {
-          holding = false;
-          held.splice(0).forEach((event) => appHandler?.(event));
-        },
-      });
-    }
-  };
-}
 
 test('while RDKit works on a newer drawing, older values can\'t be highlighted and a late reply is never shown', async ({ app }) => {
   const { context, page } = app;

@@ -1,8 +1,9 @@
 // What the properties panel needs from RDKit for one drawing, as plain data: RDKit's own
-// descriptors, the atoms counted by element, and the stereo elements. Runs in the RDKit
-// worker (rdkitWorker.ts) and, in the unit tests, in Node with the same RDKit.js.
-// Nothing here rounds or decides what is shown; properties.ts does that.
+// descriptors, the atoms counted by element, the stereo elements and the functional groups.
+// Runs in the RDKit worker (rdkitWorker.ts) and, in the unit tests, in Node with the same
+// RDKit.js. Nothing here rounds or decides what is shown; properties.ts does that.
 import type { MainModule } from '@rdkit/rdkit';
+import { findGroups, type GroupsResult, type Patterns } from './functionalGroups';
 
 // The rdMolDescriptors.Properties values the panel shows. Lipinski's own counts (NH + OH;
 // N + O), not RDKit's pharmacophore NumHBD/NumHBA (Jeff, Oct 24, 2026).
@@ -34,7 +35,11 @@ export interface Computed {
   fragments: number;
   centres: StereoElement[];
   doubleBonds: StereoElement[];
+  groups: GroupsResult;
 }
+
+/** The functional-group patterns, or why there are none (functionalGroups.ts). */
+export type PatternsOrReason = Patterns | { unavailable: string };
 
 interface JsonAtom {
   z: number;
@@ -83,7 +88,11 @@ export function configureRdkit(rdkit: MainModule): void {
 
 /** RDKit's view of a Molfile, or null when RDKit can't read it (e.g. a ring it can't
  * kekulize) or it has an atom that isn't an element. */
-export function computeProperties(rdkit: MainModule, molfile: string): Computed | null {
+export function computeProperties(
+  rdkit: MainModule,
+  molfile: string,
+  patterns: PatternsOrReason = { unavailable: 'no patterns were given' },
+): Computed | null {
   // Drawn hydrogens stay atoms here, so atom indices are the Molfile's (and so map back to
   // Ketcher's atoms). Descriptors come from a copy with them folded into their heavy atoms:
   // with explicit hydrogens, RDKit counts the bond to a methyl as rotatable.
@@ -126,6 +135,13 @@ export function computeProperties(rdkit: MainModule, molfile: string): Computed 
     const fragments = frags.molList.size();
     frags.molList.delete();
 
+    // Matched on the Molfile's own atoms (drawn hydrogens included), so indices map to
+    // Ketcher's atoms; the patterns' H counts and connectivities include drawn hydrogens.
+    const groups: GroupsResult =
+      'unavailable' in patterns
+        ? { kind: 'unavailable', reason: patterns.unavailable }
+        : { kind: 'found', groups: findGroups(mol, bonds.map((b) => b.atoms), patterns), problems: patterns.problems };
+
     return {
       descriptors,
       elements,
@@ -134,6 +150,7 @@ export function computeProperties(rdkit: MainModule, molfile: string): Computed 
       fragments,
       centres,
       doubleBonds,
+      groups,
     };
   } finally {
     mol.delete();

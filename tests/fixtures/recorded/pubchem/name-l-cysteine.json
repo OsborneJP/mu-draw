@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/L-cysteine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:12:56Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5862,
+          "SMILES": "C([C@@H](C(=O)O)N)S",
+          "Title": "L-(+)-Cysteine"
+        }
+      ]
+    }
+  }
+}

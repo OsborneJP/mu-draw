@@ -33,7 +33,8 @@
 /* While a newer drawing is worked out (a few milliseconds), the older values stay. */
 .properties-panel[data-state='updating'] .properties-list,
 .properties-panel[data-state='updating'] .lipinski,
-.properties-panel[data-state='updating'] .stereo {
+.properties-panel[data-state='updating'] .stereo,
+.properties-panel[data-state='updating'] .groups-list {
   opacity: 0.6;
 }
 
@@ -123,4 +124,41 @@
 .stereo-flag {
   color: #8a4b00;
   font-weight: 600;
+}
+
+.groups-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.groups-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.groups-list li {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 0;
+}
+
+.group-swatch {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #8c959f;
+  border-radius: 3px;
+}
+
+.group-count {
+  font-variant-numeric: tabular-nums;
+}
+
+[data-testid='groups-problems'] ul {
+  margin: 2px 0 0;
+  padding-left: 16px;
 }

@@ -66,6 +66,14 @@ All notable changes to this project. The format follows
   record for it is drawn instead, and the panel says so. Then Get name runs on the result:
   "You typed" beside "PubChem's IUPAC name", with a check mark when they match. One Undo
   removes an addition or brings back what Replace cleared. Greyed offline.
+- Functional groups in the properties panel: "Show functional groups" colours each group on
+  the canvas (alkenes, alkynes, arenes, 1°/2°/3° alcohols and amines, phenols, ethers,
+  aldehydes, ketones, acids, esters, amides, acid chlorides, anhydrides, nitriles, thiols,
+  alkyl halides, epoxides) and lists them with counts. Each atom belongs to one group: an
+  ester's O is not also an ether. The colours follow the drawing as it changes, are not an
+  edit (Undo and autosave ignore them) and work offline. The patterns are in
+  functional-groups.json, which can be edited without changing the app; a pattern it can't
+  read is named in the panel and skipped.
 
 ### Changed
 - Header buttons look greyed while they can't be used.

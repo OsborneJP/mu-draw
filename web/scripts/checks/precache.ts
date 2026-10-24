@@ -3,6 +3,7 @@
 // can look fine online and break offline. This check fails the build instead.
 import vm from 'node:vm';
 import { RDKIT_WASM_FILE, RDKIT_WORKER_FILE } from '../../config/rdkitWasm.ts';
+import { PATTERNS_FILE } from '../../src/chem/rdkitFiles.ts';
 
 export interface DistFile {
   path: string;
@@ -77,5 +78,6 @@ export function checkPrecache(files: DistFile[], precached: string[]): string[] 
   }
   if (!paths.has(RDKIT_WASM_FILE)) errors.push(`RDKit wasm missing: ${RDKIT_WASM_FILE}`);
   if (!paths.has(RDKIT_WORKER_FILE)) errors.push(`RDKit worker missing: ${RDKIT_WORKER_FILE}`);
+  if (!paths.has(PATTERNS_FILE)) errors.push(`functional-group patterns missing: ${PATTERNS_FILE}`);
   return errors;
 }
