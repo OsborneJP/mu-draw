@@ -14,9 +14,12 @@ dependencies:
   # Same release as @rdkit/rdkit in web/package.json (2026.9.1).
   - rdkit=2026.09.1
   - nodejs=24.22.1
+  # Java for OPSIN (Name to structure), run by the API as one long-running process.
+  - openjdk=21
   # fastapi-core, not fastapi: the conda metapackage pulls in an
-  # OpenTelemetry SDK and exporter.
-  - fastapi-core
+  # OpenTelemetry SDK and exporter. Pinned: server/main.py turns its native
+  # telemetry off by name, so an upgrade is a deliberate, re-checked change.
+  - fastapi-core=0.161.1
   - uvicorn
   # httpx for outbound calls (mockable with respx); httpx2 for TestClient.
   - httpx
