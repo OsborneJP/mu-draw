@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { cspMetaTag, cspPlugin, cspPolicy } from '../../config/csp';
-import { checkBuiltHtml, checkCspPolicy } from './csp';
+import { cspFor, cspMetaTag, cspPlugin, cspPolicy, WORKER_EXTRAS, workerCspPolicy } from '../../config/csp';
+import { checkBuiltHtml, checkCspPolicy, checkWorkerExtras } from './csp';
 
 const POLICY = cspPolicy();
 
@@ -72,5 +72,40 @@ describe('cspPlugin', () => {
     expect(plugin.apply).toBe('build');
     const transform = plugin.transformIndexHtml as () => unknown;
     expect(transform()).toEqual([cspMetaTag(POLICY)]);
+  });
+});
+
+describe('worker policies', () => {
+  it("passes the app's worker extras", () => {
+    expect(checkWorkerExtras(WORKER_EXTRAS)).toEqual([]);
+  });
+
+  it("gives the RDKit worker the page's policy plus 'unsafe-eval', and nothing else", () => {
+    const rdkit = cspFor('rdkit/worker.js');
+    expect(rdkit).toBe(POLICY.replace("script-src 'self' 'wasm-unsafe-eval'", "script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'"));
+    expect(rdkit).not.toBe(POLICY);
+  });
+
+  it("gives every other file the page's policy", () => {
+    for (const path of ['', 'index.html', 'sw.js', 'assets/indigoWorker-abc.js', 'rdkit/RDKit_minimal.wasm']) {
+      expect(cspFor(path)).toBe(POLICY);
+    }
+  });
+
+  it('merges extras into their own directive only', () => {
+    expect(workerCspPolicy({ 'script-src': ['x'] }, { 'default-src': ['a'], 'script-src': ['b'] })).toBe(
+      'default-src a; script-src b x',
+    );
+  });
+
+  it.each([
+    ['another host for a worker', { 'rdkit/worker.js': { 'connect-src': ['https://cdn.example.com'] } }, 'rdkit/worker.js: connect-src allows https://cdn.example.com'],
+    ['inline scripts for a worker', { 'rdkit/worker.js': { 'script-src': ["'unsafe-inline'"] } }, "rdkit/worker.js: script-src allows 'unsafe-inline'"],
+    ['unsafe-eval for the page', { 'index.html': { 'script-src': ["'unsafe-eval'"] } }, "index.html: only a worker script may get more than the page's policy"],
+    ['unsafe-eval for the root', { '': { 'script-src': ["'unsafe-eval'"] } }, "index.html: only a worker script may get more than the page's policy"],
+    ['unsafe-eval for the service worker', { 'sw.js': { 'script-src': ["'unsafe-eval'"] } }, "sw.js: only a worker script may get more than the page's policy"],
+    ['a file that is not a script', { 'rdkit/RDKit_minimal.wasm': { 'script-src': ["'unsafe-eval'"] } }, "rdkit/RDKit_minimal.wasm: only a worker script may get more than the page's policy"],
+  ])('fails on %s', (_name, extras, problem) => {
+    expect(checkWorkerExtras(extras)).toContain(problem);
   });
 });

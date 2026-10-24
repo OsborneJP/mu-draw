@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
-import { cspPolicy } from '../config/csp.ts';
-import { RDKIT_WASM_FILE } from '../config/rdkitWasm.ts';
+import { cspFor, cspPolicy } from '../config/csp.ts';
+import { RDKIT_WASM_FILE, RDKIT_WORKER_FILE } from '../config/rdkitWasm.ts';
 import {
   appManifest,
   clearCanvas,
@@ -62,6 +62,7 @@ test('online: the editor loads, works, stays on its own origin and is installabl
     precacheFetch: context.waitForEvent('request', (r) => r.serviceWorker() !== null),
     indigoWorker: context.waitForEvent('request', (r) => /\/assets\/indigoWorker-[^/]+\.js$/.test(r.url())),
     indigoWasm: context.waitForEvent('request', (r) => /\/assets\/indigo-ketcher-[^/]+\.wasm$/.test(r.url())),
+    rdkitWorker: context.waitForEvent('request', (r) => r.url() === new URL(RDKIT_WORKER_FILE, server.url).href),
   };
 
   await openEditor(app);
@@ -96,21 +97,28 @@ test('online: the editor loads, works, stays on its own origin and is installabl
 
   await waitForServiceWorker(app);
   // Positive control for the request policy: the requests it judged really happened.
-  const [swScript, , indigoWorker] = await Promise.all([
+  const [swScript, , indigoWorker, , rdkitWorker] = await Promise.all([
     seen.serviceWorkerScript,
     seen.precacheFetch,
     seen.indigoWorker,
     seen.indigoWasm,
+    seen.rdkitWorker,
   ]);
   // Workers get their CSP only from their own response header, never from the page's
   // meta tag: the server (test server or Apache) must send it. Asked of the server
   // directly: the response event for a worker's own script (sw.js, the Indigo worker)
   // can be lost, since the browser fetches it before Playwright attaches to the worker.
   // Fetches made inside a running worker, like the Indigo wasm, are reported reliably.
+  // The RDKit worker alone gets more than the page ('unsafe-eval', config/csp.ts).
   for (const request of [swScript, indigoWorker]) {
     const response = await context.request.get(request.url());
     expect(response.headers()['content-security-policy'], request.url()).toBe(cspPolicy());
   }
+  const index = await context.request.get(server.url);
+  expect(index.headers()['content-security-policy'], 'index.html').toBe(cspPolicy());
+  const rdkitPolicy = (await context.request.get(rdkitWorker.url())).headers()['content-security-policy'];
+  expect(rdkitPolicy, RDKIT_WORKER_FILE).toBe(cspFor(RDKIT_WORKER_FILE));
+  expect(rdkitPolicy).not.toBe(cspPolicy());
 
   // RDKit.js ships before any code uses it: served as WebAssembly and compilable.
   const rdkit = await fetchAndCompileWasm(page, new URL(RDKIT_WASM_FILE, server.url).href);

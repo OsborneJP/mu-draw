@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-C7rR7sul.css",
-    "size": 180997
+    "path": "assets/index-2rfAkruI.js",
+    "size": 7899185
   },
   {
-    "path": "assets/index-DUU5YcL_.js",
-    "size": 7882095
+    "path": "assets/index-Cnvdo-ZW.css",
+    "size": 184280
   },
   {
-    "path": "assets/index.modern-55d8e3ef-B2egK89f.js",
+    "path": "assets/index.modern-55d8e3ef-BL2uGmrh.js",
     "size": 425354
   },
   {
@@ -45,19 +45,23 @@
   },
   {
     "path": "index.html",
-    "size": 781
+    "size": 1200
   },
   {
     "path": "manifest.webmanifest",
-    "size": 533
+    "size": 553
   },
   {
     "path": "rdkit/RDKit_minimal.wasm",
     "size": 7379879
   },
   {
+    "path": "rdkit/worker.js",
+    "size": 65111
+  },
+  {
     "path": "sw.js",
-    "size": 1782
+    "size": 1850
   },
   {
     "path": "workbox-2fbc6a65.js",

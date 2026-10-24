@@ -1,6 +1,7 @@
 # Server setup (osbornelab)
 
-Rendered by `scripts/render_server_config.py` from `app.config.json` and `web/csp.json`.
+Rendered by `scripts/render_server_config.py` from `app.config.json`, `web/csp.json` and
+`web/csp-workers.json`.
 Don't edit this file by hand: change the sources and re-render
 (`python scripts/render_server_config.py`); check.sh fails if it is out of date.
 
@@ -63,6 +64,13 @@ Alias /draw-staging /home/webadmin/srv/mu-draw/staging/web
 # Hashed build files never change; cache them for a year.
 <Directory /home/webadmin/srv/mu-draw/staging/web/assets>
     Header set Cache-Control "public, max-age=31536000, immutable"
+</Directory>
+# rdkit/worker.js gets the page's policy plus what web/csp-workers.json adds: RDKit.js
+# builds its bindings with `new Function`. The page itself never gets it.
+<Directory /home/webadmin/srv/mu-draw/staging/web/rdkit>
+    <Files "worker.js">
+        Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    </Files>
 </Directory>
 # Staging is for campus and VPN only (covers the static files and the API).
 <LocationMatch "^/draw-staging(/|$)">
@@ -168,6 +176,13 @@ Alias /draw /home/webadmin/srv/mu-draw/production/web
 # Hashed build files never change; cache them for a year.
 <Directory /home/webadmin/srv/mu-draw/production/web/assets>
     Header set Cache-Control "public, max-age=31536000, immutable"
+</Directory>
+# rdkit/worker.js gets the page's policy plus what web/csp-workers.json adds: RDKit.js
+# builds its bindings with `new Function`. The page itself never gets it.
+<Directory /home/webadmin/srv/mu-draw/production/web/rdkit>
+    <Files "worker.js">
+        Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    </Files>
 </Directory>
 # Production is campus and VPN only, for now (covers the static files and the API).
 <LocationMatch "^/draw(/|$)">

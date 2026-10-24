@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/1%2C4-dimethylcyclohexane/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T12:53:16Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 11523,
+          "SMILES": "CC1CCC(CC1)C",
+          "Title": "1,4-Dimethylcyclohexane"
+        }
+      ]
+    }
+  }
+}

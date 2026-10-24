@@ -175,7 +175,7 @@ test('autosave: if the browser refuses to store the drawing, the header says so'
   // Room again: the next change is saved and the badge goes away.
   await page.evaluate(() => (window as unknown as { __unblockStorage: () => void }).__unblockStorage());
   saved = await nextAutosave(page);
-  await placeRing(page, { x: 1000, y: 150 });
+  await placeRing(page, { x: 600, y: 150 }); // inside the canvas, left of the properties panel
   expect(shape(await saved())).toEqual(shape(await ket(page)));
   await expect(badge).toHaveCount(0);
 });

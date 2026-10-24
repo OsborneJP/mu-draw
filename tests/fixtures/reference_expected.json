@@ -2440,6 +2440,101 @@
       "files": [
         "molfiles/boric-acid.mol"
       ]
+    },
+    {
+      "typed_name": "1,4-dimethylcyclohexane",
+      "pubchem_cid": 11523,
+      "smiles": "CC1CCC(CC1)C",
+      "canonical_smiles": "CC1CCC(C)CC1",
+      "formula": "C8H16",
+      "inchikey": "QRMPKOFEUHIBNM-UHFFFAOYSA-N",
+      "properties": {
+        "exactmw": 112.12520051199999,
+        "amw": 112.216,
+        "lipinskiHBA": 0.0,
+        "lipinskiHBD": 0.0,
+        "NumRotatableBonds": 0.0,
+        "NumHBD": 0.0,
+        "NumHBA": 0.0,
+        "NumHeavyAtoms": 8.0,
+        "NumAtoms": 24.0,
+        "NumHeteroatoms": 0.0,
+        "NumAmideBonds": 0.0,
+        "FractionCSP3": 1.0,
+        "NumRings": 1.0,
+        "NumAromaticRings": 0.0,
+        "NumAliphaticRings": 1.0,
+        "NumSaturatedRings": 1.0,
+        "NumHeterocycles": 0.0,
+        "NumAromaticHeterocycles": 0.0,
+        "NumSaturatedHeterocycles": 0.0,
+        "NumAliphaticHeterocycles": 0.0,
+        "NumSpiroAtoms": 0.0,
+        "NumBridgeheadAtoms": 0.0,
+        "NumAtomStereoCenters": 2.0,
+        "NumUnspecifiedAtomStereoCenters": 2.0,
+        "labuteASA": 52.288014675076575,
+        "tpsa": 0.0,
+        "CrippenClogP": 2.832600000000001,
+        "CrippenMR": 36.79599999999999,
+        "chi0v": 5.983127663125442,
+        "chi1v": 3.787693700234704,
+        "chi2v": 3.3650439694243293,
+        "chi3v": 2.3045304526403108,
+        "chi4v": 1.426746322052511,
+        "chi0n": 5.983127663125442,
+        "chi1n": 3.787693700234704,
+        "chi2n": 3.3650439694243293,
+        "chi3n": 2.3045304526403108,
+        "chi4n": 1.426746322052511,
+        "hallKierAlpha": 0.0,
+        "kappa1": 6.125,
+        "kappa2": 2.52,
+        "kappa3": 1.5,
+        "Phi": 1.929375
+      },
+      "stereo": {
+        "strict": [],
+        "possible": [
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 1
+          },
+          {
+            "type": "Atom_Tetrahedral",
+            "specified": "Unspecified",
+            "centered_on": 4
+          }
+        ]
+      },
+      "panel": {
+        "formula": "C8H16",
+        "fragments": "1",
+        "average_mw": "112.22",
+        "exact_mass": "112.1252",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "0",
+        "rotatable_bonds": "0",
+        "tpsa": "0.0",
+        "logp": "2.83",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "2",
+          "double_bonds": "0",
+          "undefined": "2",
+          "max_stereoisomers": "4"
+        }
+      },
+      "files": [
+        "molfiles/1-4-dimethylcyclohexane.mol"
+      ]
     }
   ],
   "invented": [

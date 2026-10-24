@@ -32,3 +32,6 @@ paraquat
 bromobenzene
 dimethyl sulfoxide
 boric acid
+# Ring cis/trans: RDKit's current stereo perception finds two undefined centres here; its
+# legacy perception (RDKit.js's default) finds none. Proves the worker switches legacy off.
+1,4-dimethylcyclohexane

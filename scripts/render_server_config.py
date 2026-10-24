@@ -21,6 +21,7 @@ from lib.appconfig import ROOT, AppConfig, load
 
 DOC = ROOT / "docs" / "server-setup.md"
 CSP_FILE = ROOT / "web" / "csp.json"
+CSP_WORKERS_FILE = ROOT / "web" / "csp-workers.json"
 VHOST = "/etc/apache2/sites-enabled/osbornelab.conf"
 CAMPUS = "10.0.0.0/8"
 # Production opens on the campus network and VPN only, for now (Jeff, 2026-10-23). False
@@ -29,10 +30,24 @@ PRODUCTION_CAMPUS_ONLY = True
 IMMUTABLE = "public, max-age=31536000, immutable"
 
 
-def csp_policy(path: Path = CSP_FILE) -> str:
+def serialise(directives: dict[str, list[str]]) -> str:
     """Same serialisation as web/config/csp.ts: 'name values; name values'."""
-    directives = json.loads(path.read_text(encoding="utf-8"))
     return "; ".join(f"{name} {' '.join(values)}" for name, values in directives.items())
+
+
+def csp_policy(path: Path = CSP_FILE) -> str:
+    return serialise(json.loads(path.read_text(encoding="utf-8")))
+
+
+def worker_policies(page: Path = CSP_FILE, workers: Path = CSP_WORKERS_FILE) -> dict[str, str]:
+    """Each worker that gets more than the page (path under the app -> its policy): the
+    page's policy with the worker's extra sources appended, as workerCspPolicy() does."""
+    directives = json.loads(page.read_text(encoding="utf-8"))
+    extras = json.loads(workers.read_text(encoding="utf-8"))
+    return {
+        path: serialise({name: values + more.get(name, []) for name, values in directives.items()})
+        for path, more in extras.items()
+    }
 
 
 def env_prefix(name: str) -> Path:
@@ -78,7 +93,25 @@ class Target:
         return f"{self.config.name}-{self.name}"
 
 
-def apache_block(t: Target, policy: str) -> str:
+def worker_sections(t: Target, workers: dict[str, str]) -> list[str]:
+    """One <Files> section per worker with its own policy. Apache applies <Files> after the
+    <Directory> sections, so its `Header set` replaces the page's policy for that file."""
+    lines = []
+    for path, policy in sorted(workers.items()):
+        folder, _, name = path.rpartition("/")
+        lines += [
+            f"# {path} gets the page's policy plus what web/csp-workers.json adds: RDKit.js",
+            "# builds its bindings with `new Function`. The page itself never gets it.",
+            f"<Directory {t.web}/{folder}>" if folder else f"<Directory {t.web}>",
+            f'    <Files "{name}">',
+            f'        Header set Content-Security-Policy "{policy}"',
+            "    </Files>",
+            "</Directory>",
+        ]
+    return lines
+
+
+def apache_block(t: Target, policy: str, workers: dict[str, str] | None = None) -> str:
     p = t.path
     lines = [
         f"# {t.marker} BEGIN (rendered by scripts/render_server_config.py; do not hand-edit)",
@@ -102,6 +135,7 @@ def apache_block(t: Target, policy: str) -> str:
         f"<Directory {t.web}/assets>",
         f'    Header set Cache-Control "{IMMUTABLE}"',
         "</Directory>",
+        *worker_sections(t, workers or {}),
     ]
     if t.name == "staging":
         lines += [
@@ -180,7 +214,9 @@ def unit_install(t: Target, uvicorn: Path) -> str:
     )
 
 
-def render(config: AppConfig, home: Path, user: str, uvicorn: Path, policy: str) -> str:
+def render(
+    config: AppConfig, home: Path, user: str, uvicorn: Path, policy: str, workers: dict[str, str]
+) -> str:
     staging = Target(config, "staging", home, user)
     production = Target(config, "production", home, user)
     host = config.host
@@ -198,7 +234,8 @@ def render(config: AppConfig, home: Path, user: str, uvicorn: Path, policy: str)
     )
     return f"""# Server setup (osbornelab)
 
-Rendered by `scripts/render_server_config.py` from `app.config.json` and `web/csp.json`.
+Rendered by `scripts/render_server_config.py` from `app.config.json`, `web/csp.json` and
+`web/csp-workers.json`.
 Don't edit this file by hand: change the sources and re-render
 (`python scripts/render_server_config.py`); check.sh fails if it is out of date.
 
@@ -240,7 +277,7 @@ Edit `{VHOST}`. Inside `<VirtualHost *:443>`, paste this block after the line
 `# timetable3 END` and before `# 5. ENVIPATH DATABASE` (the envipath block must stay last).
 
 ```apache
-{apache_block(staging, policy)}
+{apache_block(staging, policy, workers)}
 ```
 
 ### Step 4. Test and reload Apache
@@ -285,7 +322,7 @@ Only after staging has passed (`scripts/deploy.sh --production` refuses otherwis
 5. Run `scripts/deploy.sh --smoke-only production`.
 
 ```apache
-{apache_block(production, policy)}
+{apache_block(production, policy, workers)}
 ```
 
 {unit_install(production, uvicorn)}
@@ -312,7 +349,7 @@ Only after staging has passed (`scripts/deploy.sh --production` refuses otherwis
 def current() -> str:
     config = load()
     uvicorn = env_prefix(config.name) / "bin" / "uvicorn"
-    return render(config, Path.home(), getpass.getuser(), uvicorn, csp_policy())
+    return render(config, Path.home(), getpass.getuser(), uvicorn, csp_policy(), worker_policies())
 
 
 def main(argv: list[str] | None = None) -> int:

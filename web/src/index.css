@@ -16,7 +16,14 @@ body {
   flex-direction: column;
 }
 
+/* The editor, with the properties panel on its right. */
 .workspace {
   flex: 1;
   min-height: 0;
+  display: flex;
+}
+
+.workspace > .editor {
+  flex: 1;
+  min-width: 0;
 }

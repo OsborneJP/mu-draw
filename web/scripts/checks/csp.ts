@@ -40,6 +40,29 @@ export function checkCspPolicy(policy: string): string[] {
   return errors;
 }
 
+// A worker may get more than the page (web/csp-workers.json), but only this: RDKit.js
+// builds its bindings with `new Function`. Never the page, never the service worker.
+const WORKER_EXTRAS_ALLOWED: Record<string, string[]> = { 'script-src': ["'unsafe-eval'"] };
+const NEVER_LOOSENED = ['', 'index.html', 'sw.js'];
+
+/** Problems with the per-worker extras: each key a worker script, each extra allowed. */
+export function checkWorkerExtras(extras: Record<string, Record<string, string[]>>): string[] {
+  const errors: string[] = [];
+  for (const [path, directives] of Object.entries(extras)) {
+    if (NEVER_LOOSENED.includes(path) || !path.endsWith('.js')) {
+      errors.push(`${path || 'index.html'}: only a worker script may get more than the page's policy`);
+      continue;
+    }
+    for (const [name, values] of Object.entries(directives)) {
+      const allowed = WORKER_EXTRAS_ALLOWED[name.toLowerCase()] ?? [];
+      for (const value of values) {
+        if (!allowed.includes(value.toLowerCase())) errors.push(`${path}: ${name} allows ${value}`);
+      }
+    }
+  }
+  return errors;
+}
+
 /** The built index.html carries exactly one CSP meta tag, equal to the expected policy. */
 export function checkBuiltHtml(html: string, expected: string): string[] {
   const metas = [...html.matchAll(/<meta\s+http-equiv="Content-Security-Policy"\s+content="([^"]*)"/gi)];

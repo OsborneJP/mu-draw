@@ -83,3 +83,28 @@ def test_public_production_campus_option_is_a_valid_section_once_uncommented(mon
     production = rsc.apache_block(target("production"), POLICY)
     uncommented = "\n".join(re.sub(r"^# ?", "", line) for line in production.splitlines())
     assert CAMPUS_SECTION.search(uncommented)
+
+
+def test_rdkit_worker_gets_its_own_policy_and_only_it():
+    # web/csp-workers.json: the page's policy plus 'unsafe-eval' for the RDKit worker.
+    page = rsc.csp_policy()
+    workers = rsc.worker_policies()
+    assert workers == {
+        "rdkit/worker.js": page.replace(
+            "script-src 'self' 'wasm-unsafe-eval'",
+            "script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'",
+        )
+    }
+    doc = rsc.current()
+    for name in ("staging", "production"):
+        t = target(name)
+        section = (
+            f"<Directory {t.web}/rdkit>\n"
+            '    <Files "worker.js">\n'
+            f'        Header set Content-Security-Policy "{workers["rdkit/worker.js"]}"\n'
+            "    </Files>\n"
+            "</Directory>"
+        )
+        assert section in rsc.apache_block(t, page, workers), name
+    assert doc.count("'unsafe-eval'") == 2  # once per target, in the worker's section only
+    assert f'Header set Content-Security-Policy "{page}"' in doc

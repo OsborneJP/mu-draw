@@ -39,6 +39,12 @@ All notable changes to this project. The format follows
 - Copy image (in the header): one click puts a picture of the whole drawing (PNG, 2x, white
   background) on the clipboard, ready to paste into Word or Google Docs. "Image copied"
   shows until the drawing changes.
+- Properties panel (right of the canvas): molecular formula, average MW, exact mass,
+  degree of unsaturation, H-bond donors and acceptors (Lipinski's NH + OH and N + O),
+  rotatable bonds, TPSA and Crippen logP, with a Lipinski rule-of-5 card. Worked out on
+  this device by RDKit as the drawing changes, offline too; nothing about the drawing
+  leaves the device. Several structures get values for the whole drawing; a reaction, an
+  empty canvas, R-groups or query atoms, and an impossible valence get a message instead.
 
 ### Fixed
 - Ketcher's image previews and exports could hang when two were made at once; they now

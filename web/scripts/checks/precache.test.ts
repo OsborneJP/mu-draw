@@ -54,10 +54,13 @@ describe('checkPrecache', () => {
     expect(errors).toEqual([`norender Indigo shipped: ${norender.path}`]);
   });
 
-  it('fails when the RDKit wasm is missing from the build', () => {
-    const files = FILES.filter((f) => !f.path.startsWith('rdkit/'));
-    const urls = parseSwManifest(SW).filter((url) => !url.startsWith('rdkit/'));
-    expect(checkPrecache(files, urls)).toEqual(['RDKit wasm missing: rdkit/RDKit_minimal.wasm']);
+  it.each([
+    ['wasm', 'rdkit/RDKit_minimal.wasm'],
+    ['worker', 'rdkit/worker.js'],
+  ])('fails when the RDKit %s is missing from the build', (what, path) => {
+    const files = FILES.filter((f) => f.path !== path);
+    const urls = parseSwManifest(SW).filter((url) => url !== path);
+    expect(checkPrecache(files, urls)).toEqual([`RDKit ${what} missing: ${path}`]);
   });
 
   it('fails when Indigo is missing (e.g. the base64 build was used)', () => {

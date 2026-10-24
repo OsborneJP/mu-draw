@@ -19,7 +19,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preview } from 'vite';
 import { resolveBase } from '../config/app.ts';
-import { cspPolicy } from '../config/csp.ts';
+import { cspHeaders } from '../config/csp.ts';
 import { requestProblem } from '../config/requestPolicy.ts';
 import { autosaveKey } from '../src/editor/autosave.ts';
 
@@ -54,13 +54,10 @@ export async function startServer(copy?: string): Promise<AppServer> {
     logLevel: 'warn',
     // Vite's preview reads each file from disk per request, so a test can change the copy.
     build: { outDir: copy ?? dist },
-    // Like Apache: the CSP header covers every file, including sw.js and the Indigo worker.
-    preview: {
-      host: '127.0.0.1',
-      port: 0,
-      strictPort: true,
-      headers: { 'Content-Security-Policy': cspPolicy() },
-    },
+    // Like Apache: the CSP header covers every file, including sw.js and the Indigo worker,
+    // and the RDKit worker gets its own (web/csp-workers.json).
+    plugins: [cspHeaders(resolveBase())],
+    preview: { host: '127.0.0.1', port: 0, strictPort: true },
   });
   const url = server.resolvedUrls?.local[0];
   if (!url) throw new Error('preview server did not report a URL');

@@ -4,9 +4,9 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolveBase } from '../config/app.ts';
-import { cspPolicy } from '../config/csp.ts';
+import { cspPolicy, WORKER_EXTRAS } from '../config/csp.ts';
 import { appTitle } from '../config/pwa.ts';
-import { checkBuiltHtml, checkCspPolicy } from './checks/csp.ts';
+import { checkBuiltHtml, checkCspPolicy, checkWorkerExtras } from './checks/csp.ts';
 import { checkHtmlLinks, checkTitle } from './checks/html.ts';
 import { checkManifest, checkPromptMode } from './checks/manifest.ts';
 import { checkPrecache, parseSwManifest, type DistFile } from './checks/precache.ts';
@@ -26,6 +26,10 @@ const errors = [
   ...checkPromptMode(sw).map((e) => `sw.js: ${e}`),
   ...checkPrecache(files, parseSwManifest(sw)).map((e) => `precache: ${e}`),
   ...checkCspPolicy(cspPolicy()).map((e) => `csp.json: ${e}`),
+  ...checkWorkerExtras(WORKER_EXTRAS).map((e) => `csp-workers.json: ${e}`),
+  ...Object.keys(WORKER_EXTRAS)
+    .filter((path) => !files.some((f) => f.path === path))
+    .map((path) => `csp-workers.json: ${path} is not in the build`),
   ...checkBuiltHtml(read('index.html'), cspPolicy()).map((e) => `index.html: ${e}`),
   ...checkHtmlLinks(read('index.html'), base, files.map((f) => f.path)).map((e) => `index.html: ${e}`),
   ...checkTitle(read('index.html'), title).map((e) => `index.html: ${e}`),

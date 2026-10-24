@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { ports, resolveBase } from './config/app.ts';
 import { cspPlugin } from './config/csp.ts';
 import { appTitle, htmlTitle, pwaOptions } from './config/pwa.ts';
-import { rdkitWasm } from './config/rdkitWasm.ts';
+import { rdkitWasm, workerFileName } from './config/rdkitWasm.ts';
 import pkg from './package.json' with { type: 'json' };
 
 const base = resolveBase();
@@ -28,6 +28,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(base, '/'),
       },
     },
+  },
+  worker: {
+    // The RDKit worker at a fixed path, which the server gives its own CSP (config/csp.ts).
+    rolldownOptions: { output: { entryFileNames: workerFileName } },
   },
   build: {
     sourcemap: false,

@@ -3,9 +3,9 @@
     python scripts/check_live.py <app-url> <dist-dir>
 
 Confirms what docs/server-setup.md promises: the API answers through Apache; index.html,
-sw.js, the manifest and the RDKit wasm revalidate (no-cache); hashed assets are immutable;
+sw.js, the manifest and the RDKit files revalidate (no-cache); hashed assets are immutable;
 WebAssembly and the manifest have the right types; every page and worker script carries
-the build's CSP, exactly once.
+the build's CSP, exactly once, and the RDKit worker its own (web/csp-workers.json).
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from lib.appconfig import ROOT
-from render_server_config import IMMUTABLE, csp_policy
+from render_server_config import IMMUTABLE, csp_policy, worker_policies
 
 
 @dataclass
@@ -37,7 +37,8 @@ class Expect:
     path: str  # relative to the app URL
     cache: str | None = None
     content_type: str | None = None
-    csp: bool = False
+    csp: bool = False  # the page's policy (web/csp.json)
+    worker_csp: bool = False  # this worker's own policy (web/csp-workers.json)
     body_json: object = None
 
 
@@ -60,11 +61,17 @@ def expectations(dist_files: list[str]) -> list[Expect]:
             content_type="application/wasm",
         ),
         Expect("rdkit/RDKit_minimal.wasm", cache="no-cache", content_type="application/wasm"),
+        Expect("rdkit/worker.js", cache="no-cache", worker_csp=True),
         Expect("api/health", body_json={"ok": True}),
     ]
 
 
-def check(results: dict[str, Fetched], expected: list[Expect], policy: str) -> list[str]:
+def check(
+    results: dict[str, Fetched],
+    expected: list[Expect],
+    policy: str,
+    workers: dict[str, str] | None = None,
+) -> list[str]:
     problems = []
     for e in expected:
         got = results[e.path]
@@ -82,6 +89,8 @@ def check(results: dict[str, Fetched], expected: list[Expect], policy: str) -> l
                 problems.append(f"{where}: Content-Type {types}, want {e.content_type}")
         if e.csp and got.header("content-security-policy") != [policy]:
             problems.append(f"{where}: Content-Security-Policy differs from web/csp.json")
+        if e.worker_csp and got.header("content-security-policy") != [(workers or {}).get(e.path)]:
+            problems.append(f"{where}: Content-Security-Policy differs from web/csp-workers.json")
         if e.body_json is not None:
             try:
                 body = json.loads(got.body)
@@ -114,7 +123,7 @@ def main(argv: list[str]) -> int:
     files = [p.relative_to(dist).as_posix() for p in sorted(dist.rglob("*")) if p.is_file()]
     expected = expectations(files)
     results = {e.path: fetch(url + e.path, with_body=e.body_json is not None) for e in expected}
-    problems = check(results, expected, csp_policy(ROOT / "web" / "csp.json"))
+    problems = check(results, expected, csp_policy(ROOT / "web" / "csp.json"), worker_policies())
     for problem in problems:
         print(f"live: {problem}")
     if not problems:
