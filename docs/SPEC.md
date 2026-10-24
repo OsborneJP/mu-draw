@@ -84,6 +84,12 @@ Six features ship in v1; four run fully on the student's device and two call out
 - Label logP as "Crippen estimate" so students know it is a prediction.
 - Multiple fragments drawn: show values for the whole drawing and say so.
 - **Done when:** values for 10 reference compounds (aspirin, ibuprofen, caffeine, glucose, etc.) match RDKit run on the server to the displayed precision.
+- **Decided (Jeff, Oct 24, 2026):**
+  - H-bond donors and acceptors use Lipinski's own counts (NH + OH; N + O), in the panel and the Lipinski card alike, not RDKit's pharmacophore definitions (which give caffeine 3 acceptors instead of 6).
+  - Stereocenters count every potential stereo element, defined or not (RDKit `FindPotentialStereo` with `flagPossible=True`), including stereogenic double bonds; undefined ones are flagged, and the maximum is 2ⁿ. So ibuprofen shows 1 (undefined), cyclic glucose 5 (the anomeric carbon undefined), open-chain glucose 4.
+  - Displayed precision: average MW 2 decimal places, exact mass 4, Crippen logP 2, TPSA 1; counts as whole numbers.
+  - Degree of unsaturation (C − H/2 − X/2 + N/2 + 1 from the formula) is shown only for neutral molecules made of C, H, N, O, S and halogens; otherwise "—".
+  - A drawing with a reaction shows "Properties are shown for structures, not reactions" instead of numbers.
 
 ### 3. Functional group highlighter
 
@@ -345,7 +351,7 @@ These are held back because each needs substantial new drawing code or heavy ser
 ### Open questions
 
 - [ ] App name and URL path (`/draw/` is a placeholder; Kenapocomochem under consideration)
-- [ ] Is Java acceptable on osbornelab for the OPSIN .jar, or start with the EBI web service?
+- [x] Is Java acceptable on osbornelab for the OPSIN .jar, or start with the EBI web service? Decided Oct 24, 2026: Java on osbornelab. Measured with OPSIN 2.9.0 on OpenJDK 21: one long-running process per site uses about 120-135 MB at rest (about 330 MB at most under a flood of 3,500 names/s) and parses a name in about 2.5 ms; starting Java per request costs 0.7 s and 115 MB each time, so keep one process running. OpenJDK from conda-forge takes 550 MB of disk.
 - [ ] Does osbornelab's HTTPS certificate cover this path, and is it reachable off campus?
 - [ ] Who besides you will maintain it (a student developer, IT)?
 - [ ] Which department courses adopt it first: CHEM-312 in Spring 2027, or a smaller pilot?
