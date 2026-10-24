@@ -1,0 +1,23 @@
+# The ¹³C NMR preview's test compounds (spec "NMR prediction proof of concept": "15
+# compounds from CHEM-312 ... mixing aromatics, carbonyls, alcohols and amines").
+# Provisional: chosen by Claude on 2026-10-24 for Jeff to check. One name per line, as a
+# student would type it; scripts/fetch_reference_smiles.py asks PubChem for each and
+# writes nmr_compounds.csv. Measured shifts come from NMRShiftDB2
+# (web/scripts/build-carbon-table.ts, tests/fixtures/nmr/); nothing here is a value.
+toluene
+anisole
+p-cresol
+acetophenone
+benzaldehyde
+methyl benzoate
+ethyl acetate
+cyclohexanone
+propanoic acid
+2-butanol
+benzyl alcohol
+aniline
+triethylamine
+cyclohexanamine
+ibuprofen
+# 30 heavy atoms, for the timing criterion ("a 30-heavy-atom molecule ... under 2 seconds").
+squalene

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/p-cresol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:55:01Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 2879,
+          "SMILES": "CC1=CC=C(C=C1)O",
+          "Title": "P-Cresol"
+        }
+      ]
+    }
+  }
+}

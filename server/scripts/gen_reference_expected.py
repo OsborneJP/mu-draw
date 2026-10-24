@@ -5,10 +5,13 @@
 Reads tests/fixtures/reference_compounds.csv (SMILES from PubChem) and writes:
   tests/fixtures/reference_expected.json   descriptors, formula, InChIKey, stereo
   tests/fixtures/molfiles/<slug>.mol       2D Molfiles for the editor tests
-and, from tests/fixtures/functional_group_compounds.csv (the highlighter's test set):
-  tests/fixtures/functional_groups/<slug>.mol, and compounds.json listing them
+and, from tests/fixtures/functional_group_compounds.csv (the highlighter's test set) and
+tests/fixtures/nmr_compounds.csv (the NMR preview's):
+  tests/fixtures/functional_groups/<slug>.mol and tests/fixtures/nmr/<slug>.mol, each
+  folder with a compounds.json listing them and each compound's carbon symmetry classes
+  (CanonicalRankAtoms without tie-breaking: what the NMR preview's peaks must group)
 Only structures: the groups each one should show are a person's judgement
-(functional_groups_expected.json), never generated.
+(functional_groups_expected.json), never generated; so are NMR signal counts.
 
 It also invents structures for Get name's not-found check: two reference compounds joined
 by one C-C bond (INVENTED), so RDKit makes them and nobody types them. They are listed
@@ -47,7 +50,8 @@ CSV_FILE = FIXTURES / "reference_compounds.csv"
 EXPECTED_FILE = "reference_expected.json"
 FG_CSV_FILE = FIXTURES / "functional_group_compounds.csv"
 FG_DIR = "functional_groups"
-FG_INDEX = f"{FG_DIR}/compounds.json"
+NMR_CSV_FILE = FIXTURES / "nmr_compounds.csv"
+NMR_DIR = "nmr"
 
 # Pairs of reference compounds (typed names) to join; see join().
 INVENTED = (
@@ -257,8 +261,19 @@ def compound(row: dict[str, str]) -> tuple[dict[str, object], dict[str, str]]:
     return entry, files
 
 
-def functional_group_set(rows: list[dict[str, str]]) -> dict[str, str]:
-    """The highlighter's test set: one Molfile per compound, and an index of them."""
+def carbon_classes(mol: Chem.Mol) -> list[list[int]]:
+    """Topologically equivalent carbons (canonical ranks without tie-breaking or chirality),
+    each class sorted, the classes by their first atom."""
+    ranks = Chem.CanonicalRankAtoms(mol, breakTies=False, includeChirality=False)
+    classes: dict[int, list[int]] = {}
+    for atom in mol.GetAtoms():
+        if atom.GetAtomicNum() == 6:
+            classes.setdefault(ranks[atom.GetIdx()], []).append(atom.GetIdx())
+    return sorted(classes.values())
+
+
+def compound_set(rows: list[dict[str, str]], folder: str) -> dict[str, str]:
+    """A test set: one Molfile per compound in `folder`, and an index of them."""
     outputs: dict[str, str] = {}
     compounds = []
     for row in rows:
@@ -266,7 +281,7 @@ def functional_group_set(rows: list[dict[str, str]]) -> dict[str, str]:
         if mol is None:
             raise ValueError(f"RDKit cannot parse the PubChem SMILES for {row['typed_name']!r}")
         name = row["typed_name"]
-        rel = f"{FG_DIR}/{slug(name)}.mol"
+        rel = f"{folder}/{slug(name)}.mol"
         outputs[rel] = molfile(mol, name)
         compounds.append(
             {
@@ -276,6 +291,7 @@ def functional_group_set(rows: list[dict[str, str]]) -> dict[str, str]:
                 "canonical_smiles": Chem.MolToSmiles(mol),
                 "inchikey": Chem.MolToInchiKey(mol),
                 "heavy_atoms": mol.GetNumHeavyAtoms(),
+                "carbon_classes": carbon_classes(mol),
                 "file": rel,
             }
         )
@@ -285,17 +301,13 @@ def functional_group_set(rows: list[dict[str, str]]) -> dict[str, str]:
         "settings": SETTINGS,
         "compounds": compounds,
     }
-    outputs[FG_INDEX] = json.dumps(index, indent=2, ensure_ascii=False) + "\n"
+    outputs[f"{folder}/compounds.json"] = json.dumps(index, indent=2, ensure_ascii=False) + "\n"
     return outputs
 
 
-def generate(
-    rows: list[dict[str, str]], fg_rows: list[dict[str, str]] | None = None
-) -> dict[str, str]:
+def generate(rows: list[dict[str, str]]) -> dict[str, str]:
     """All generated files, keyed by path relative to tests/fixtures/."""
     configure()
-    if fg_rows is None:
-        fg_rows = read_rows(FG_CSV_FILE)
     outputs: dict[str, str] = {}
     compounds = []
     for row in rows:
@@ -312,7 +324,8 @@ def generate(
         "invented": made_up,
     }
     outputs[EXPECTED_FILE] = json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
-    outputs.update(functional_group_set(fg_rows))
+    outputs.update(compound_set(read_rows(FG_CSV_FILE), FG_DIR))
+    outputs.update(compound_set(read_rows(NMR_CSV_FILE), NMR_DIR))
     return outputs
 
 

@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
 import type { Action, Ketcher } from 'ketcher-core';
+import { startRdkitWorker } from '../chem/rdkitWorkers';
 import { createTracker, type PanelState } from '../chem/tracker';
 import type { PanelValues } from '../chem/properties';
 import { readDrawing } from '../editor/drawing';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
 import FunctionalGroups from './FunctionalGroups';
+import NmrButton from './NmrButton';
 import './properties.css';
 
 // Properties panel (spec section 2): RDKit's values for the drawing as it changes, worked
@@ -32,7 +34,7 @@ function message(state: PanelState): string | undefined {
 }
 
 function startTracking(ketcher: Ketcher, show: (state: PanelState) => void): () => void {
-  const worker = new Worker(new URL('../chem/rdkitWorker.ts', import.meta.url), { name: 'rdkit' });
+  const worker = startRdkitWorker('rdkit');
   const tracker = createTracker(
     () => readDrawing(ketcher),
     (request) => worker.postMessage(request),
@@ -277,6 +279,7 @@ export default function PropertiesPanel() {
         <Values values={state.values}>
           <Stereo stereo={state.values.stereo} current={current} highlighted={highlighted} onToggle={toggle} />
           <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
+          <NmrButton />
         </Values>
       )}
     </aside>

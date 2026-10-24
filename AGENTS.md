@@ -22,11 +22,11 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
    (it put the drawing in the URL; web/src/editor/debugHotkeys.ts + online smoke test).
    Accounts and analytics: review only.
-3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, or PubChem: never from an
-   LLM and never hand-typed into code or tests.
-   Enforced by: generated fixtures with drift tests (tests/fixtures/), and
-   scripts/checks/chem_literals.py (no Molfile/CDXML/InChI text in source). SMILES and
-   numeric literals in source: review only.
+3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, or NMRShiftDB2
+   (¹³C shifts): never from an LLM and never hand-typed into code or tests.
+   Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's
+   header names its SD file's SHA-256), and scripts/checks/chem_literals.py (no
+   Molfile/CDXML/InChI text in source). SMILES and numeric literals in source: review only.
 4. Everything except the naming endpoints works offline.
    Enforced by: the precache guard (web/scripts/checks/precache.ts, run by
    web/scripts/verify-dist.ts in every check.sh and deploy build, not by a bare
@@ -59,19 +59,22 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
   then in server/scripts: gen_reference_expected, record_pubchem_names, record_name_lookups.
+  ¹³C table: in web/, `node scripts/build-carbon-table.ts <nmrshiftdb2withsignals.sd>` (plans/nmr).
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker, image request
   queue, the ready Ketcher (instance.ts), drawing.ts (Molfile + atom ids), stereoHighlight.ts.
-- `web/src/chem/`: rdkitWorker.ts, compute.ts (RDKit values), properties.ts (display rules),
-  tracker.ts (request ordering), functionalGroups.ts (SMARTS matching, overlap rule).
-- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel (+ FunctionalGroups),
-  Get name, Name to structure (naming.ts: shared state; NamePanel floats over `.canvas-area`).
+- `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
+  properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
+  overlap rule), hose.ts (symmetry, HOSE codes), carbonTable.ts (¹³C table), nmr.ts (peaks).
+- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel (+ FunctionalGroups,
+  NmrButton), Get name, Name to structure (naming.ts: shared state; NamePanel floats over
+  `.canvas-area`), NMR preview (nmr.ts state, nmrStore.ts wiring, NmrPanel docks below).
 - `web/src/api.ts`: calls to `<base>api/*` (name, structure), with the 8 s deadline.
 - `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; functional-groups.json (patterns anyone may edit; the worker fetches it).
+- `web/public/`: icons; functional-groups.json (editable patterns); nmr/ (¹³C table, licence).
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
@@ -81,8 +84,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
   `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
-- `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (server
-  answers e2e replays), `functional_group*` (25-molecule set; groups by judgement), `chemdraw/`.
+- `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
+  replays), `functional_group*` and `nmr*` (test sets; judgement provisional), `chemdraw/`.
 - `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit), plans/ (acceptance bars).
 
 ## Conventions
@@ -98,8 +101,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Every bug fix gets a test that fails without it; every guard has a negative test.
 - No test touches the network (pytest-socket; a Vitest fetch stub). Naming tests replay
   recorded responses from tests/fixtures/recorded/.
-- Playwright: full Chromium (`channel: 'chromium'`), a fresh persistent profile per test,
-  `retries: 0`.
+- Playwright: full Chromium (`channel: 'chromium'`), a fresh profile per test, `retries: 0`.
 - Server: SMILES and names arrive in POST bodies only; never log bodies or put user input
   in exceptions. When RDKit or httpx is first used, call `RDLogger.DisableLog('rdApp.*')`
   and set the `httpx` logger to WARNING (both echo input).
@@ -143,7 +145,5 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `eval "$(cmd)"` under `set -e` ignores cmd failing; assign first, then eval.
 - Calling `updateSW()` or posting SKIP_WAITING without the student clicking the banner.
   Expecting `updateSW()` to reload: in vite-plugin-pwa 2.0 it only posts SKIP_WAITING.
-- Sleeps, retries or real network calls in tests.
-- Editing Apache or systemd directly instead of rendering docs/server-setup.md.
-- Building After-v1 or Later features (3D view, practice mode, mechanism arrows, ...).
+- Expecting a worker started once the service worker is active to reach the server (it can't).
 - `playwright uninstall --all`: other projects share ~/.cache/ms-playwright.

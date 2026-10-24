@@ -1,0 +1,154 @@
+/* Below the canvas (.canvas-area is a column, index.css): the editor gives up the height,
+   so the panel never covers the drawing. */
+.nmr-panel {
+  flex: none;
+  max-height: 45%;
+  overflow-y: auto;
+  padding: 8px 12px;
+  border-top: 1px solid #d0d7de;
+  background: #fff;
+  font-size: 13px;
+  color: #1f2328;
+}
+
+.nmr-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nmr-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.preview-tag {
+  margin-left: 4px;
+  padding: 0 5px;
+  border: 1px solid #9a6700;
+  border-radius: 8px;
+  color: #9a6700;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.nmr-tms-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #57606a;
+}
+
+.nmr-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nmr-banner {
+  margin: 6px 0;
+  padding: 4px 8px;
+  border-left: 3px solid #9a6700;
+  background: #fff8c5;
+}
+
+.nmr-message {
+  margin: 8px 0;
+  color: #57606a;
+}
+
+.nmr-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.nmr-spectrum {
+  flex: 1 1 420px;
+  max-width: 640px;
+}
+
+.nmr-axis {
+  stroke: #57606a;
+}
+
+.nmr-tick {
+  fill: #57606a;
+  font-size: 10px;
+}
+
+.nmr-tms {
+  stroke: #8c959f;
+  stroke-dasharray: 3 3;
+}
+
+.nmr-stick {
+  cursor: pointer;
+}
+
+.nmr-stick line {
+  stroke: #1f4e79;
+  stroke-width: 2;
+}
+
+.nmr-stick[data-low='true'] line {
+  stroke: #8c959f;
+  stroke-dasharray: 4 2;
+}
+
+.nmr-stick[data-selected='true'] line {
+  stroke: #d1580a;
+  stroke-width: 3;
+}
+
+.nmr-table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.nmr-table th,
+.nmr-table td {
+  padding: 1px 8px;
+  text-align: left;
+}
+
+.nmr-table th {
+  color: #57606a;
+  font-weight: 600;
+}
+
+.nmr-table tbody tr {
+  cursor: pointer;
+}
+
+.nmr-table tbody tr[aria-selected='true'] {
+  background: #ffe3cc;
+}
+
+.nmr-shift {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nmr-note {
+  color: #9a6700;
+}
+
+.nmr-notice {
+  margin: 6px 0 0;
+  color: #57606a;
+  font-size: 11px;
+}
+
+.nmr-predict {
+  margin-top: 2px;
+}

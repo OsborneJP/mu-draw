@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/propanoic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:55:04Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1032,
+          "SMILES": "CCC(=O)O",
+          "Title": "Propionic Acid"
+        }
+      ]
+    }
+  }
+}

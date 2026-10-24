@@ -70,6 +70,16 @@ describe('checkPrecache', () => {
     expect(checkPrecache(files, urls)).toEqual(['functional-group patterns missing: functional-groups.json']);
   });
 
+  it.each([
+    ['¹³C shift table', 'nmr/carbon-shifts.bin'],
+    ["¹³C shift table's licence", 'nmr/LICENSE-nmrshiftdb2.txt'],
+  ])('fails when the %s is missing from the build', (what, path) => {
+    const files = FILES.filter((f) => f.path !== path);
+    expect(files.length).toBe(FILES.length - 1);
+    const urls = parseSwManifest(SW).filter((url) => url !== path);
+    expect(checkPrecache(files, urls)).toEqual([`${what} missing: ${path}`]);
+  });
+
   it('fails when Indigo is missing (e.g. the base64 build was used)', () => {
     const files = FILES.filter((f) => f.path !== INDIGO);
     const urls = parseSwManifest(SW).filter((url) => url !== INDIGO);

@@ -74,6 +74,15 @@ All notable changes to this project. The format follows
   edit (Undo and autosave ignore them) and work offline. The patterns are in
   functional-groups.json, which can be edited without changing the app; a pattern it can't
   read is named in the panel and skipped.
+- ¹³C NMR preview (in the properties panel, marked Preview): "Predict ¹³C NMR" shows a
+  stick spectrum (220 to 0 ppm, with a TMS line that can be switched off) and a table of
+  peaks: shift, C/CH/CH₂/CH₃, and how many equivalent carbons each represents. Equivalent
+  carbons share one peak. Shifts come from measured spectra in NMRShiftDB2, looked up on
+  this device (offline too); peaks matched only on a carbon's nearest surroundings are
+  marked "low confidence". Clicking a peak or its row highlights its carbons on the
+  drawing; clicking a carbon highlights its peak. A banner says these are predictions, not
+  an answer key, and every prediction carries NMRShiftDB2's licence notice. Changing the
+  drawing clears the prediction until it is predicted again.
 
 ### Changed
 - Header buttons look greyed while they can't be used.

@@ -16,3 +16,8 @@ export const RDKIT_WORKER_CHUNK = 'rdkitWorker';
 /** The functional-group patterns (web/public/), which the RDKit worker fetches once. Not
  * hashed, so anyone can edit it; the precache revision picks up a change. */
 export const PATTERNS_FILE = 'functional-groups.json';
+
+/** The ¹³C shift table (web/scripts/build-carbon-table.ts), which the NMR worker fetches on
+ * its first prediction, and the licence it is shared under. */
+export const CARBON_TABLE_FILE = 'nmr/carbon-shifts.bin';
+export const CARBON_TABLE_LICENCE_FILE = 'nmr/LICENSE-nmrshiftdb2.txt';

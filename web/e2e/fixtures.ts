@@ -512,34 +512,40 @@ export function highlights(page: Page) {
   );
 }
 
-/** An init script (context.addInitScript): the RDKit worker's replies reach the app only
- * while not held, so a test decides when RDKit "answers" (window.__holdRdkit(),
- * window.__releaseRdkit()). */
+/** An init script (context.addInitScript): an RDKit worker's replies reach the app only
+ * while not held, so a test decides when RDKit "answers": window.__holdRdkit(name) and
+ * window.__releaseRdkit(name), by worker name ('rdkit', the default, for the properties;
+ * 'rdkit-nmr' for the NMR preview, which may be held before it starts).
+ * window.__heldRdkit(name) counts the replies held now. */
 export function holdableRdkitReplies() {
   const RealWorker = window.Worker;
+  const holding = new Set<string>();
+  const queues = new Map<string, { held: MessageEvent[]; release: () => void }>();
+  Object.assign(window, {
+    __holdRdkit: (name = 'rdkit') => holding.add(name),
+    __releaseRdkit: (name = 'rdkit') => {
+      holding.delete(name);
+      queues.get(name)?.release();
+    },
+    __heldRdkit: (name = 'rdkit') => queues.get(name)?.held.length ?? 0,
+  });
   window.Worker = class extends RealWorker {
     constructor(url: string | URL, options?: WorkerOptions) {
       super(url, options);
-      if (options?.name !== 'rdkit') return;
+      const name = options?.name ?? '';
+      if (!name.startsWith('rdkit')) return;
       const held: MessageEvent[] = [];
-      let holding = false;
       let appHandler: ((event: MessageEvent) => void) | null = null;
       // The app sets worker.onmessage after construction; deliver through this filter.
       RealWorker.prototype.addEventListener.call(this, 'message', (event: Event) => {
-        if (holding) held.push(event as MessageEvent);
+        if (holding.has(name)) held.push(event as MessageEvent);
         else appHandler?.(event as MessageEvent);
       });
       Object.defineProperty(this, 'onmessage', {
         get: () => appHandler,
         set: (handler: ((event: MessageEvent) => void) | null) => (appHandler = handler),
       });
-      Object.assign(window, {
-        __holdRdkit: () => (holding = true),
-        __releaseRdkit: () => {
-          holding = false;
-          held.splice(0).forEach((event) => appHandler?.(event));
-        },
-      });
+      queues.set(name, { held, release: () => held.splice(0).forEach((event) => appHandler?.(event)) });
     }
   };
 }

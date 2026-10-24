@@ -745,3 +745,78 @@ that fails without the fix. Accepted as known limits:
   groups of their own; where the stereo highlight and a group mark the same bond (a
   stereogenic C=C is also an alkene), one colour covers the other; on a first visit the
   properties wait for the 3 kB pattern file.
+
+## ¹³C NMR preview (session 7, 2026-10-24)
+
+- Plan, licence findings and acceptance bar: docs/plans/nmr.md. Licences, checked first:
+  current nmr-processing (22.25.6) is CC BY-NC-SA 4.0 and predicts ¹³C by calling Zakodium's
+  web service (invariant 1 forbids it); v11.1.1 (MIT) needs the database supplied. The
+  NMRShiftDB2 data is under the "nmrshiftdb2 Database License" (ODbL 1.0 plus a clause 4.5:
+  software relying on the database for NMR prediction must be under an OSI-approved
+  licence). Its official URL refused connections from here; the copy shipped
+  (web/public/nmr/LICENSE-nmrshiftdb2.txt) is the Wayback Machine's 2024 capture. Jeff was
+  asked about 4.5 (the repository is private and unlicensed) before anything ships.
+- Data: nmrshiftdb2withsignals.sd from SourceForge (159 MB, 58,187 records, 43,258 ¹³C
+  spectra; SHA-256 0e866883…3a0afe, also in the table header). Peaks are
+  `shift;intensity+multiplicity;atom index`; the Solvent field numbers solvents by spectrum.
+  The file is not in the repository; `node web/scripts/build-carbon-table.ts <file>`
+  rebuilds the table, the excerpt and the reference spectra byte for byte (checked twice).
+- Prototype on a random 2% of NMRShiftDB2 compounds held out (662 compounds, 7,085
+  carbons): mean absolute error 2.55 ppm out to 5 bonds, 2.59 to 4 (60% of the codes),
+  2.77 to 3; requiring two observations per code made it worse (2.70). By the sphere a
+  match reached: 9.2 ppm at 1, 4.0 at 2, 2.1 at 3, 1.1 at 4, hence "low confidence" at 2
+  or fewer. Marking a neighbour that has a double or triple bond further out ('u' in the
+  code) helped on both sets (2.59 to 2.51; the 15 compounds 1.33 to 1.11) for 6% more codes;
+  adding neighbours' hydrogen counts did not (the codes got too specific).
+- The table as text was 17 MB (4 spheres) to 33 MB (5). Stored as a sorted 32-bit hash per
+  code (delta varints) plus an 8-bit check and an int16 shift: 1.97 MB for 376,977 codes; a
+  missing code matches by accident about once in 3 million lookups. Precache: 18 entries,
+  30,508 KiB (29.8 MiB; 31.2 MB), up from 28,543 KiB; Workbox's limit is 30 MB per file.
+- RDKit.js 2026.9.1 has no CanonicalRankAtoms. Topological symmetry is refined in
+  src/chem/hose.ts (element, isotope, charge, aromaticity, hydrogens, degree, then
+  neighbours' ranks and bonds) and equals server-side CanonicalRankAtoms(breakTies=False,
+  includeChirality=False) on all 41 NMR and functional-group fixture compounds.
+- A second worker from the same rdkit/worker.js (one `new URL` site in
+  src/chem/rdkitWorkers.ts, so Vite emits one file): no new CSP entry or Apache change.
+  It starts on the first prediction. A dedicated worker started after the service worker
+  is active is controlled by it (matched by its own URL), so its table fetch is answered
+  from the precache even on the first visit; the properties worker, started before, went
+  to the network. So the "missing table" test 404s the service worker's request too.
+- The panel first floated over the bottom of the canvas and covered the drawing; docked
+  below it, it shortened the canvas and Ketcher, which keeps its view's top-left corner on
+  resize, left the drawing's lower half behind its bottom toolbar (a test's click on a
+  carbon hit the toolbar). The panel now moves the view down by half its height (a
+  ResizeObserver; Ketcher's own resize sets only the view's size, so they commute) and
+  says so in data-docked; the test checks every atom is on the open canvas.
+  `centerViewportAccordingToStruct` was not used: it also changes the zoom.
+- Sticks less than about a ppm apart overlap at 2.4 px per ppm; Playwright then waits
+  forever for an unobstructed click. Rows select any peak; tests click isolated sticks.
+- Held-out results for the 15 (structures from PubChem, measured shifts from their
+  NMRShiftDB2 records, CDCl3 when there is one): every signal count right; 72 signals,
+  mean absolute error 1.18 ppm, 64 (89%) within ±3 ppm. The 8 outside, recorded in
+  tests/fixtures/nmr/outliers.json (predicted / measured ppm): toluene C1 141.9 / 137.8;
+  p-cresol C-CH3 132.0 / 127.4 (DMSO-d6 only); benzaldehyde para 131.1 / 134.3;
+  propanoic acid COOH 176.6 / 181.5; 2-butanol CH2 27.6 / 32.0; aniline para 123.6 /
+  116.3; triethylamine CH2 47.3 / 51.4; cyclohexanamine C2/C6 30.6 / 37.2.
+- Squalene (30 heavy atoms) predicts in about 2 ms in Node; in the browser the first
+  prediction, worker start and table load included, is well under the 2 s bar.
+- Each guard removed in turn, and the test that failed (Vitest at once; Playwright, rebuilt
+  each time, at once): symmetry refinement (the 41-compound class test); ties ordered by
+  rank, the 'u' flag, folding drawn hydrogens, the back-off, grouping equivalent carbons,
+  carbons only, CDCl3 preferred (the acceptance tests); the low-confidence threshold, the
+  dropped late answer, a change dropping the request, mapping atoms to Ketcher ids,
+  remembering an RDKit failure (state tests); the check byte, dropping colliding codes,
+  the length and magic checks (table tests; the magic check first SURVIVED, because the
+  test's error page was shorter than a header and failed the length check first); the
+  precache checks for the table and its licence; removing the colour on a state change,
+  the canvas selection, the docked view's shift, the HTTP status check, the licence
+  notice, the banner, the low-confidence label, `bin` in globPatterns (browser tests).
+  Naming the NMR worker like the properties one first SURVIVED: the first prediction was
+  slow enough that the change came before its answer anyway, so the ordering test didn't
+  prove its hold worked. It now waits for exactly one held answer before releasing it.
+- Accepted limits: topological symmetry merges carbons that are only stereochemically
+  different (squalene's gem-dimethyls, cis and trans to the chain, give one peak where its
+  spectrum has two; menthol's isopropyl methyls likewise); shifts are medians over all
+  solvents; sticks closer than about a ppm overlap (the table selects any peak); the
+  table describes 4 bonds out, so a substituent 5 bonds away (a benzoyl ring's para
+  carbon) is seen only through the 'u' flag; ¹H prediction is "Later" in the spec.

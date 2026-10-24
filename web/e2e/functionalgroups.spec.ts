@@ -333,7 +333,8 @@ test('a pattern file the server cannot find: the section says so and the propert
   // Both requests for the file are held until the editor is up, so the 404s (which the
   // guards report) can't fail the start. Holding the service worker's precache request
   // also keeps it from taking over: a worker started under an active service worker is
-  // answered from the precache, and the RDKit worker must ask the server.
+  // answered from the precache, and the RDKit worker must ask the server. The RDKit worker
+  // asks on its first request, which the first structure drawn makes.
   let workerAsked: (route: Route) => void = () => {};
   const asked = new Promise<Route>((resolve) => (workerAsked = resolve));
   const precache = new Promise<Route>((resolve) => {
@@ -342,10 +343,10 @@ test('a pattern file the server cannot find: the section says so and the propert
     );
   });
   await openEditor(app);
-  await (await asked).fulfill({ status: 404, body: 'Not Found' });
-  await (await precache).fulfill({ status: 404, body: 'Not Found' });
   const name = 'aspirin';
   await loadInOrder(page, name);
+  await (await asked).fulfill({ status: 404, body: 'Not Found' });
+  await (await precache).fulfill({ status: 404, body: 'Not Found' });
   await expectReady(page, compound(name).heavy_atoms);
   await expect(page.getByTestId('prop-formula')).toHaveCount(1);
   await tick(page);

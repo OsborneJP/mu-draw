@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-DzzkeRfa.js",
-    "size": 7913532
+    "path": "assets/index-8aqlHzY4.js",
+    "size": 7921621
   },
   {
-    "path": "assets/index-WbDcwp5J.css",
-    "size": 186654
+    "path": "assets/index-DZ5mvGmw.css",
+    "size": 188258
   },
   {
-    "path": "assets/index.modern-55d8e3ef-Dxa1a5Uw.js",
+    "path": "assets/index.modern-55d8e3ef-CMZXhdZW.js",
     "size": 425354
   },
   {
@@ -56,16 +56,24 @@
     "size": 553
   },
   {
+    "path": "nmr/LICENSE-nmrshiftdb2.txt",
+    "size": 26584
+  },
+  {
+    "path": "nmr/carbon-shifts.bin",
+    "size": 1971438
+  },
+  {
     "path": "rdkit/RDKit_minimal.wasm",
     "size": 7379879
   },
   {
     "path": "rdkit/worker.js",
-    "size": 67066
+    "size": 71400
   },
   {
     "path": "sw.js",
-    "size": 1925
+    "size": 2079
   },
   {
     "path": "workbox-2fbc6a65.js",

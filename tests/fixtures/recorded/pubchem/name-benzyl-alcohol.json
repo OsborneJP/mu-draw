@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/benzyl%20alcohol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:55:05Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 244,
+          "SMILES": "C1=CC=C(C=C1)CO",
+          "Title": "Benzyl Alcohol"
+        }
+      ]
+    }
+  }
+}

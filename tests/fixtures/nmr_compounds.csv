@@ -1,0 +1,17 @@
+typed_name,pubchem_cid,pubchem_title,smiles
+toluene,1140,Toluene,CC1=CC=CC=C1
+anisole,7519,Anisole,COC1=CC=CC=C1
+p-cresol,2879,P-Cresol,CC1=CC=C(C=C1)O
+acetophenone,7410,Acetophenone,CC(=O)C1=CC=CC=C1
+benzaldehyde,240,Benzaldehyde,C1=CC=C(C=C1)C=O
+methyl benzoate,7150,Methyl Benzoate,COC(=O)C1=CC=CC=C1
+ethyl acetate,8857,Ethyl Acetate,CCOC(=O)C
+cyclohexanone,7967,Cyclohexanone,C1CCC(=O)CC1
+propanoic acid,1032,Propionic Acid,CCC(=O)O
+2-butanol,6568,(+-)-2-Butanol,CCC(C)O
+benzyl alcohol,244,Benzyl Alcohol,C1=CC=C(C=C1)CO
+aniline,6115,Aniline,C1=CC=C(C=C1)N
+triethylamine,8471,Triethylamine,CCN(CC)CC
+cyclohexanamine,7965,Cyclohexylamine,C1CCC(CC1)N
+ibuprofen,3672,"Ibuprofen, (+-)-",CC(C)CC1=CC=C(C=C1)C(C)C(=O)O
+squalene,638072,Squalene,CC(=CCC/C(=C/CC/C(=C/CC/C=C(/CC/C=C(/CCC=C(C)C)\C)\C)/C)/C)C

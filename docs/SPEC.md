@@ -292,6 +292,8 @@ Both candidates use HOSE codes, which describe each atom's surroundings shell by
 
 **Recommendation:** spend one day prototyping both on the same test set and keep the one that scores better. If they tie, choose A: the server already runs Java for OPSIN, and it avoids the ShareAlike question for your app's own code. The NC licence on B is fine for noncommercial teaching use, but check with whoever decides how the app is licensed before adopting it.
 
+**Decided (Jeff, Oct 24, 2026):** B's shape, built in the app so it works offline, from NMRShiftDB2's data (current nmr-processing calls a web service and is CC BY-NC-SA, so it isn't used). The NMRShiftDB2 Database License requires NMR prediction software built on its data to be under an OSI-approved licence, so mu-draw goes under the MIT licence with its source public, and every prediction carries the nmrshiftdb2 notice. Plan and results: docs/plans/nmr.md.
+
 ### What the student sees
 
 - **Predict ¹³C NMR** button in the side panel, with a "Preview" tag.

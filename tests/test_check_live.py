@@ -73,6 +73,10 @@ def test_two_cache_control_headers_fail():
         ("rdkit/worker.js", "cache-control", [IMMUTABLE], "rdkit/worker.js: Cache-Control"),
         ("functional-groups.json", "cache-control", [IMMUTABLE], "functional-groups.json: Cache"),
         ("functional-groups.json", "content-type", ["text/html"], "functional-groups.json: Cont"),
+        # An HTML error page where the ¹³C table should be: the preview couldn't read it.
+        ("nmr/carbon-shifts.bin", "content-type", ["text/html"], "nmr/carbon-shifts.bin: Content"),
+        ("nmr/carbon-shifts.bin", "cache-control", [IMMUTABLE], "nmr/carbon-shifts.bin: Cache"),
+        ("nmr/LICENSE-nmrshiftdb2.txt", "content-type", ["text/html"], "nmrshiftdb2.txt: Content"),
     ],
 )
 def test_wrong_headers_fail(path, header, value, problem):

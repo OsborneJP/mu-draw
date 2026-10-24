@@ -16,6 +16,13 @@ import fetch_reference_smiles as fetch
 import gen_reference_expected as gen
 
 LOCK = Path(gen.ROOT) / "environment.lock.txt"
+NMR_NOT_FROM_RDKIT = (
+    "excerpt.sd",
+    "reference_spectra.json",
+    "expected.json",
+    "outliers.json",
+    "README.md",
+)
 
 
 def locked_version(package: str) -> str:
@@ -38,8 +45,8 @@ def test_csv_rebuilds_from_recordings(names_file, csv_file):
 def test_one_recording_per_name():
     wanted = {fetch.recording_path(name).name for name in fetch.all_names()}
     assert {p.name for p in fetch.RECORDINGS.glob("name-*.json")} == wanted
-    # Both sets are recorded; names they share (aspirin) are recorded once.
-    assert len(fetch.SETS) == 2
+    # Every set is recorded; names they share (aspirin) are recorded once.
+    assert len(fetch.SETS) == 3
     assert len(fetch.all_names()) < sum(len(fetch.read_names(n)) for n, _ in fetch.SETS)
 
 
@@ -71,10 +78,13 @@ def test_generated_files_match_committed(generated):
 def test_no_stale_generated_files(generated):
     on_disk = {
         p.relative_to(gen.FIXTURES).as_posix()
-        for folder in ("molfiles", gen.FG_DIR)
+        for folder in ("molfiles", gen.FG_DIR, gen.NMR_DIR)
         for p in (gen.FIXTURES / folder).iterdir()
     }
-    assert on_disk == {rel for rel in generated if rel != gen.EXPECTED_FILE}
+    # tests/fixtures/nmr/ also holds what web/scripts/build-carbon-table.ts writes from
+    # NMRShiftDB2, and the judgement files.
+    others = {f"{gen.NMR_DIR}/{name}" for name in NMR_NOT_FROM_RDKIT}
+    assert on_disk - others == {rel for rel in generated if rel != gen.EXPECTED_FILE}
 
 
 def test_expected_values_come_from_the_pinned_rdkit(generated):

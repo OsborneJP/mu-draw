@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/anisole/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:55:01Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 7519,
+          "SMILES": "COC1=CC=CC=C1",
+          "Title": "Anisole"
+        }
+      ]
+    }
+  }
+}

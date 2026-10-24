@@ -1,0 +1,22 @@
+{
+  "status": "provisional",
+  "chosen_by": "Claude, 2026-10-24 (the spec says 'you choose'); for Jeff to check against CHEM-312",
+  "how": "The number of ¹³C signals a student should expect for each structure (one per set of equivalent carbons), written by reading the structure, not by running the predictor. Squalene is in the set only for the timing criterion: its two methyls on each end are cis and trans to the chain, so its real spectrum has one more signal than topological symmetry gives (an accepted limit, docs/plans/nmr.md).",
+  "molecules": [
+    { "name": "toluene", "signals": 5 },
+    { "name": "anisole", "signals": 5 },
+    { "name": "p-cresol", "signals": 5 },
+    { "name": "acetophenone", "signals": 6 },
+    { "name": "benzaldehyde", "signals": 5 },
+    { "name": "methyl benzoate", "signals": 6 },
+    { "name": "ethyl acetate", "signals": 4 },
+    { "name": "cyclohexanone", "signals": 4 },
+    { "name": "propanoic acid", "signals": 3 },
+    { "name": "2-butanol", "signals": 4 },
+    { "name": "benzyl alcohol", "signals": 5 },
+    { "name": "aniline", "signals": 4 },
+    { "name": "triethylamine", "signals": 2 },
+    { "name": "cyclohexanamine", "signals": 4 },
+    { "name": "ibuprofen", "signals": 10 }
+  ]
+}

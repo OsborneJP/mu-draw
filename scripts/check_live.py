@@ -5,8 +5,9 @@
 Confirms what docs/server-setup.md promises: the API answers through Apache, names a
 reference compound (aspirin) as recorded, which needs PubChem or the server's cache, and
 draws a systematic name as recorded, which needs OPSIN (Java) on the server;
-index.html, sw.js, the manifest, the RDKit files and the functional-group patterns
-revalidate (no-cache), and the patterns are this commit's; hashed assets are immutable;
+index.html, sw.js, the manifest, the RDKit files, the functional-group patterns and the ¹³C
+shift table (with its licence) revalidate (no-cache), and the patterns are this commit's;
+hashed assets are immutable;
 WebAssembly and the manifest have the right types; every page and worker script carries
 the build's CSP, exactly once, and the RDKit worker its own (web/csp-workers.json).
 """
@@ -104,6 +105,8 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         Expect("rdkit/RDKit_minimal.wasm", cache="no-cache", content_type="application/wasm"),
         Expect("rdkit/worker.js", cache="no-cache", worker_csp=True),
         patterns_check(),
+        Expect("nmr/carbon-shifts.bin", cache="no-cache", content_type="application/octet-stream"),
+        Expect("nmr/LICENSE-nmrshiftdb2.txt", cache="no-cache", content_type="text/plain"),
         Expect("api/health", body_json={"ok": True}),
         name_check(),
         structure_check(),

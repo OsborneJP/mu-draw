@@ -23,9 +23,11 @@ body {
   display: flex;
 }
 
+/* The editor, with the NMR preview (when open) below it. */
 .workspace > .canvas-area {
   position: relative;
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
 }
@@ -33,4 +35,5 @@ body {
 .canvas-area > .editor {
   flex: 1;
   min-width: 0;
+  min-height: 0;
 }

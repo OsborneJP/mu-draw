@@ -1,0 +1,14 @@
+{
+  "tolerance_ppm": 3,
+  "how": "Every predicted signal of the 15 test compounds more than 3 ppm from NMRShiftDB2's measured shift, by compound and carbons (Molfile atom indices of tests/fixtures/nmr/<compound>.mol). Recorded so they are not hidden: web/scripts/nmr.test.ts fails if the predictions change. The values are in BUILD-LEARNINGS.md; 'why' is Claude's reading.",
+  "outliers": [
+    { "name": "toluene", "atoms": [1], "why": "ipso carbon: toluene itself is left out of the table, and at 3 bonds the table mixes toluenes with any para substituent" },
+    { "name": "p-cresol", "atoms": [1], "why": "the carbon bearing CH3; its only measured spectra are in DMSO-d6 and D2O, not CDCl3" },
+    { "name": "benzaldehyde", "atoms": [0], "why": "para carbon: the C=O that deshields it is 5 bonds away, past the 4 the table describes" },
+    { "name": "propanoic acid", "atoms": [2], "why": "COOH carbon: measured in CDCl3 (H-bonded dimer), while the table's acids are mostly in other solvents; matched at 2 bonds" },
+    { "name": "2-butanol", "atoms": [1], "why": "CH2: matched only at 2 bonds (low confidence)" },
+    { "name": "aniline", "atoms": [0], "why": "para carbon: an NH2 and an amide's NH look alike to the code, and anilides dominate the table" },
+    { "name": "triethylamine", "atoms": [1, 3, 5], "why": "CH2 next to N: few tertiary ethylamines like it in the table" },
+    { "name": "cyclohexanamine", "atoms": [2, 4], "why": "CH2 next to the CH-NH2: matched only at 2 bonds (low confidence)" }
+  ]
+}

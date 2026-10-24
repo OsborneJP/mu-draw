@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/cyclohexanamine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:55:06Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 7965,
+          "SMILES": "C1CCC(CC1)N",
+          "Title": "Cyclohexylamine"
+        }
+      ]
+    }
+  }
+}

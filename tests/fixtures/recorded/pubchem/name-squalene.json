@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/squalene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-24T17:55:07Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 638072,
+          "SMILES": "CC(=CCC/C(=C/CC/C(=C/CC/C=C(/CC/C=C(/CCC=C(C)C)\\C)\\C)/C)/C)C",
+          "Title": "Squalene"
+        }
+      ]
+    }
+  }
+}
