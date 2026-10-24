@@ -1,8 +1,10 @@
 // Fixtures for the smoke tests: a server the test owns, a fresh browser profile, and
 // guards that fail the test on page errors, editor or service-worker errors, CSP
 // violations, popups, websockets, same-origin HTTP errors, any request outside the
-// app's own origin and base path (invariant 1), and the app reloading itself or letting
-// a new build take over without the student clicking the update banner.
+// app's own origin and base path (invariant 1), any link that leads outside it except to a
+// PubChem compound page (the one way out, which only the student's click takes), and the
+// app reloading itself or letting a new build take over without the student clicking the
+// update banner.
 //
 // Local runs serve DIST_DIR (default dist) at BASE (default staging) with Vite's preview
 // server. With SMOKE_URL set, the tests run against that deployed URL instead.
@@ -20,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { preview } from 'vite';
 import { resolveBase } from '../config/app.ts';
 import { cspHeaders } from '../config/csp.ts';
-import { requestProblem } from '../config/requestPolicy.ts';
+import { linkProblem, requestProblem } from '../config/requestPolicy.ts';
 import { autosaveKey } from '../src/editor/autosave.ts';
 
 const WEB_DIR = fileURLToPath(new URL('..', import.meta.url));
@@ -106,14 +108,73 @@ export function referenceCompound(typedName: string): ReferenceCompound {
   return found;
 }
 
+/** What the server answers for a Get name test compound (tests/fixtures/name_responses.json,
+ * rebuilt from recorded PubChem answers by server/scripts/record_pubchem_names.py). */
+export interface NameResponse {
+  found: boolean;
+  iupac: string | null;
+  title: string | null;
+  cid: number | null;
+  url: string | null;
+  undefined_stereo: number;
+}
+
+export function nameResponses(): Record<string, NameResponse> {
+  return (JSON.parse(fixture('name_responses.json')) as { responses: Record<string, NameResponse> }).responses;
+}
+
+export function nameResponse(name: string): NameResponse {
+  const found = nameResponses()[name];
+  if (!found) throw new Error(`${name} is not in name_responses.json`);
+  return found;
+}
+
 /** The update banner's Reload button: the only thing that may reload the app. */
 export const RELOAD_BUTTON_TEST_ID = 'update-reload-button';
 
 // Runs in every document before any page script.
-function installPageGuards(reloadButtonTestId: string) {
+function installPageGuards({ reloadButtonTestId, appUrl }: { reloadButtonTestId: string; appUrl: string }) {
   type Report = (kind: string, detail: string) => void;
   const report: Report = (kind, detail) =>
     (window as unknown as { __reportGuard?: Report }).__reportGuard?.(kind, detail);
+  // Every link in the page (href, form action), resolved as the browser would follow it. A
+  // link inside the app is fine; any other goes to the test, which applies the link policy
+  // (config/requestPolicy.ts). Namespaced xlink:href is read when its element is added
+  // (MutationObserver's attributeFilter can't name it); the others also when they change.
+  const LINK_ATTRIBUTES = ['href', 'action', 'formaction'];
+  const XLINK = 'http://www.w3.org/1999/xlink';
+  const reportLink = (element: Element, attribute: string, value: string) => {
+    let url = value;
+    try {
+      url = new URL(value, element.baseURI).href;
+    } catch {
+      // Reported as written; the test side can't parse it either.
+    }
+    if (url.startsWith(appUrl)) return;
+    (window as unknown as { __reportLink?: (where: string, url: string) => void }).__reportLink?.(
+      `${element.tagName}[${attribute}]`,
+      url,
+    );
+  };
+  const checkElement = (element: Element) => {
+    for (const name of LINK_ATTRIBUTES) {
+      const value = element.getAttribute(name);
+      if (value !== null) reportLink(element, name, value);
+    }
+    const xlink = element.getAttributeNS(XLINK, 'href');
+    if (xlink !== null) reportLink(element, 'xlink:href', xlink);
+  };
+  const checkTree = (node: Node) => {
+    if (!(node instanceof Element)) return;
+    checkElement(node);
+    node.querySelectorAll('*').forEach(checkElement);
+  };
+  new MutationObserver((records) => {
+    for (const record of records) {
+      if (record.type === 'attributes') checkElement(record.target as Element);
+      else record.addedNodes.forEach(checkTree);
+    }
+  }).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: LINK_ATTRIBUTES });
   addEventListener('securitypolicyviolation', (e) =>
     report('csp', `${e.violatedDirective} blocked ${e.blockedURI}`),
   );
@@ -226,7 +287,16 @@ export const test = base.extend<{ app: App; buildCopy: boolean }>({
       await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
         addProblem(`${kind}: ${detail}`);
       });
-      await context.addInitScript(installPageGuards, RELOAD_BUTTON_TEST_ID);
+      await context.exposeFunction('__reportLink', (where: string, url: string) => {
+        let problem: string | null;
+        try {
+          problem = linkProblem(url, server.url);
+        } catch {
+          problem = 'unparseable';
+        }
+        if (problem) addProblem(`link (${problem}) ${where}: ${url}`);
+      });
+      await context.addInitScript(installPageGuards, { reloadButtonTestId: RELOAD_BUTTON_TEST_ID, appUrl: server.url });
       context.on('request', (request) => {
         requests.push(request);
         const problem = requestProblem(request.url(), server.url);

@@ -9,12 +9,14 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 
 ## Invariants (never break these; each line names what enforces it)
 "/draw/" means the configured base (`path` in app.config.json); staging is "/draw-staging/".
-1. The browser makes no requests except to /draw/api/* and its own static files.
+1. The app requests nothing except /draw/api/* and its own static files. Only a link the
+   student clicks may leave it, and the only such link is Get name's PubChem compound page.
    Enforced by: the CSP from web/csp.json (meta tag + Apache header; checker
    web/scripts/checks/csp.ts allows only listed sources; the RDKit worker alone adds
-   'unsafe-eval', web/csp-workers.json, and nothing else); the request guard on every
-   smoke test (web/e2e/fixtures.ts); the built-HTML link check (web/scripts/checks/html.ts,
-   incl. the relative icon link, since Playwright can't see /favicon.ico); Help/About hidden.
+   'unsafe-eval', web/csp-workers.json, and nothing else); the request guard and the link
+   guard on every smoke test (web/e2e/fixtures.ts; links per web/config/requestPolicy.ts);
+   the built-HTML link check (web/scripts/checks/html.ts, incl. the relative icon link,
+   since Playwright can't see /favicon.ico); Help/About hidden.
 2. No accounts, student identifiers, analytics, or logging of request bodies.
    Enforced by: server/tests/test_privacy.py (a sentinel body never reaches logs), uvicorn
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
