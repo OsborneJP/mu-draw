@@ -34,3 +34,9 @@ Requested by Jeff on 2026-10-25, for CHEM-311 to start using the app as soon as 
 4. Then `scripts/deploy.sh --smoke-only production` passes. Jeff opens /draw/ from off campus (a phone on mobile data) to confirm.
 
 **E. Every change:** check.sh passes before each commit, and staging passes its live checks. Production only on Jeff's go-ahead.
+
+## Done (2026-10-25)
+
+- A to C shipped in 3df4f00 and 1ada5e8; D in 25eb814.
+- Jeff applied the vhost change (backup osbornelab.conf.bak.20261025_173547). Production was promoted at 2dfc6a8: the full check passed on the production build, then 14 live checks and 85 browser tests passed against /draw/.
+- Jeff opened /draw/ on his phone off campus.

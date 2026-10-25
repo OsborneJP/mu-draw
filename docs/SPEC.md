@@ -356,7 +356,7 @@ These are held back because each needs substantial new drawing code or heavy ser
 
 - [x] App name and URL path. Decided Oct 25, 2026: MU Draw, at /draw/.
 - [x] Is Java acceptable on osbornelab for the OPSIN .jar, or start with the EBI web service? Decided Oct 24, 2026: Java on osbornelab. Measured with OPSIN 2.9.0 on OpenJDK 21: one long-running process per site uses about 120-135 MB at rest (about 330 MB at most under a flood of 3,500 names/s) and parses a name in about 2.5 ms; starting Java per request costs 0.7 s and 115 MB each time, so keep one process running. OpenJDK from conda-forge takes 550 MB of disk.
-- [ ] Does osbornelab's HTTPS certificate cover this path, and is it reachable off campus?
+- [x] Does osbornelab's HTTPS certificate cover this path, and is it reachable off campus? Decided Oct 25, 2026: /draw/ is public, like /chemtutor, so CHEM-311 students can use it at home; staging stays campus and VPN only. Jeff opened /draw/ on his phone off campus the same day.
 - [ ] Who besides you will maintain it (a student developer, IT)?
 - [x] Which department courses adopt it first: CHEM-312 in Spring 2027, or a smaller pilot? Decided Oct 25, 2026: CHEM-311, as soon as possible.
 - [x] ChemDraw round-trip tests: Jeff runs them on his own ChemDraw. Done on Windows, Oct 25, 2026.

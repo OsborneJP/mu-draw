@@ -986,5 +986,8 @@ Acceptance bar: docs/plans/dialogs-icon-offcampus.md.
 - **Public production.** `PRODUCTION_CAMPUS_ONLY = False` renders the production block with
   its campus rule commented out; the live vhost changes by those 5 lines (applied by Jeff).
   The naming API is public with it: anyone's lookups share the server's PubChem budget
-  (5 a second, 400 a minute), and heavy outside use would show students "Busy".
-
+  (5 a second, 400 a minute), and heavy outside use would show students "Busy".- Live (2026-10-25, 2dfc6a8): the server rebooted after the apply script was prepared, and
+  the reboot emptied /tmp, the scratchpad included. The script was recreated from the
+  unchanged vhost (same checksum) and Jeff ran it. `--production` then passed the full
+  check on the production build, 14 live checks and 85 browser tests against /draw/. Jeff
+  opened /draw/ on his phone off campus.
