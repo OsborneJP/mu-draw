@@ -130,3 +130,62 @@ def test_the_flipped_chair_is_the_mirror_image(made):
     ring, _ = ring_and_hydrogens(made["chair"].drawing)
     assert left_tip_lower(chair, ring)
     assert not left_tip_lower(flipped, ring)
+
+
+NEWMANS = {"newman-staggered": 60.0, "newman-eclipsed": 20.0}
+
+
+def directions(lines: list[dict]) -> list[float]:
+    """Each line's direction, in degrees from its end nearer the centre."""
+    angles = []
+    for line in lines:
+        near, far = sorted((np.array(p) for p in line["points"]), key=np.linalg.norm)
+        angles.append(float(np.degrees(np.arctan2(*(far - near)[::-1])) % 360))
+    return angles
+
+
+def test_newmans_are_pictures_with_six_labelled_positions(made):
+    for name in NEWMANS:
+        drawing = made[name].drawing
+        assert made[name].source is None
+        assert (drawing.atoms, drawing.bonds) == ([], [])
+        assert sorted(s["mode"] for s in drawing.shapes) == ["ellipse"] + ["line"] * 6
+        assert [t["text"] for t in drawing.texts] == ["H"] * 6
+
+
+def test_a_newman_is_held_by_its_centre(made):
+    # Ketcher's paste tool holds a drawing without atoms by its first shape's first point
+    # (an ellipse's is a corner), so the first shape is a front bond from the centre.
+    for name in NEWMANS:
+        first = made[name].drawing.shapes[0]
+        assert first["mode"] == "line"
+        assert first["points"][0] == pytest.approx((0, 0)), name
+
+
+def test_newman_front_bonds_meet_at_the_centre_and_back_bonds_start_on_the_circle(made):
+    for name, offset in NEWMANS.items():
+        drawing = made[name].drawing
+        (circle,) = (s for s in drawing.shapes if s["mode"] == "ellipse")
+        (a, b) = (np.array(p) for p in circle["points"])
+        centre, radius = (a + b) / 2, (b - a)[0] / 2
+        assert (b - a)[0] == pytest.approx((b - a)[1])  # a circle
+        lines = [s for s in drawing.shapes if s["mode"] == "line"]
+        starts = [min(np.linalg.norm(np.array(p) - centre) for p in s["points"]) for s in lines]
+        front = [s for s, r in zip(lines, starts, strict=True) if r == pytest.approx(0, abs=1e-6)]
+        back = [s for s, r in zip(lines, starts, strict=True) if r == pytest.approx(radius)]
+        assert len(front) == len(back) == 3, name
+        front_angles, back_angles = sorted(directions(front)), sorted(directions(back))
+        assert np.diff(front_angles) == pytest.approx([120, 120]), name
+        assert np.diff(back_angles) == pytest.approx([120, 120]), name
+        turned = sorted((f + offset) % 360 for f in front_angles)
+        assert back_angles == pytest.approx(turned), name
+
+
+def test_newman_labels_sit_beyond_the_bond_ends(made):
+    for name in NEWMANS:
+        drawing = made[name].drawing
+        lines = [s for s in drawing.shapes if s["mode"] == "line"]
+        ends = [max((np.array(p) for p in s["points"]), key=np.linalg.norm) for s in lines]
+        for end, label in zip(ends, drawing.texts, strict=True):
+            at = np.array(label["xy"])
+            assert angle(at, end) < 1e-6 and np.linalg.norm(at) > np.linalg.norm(end), name

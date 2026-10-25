@@ -29,6 +29,8 @@ interface Expected {
   source: string | null;
   atoms: number;
   bonds: number;
+  shapes: number;
+  texts: number;
   inchikey?: string;
   panel?: Panel;
 }
@@ -46,21 +48,20 @@ const MENU = (
   }
 ).templates;
 const MOLECULES = EXPECTED.filter((t) => t.source !== null);
+const PICTURES = EXPECTED.filter((t) => t.atoms === 0);
+const NOTHING = { atoms: 0, bonds: 0, shapes: 0, texts: 0 };
 
-interface Counts {
-  atoms: number;
-  bonds: number;
-}
+type Counts = typeof NOTHING;
 
 function counts(page: Page): Promise<Counts> {
   return page.evaluate(() => {
     const struct = window.ketcher!.editor.struct();
-    return { atoms: struct.atoms.size, bonds: struct.bonds.size };
+    return { atoms: struct.atoms.size, bonds: struct.bonds.size, shapes: struct.simpleObjects.size, texts: struct.texts.size };
   });
 }
 
 function sizeOf(template: Expected): Counts {
-  return { atoms: template.atoms, bonds: template.bonds };
+  return { atoms: template.atoms, bonds: template.bonds, shapes: template.shapes, texts: template.texts };
 }
 
 interface CanvasPoint {
@@ -91,15 +92,17 @@ async function moveTo(page: Page, point: CanvasPoint): Promise<void> {
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
 }
 
-/** The centre of the drawing's atoms, in model units. */
+/** The centre of everything drawn (atoms, shapes, text), in model units. */
 function centre(page: Page): Promise<{ x: number; y: number }> {
   return page.evaluate(() => {
-    const xs: number[] = [];
-    const ys: number[] = [];
-    for (const [, atom] of window.ketcher!.editor.struct().atoms) {
-      xs.push(atom.pp.x);
-      ys.push(atom.pp.y);
-    }
+    const struct = window.ketcher!.editor.struct();
+    const points = [
+      ...[...struct.atoms.values()].map((atom) => atom.pp),
+      ...[...struct.simpleObjects.values()].flatMap((shape) => shape.pos),
+      ...[...struct.texts.values()].flatMap((text) => text.pos),
+    ];
+    const xs = points.map((p) => p.x);
+    const ys = points.map((p) => p.y);
     return { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
   });
 }
@@ -180,7 +183,7 @@ test('the menu shows every template under its group, each with its picture', asy
   await page.mouse.click(away.x, away.y);
   await expect(menu).toHaveCount(0);
   await expect(page.getByTestId('templates-placing')).toHaveCount(0);
-  expect(await counts(page)).toEqual({ atoms: 0, bonds: 0 });
+  expect(await counts(page)).toEqual(NOTHING);
   expect(await changes()).toBe(0);
 });
 
@@ -208,7 +211,7 @@ for (const template of EXPECTED) {
     // The selection tool is back (the bond tool chosen before would draw a bond).
     await expect.poll(() => chosenTools(page)).toEqual(['select-rectangle']);
     await undo(page);
-    await expect.poll(() => counts(page)).toEqual({ atoms: 0, bonds: 0 });
+    await expect.poll(() => counts(page)).toEqual(NOTHING);
   });
 }
 
@@ -232,6 +235,32 @@ for (const template of MOLECULES) {
   });
 }
 
+for (const template of PICTURES) {
+  test(`${template.id}: a picture, not a structure; Export draws its circle, lines and labels`, async ({ app }) => {
+    const { page } = app;
+    await emptyCanvas(app);
+    await pick(page, template.id);
+    const point = await canvasPoint(page, 0.4, 0.5);
+    await moveTo(page, point);
+    await page.mouse.click(point.x, point.y);
+    await expect(page.getByTestId('templates-placing')).toHaveCount(0);
+    await expect(page.getByTestId('properties-message')).toHaveText('Draw a structure to see its properties');
+    await page.getByTestId('app-export-button').click();
+    const dialog = page.getByRole('dialog', { name: 'Export image' });
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      dialog.getByRole('button', { name: 'Download SVG' }).click(),
+    ]);
+    const svg = readFileSync((await download.path())!, 'utf8');
+    // Indigo strokes shapes as unfilled paths (a circle with curves, a line straight) and
+    // draws each letter of a label as one glyph.
+    const strokes = [...svg.matchAll(/<path fill="none"[^>]* d="([^"]*)"/g)].map((m) => m[1]);
+    expect(strokes.filter((d) => / C /.test(d))).toHaveLength(1);
+    expect(strokes.filter((d) => !/ C /.test(d))).toHaveLength(template.shapes - 1);
+    expect(svg.match(/<use /g)).toHaveLength(template.texts);
+  });
+}
+
 for (const [how, putAway, toolAfter] of [
   ['Esc', (page: Page) => page.keyboard.press('Escape'), 'select-rectangle'],
   ['another tool', (page: Page) => page.getByTestId('chain').filter({ visible: true }).click(), 'chain'],
@@ -246,10 +275,10 @@ for (const [how, putAway, toolAfter] of [
     await putAway(page);
     await expect(page.getByTestId('templates-placing')).toHaveCount(0);
     await expect.poll(() => chosenTools(page)).toEqual([toolAfter]);
-    expect(await counts(page)).toEqual({ atoms: 0, bonds: 0 });
+    expect(await counts(page)).toEqual(NOTHING);
     // Put away for good: moving over the canvas does not bring it back.
     await moveTo(page, await canvasPoint(page, 0.5, 0.6));
-    expect(await counts(page)).toEqual({ atoms: 0, bonds: 0 });
+    expect(await counts(page)).toEqual(NOTHING);
     expect(await changes()).toBe(0);
   });
 }
@@ -307,10 +336,10 @@ test('offline: a template is picked and placed with no network', async ({ app })
   expect(await counts(page)).toEqual(sizeOf(template));
 });
 
-test('a placed template survives a reload', async ({ app }) => {
+test('a placed template survives a reload, its shapes and text too', async ({ app }) => {
   const { page } = app;
   await emptyCanvas(app);
-  const [template] = EXPECTED;
+  const [template] = PICTURES;
   await pick(page, template.id);
   const point = await canvasPoint(page, 0.4, 0.5);
   await moveTo(page, point);

@@ -62,7 +62,7 @@ Requested by Jeff on 2026-10-25, for CHEM-311 as soon as possible. docs/SPEC.md,
 1. Chair cyclohexane, with all 12 positions as H atoms. It is cyclohexane; putting another atom on an H with the atom tool makes that group axial or equatorial.
 2. The same chair after a ring flip.
 3. Newman, staggered: the circle, front and back bonds, and six editable "H" labels.
-4. Newman, eclipsed: the back bonds drawn 15° off the front ones so they show.
+4. Newman, eclipsed: the back bonds drawn 20° off the front ones so they show (at 15° the labels of a pair overlapped).
 5. Fischer skeletons with 1, 2 and 4 stereocentres. Their bond ends are carbons until relabelled.
 6. Fischer D-glucose.
 7. Haworth pyranose and furanose skeletons.
@@ -76,7 +76,7 @@ Requested by Jeff on 2026-10-25, for CHEM-311 as soon as possible. docs/SPEC.md,
 3. Fischer D-glucose, with its horizontal bonds wedged, has PubChem aldehydo-D-glucose's InChIKey.
 4. Each Haworth glucose's up/down layout, rebuilt in 3D, reads back as PubChem's anomer.
 5. Chair geometry: the 6 axial bonds are vertical to within 1° and alternate up and down; each equatorial bond is within 5° of parallel to the two ring bonds one removed.
-6. Newman geometry: front bonds are 120° apart; back bonds start on the circle, 60° (staggered) or 15° (eclipsed) off the front ones.
+6. Newman geometry: front bonds are 120° apart; back bonds start on the circle, 60° (staggered) or 20° (eclipsed) off the front ones.
 
 **B. Picker**
 1. A "Templates" button in the header opens a menu grouped Chair, Newman, Fischer, Haworth. Each item shows its picture (StructRender) and its name. The button is disabled until the editor is ready.

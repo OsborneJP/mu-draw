@@ -85,8 +85,10 @@ All notable changes to this project. The format follows
   drawing clears the prediction until it is predicted again.
 - Templates (header): conformation and projection templates to drop onto the canvas. A click
   on one puts it in hand, as Add does: it follows the mouse until a click places it, Esc
-  puts it away, and one Undo removes it. Works offline. First: the cyclohexane chair with
-  all 12 hydrogens, axial and equatorial, and the same chair ring-flipped.
+  puts it away, and one Undo removes it. Works offline. The templates: the cyclohexane chair
+  with all 12 hydrogens, axial and equatorial, and the same chair ring-flipped; Newman
+  projections, staggered and eclipsed, drawn as pictures with six "H" labels to edit (the
+  properties panel leaves them out).
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name

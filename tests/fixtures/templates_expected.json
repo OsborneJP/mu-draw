@@ -7,6 +7,8 @@
       "source": "cyclohexane",
       "atoms": 18,
       "bonds": 18,
+      "shapes": 0,
+      "texts": 0,
       "canonical_smiles": "C1CCCCC1",
       "inchikey": "XDTMQSROBMDMFD-UHFFFAOYSA-N",
       "panel": {
@@ -39,6 +41,8 @@
       "source": "cyclohexane",
       "atoms": 18,
       "bonds": 18,
+      "shapes": 0,
+      "texts": 0,
       "canonical_smiles": "C1CCCCC1",
       "inchikey": "XDTMQSROBMDMFD-UHFFFAOYSA-N",
       "panel": {
@@ -65,6 +69,22 @@
           "max_stereoisomers": "1"
         }
       }
+    },
+    {
+      "id": "newman-staggered",
+      "source": null,
+      "atoms": 0,
+      "bonds": 0,
+      "shapes": 7,
+      "texts": 6
+    },
+    {
+      "id": "newman-eclipsed",
+      "source": null,
+      "atoms": 0,
+      "bonds": 0,
+      "shapes": 7,
+      "texts": 6
     }
   ]
 }

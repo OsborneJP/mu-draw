@@ -1012,3 +1012,13 @@ Acceptance bar and measurements: docs/plans/v2-templates.md.
   labels) became each menu button's accessible name; the picture is `aria-hidden`.
 - Ketcher's bottom toolbar already uses `data-testid` `template-0`..`template-7` and
   `template-lib`; the menu's items are `template-item-<id>`.
+- A Newman projection can't be one molecule in Ketcher (both carbons at one point), so it
+  is lines, a circle and text. Ketcher's paste tool holds a drawing without atoms by its
+  first shape's `center()`, which for an ellipse is a corner of its box: the Newman sat off
+  the mouse until a front bond, which starts at the centre, became its first shape.
+- Ketcher 3.18 writes text as KET 2.0 (`boundingBox` and `paragraphs`) and still reads the
+  older Draft.js `content`. A one-letter label at the default size measures 0.235 × 0.375
+  bond lengths. With eclipsed back bonds 15° off the front ones, the labels of a pair
+  overlapped; at 20° they don't.
+- Indigo's SVG strokes shapes as `<path fill="none">` (a circle with curves, a line with
+  straight segments) and draws each letter as one `<use>` glyph, so a test can count them.

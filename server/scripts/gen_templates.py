@@ -9,7 +9,8 @@ Reads tests/fixtures/template_compounds.csv (SMILES from PubChem) and writes:
 
 What is chemistry comes from PubChem and RDKit: which molecule each template is, and the
 chair's bond directions (a real chair, projected). What is only a drawing convention is
-computed here: the bond length and the chair's viewing angle. Nothing is typed in.
+computed here: the bond length, the chair's viewing angle, and a Newman projection, which
+is a picture (lines, a circle and labels) rather than a molecule. Nothing is typed in.
 
 Output is deterministic; tests/test_templates.py regenerates it and compares bytes.
 """
@@ -50,13 +51,32 @@ CHAIR = {
     "turn_deg": 9.0,
 }
 
+# A Newman projection looks down a C-C bond, so both carbons sit at one point and Ketcher
+# can't hold it as one molecule: it is a picture the student labels. Front bonds meet at the
+# centre; back bonds start on the circle. Angles anticlockwise from 3 o'clock; lengths in
+# bond lengths. Eclipsed back bonds are drawn a little off the front ones, so they show.
+NEWMAN = {
+    "front_deg": [90.0, 210.0, 330.0],
+    "staggered_offset_deg": 60.0,
+    "eclipsed_offset_deg": 20.0,  # at 15° the labels of a pair overlap
+    "circle_radius": 0.5,
+    "bond_end": 1.0,
+    "label_radius": 1.3,
+    "label": "H",
+}
+# A one-letter label's box, in bond lengths, as Ketcher measures it at its default size.
+LABEL_BOX = (0.235, 0.375)
+
 
 @dataclass
 class Drawing:
-    """A template as Ketcher holds it: atoms and bonds (coordinates in bond lengths)."""
+    """A template as Ketcher holds it: atoms and bonds, shapes and text (coordinates in bond
+    lengths, y up)."""
 
     atoms: list[dict] = field(default_factory=list)  # {"label", "xy"}
     bonds: list[dict] = field(default_factory=list)  # {"atoms": (i, j), "order", "wedge"}
+    shapes: list[dict] = field(default_factory=list)  # {"mode", "points": (xy, xy)}
+    texts: list[dict] = field(default_factory=list)  # {"text", "xy": its centre}
 
     def atom(self, label: str, xy) -> int:
         self.atoms.append({"label": label, "xy": (float(xy[0]), float(xy[1]))})
@@ -65,6 +85,13 @@ class Drawing:
     def bond(self, i: int, j: int, order: int = 1, wedge: bool = False) -> None:
         """A wedge's narrow end is at atom i."""
         self.bonds.append({"atoms": (i, j), "order": order, "wedge": wedge})
+
+    def shape(self, mode: str, a, b) -> None:
+        """Ketcher's line (from a to b) or ellipse (in the box with corners a and b)."""
+        self.shapes.append({"mode": mode, "points": (tuple(map(float, a)), tuple(map(float, b)))})
+
+    def text(self, text: str, xy) -> None:
+        self.texts.append({"text": text, "xy": (float(xy[0]), float(xy[1]))})
 
     def ket(self) -> dict:
         atoms = [
@@ -77,10 +104,25 @@ class Drawing:
             if b["wedge"]:
                 bond["stereo"] = 1
             bonds.append(bond)
-        return {
-            "root": {"nodes": [{"$ref": "mol0"}]},
-            "mol0": {"type": "molecule", "atoms": atoms, "bonds": bonds},
-        }
+        nodes: list[dict] = [{"$ref": "mol0"}] if atoms else []
+        for s in self.shapes:
+            pos = [{"x": rounded(x), "y": rounded(y), "z": 0.0} for x, y in s["points"]]
+            nodes.append({"type": "simpleObject", "data": {"mode": s["mode"], "pos": pos}})
+        width, height = LABEL_BOX
+        for label in self.texts:
+            x, y = label["xy"]
+            box = {"x": rounded(x - width / 2), "y": rounded(y + height / 2)}
+            nodes.append(
+                {
+                    "type": "text",
+                    "boundingBox": box | {"width": width, "height": height},
+                    "paragraphs": [{"parts": [{"text": label["text"]}]}],
+                }
+            )
+        ket: dict = {"root": {"nodes": nodes}}
+        if atoms:
+            ket["mol0"] = {"type": "molecule", "atoms": atoms, "bonds": bonds}
+        return ket
 
     def mol(self) -> Chem.Mol:
         """What RDKit reads from the drawing, as the app's properties panel does from
@@ -186,6 +228,23 @@ def chair(smiles: str, flipped: bool) -> Drawing:
     return drawing
 
 
+def newman(offset_deg: float) -> Drawing:
+    """Six positions, each labelled "H" for the student to change: three front bonds from
+    the centre, and three back bonds from the circle, `offset_deg` round from the front.
+    The first shape is a front bond: Ketcher's paste tool holds a drawing without atoms by
+    its first shape's first point, which for a front bond is the centre (for the circle it
+    would be a corner of its box)."""
+    drawing = Drawing()
+    radius, end = NEWMAN["circle_radius"], NEWMAN["bond_end"]
+    for front in NEWMAN["front_deg"]:
+        for angle, start in ((front, 0.0), (front + offset_deg, radius)):
+            direction = np.array([np.cos(np.radians(angle)), np.sin(np.radians(angle))])
+            drawing.shape("line", direction * start, direction * end)
+            drawing.text(NEWMAN["label"], direction * NEWMAN["label_radius"])
+    drawing.shape("ellipse", (-radius, -radius), (radius, radius))
+    return drawing
+
+
 @dataclass
 class Template:
     id: str
@@ -211,6 +270,20 @@ def templates(smiles: dict[str, str]) -> list[Template]:
             chair(smiles["cyclohexane"], True),
             "cyclohexane",
         ),
+        Template(
+            "newman-staggered",
+            "Newman",
+            "Newman, staggered",
+            newman(NEWMAN["staggered_offset_deg"]),
+            None,
+        ),
+        Template(
+            "newman-eclipsed",
+            "Newman",
+            "Newman, eclipsed",
+            newman(NEWMAN["eclipsed_offset_deg"]),
+            None,
+        ),
     ]
 
 
@@ -222,6 +295,8 @@ def expected(template: Template) -> dict:
         "source": template.source,
         "atoms": len(drawing.atoms),
         "bonds": len(drawing.bonds),
+        "shapes": len(drawing.shapes),
+        "texts": len(drawing.texts),
     }
     if drawing.atoms:
         mol = Chem.RemoveHs(drawing.mol())
@@ -248,6 +323,7 @@ def generate() -> dict[Path, str]:
         "generator": GENERATOR,
         "rdkit_version": rdkit.__version__,
         "chair": CHAIR,
+        "newman": NEWMAN,
         "templates": [
             {"id": t.id, "group": t.group, "name": t.name, "ket": t.drawing.ket()} for t in made
         ],
