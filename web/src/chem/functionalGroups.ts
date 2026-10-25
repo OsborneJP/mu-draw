@@ -10,9 +10,11 @@
 // matches of one group that share atoms merge into one instance.
 import type { MainModule, Mol } from '@rdkit/rdkit';
 
-/** One entry of functional-groups.json. */
+/** One entry of functional-groups.json. `id`, if given, is the group's key in the IR
+ * hint table (src/chem/irBands.ts). */
 export interface GroupPattern {
   name: string;
+  id?: string;
   smarts: string;
   color: string;
   priority: number;
@@ -33,6 +35,7 @@ export interface GroupInstance {
 
 export interface FoundGroup {
   name: string;
+  id?: string;
   color: string;
   instances: GroupInstance[];
 }
@@ -43,6 +46,7 @@ export type GroupsResult =
   | { kind: 'unavailable'; reason: string };
 
 const COLOR = /^#[0-9a-fA-F]{6}$/;
+const ID = /^[a-z][a-z0-9_]*$/;
 
 /** The patterns in a parsed functional-groups.json. Entries that can't be used are left
  * out and described in `problems`, so one mistake doesn't hide every other group. */
@@ -52,19 +56,24 @@ export function readPatterns(rdkit: MainModule, file: unknown): Patterns {
   const groups: Patterns['groups'] = [];
   const problems: string[] = [];
   const names = new Set<string>();
+  const ids = new Set<string>();
   entries.forEach((entry: Partial<Record<keyof GroupPattern, unknown>> | null, i) => {
-    const { name, smarts, color, priority } = entry ?? {};
+    const { name, id, smarts, color, priority } = entry ?? {};
     const label = typeof name === 'string' && name.trim() !== '' ? `"${name}"` : `entry ${i + 1}`;
     const wrong = (what: string) => problems.push(`${label}: ${what}`);
     if (typeof name !== 'string' || name.trim() === '') return wrong('it has no name');
     if (names.has(name)) return wrong('another group has the same name');
+    const key = typeof id === 'string' ? id : undefined;
+    if (id !== undefined && (key === undefined || !ID.test(key))) return wrong('its id is not lowercase letters, digits and _');
+    if (key !== undefined && ids.has(key)) return wrong('another group has the same id');
     if (typeof smarts !== 'string' || smarts.trim() === '') return wrong('it has no SMARTS');
     if (typeof color !== 'string' || !COLOR.test(color)) return wrong('its color is not #rrggbb');
     if (typeof priority !== 'number' || !Number.isFinite(priority)) return wrong('its priority is not a number');
     const query = rdkit.get_qmol(smarts);
     if (!query) return wrong("RDKit can't read its SMARTS");
     names.add(name);
-    groups.push({ name, smarts, color, priority, query });
+    if (key !== undefined) ids.add(key);
+    groups.push({ name, id: key, smarts, color, priority, query });
   });
   // Highest priority first; equal priorities keep the file's order (sort is stable).
   groups.sort((a, b) => b.priority - a.priority);
@@ -94,7 +103,7 @@ export function findGroups(mol: Mol, bonds: [number, number][], patterns: Patter
       };
     });
     for (const instance of instances) instance.atoms.forEach((a) => claimed.add(a));
-    if (instances.length > 0) found.push({ name: group.name, color: group.color, instances });
+    if (instances.length > 0) found.push({ name: group.name, id: group.id, color: group.color, instances });
   }
   return found;
 }
