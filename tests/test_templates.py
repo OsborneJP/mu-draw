@@ -10,6 +10,7 @@ import json
 import numpy as np
 import pytest
 from rdkit import Chem
+from rdkit.Geometry import Point3D
 
 import gen_templates as gen
 from test_reference_fixtures import locked_version
@@ -244,3 +245,104 @@ def test_a_relabelled_fischer_skeleton_is_read_the_fischer_way(made):
     plain = gen.Drawing(labelled, [b | {"wedge": False} for b in drawing.bonds])
     assert len(Chem.FindMolChiralCenters(wedged.mol(), useLegacyImplementation=False)) == 1
     assert not Chem.FindMolChiralCenters(plain.mol(), useLegacyImplementation=False)
+
+
+HAWORTH_SUGARS = {
+    "haworth-alpha-d-glucopyranose": "alpha-D-glucopyranose",
+    "haworth-beta-d-glucopyranose": "beta-D-glucopyranose",
+}
+
+
+def rebuilt_in_3d(drawing: gen.Drawing) -> str:
+    """A Haworth projection read as a model: the ring flat, each ring atom's height on the
+    page as its depth (higher is further back), and each group straight up or down from its
+    ring atom, splayed a little outward as real ones are. RDKit's stereo from that model, as
+    canonical SMILES."""
+    mol = drawing.mol()
+    (ring,) = (list(r) for r in mol.GetRingInfo().AtomRings())
+    anchor = {i: i for i in ring}  # each atom's ring atom
+    frontier = list(ring)
+    while frontier:
+        reached = []
+        for i in frontier:
+            for n in mol.GetAtomWithIdx(i).GetNeighbors():
+                if n.GetIdx() not in anchor:
+                    anchor[n.GetIdx()] = anchor[i]
+                    reached.append(n.GetIdx())
+        frontier = reached
+    points = xy(drawing)
+    flat = {i: np.array([points[i][0], 0.0, -2 * points[i][1]]) for i in ring}
+    middle = np.mean(list(flat.values()), axis=0)
+    conformer = Chem.Conformer(mol.GetNumAtoms())
+    conformer.Set3D(True)
+    for i in range(mol.GetNumAtoms()):
+        a = anchor[i]
+        outward = (flat[a] - middle) / np.linalg.norm(flat[a] - middle)
+        at = flat[a]
+        if i != a:
+            at = at + np.array([0.0, points[i][1] - points[a][1], 0.0]) + 0.3 * outward
+        conformer.SetAtomPosition(i, Point3D(*map(float, at)))
+    mol.RemoveAllConformers()
+    mol.AddConformer(conformer, assignId=True)
+    Chem.AssignStereochemistryFrom3D(mol)
+    return Chem.MolToSmiles(Chem.RemoveHs(mol))
+
+
+def pubchem_smiles(typed_name: str) -> str:
+    return Chem.MolToSmiles(Chem.MolFromSmiles(gen.read_smiles()[typed_name]))
+
+
+def test_haworth_sugars_rebuilt_in_3d_are_pubchems_anomers(made):
+    for name, source in HAWORTH_SUGARS.items():
+        assert made[name].source == source
+        assert rebuilt_in_3d(made[name].drawing) == pubchem_smiles(source), name
+
+
+def test_the_3d_rebuild_tells_the_anomers_apart(made):
+    # Negative control: each anomer's drawing is not the other's.
+    alpha, beta = HAWORTH_SUGARS
+    assert rebuilt_in_3d(made[alpha].drawing) != pubchem_smiles(HAWORTH_SUGARS[beta])
+    assert rebuilt_in_3d(made[beta].drawing) != pubchem_smiles(HAWORTH_SUGARS[alpha])
+
+
+def test_haworths_have_plain_bonds_and_read_with_every_centre_undefined(made):
+    for name in [*HAWORTH_SUGARS, "haworth-pyranose", "haworth-furanose"]:
+        drawing = made[name].drawing
+        assert not any(b["wedge"] for b in drawing.bonds), name
+        mol = drawing.mol()
+        assert not Chem.FindMolChiralCenters(mol, useLegacyImplementation=False), name
+    for name, source in HAWORTH_SUGARS.items():
+        mol = Chem.RemoveHs(made[name].drawing.mol())
+        expected = Chem.MolFromSmiles(gen.read_smiles()[source])
+        Chem.RemoveStereochemistry(expected)
+        assert Chem.MolToSmiles(mol) == Chem.MolToSmiles(expected), name
+
+
+def test_haworth_groups_are_straight_up_or_down_from_the_ring(made):
+    for name in [*HAWORTH_SUGARS, "haworth-pyranose", "haworth-furanose"]:
+        drawing = made[name].drawing
+        points = xy(drawing)
+        mol = drawing.mol()
+        (ring,) = (list(r) for r in mol.GetRingInfo().AtomRings())
+        for atom in ring:
+            for n in mol.GetAtomWithIdx(atom).GetNeighbors():
+                if n.GetIdx() in ring:
+                    continue
+                d = points[n.GetIdx()] - points[atom]
+                assert d[0] == pytest.approx(0) and abs(d[1]) > 0, name
+
+
+def test_haworth_bonds_keep_clear_of_other_atoms(made):
+    # On a regular flattened hexagon a front carbon's bond pointing up ran through the label
+    # of the back carbon's group pointing down; the perspective ring keeps them apart.
+    for name in [*HAWORTH_SUGARS, "haworth-pyranose", "haworth-furanose"]:
+        drawing = made[name].drawing
+        points = xy(drawing)
+        for bond in drawing.bonds:
+            i, j = bond["atoms"]
+            a, b = points[i], points[j]
+            for k, p in enumerate(points):
+                if k in (i, j):
+                    continue
+                t = np.clip((p - a) @ (b - a) / ((b - a) @ (b - a)), 0, 1)
+                assert np.linalg.norm(p - (a + t * (b - a))) >= 0.2, (name, k, i, j)

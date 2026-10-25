@@ -1030,3 +1030,12 @@ Acceptance bar and measurements: docs/plans/v2-templates.md.
   loaded as "AND Enantiomer".
 - Ketcher labels a lone bond end "CH3", so the Fischer skeletons show CH3 at each end until
   the student relabels it.
+- Haworth projections: up or down comes from RDKit's 3D model of the PubChem sugar (the
+  side of the ring plane from which O, C1, C2 run clockwise is up). The test rebuilds the
+  drawing as a 3D model and compares RDKit's stereo with PubChem's. With each carbon's up
+  and down groups exactly collinear, `AssignStereochemistryFrom3D` assigned nothing (a zero
+  chiral volume from the first three neighbours, measured on CHFClBr too); the rebuild
+  splays them outward a little, as real ones are.
+- On a regular flattened hexagon, a back carbon's group pointing down and a front carbon's
+  pointing up share one vertical line inside the ring and their labels collide. The ring is
+  drawn in perspective (back edge narrower) and bonds into the ring are shorter.

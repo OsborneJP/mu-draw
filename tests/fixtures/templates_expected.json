@@ -221,6 +221,142 @@
           "max_stereoisomers": "16"
         }
       }
+    },
+    {
+      "id": "haworth-pyranose",
+      "source": null,
+      "atoms": 16,
+      "bonds": 16,
+      "shapes": 0,
+      "texts": 0,
+      "canonical_smiles": "C1CCOCC1",
+      "inchikey": "DHXVGJBLRPWPCS-UHFFFAOYSA-N",
+      "panel": {
+        "formula": "C5H10O",
+        "fragments": "1",
+        "average_mw": "86.13",
+        "exact_mass": "86.0732",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "9.2",
+        "logp": "1.19",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      }
+    },
+    {
+      "id": "haworth-furanose",
+      "source": null,
+      "atoms": 13,
+      "bonds": 13,
+      "shapes": 0,
+      "texts": 0,
+      "canonical_smiles": "C1CCOC1",
+      "inchikey": "WYURNTSHIVDZCO-UHFFFAOYSA-N",
+      "panel": {
+        "formula": "C4H8O",
+        "fragments": "1",
+        "average_mw": "72.11",
+        "exact_mass": "72.0575",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "1",
+        "rotatable_bonds": "0",
+        "tpsa": "9.2",
+        "logp": "0.80",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      }
+    },
+    {
+      "id": "haworth-alpha-d-glucopyranose",
+      "source": "alpha-D-glucopyranose",
+      "atoms": 17,
+      "bonds": 17,
+      "shapes": 0,
+      "texts": 0,
+      "canonical_smiles": "OCC1OC(O)C(O)C(O)C1O",
+      "inchikey": "WQZGKKKJIJFFOK-UHFFFAOYSA-N",
+      "panel": {
+        "formula": "C6H12O6",
+        "fragments": "1",
+        "average_mw": "180.16",
+        "exact_mass": "180.0634",
+        "degree_of_unsaturation": "1",
+        "hbd": "5",
+        "hba": "6",
+        "rotatable_bonds": "1",
+        "tpsa": "110.4",
+        "logp": "-3.22",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "5",
+          "double_bonds": "0",
+          "undefined": "5",
+          "max_stereoisomers": "32"
+        }
+      }
+    },
+    {
+      "id": "haworth-beta-d-glucopyranose",
+      "source": "beta-D-glucopyranose",
+      "atoms": 17,
+      "bonds": 17,
+      "shapes": 0,
+      "texts": 0,
+      "canonical_smiles": "OCC1OC(O)C(O)C(O)C1O",
+      "inchikey": "WQZGKKKJIJFFOK-UHFFFAOYSA-N",
+      "panel": {
+        "formula": "C6H12O6",
+        "fragments": "1",
+        "average_mw": "180.16",
+        "exact_mass": "180.0634",
+        "degree_of_unsaturation": "1",
+        "hbd": "5",
+        "hba": "6",
+        "rotatable_bonds": "1",
+        "tpsa": "110.4",
+        "logp": "-3.22",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "5",
+          "double_bonds": "0",
+          "undefined": "5",
+          "max_stereoisomers": "32"
+        }
+      }
     }
   ]
 }

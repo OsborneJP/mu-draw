@@ -12,7 +12,9 @@ chair's bond directions (a real chair, projected). What is only a drawing conven
 computed here: the bond length, the chair's viewing angle, a Newman projection, which is
 a picture (lines, a circle and labels) rather than a molecule, and the right angles of a
 Fischer projection. Which side of a Fischer cross each group goes is found, not typed: the
-one layout whose wedges RDKit reads as the PubChem compound. Nothing is typed in.
+one layout whose wedges RDKit reads as the PubChem compound. Which way each group of a
+Haworth projection points, up or down, comes from RDKit's 3D model of the PubChem sugar.
+Nothing is typed in.
 
 Output is deterministic; tests/test_templates.py regenerates it and compares bytes.
 """
@@ -71,6 +73,29 @@ NEWMAN = {
 # are wedges toward the viewer, which is what the cross means, so the app reads the
 # stereoisomer (decided by Jeff). Skeletons with this many stereocentres, and D-glucose.
 FISCHER = {"skeleton_centres": [1, 2, 4]}
+# A Haworth projection: the ring drawn flat in perspective, ring oxygen at the back right,
+# C1 at the right, the front edge at the bottom; each ring carbon's groups straight up or
+# down. Plain bonds only (decided by Jeff): no drawing of a Haworth carries stereo that RDKit
+# or Indigo read correctly (measured for the plan), so the app shows its centres as
+# undefined rather than reading a wrong stereoisomer. Paper positions, ring oxygen first.
+HAWORTH = {
+    # In perspective: the back edge narrower than the front one, so a back carbon's group
+    # pointing down and a front carbon's pointing up don't share one line.
+    "pyranose": [
+        (0.35, 0.6),
+        (1.15, 0.0),
+        (0.65, -0.6),
+        (-0.65, -0.6),
+        (-1.15, 0.0),
+        (-0.35, 0.6),
+    ],
+    "furanose": [(0.0, 0.6), (1.0, 0.15), (0.5, -0.55), (-0.5, -0.55), (-1.0, 0.15)],
+    "vertical": 0.7,
+    # Shorter into the ring (down from the back, up from the front), so labels don't meet.
+    "vertical_inward": 0.4,
+    # A ring carbon's group's own group (C6's oxygen): off to the side, away from the ring.
+    "beyond": (0.6, 0.35),
+}
 # A one-letter label's box, in bond lengths, as Ketcher measures it at its default size.
 LABEL_BOX = (0.235, 0.375)
 
@@ -349,6 +374,82 @@ def fischer(smiles: str) -> Drawing:
     return drawing
 
 
+def vertical(y: float, side: float) -> float:
+    """How far a group goes up (side 1) or down (-1) from a ring atom at height y."""
+    inward = abs(y) > 0.3 and side * y < 0
+    return side * (HAWORTH["vertical_inward"] if inward else HAWORTH["vertical"])
+
+
+def haworth_skeleton(ring: list[tuple[float, float]]) -> Drawing:
+    """The ring (oxygen first) with an H up and an H down on every carbon, as the chair has:
+    the drawing is oxane or oxolane until the student puts groups in place of the H's."""
+    drawing = Drawing()
+    atoms = [drawing.atom("O" if k == 0 else "C", xy) for k, xy in enumerate(ring)]
+    for k, atom in enumerate(atoms):
+        drawing.bond(atom, atoms[(k + 1) % len(atoms)])
+    for atom, (x, y) in zip(atoms[1:], ring[1:], strict=True):
+        for side in (1.0, -1.0):
+            drawing.bond(atom, drawing.atom("H", (x, y + vertical(y, side))))
+    return drawing
+
+
+def sugar_ring(mol: Chem.Mol) -> list[int]:
+    """The ring's atoms in Haworth order: the ring oxygen, the anomeric carbon (C1, the one
+    with two oxygens), then on round the ring."""
+    (ring,) = (list(r) for r in mol.GetRingInfo().AtomRings())
+    (oxygen,) = (i for i in ring if mol.GetAtomWithIdx(i).GetSymbol() == "O")
+    (anomeric,) = (
+        n.GetIdx()
+        for n in mol.GetAtomWithIdx(oxygen).GetNeighbors()
+        if sum(x.GetSymbol() == "O" for x in n.GetNeighbors()) == 2
+    )
+    order = [oxygen, anomeric]
+    while len(order) < len(ring):
+        last = mol.GetAtomWithIdx(order[-1])
+        (following,) = (
+            n.GetIdx()
+            for n in last.GetNeighbors()
+            if n.GetIdx() in ring and n.GetIdx() not in order
+        )
+        order.append(following)
+    return order
+
+
+def haworth(smiles: str, paper: list[tuple[float, float]]) -> Drawing:
+    """A cyclic sugar from PubChem as a Haworth projection. Which groups go up and which down
+    comes from RDKit's 3D model of it: up is the side of the ring from which oxygen, C1, C2
+    run clockwise, as they do on the page."""
+    mol = Chem.AddHs(Chem.MolFromSmiles(smiles))
+    ring = sugar_ring(mol)
+    pos = lowest_energy_conformer(mol)
+    up = -ring_axis(pos - pos[ring].mean(axis=0), ring)
+    drawing = Drawing()
+    index = {}
+    for atom, xy in zip(ring, paper, strict=True):
+        index[atom] = drawing.atom(mol.GetAtomWithIdx(atom).GetSymbol(), xy)
+    side = {}
+    for atom, (x, y) in zip(ring[1:], paper[1:], strict=True):
+        for n in mol.GetAtomWithIdx(atom).GetNeighbors():
+            if n.GetIdx() in ring:
+                continue
+            side[n.GetIdx()] = 1.0 if (pos[n.GetIdx()] - pos[atom]) @ up > 0 else -1.0
+            xy = (x, y + vertical(y, side[n.GetIdx()]))
+            index[n.GetIdx()] = drawing.atom(n.GetSymbol(), xy)
+            drawing.bond(index[atom], index[n.GetIdx()])
+    # Further out (C6's oxygen), heavy atoms only: their hydrogens stay implicit.
+    for a in mol.GetAtoms():
+        if a.GetIdx() in index or a.GetSymbol() == "H":
+            continue
+        (parent,) = (n.GetIdx() for n in a.GetNeighbors() if n.GetIdx() in index)
+        x, y = drawing.atoms[index[parent]]["xy"]
+        dx, dy = HAWORTH["beyond"]
+        index[a.GetIdx()] = drawing.atom(a.GetSymbol(), (x - dx, y + side[parent] * dy))
+        drawing.bond(index[parent], index[a.GetIdx()])
+    for k, atom in enumerate(ring):
+        drawing.bond(index[atom], index[ring[(k + 1) % len(ring)]])
+    return drawing
+
+
 @dataclass
 class Template:
     id: str
@@ -405,6 +506,34 @@ def templates(smiles: dict[str, str]) -> list[Template]:
             fischer(smiles["aldehydo-D-glucose"]),
             "aldehydo-D-glucose",
         ),
+        Template(
+            "haworth-pyranose",
+            "Haworth",
+            "Haworth, pyranose ring",
+            haworth_skeleton(HAWORTH["pyranose"]),
+            None,
+        ),
+        Template(
+            "haworth-furanose",
+            "Haworth",
+            "Haworth, furanose ring",
+            haworth_skeleton(HAWORTH["furanose"]),
+            None,
+        ),
+        Template(
+            "haworth-alpha-d-glucopyranose",
+            "Haworth",
+            "Haworth, α-D-glucopyranose",
+            haworth(smiles["alpha-D-glucopyranose"], HAWORTH["pyranose"]),
+            "alpha-D-glucopyranose",
+        ),
+        Template(
+            "haworth-beta-d-glucopyranose",
+            "Haworth",
+            "Haworth, β-D-glucopyranose",
+            haworth(smiles["beta-D-glucopyranose"], HAWORTH["pyranose"]),
+            "beta-D-glucopyranose",
+        ),
     ]
 
 
@@ -446,6 +575,7 @@ def generate() -> dict[Path, str]:
         "chair": CHAIR,
         "newman": NEWMAN,
         "fischer": FISCHER,
+        "haworth": HAWORTH,
         "templates": [
             {"id": t.id, "group": t.group, "name": t.name, "ket": t.drawing.ket()} for t in made
         ],

@@ -91,7 +91,10 @@ All notable changes to this project. The format follows
   properties panel leaves them out); Fischer projections with 1, 2 and 4 stereocenters to
   fill in, and D-glucose. A Fischer cross's horizontal bonds are wedges toward the viewer,
   which is what the cross means, so Get name and the stereocenter count read the right
-  stereoisomer.
+  stereoisomer; Haworth projections of a pyranose and a furanose ring to fill in, and of
+  α- and β-D-glucopyranose. No drawing of a Haworth projection carries stereo the app can
+  read, so they have plain bonds (no thick front edge) and the app shows their
+  stereocenters as undefined rather than as a wrong stereoisomer.
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name

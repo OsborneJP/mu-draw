@@ -65,7 +65,7 @@ Requested by Jeff on 2026-10-25, for CHEM-311 as soon as possible. docs/SPEC.md,
 4. Newman, eclipsed: the back bonds drawn 20° off the front ones so they show (at 15° the labels of a pair overlapped).
 5. Fischer skeletons with 1, 2 and 4 stereocentres. Their bond ends are carbons until relabelled.
 6. Fischer D-glucose.
-7. Haworth pyranose and furanose skeletons.
+7. Haworth pyranose and furanose rings, with an H up and down on each carbon to replace.
 8. Haworth α- and β-D-glucopyranose.
 
 ## Acceptance bar
@@ -105,3 +105,14 @@ Jeff approved the plan as written: the starter set above, all four types, one co
 3. **Fischer:** wedged horizontal bonds, so the app reads the stereoisomer. Not plain crosses.
 4. **Haworth:** plain bonds with no thick front edge, so the app never reads a wrong stereoisomer; its centres show as undefined.
 5. **Still open:** Ketcher's own Haworth sugars (Structure Library, "Sugars") are misread in the app today. They stay as they are unless Jeff decides otherwise.
+
+## Done (2026-10-25, on branch claude/zen-newton-b872d1)
+
+- The Templates menu and the chairs (6092a87), Newman projections (9437bd5), Fischer projections (f5e4f6e), and Haworth projections (the commit after). Each commit passed check.sh. Nothing is deployed; the main session merges and deploys.
+- Bar A is tests/test_templates.py, including the Haworth 3D rebuild and a negative control that tells the anomers apart. Bars B and C are web/e2e/templates.spec.ts (25 browser tests) and web/src/panels/templates.test.ts, which forces the orderings of two picks.
+- Changed while building:
+  - The eclipsed Newman's offset is 20°, not 15°: at 15° the labels of a pair overlapped.
+  - The Haworth rings are drawn in perspective with shorter inward bonds; on a regular flattened hexagon, a bond ran through another group's label.
+  - The Haworth rings carry H atoms rather than bare bond ends, as the chair does.
+- For Jeff to look at: the chair's two inner axial bonds cross the opposite ring edge, as they do in any true projection (BUILD-LEARNINGS.md).
+- Still open: decision 5 (Ketcher's own "Sugars" Haworths, misread today).
