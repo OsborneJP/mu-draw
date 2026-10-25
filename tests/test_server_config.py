@@ -72,23 +72,24 @@ CAMPUS_SECTION = re.compile(
 )
 
 
-def test_staging_and_for_now_production_are_restricted_to_campus():
-    assert rsc.PRODUCTION_CAMPUS_ONLY
-    for name in ("staging", "production"):
-        assert CAMPUS_SECTION.search(rsc.apache_block(target(name), POLICY)), name
+def active(block: str) -> list[str]:
+    return [line for line in block.splitlines() if not line.lstrip().startswith("#")]
 
 
-def test_public_production_has_no_active_restriction(monkeypatch):
-    monkeypatch.setattr(rsc, "PRODUCTION_CAMPUS_ONLY", False)
-    production = rsc.apache_block(target("production"), POLICY)
-    active = [line for line in production.splitlines() if not line.lstrip().startswith("#")]
-    assert not any("Require ip" in line for line in active)
+def test_staging_is_campus_only_and_production_public():
+    assert not rsc.PRODUCTION_CAMPUS_ONLY
     assert CAMPUS_SECTION.search(rsc.apache_block(target("staging"), POLICY))
+    production = rsc.apache_block(target("production"), POLICY)
+    assert not any("Require ip" in line for line in active(production))
 
 
-def test_public_production_campus_option_is_a_valid_section_once_uncommented(monkeypatch):
+def test_campus_only_production_is_restricted(monkeypatch):
+    monkeypatch.setattr(rsc, "PRODUCTION_CAMPUS_ONLY", True)
+    assert CAMPUS_SECTION.search(rsc.apache_block(target("production"), POLICY))
+
+
+def test_public_production_campus_option_is_a_valid_section_once_uncommented():
     # Apache needs the opening and closing tags on their own lines.
-    monkeypatch.setattr(rsc, "PRODUCTION_CAMPUS_ONLY", False)
     production = rsc.apache_block(target("production"), POLICY)
     uncommented = "\n".join(re.sub(r"^# ?", "", line) for line in production.splitlines())
     assert CAMPUS_SECTION.search(uncommented)

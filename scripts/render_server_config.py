@@ -24,9 +24,10 @@ CSP_FILE = ROOT / "web" / "csp.json"
 CSP_WORKERS_FILE = ROOT / "web" / "csp-workers.json"
 VHOST = "/etc/apache2/sites-enabled/osbornelab.conf"
 CAMPUS = "10.0.0.0/8"
-# Production opens on the campus network and VPN only, for now (Jeff, 2026-10-23). False
-# makes it public like /chemtutor: re-render, then re-apply the production block.
-PRODUCTION_CAMPUS_ONLY = True
+# Production is public like /chemtutor, so CHEM-311 students can use it at home (Jeff,
+# 2026-10-25; it was campus and VPN only from 2026-10-23). True restricts it to campus and
+# VPN again: re-render, then re-apply the production block.
+PRODUCTION_CAMPUS_ONLY = False
 IMMUTABLE = "public, max-age=31536000, immutable"
 
 
@@ -229,8 +230,9 @@ def render(
         "in scripts/render_server_config.py to change that), so the live checks, like\n"
         "staging's, need this host to reach its own name from a 10.x address."
         if PRODUCTION_CAMPUS_ONLY
-        else "Decide first whether production is public (as rendered, like /chemtutor) or\n"
-        "campus-only (set `PRODUCTION_CAMPUS_ONLY` in scripts/render_server_config.py)."
+        else "It is public, like /chemtutor (Jeff, 2026-10-25, for CHEM-311 students at home);\n"
+        "set `PRODUCTION_CAMPUS_ONLY` in scripts/render_server_config.py to restrict it to\n"
+        "campus and VPN again."
     )
     rows = "\n".join(
         f"| {t.name} | `https://{host}/{t.path}/` | `{t.web}` | `{t.unit}` on 127.0.0.1:{t.port} |"
