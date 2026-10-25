@@ -46,7 +46,7 @@ This changes one point of docs/SPEC.md section 6: "Added fragments must not over
 
 **C. Name and colours**
 1. **Name.** The app is "MU Draw" ("MU Draw (staging)" on staging) everywhere it is named: manifest `name` and `short_name`, page title, header, About box. verify-dist already checks the manifest and the title for each target.
-2. **Colours.** They are tokens in one place (`--mu-black` #000 and `--mu-gold` #f0b323 in web/src/index.css; a stand-in gold until there is an official brand value).
+2. **Colours.** They are tokens in one place (`--mu-black` #000 and `--mu-gold` #eeb111, Manchester's brand gold, in web/src/index.css).
    - The header is black with a gold rule and gold "MU".
    - Buttons that were blue are black, with gold focus and hover states.
    - NMR sticks are black. `theme_color` is black.

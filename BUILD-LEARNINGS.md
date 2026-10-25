@@ -906,10 +906,11 @@ Acceptance bar: docs/plans/placement-toolbar-branding.md.
     the arrow works. The pinned tools move up by that 1px.
   - The browser test waits on `scrollend` for every scroll. It compares the gap's pixels
     before and after: `elementFromPoint` alone passed with the background removed.
-- **Brand.** `--mu-black` (#000) and `--mu-gold` (#f0b323, a stand-in until there is an
-  official value) in web/src/index.css. The icons use the same two colours
-  (scripts/make_icons.py). brand.test.ts reads the web source as text for the old blue
-  and name; it reads stereoHighlight.ts as text too, because importing it loads Ketcher.
+- **Brand.** `--mu-black` (#000) and `--mu-gold` (#eeb111, Manchester's brand gold, from
+  Jeff; a stand-in #f0b323 shipped first) in web/src/index.css. The icons
+  (scripts/make_icons.py) and the theme colour repeat them, and brand.test.ts checks they
+  match. It reads the web source as text for the old blue and name, and reads
+  stereoHighlight.ts as text too, because importing it loads Ketcher.
 - Each guard removed in turn, and the test that failed.
   - Vitest: putting it away on cancel, cancelling when closed while the structure is read,
     cancelling on close, the own-change flag, keeping the placement, and dropping a
@@ -938,4 +939,10 @@ Acceptance bar: docs/plans/placement-toolbar-branding.md.
     select directly, and the toolbar shows the old tool until one is picked.
   - A drag under way when the compound arrives is cut off: Ketcher's select tool has no
     `cancel`, so its moved fragment stays moved, outside the undo history.
+- Staging and production (2026-10-25, e7d2a64): `scripts/deploy.sh staging` ran check.sh
+  (420 pytest, 425 Vitest, 86 Playwright tests) and needed no API restart (no server
+  change); the 14 live checks and 80 Playwright tests passed against /draw-staging/, with
+  8 skipped by design. `--production` (Jeff's go-ahead) ran the 86 tests on the
+  production build, then passed the same 14 checks and 80 tests against /draw/. Manchester's
+  brand gold (#eeb111) replaced the stand-in gold just after, in its own commit.
 

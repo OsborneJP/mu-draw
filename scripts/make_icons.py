@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 
 OUT = Path(__file__).resolve().parents[1] / "web" / "public" / "icons"
 BACKGROUND = (0, 0, 0, 255)  # --mu-black
-FOREGROUND = (240, 179, 35, 255)  # --mu-gold, #f0b323
+FOREGROUND = (238, 177, 17, 255)  # --mu-gold, #eeb111
 SUPERSAMPLE = 4
 
 

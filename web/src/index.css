@@ -1,7 +1,8 @@
-/* MU Draw's colours: Manchester University's black and gold. Change them here. */
+/* MU Draw's colours: Manchester University's black and its brand gold. Change them here;
+   the icons (scripts/make_icons.py) and the theme colour follow (src/brand.test.ts). */
 :root {
   --mu-black: #000;
-  --mu-gold: #f0b323;
+  --mu-gold: #eeb111;
 }
 
 html,
