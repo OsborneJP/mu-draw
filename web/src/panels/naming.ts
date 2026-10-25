@@ -1,10 +1,13 @@
 import type { Ketcher } from 'ketcher-core';
 import { requestName, requestStructure, type NameOutcome, type StructureOutcome } from '../api';
+import type { Placement } from '../editor/placeInHand';
 
 // The naming panel's state, shared by the header's Get name button, its Name to structure box
 // and the panel over the canvas. An answer is about the drawing as it was when it was asked
 // for, so any change to the drawing closes the panel and drops an answer still on its way
 // (its request aborted). The one exception: the change Name to structure makes itself.
+// Add puts the compound in the student's hand until a click places it; while it is in hand
+// the request is still on its way (Get name stays greyed), and a change puts it away.
 type Drawn = Extract<StructureOutcome, { kind: 'drawn' }>;
 
 /** A drawn name and its round trip: Get name on what was drawn. */
@@ -21,6 +24,7 @@ export type NameState =
   | { kind: 'reaction' }
   | NameOutcome
   | { kind: 'drawing'; typed: string }
+  | { kind: 'placing'; typed: string }
   | DrawnState
   | { kind: 'no-compound'; typed: string; opsinMessage: string | null }
   | { kind: 'bad-name' }
@@ -37,6 +41,7 @@ export const NAME_MESSAGES = {
   'no-compound': 'PubChem has no compound by this name, so nothing was drawn.',
   'bad-name': 'Type one chemical name, on one line, of at most 300 characters.',
   'draw-failed': "The editor couldn't draw this structure.",
+  placing: 'Click on the canvas to place it. Esc cancels.',
 } as const;
 
 export function stereoNote(undefinedStereo: number): string {
@@ -53,6 +58,7 @@ export function sameName(typed: string, iupac: string): boolean {
 let state: NameState = { kind: 'idle' };
 let inFlight: AbortController | null = null;
 let drawingItself = false; // Name to structure is putting its structure on the canvas
+let inHand: Placement | null = null; // Add's compound, following the mouse
 const listeners = new Set<() => void>();
 
 function show(next: NameState): void {
@@ -74,18 +80,31 @@ export function isBusy(): boolean {
   return inFlight !== null;
 }
 
-/** Close the panel and drop any answer still coming (the student closed it). */
+/** Close the panel, drop any answer still coming and put away a compound in hand (the
+ * student closed it, or the drawing changed). */
 export function closeName(): void {
   inFlight?.abort();
   inFlight = null;
+  const held = inHand;
+  inHand = null;
+  held?.cancel();
   if (state.kind !== 'idle') show({ kind: 'idle' });
 }
 
 /** Ketcher's change event: the drawing changed, so whatever the panel says is stale. Ketcher
- * fires it once for addFragment() and setMolecule(), before they resolve (measured), and
- * that one is Name to structure's own. */
+ * fires it once for setMolecule(), before it resolves, and once inside the click that places
+ * Add's compound (measured); those are Name to structure's own. */
 export function drawingChanged(): void {
   if (!drawingItself) closeName();
+}
+
+function ownChange(draw: () => void): void {
+  drawingItself = true;
+  try {
+    draw();
+  } finally {
+    drawingItself = false;
+  }
 }
 
 function start(next: NameState): AbortController {
@@ -117,9 +136,55 @@ export async function nameDrawing(ketcher: Ketcher): Promise<void> {
   show(next);
 }
 
-/** Name to structure: draw `typed` (Add puts it beside the drawing, Replace replaces the
- * drawing; either is one Undo), then run Get name on what was drawn. */
-export async function drawName(ketcher: Ketcher, typed: string, mode: 'add' | 'replace'): Promise<void> {
+/** Puts a Molfile in the student's hand (src/editor/placeInHand.ts; a stand-in in tests). */
+export type Placer = (
+  ketcher: Ketcher,
+  molfile: string,
+  dropping: (drop: () => void) => void,
+) => Promise<Placement>;
+
+/** Add: the compound follows the mouse until a click places it. True once placed; false if
+ * it was put away (Esc, another tool, a change, the panel closed), and then the panel is
+ * closed. */
+async function addByClick(
+  ketcher: Ketcher,
+  typed: string,
+  molfile: string,
+  place: Placer,
+  request: AbortController,
+): Promise<boolean> {
+  const held = await place(ketcher, molfile, ownChange);
+  if (inFlight !== request) {
+    held.cancel();
+    return false;
+  }
+  inHand = held;
+  show({ kind: 'placing', typed });
+  const placed = await held.done;
+  if (inHand === held) inHand = null;
+  if (inFlight !== request) return false;
+  if (!placed) closeName();
+  return placed;
+}
+
+async function replace(ketcher: Ketcher, molfile: string, request: AbortController): Promise<boolean> {
+  drawingItself = true;
+  try {
+    await ketcher.setMolecule(molfile);
+  } finally {
+    drawingItself = false;
+  }
+  return inFlight === request;
+}
+
+/** Name to structure: draw `typed` (Add places it where the student clicks, Replace replaces
+ * the drawing; either is one Undo), then run Get name on what was drawn. */
+export async function drawName(
+  ketcher: Ketcher,
+  typed: string,
+  mode: 'add' | 'replace',
+  place: Placer,
+): Promise<void> {
   const request = start({ kind: 'drawing', typed });
   const outcome = await requestStructure(typed, request.signal);
   if (inFlight !== request) return;
@@ -128,17 +193,19 @@ export async function drawName(ketcher: Ketcher, typed: string, mode: 'add' | 'r
     show(outcome.kind === 'no-compound' ? { ...outcome, typed } : outcome);
     return;
   }
-  drawingItself = true;
+  let drew: boolean;
   try {
-    await (mode === 'add' ? ketcher.addFragment(outcome.molfile) : ketcher.setMolecule(outcome.molfile));
+    drew =
+      mode === 'add'
+        ? await addByClick(ketcher, typed, outcome.molfile, place, request)
+        : await replace(ketcher, outcome.molfile, request);
   } catch {
+    if (inFlight !== request) return;
     inFlight = null;
     show({ kind: 'draw-failed' });
     return;
-  } finally {
-    drawingItself = false;
   }
-  if (inFlight !== request) return;
+  if (!drew) return;
   const drawn: DrawnState = { kind: 'drawn', typed, structure: outcome, roundTrip: { kind: 'naming' } };
   show(drawn);
   const roundTrip = await requestName(outcome.smiles, request.signal);

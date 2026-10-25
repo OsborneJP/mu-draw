@@ -1,14 +1,16 @@
 import { useState, useSyncExternalStore } from 'react';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
+import { placeInHand } from '../editor/placeInHand';
 import { useOnline } from '../shell/useOnline';
 import { drawName, isBusy, subscribeNameState } from './naming';
 import { useHasAtoms } from './useHasAtoms';
 
 const OFFLINE = 'Needs an internet connection';
 
-// Name to structure (header): type a name, then Add (beside the drawing) or Replace. Enter
-// does Add while the canvas has atoms, else Replace. The answer and its round trip show in
-// the naming panel (src/panels/naming.ts). Greyed offline and while a request is on its way.
+// Name to structure (header): type a name, then Add (the compound follows the mouse until a
+// click places it) or Replace. Enter does Add while the canvas has atoms, else Replace. The
+// answer and its round trip show in the naming panel (src/panels/naming.ts). Greyed offline
+// and while a request is on its way or a compound is in hand.
 export default function NameToStructure() {
   const ketcher = useSyncExternalStore(subscribeKetcher, getKetcher);
   const online = useOnline();
@@ -20,7 +22,7 @@ export default function NameToStructure() {
   const canDraw = usable && typed !== '';
 
   function draw(mode: 'add' | 'replace') {
-    if (ketcher && canDraw) void drawName(ketcher, typed, mode);
+    if (ketcher && canDraw) void drawName(ketcher, typed, mode, placeInHand);
   }
 
   return (
@@ -47,7 +49,7 @@ export default function NameToStructure() {
         className="header-button"
         data-testid="name-to-structure-add"
         disabled={!canDraw}
-        title={online ? 'Draw the structure beside the drawing' : OFFLINE}
+        title={online ? 'Pick up the structure, then click on the canvas to place it' : OFFLINE}
         onClick={() => draw('add')}
       >
         Add
