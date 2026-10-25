@@ -159,3 +159,15 @@ The first "Common AI failure modes" bullet also gains "or an IR wavenumber".
 4. scripts/check.sh passes before each commit. Commits are small, on branch claude/v2-ir-hints. No deploy, push or merge: the main session does those, and production only on Jeff's word.
 
 Not in scope: a drawn IR spectrum or a band chart; matching a student's peak list; hints for groups the highlighter doesn't find (carboxylates, ammonium, aryl halides); per-halogen filtering of bands; checking the 9 `verify` bands (Jeff's task, against Pavia or Silverstein).
+
+## Done (2026-10-25, branch claude/v2-ir-hints, not merged or deployed)
+
+- 38bdc11 is this plan. a8a6b1e gives each highlighter group its `id`. 8afe4d9 adds the table, its reader, its unit tests, the precache and live guards, the invariant 3 wording and the licence notice. 4da134e adds the panel and 10 browser tests. The last commit adds BUILD-LEARNINGS.md and these notes.
+- Each guard was broken on purpose and a test failed. Removing the verify filter failed the unit tests and both browser verify tests.
+- Differences from the bar:
+  - C.2: AGENTS.md's Layout section names no IR file. It was at 149 of 149 lines, and invariant 3 already gives both paths.
+  - B.3's glycerol order is corrected above: the shared O–H comes right after the 1° alcohol, by the order rule.
+- Left for Jeff:
+  - check the 9 `verify` bands against Pavia or Silverstein, set `verify` to false and cite the book (until then amide, thiol, epoxide and 2° amine N–H show no band);
+  - bump the table's `version` from 0.1-draft once it has been reviewed;
+  - say when the main session may merge, deploy to staging and promote.

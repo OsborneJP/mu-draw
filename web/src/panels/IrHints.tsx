@@ -24,6 +24,7 @@ function BandRow({ band }: { band: Band }) {
       data-low={band.low}
       data-high={band.high}
       data-diagnostic={band.diagnostic}
+      data-verify={band.verify}
     >
       <span className="ir-range">{rangeText(band)}</span>
       <span className="ir-what">

@@ -101,6 +101,7 @@ function fileBands(file: TableFile, key: string) {
 /** Every entry shown has exactly the file's bands, and the "still being checked" line
  * exactly when the file marks one of its bands verify. */
 async function expectBandsFromFile(page: Page, file: TableFile = TABLE): Promise<void> {
+  await expect(page.locator('[data-testid="ir-band"][data-verify="true"]')).toHaveCount(0);
   for (const key of await entries(page)) {
     expect(await shownBands(page, key!), key!).toEqual(fileBands(file, key!));
     const checking = page.locator(`[data-testid="ir-entry"][data-key="${key}"] [data-testid="ir-checking"]`);
