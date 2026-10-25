@@ -294,6 +294,12 @@ async function loadInOrder(page: Page, c: Compound): Promise<void> {
   expect(ids.bonds).toEqual(ids.bonds.map((_, i) => i));
 }
 
+/** '#9ecbff' as the browser reports it: 'rgb(158, 203, 255)'. */
+function rgb(hex: string): string {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 const identity = (c: Compound) => new Map(c.stereo.possible.map((e) => [e.centered_on, e.centered_on]));
 
 test('clicking a stereo count highlights exactly those elements, and clicking again removes them', async ({ app }) => {
@@ -314,6 +320,9 @@ test('clicking a stereo count highlights exactly those elements, and clicking ag
     await button.click();
     await expect(button).toHaveAttribute('aria-pressed', 'true');
     expect(await highlights(page)).toEqual(expectedHighlight(c, identity(c)));
+    // Pressed, it is the colour of what it lights up, with the mouse still over it too.
+    await expect(button).toHaveCSS('background-color', rgb(DEFINED_COLOR));
+    expect(await button.evaluate((e) => e.matches(':hover'))).toBe(true);
     // Highlighting is not an edit: no change event (so no autosave), nothing to undo.
     const after = () =>
       page.evaluate(() => [

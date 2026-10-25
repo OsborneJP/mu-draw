@@ -254,21 +254,24 @@ test('Name to structure: 20 systematic and 10 common names draw, and the round t
   }
 });
 
-/** A drawing and the bond tool chosen, then Add answered: the compound is in hand. */
-async function compoundInHand(app: App) {
+/** A drawing and a tool chosen (the bond tool unless said), then Add answered: the compound
+ * is in hand. `whileLookingUp` runs after Add and before the answer. */
+async function compoundInHand(app: App, { tool = 'bonds', whileLookingUp = async () => {} } = {}) {
   const { page } = app;
   const { input, add, panel } = ui(page);
   await openEditor(app);
   const apis: Apis = { structures: await holdApi(page, 'structure'), names: await holdApi(page, 'name') };
   await clearCanvas(page);
   const first = await drawRecorded(app, apis, 'cyclohexanol', 'replace');
-  await page.getByTestId('bonds').filter({ visible: true }).click();
-  await expect.poll(() => chosenTools(page)).toEqual(['bonds']);
+  await page.getByTestId(tool).filter({ visible: true }).click();
+  await expect.poll(() => chosenTools(page)).toEqual([tool]);
   const before = await fragmentBoxes(page);
   const changes = await changeCounter(page);
   await input.fill('caffeine');
   await add.click();
-  await (await guarded(app, apis.structures.next())).answer(answerFor('caffeine').structure);
+  const structure = await guarded(app, apis.structures.next());
+  await whileLookingUp();
+  await structure.answer(answerFor('caffeine').structure);
   await expect(panel).toHaveAttribute('data-state', 'placing');
   return { apis, first, before, changes };
 }
@@ -308,6 +311,71 @@ test('Add: the compound follows the mouse until a click places it there, as one 
   await expect.poll(() => fragments(page).then((boxes) => boxes.length)).toBe(1);
   expect(await inchiKey(page)).toBe(first.inchikey);
   await expect(panel).toHaveCount(0); // the Undo is a change: the answer was about before
+});
+
+test('a compound that arrives under a resting mouse shows there, and a click without moving places it', async ({
+  app,
+}) => {
+  const { page } = app;
+  const { panel } = ui(page);
+  const at: CanvasPoint[] = [];
+  const { before, changes } = await compoundInHand(app, {
+    whileLookingUp: async () => {
+      at.push(await canvasPoint(page, 0.25, 0.7));
+      await moveTo(page, at[0]);
+    },
+  });
+  expectNear(await newCentre(page, before), at[0]); // shown at once, under the mouse
+  await page.mouse.down();
+  await page.mouse.up();
+  await expect(panel).toHaveAttribute('data-state', 'drawn');
+  expectNear(await newCentre(page, before), at[0]);
+  expect(await changes()).toBe(1);
+  await expect.poll(() => chosenTools(page)).toEqual(['select-rectangle']);
+});
+
+test('a click on the canvas places the compound there even when Ketcher has hidden it', async ({ app }) => {
+  const { page } = app;
+  const { panel } = ui(page);
+  const { before, changes } = await compoundInHand(app);
+  const point = await canvasPoint(page, 0.25, 0.7);
+  await moveTo(page, point);
+  // What Ketcher does when the mouse leaves the canvas: the compound is hidden, still in hand.
+  // Here the mouse stays where it is, and the next click has had no move to show it again.
+  await page.evaluate(() => {
+    const editor = window.ketcher!.editor as unknown as { render: { clientArea: HTMLElement } };
+    editor.render.clientArea.dispatchEvent(new MouseEvent('mouseleave'));
+  });
+  expect(await fragments(page)).toHaveLength(1);
+  await expect(panel).toHaveAttribute('data-state', 'placing');
+  await page.mouse.down();
+  await page.mouse.up();
+  await expect(panel).toHaveAttribute('data-state', 'drawn');
+  expectNear(await newCentre(page, before), point);
+  expect(await changes()).toBe(1);
+});
+
+test('the release that ends a drag begun before the compound arrived does not place it', async ({ app }) => {
+  const { page } = app;
+  const { panel } = ui(page);
+  const { changes } = await compoundInHand(app, {
+    tool: 'select-rectangle',
+    // A selection rectangle under way when the answer comes.
+    whileLookingUp: async () => {
+      const from = await canvasPoint(page, 0.2, 0.65);
+      await moveTo(page, from);
+      await page.mouse.down();
+      await moveTo(page, await canvasPoint(page, 0.3, 0.75));
+    },
+  });
+  await page.mouse.up();
+  await expect(panel).toHaveAttribute('data-state', 'placing'); // still in hand
+  expect(await changes()).toBe(0);
+  const point = await canvasPoint(page, 0.7, 0.7);
+  await moveTo(page, point);
+  await page.mouse.click(point.x, point.y);
+  await expect(panel).toHaveAttribute('data-state', 'drawn');
+  expect(await changes()).toBe(1);
 });
 
 for (const [how, putAway, toolAfter] of [

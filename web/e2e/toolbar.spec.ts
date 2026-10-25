@@ -72,6 +72,12 @@ test('in a short window the lower tools scroll and hand, select and eraser stay 
   expect(scrollHeight).toBeGreaterThan(clientHeight); // it really overflows here
   await expect(down).toBeVisible();
   await expect(up).toHaveCount(0);
+  // Scrollable now, and still with no scrollbar (Playwright's Chrome never draws one, so
+  // this is read from the style).
+  expect(await column.evaluate((e) => getComputedStyle(e).scrollbarWidth)).toBe('none');
+  // The pinned area covers the column's whole width, its right-hand padding included.
+  const [columnBox, pinnedBox] = [(await column.boundingBox())!, (await pinned.boundingBox())!];
+  expect([pinnedBox.x, pinnedBox.width]).toEqual([columnBox.x, columnBox.width]);
   const pinnedBefore = await tops(page, PINNED);
   const [textBefore] = await tops(page, ['text']);
   const gapBefore = await gapPixels(page, pinned);
@@ -98,6 +104,36 @@ test('in a short window the lower tools scroll and hand, select and eraser stay 
   expect((await tops(page, ['text']))[0]).toBeCloseTo(textBefore - byWheel, 0);
   (await tops(page, PINNED)).forEach((top, i) => expect(Math.abs(top - pinnedBefore[i])).toBeLessThanOrEqual(1));
   await nothingShowsThrough(page, pinned, gapBefore);
+
+  // The wheel went to the end, where the chain tool is under the pinned ones; given the
+  // keyboard focus, it scrolls out from under them.
+  expect(byWheel).toBe(scrollHeight - clientHeight);
+  const chainTool = toolbar(page).root.getByTestId('chain');
+  const under = (await chainTool.boundingBox())!;
+  const area = (await pinned.boundingBox())!;
+  expect(under.y).toBeLessThan(area.y + area.height); // under them before
+  await scrolled(column, () => chainTool.focus());
+  expect((await chainTool.boundingBox())!.y).toBeGreaterThanOrEqual(area.y + area.height);
+});
+
+test('in a very short editor the whole column scrolls, as Ketcher has it', async ({ app }) => {
+  const { page } = app;
+  await page.setViewportSize({ width: 1280, height: 360 });
+  await openEditor(app);
+  const { column, pinned } = toolbar(page);
+  expect(await pinned.evaluate((e) => getComputedStyle(e).position)).not.toBe('sticky');
+  // Every tool can be reached: at the end of the column the last one is in view, unhidden.
+  await scrolled(column, () => column.evaluate((e) => (e.scrollTop = e.scrollHeight)).then(() => {}));
+  const hand = (await toolbar(page).root.getByTestId('hand').boundingBox())!;
+  const columnBox = (await column.boundingBox())!;
+  expect(hand.y + hand.height).toBeLessThanOrEqual(columnBox.y); // scrolled away with the rest
+  const last = toolbar(page).root.getByTestId('images');
+  const box = (await last.boundingBox())!;
+  const hit = await page.evaluate(
+    ([x, y]) => document.elementFromPoint(x, y)?.closest('[data-testid="images"]') !== null,
+    [box.x + box.width / 2, box.y + box.height / 2],
+  );
+  expect(hit).toBe(true);
 });
 
 test('in a tall window nothing scrolls and the tools sit as Ketcher lays them out', async ({ app }) => {

@@ -20,10 +20,10 @@ This changes one point of docs/SPEC.md section 6: "Added fragments must not over
 
 **A. Add by click**
 1. When the server answers for Add (the button, or Enter on a drawing):
-   - The drawing is unchanged and the compound is in hand: it follows the mouse over the canvas. Nothing shows until the mouse is over the canvas, so Export, Copy image and autosave never see an unplaced compound while the student is elsewhere.
+   - The drawing is unchanged and the compound is in hand: it follows the mouse over the canvas. Nothing shows until the mouse is over the canvas, so Export, Copy image and autosave never see an unplaced compound while the student is elsewhere. If the mouse is already resting on the canvas, it shows there at once.
    - The panel is in state `placing` and says "Click on the canvas to place it. Esc cancels."
    - Get name stays greyed.
-2. A click places it centred on the click: the new fragment's centre is within 0.5 bond length of the click's model point (`render.page2obj`).
+2. A click places it centred on the click: the new fragment's centre is within 0.5 bond length of the click's model point (`render.page2obj`). This holds for a click with no move before it (a still mouse, a trackpad tap), and when Ketcher has hidden it. The release that ends a drag begun before the compound arrived is not a click.
    - It is exactly one change, and one Undo removes it.
    - The panel then shows `drawn`, and the round trip runs on what was placed.
    - The selection tool is back afterwards, on Ketcher's toolbar too. (Measured: Ketcher's paste tool switches the editor to select directly, and the toolbar went on showing the bond tool chosen before Add.)
@@ -39,9 +39,10 @@ This changes one point of docs/SPEC.md section 6: "Added fragments must not over
 **B. Pinned tools**
 1. At a window height where the left toolbar overflows (1280×600), scrolling the tools (mouse wheel, and Ketcher's arrow buttons, down and back up) moves the lower tools. Hand, select and eraser stay where they were (within 1 px), and nothing scrolled shows through around them.
    - Why 1 px: Ketcher shows its up arrow only while the first group is not wholly in view (an IntersectionObserver at threshold 1). Pinned at `top: -1px`, 1 px of it is hidden once the column has scrolled, so the up arrow still appears; at `top: 0` it never would.
-2. Where everything fits, nothing changes.
-3. The hidden-UI tests, compact toolbar included, still pass.
-4. Positive control: the column really scrolled, so its `scrollTop` is above 0 and a lower tool moved.
+2. Where everything fits, nothing changes. In a very short editor (Ketcher's app under 330px tall: a small window, or the NMR preview docked) nothing is pinned and the whole column scrolls as before, so every tool can be reached.
+3. A tool given keyboard focus scrolls out from under the pinned ones.
+4. The hidden-UI tests, compact toolbar included, still pass.
+5. Positive control: the column really scrolled, so its `scrollTop` is above 0 and a lower tool moved.
 
 **C. Name and colours**
 1. **Name.** The app is "MU Draw" ("MU Draw (staging)" on staging) everywhere it is named: manifest `name` and `short_name`, page title, header, About box. verify-dist already checks the manifest and the title for each target.
@@ -50,7 +51,23 @@ This changes one point of docs/SPEC.md section 6: "Added fragments must not over
    - Buttons that were blue are black, with gold focus and hover states.
    - NMR sticks are black. `theme_color` is black.
    - Icons are a gold hexagon on black.
-3. **What stays the same.** The canvas highlight colours stay: light blue marks defined stereocentres and gold marks undefined ones, so changing the blue would make the two look the same. The stereocentre count button's pressed colour keeps matching the canvas highlight.
+3. **What stays the same.** The canvas highlight colours stay: light blue marks defined stereocentres and gold marks undefined ones, so changing the blue would make the two look the same. The stereocentre count button's pressed colour keeps matching the canvas highlight, with the mouse over it too.
 4. **Guard.** A test (web/src/brand.test.ts) fails if the old blue or the old name appears in web source again, or if the pressed stereocentre button stops matching DEFINED_COLOR.
 
 **D. Every change:** check.sh passes before each commit, and `scripts/deploy.sh staging` passes the live checks at the end. Production is promoted only on Jeff's say-so.
+
+## Review (2026-10-25)
+
+One capped round: three reviewers (placement, toolbar, brand), each finding checked by a verifier asked to refute it. 8 confirmed, 5 rejected.
+- Fixed, each with a test that fails without the fix:
+  - (medium) A click with no move since the compound arrived placed nothing, closed the panel and left the toolbar stale.
+  - A drag's release placed the compound.
+  - The pinned block left no room for the other tools in a very short editor.
+  - Scrolled tools' shadows showed in the column's right-hand padding.
+  - Keyboard focus could land on a tool under the pinned ones.
+  - No test covered the hidden scrollbar.
+  - The pressed stereocentre button was grey under the mouse.
+- Accepted limits:
+  - If a Ketcher dialog is open when the compound is put away (Esc closing the dialog, say), Ketcher ignores its Escape. The editor returns to select, but the toolbar keeps showing the tool from before Add until the student picks one.
+  - A drag already under way when the compound arrives (moving a fragment with the select tool) is cut off. The fragment stays where it was dragged to, but that move is not in the undo history.
+

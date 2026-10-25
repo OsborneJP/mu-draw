@@ -9,11 +9,15 @@ import { KETCHER_ROOT_NODE_CSS_SELECTOR } from 'ketcher-react';
 
 /** Ketcher's paste tool (ketcher-react), as far as this file uses it. */
 interface PasteTool {
+  action?: unknown; // the compound as shown under the mouse; none while it is hidden
+  mousedown(event: MouseEvent): void;
+  mousemove(event: MouseEvent): void;
   mouseup(event: MouseEvent): void;
   cancel(): void;
 }
 
 interface Tools {
+  render: { clientArea: HTMLElement };
   tool(): unknown;
   tool(name: 'paste', struct: Struct): PasteTool | null;
   tool(name: 'select'): unknown;
@@ -40,10 +44,11 @@ export async function placeInHand(
   const editor = ketcher.editor as unknown as Tools;
   const tool = editor.tool('paste', struct);
   if (!tool) throw new Error('Ketcher did not arm its paste tool');
-  // Ketcher shows it at once where the mouse last was on the canvas; the mouse is on the Add
-  // button. Shown only once the mouse is over the canvas, the drawing is never more than
-  // what is on it while the student is elsewhere (Export, Copy image, the next autosave).
-  tool.cancel();
+  // Ketcher shows it at once where the mouse last was. Over the canvas, that is where the
+  // mouse is now. Anywhere else (the Add button, say) it is hidden until the mouse comes over
+  // the canvas, so the drawing is never more than what is on it while the student is
+  // elsewhere (Export, Copy image, the next autosave).
+  if (!editor.render.clientArea.matches(':hover')) tool.cancel();
 
   let settle: (placed: boolean) => void = () => {};
   const done = new Promise<boolean>((resolve) => (settle = resolve));
@@ -55,8 +60,23 @@ export async function placeInHand(
     settle(placed);
   };
 
+  // A release is a click only after a press on the canvas with the compound in hand: the
+  // release that ends a drag begun before it arrived is not.
+  let pressed = false;
+  const mousedown = tool.mousedown.bind(tool);
+  tool.mousedown = (event) => {
+    pressed = true;
+    mousedown(event);
+  };
+
+  const mousemove = tool.mousemove.bind(tool);
   const mouseup = tool.mouseup.bind(tool);
   tool.mouseup = (event) => {
+    if (!pressed) return;
+    pressed = false;
+    // Nothing shown yet (a click with no move since it was hidden, a trackpad tap): show it
+    // at the click, so the click puts it down there.
+    if (!tool.action) mousemove(event);
     let changed = false;
     const notice = () => (changed = true);
     ketcher.changeEvent.add(notice);
@@ -65,8 +85,9 @@ export async function placeInHand(
     } finally {
       ketcher.changeEvent.remove(notice);
     }
-    if (!changed) return;
-    finish(true);
+    if (changed) finish(true);
+    else if (editor.tool() !== tool) finish(false); // Ketcher ended its tool, adding nothing
+    else return;
     queueMicrotask(backToSelection); // once Ketcher is done with this click
   };
 

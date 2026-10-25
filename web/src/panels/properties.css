@@ -106,7 +106,7 @@
   cursor: pointer;
 }
 
-.count-button:hover:not(:disabled) {
+.count-button:hover:not(:disabled, [aria-pressed='true']) {
   background: #f2f2f2;
 }
 

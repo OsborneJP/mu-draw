@@ -25,16 +25,27 @@
   scrollbar-width: none;
 }
 
-[data-testid='left-toolbar'] > [data-testid='left-toolbar-buttons'] > div:first-child {
-  position: sticky;
-  /* 1px above the top: Ketcher shows its up arrow only while these first tools are not
-     wholly in view, so once the column has scrolled, 1px of them is hidden. At top: 0 the
-     up arrow would never show. */
-  top: -1px;
-  z-index: 1;
-  /* Ketcher's gap below the group, as padding over its own background, so nothing scrolled
-     shows through around the tools. */
-  margin-bottom: 0;
-  padding-bottom: 6px;
-  background: rgb(252 252 252);
+/* Only while the column has room for more than them: in a very short editor (a small window,
+   the NMR preview docked) the whole column scrolls, as Ketcher has it, so every tool can be
+   reached. Ketcher's app grid is a size container; the column is 122px shorter than it, so
+   this leaves the other tools at least 100px. */
+@container (min-height: 330px) {
+  [data-testid='left-toolbar'] > [data-testid='left-toolbar-buttons'] {
+    /* Keyboard focus scrolls a tool out from under them. */
+    scroll-padding-top: 106px;
+  }
+
+  [data-testid='left-toolbar'] > [data-testid='left-toolbar-buttons'] > div:first-child {
+    position: sticky;
+    /* 1px above the top: Ketcher shows its up arrow only while these first tools are not
+       wholly in view, so once the column has scrolled, 1px of them is hidden. At top: 0 the
+       up arrow would never show. */
+    top: -1px;
+    z-index: 1;
+    /* Ketcher's gap below the group, and the column's padding on the right, covered with its
+       own background, so nothing scrolled shows through around the tools. */
+    margin: 0 -5px 0 0;
+    padding: 0 5px 6px 0;
+    background: rgb(252 252 252);
+  }
 }
