@@ -75,6 +75,7 @@ describe('Lipinski', () => {
     fragments: 1,
     centres: [],
     doubleBonds: [],
+    axis: false,
     groups: { kind: 'found', groups: [], problems: [] },
   });
 
@@ -104,6 +105,7 @@ describe('stereoisomers', () => {
       fragments: 1,
       centres: Array.from({ length: 60 }, () => element),
       doubleBonds: [{ atoms: [0, 1], defined: true }],
+      axis: true,
       groups: { kind: 'found', groups: [], problems: [] },
     });
     expect(values.stereo).toEqual({
@@ -111,6 +113,7 @@ describe('stereoisomers', () => {
       doubleBonds: 1,
       undefined: 60,
       maxStereoisomers: (2n ** 61n).toString(),
+      axis: true,
     });
   });
 });

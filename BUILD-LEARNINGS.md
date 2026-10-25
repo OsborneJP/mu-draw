@@ -986,8 +986,53 @@ Acceptance bar: docs/plans/dialogs-icon-offcampus.md.
 - **Public production.** `PRODUCTION_CAMPUS_ONLY = False` renders the production block with
   its campus rule commented out; the live vhost changes by those 5 lines (applied by Jeff).
   The naming API is public with it: anyone's lookups share the server's PubChem budget
-  (5 a second, 400 a minute), and heavy outside use would show students "Busy".- Live (2026-10-25, 2dfc6a8): the server rebooted after the apply script was prepared, and
+  (5 a second, 400 a minute), and heavy outside use would show students "Busy".
+- Live (2026-10-25, 2dfc6a8): the server rebooted after the apply script was prepared, and
   the reboot emptied /tmp, the scratchpad included. The script was recreated from the
   unchanged vhost (same checksum) and Jeff ran it. `--production` then passed the full
   check on the production build, 14 live checks and 85 browser tests against /draw/. Jeff
   opened /draw/ on his phone off campus.
+
+## Stereoisomer enumerator (version 2, 2026-10-25)
+
+Acceptance bar: docs/plans/v2-stereoisomers.md (its "After the first review" section lists
+what changed). Measured with RDKit.js 2026.9.1 and Python RDKit 2026.09.1.
+- RDKit.js has no EnumerateStereoisomers. Each setting is written into RDKit's JSON (atom
+  `stereo` cw/ccw, bond `stereo` cis/trans with `stereoAtoms`) and read back with `get_mol`.
+  Its JSON reader rejects whole-number coordinates (`0` for `0.0`), so they are written by hand.
+- Stereoisomers are told apart by InChI without coordinates. Canonical SMILES left
+  duplicates (myo-inositol), an RDKit SMILES round trip changed some stereoisomers, and
+  with coordinates InChI read E/Z from the layout. With coordinates it also gave
+  cyclooctatetraene's ring single bonds a parity, so a picture is checked by reading its
+  Molfile and taking the InChI of what RDKit read, without coordinates.
+- The elements come from the drawing with its stereo taken off: drawn (2R,4R), C3 of
+  pentane-2,3,4-triol is no stereocentre, yet it is one in the meso forms.
+- `get_stereo_tags` leaves out a double bond whose geometry isn't fixed (drawn crossed), and
+  one stereogenic only through the centres beside it (3-ethylidenepentane-2,4-diol). Open
+  double bonds are set to cis and RDKit asked again; the rest are tried against every
+  setting of the others (web/src/chem/stereoElements.ts). The properties panel had the
+  first miss too (379b64b); it now uses the same finder.
+- Python's FindPotentialStereo flags cumulated double bonds (allenes); RDKit.js doesn't, so
+  the generator leaves them out. Neither sees stereo at a bridgehead nitrogen (Tröger's
+  base); both vary the aziridine nitrogen, and InChI sees it.
+- Python's EnumerateStereoisomers (unique=False) gives cyclooctatetraene's 8 settings with
+  an even number of trans bonds twice each and none with an odd number. The generator now
+  writes every setting itself; RDKit's enumerator must agree everywhere else (a test).
+- Two of cyclooctatetraene's six (one or three E) have no flat drawing that RDKit reads back
+  as them: the panel lists them without a picture or Add, instead of failing.
+- Wedges: `get_svg_with_highlights` draws RDKit's own choice of wedge unless
+  `useMolBlockWedging` is set. Indigo rejects a wedge and a hash both pointing out of one
+  centre as two wedges, so the student's own marks are kept (or all swapped) per centre,
+  and RDKit's are taken off that centre first.
+- Labels: RDKit draws atom symbols as glyph outlines (`path class='atom-N'`) and bonds as
+  `path class='bond-N atom-a atom-b'`, so a label goes in the first spot round its atom's
+  highlight that covers neither; at the atom itself it covered S in the sulfoxide.
+- 3D embedding (only to record which bridged stereoisomers exist) needs a cap: RDKit's own
+  tryEmbedding took 75 s on cocaine; one seeded ETKDG with 5 iterations gives the same sets.
+- Vitest 5 caches transformed test files on disk (`node_modules/.vitest-cache`, on by
+  default), keyed on the test file's own text, so an `import.meta.glob` kept its file list:
+  six new fixture drawings were "missing" until the cache was turned off (vitest.config.ts,
+  config/vitest.test.ts).
+- A commit was once chained after a grep of check.sh's log that matched "CHECK FAILED", so
+  it ran although the check had failed; it was undone. The check's exit status is now
+  read in its own command before any commit.

@@ -19,6 +19,7 @@ function result(
     fragments: 1,
     centres: centres.map((i) => ({ atoms: [i], defined: true })),
     doubleBonds: [],
+    axis: false,
     groups,
   };
 }

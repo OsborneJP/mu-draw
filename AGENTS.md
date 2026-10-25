@@ -67,10 +67,10 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   ready Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts (Add's paste tool).
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
-  overlap rule), hose.ts (symmetry, HOSE codes), carbonTable.ts (¹³C table), nmr.ts (peaks).
-- `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel (+ FunctionalGroups,
-  NmrButton), Get name, Name to structure (naming.ts: shared state; NamePanel floats over
-  `.canvas-area`), NMR preview (nmr.ts state, nmrStore.ts wiring, NmrPanel docks below).
+  overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
+- `web/src/panels/`: Export, Copy image, properties panel, Get name and Name to structure
+  (naming.ts; NamePanel floats), NMR preview and stereoisomers (nmr.ts/stereo.ts state, *Store.ts
+  wiring, panelWorker.ts their RDKit copy, Docked.tsx below the canvas, one open at a time).
 - `web/src/api.ts`: calls to `<base>api/*` (name, structure), with the 8 s deadline.
 - `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
@@ -138,7 +138,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   Ketcher's toolbar, so the app's header clips it; use `generateImage`.
 - RDKit.js needs `'unsafe-eval'` (embind's `new Function`): it runs only in rdkit/worker.js,
   never on the page. It defaults to legacy stereo perception (`configureRdkit` turns it off).
-- `tsc --noEmit` on the solution-style tsconfig checks zero files; use `tsc -b`.
+- `tsc --noEmit` checks zero files here (use `tsc -b`). Vitest 5's disk cache froze globs (off).
 - Playwright's default headless shell always reports a page as installable; it never
   reports /favicon.ico requests; the `controllerchange` wait hangs in prompt mode;
   `navigator.serviceWorker.ready` never rejects (race it against `redundant`).

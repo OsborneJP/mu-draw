@@ -18,6 +18,14 @@ JUDGED = gen.FIXTURES / "stereoisomers_judged.json"
 REVIEWED = {
     "myo-inositol": "RDKit's canonical SMILES leaves duplicates in a highly symmetric ring",
     "2,3,4-pentanetriol": "SMILES keeps a setting at C3 even where C3 is not a stereocentre",
+    "3-ethylidenepentane-2,4-diol": "SMILES keeps E/Z on the double bond where its two sides are"
+    " the same (the R,R and S,S forms)",
+}
+# Where RDKit's own EnumerateStereoisomers (unique=False) leaves settings out, so the
+# stereoisomers it gives differ from every setting's. Any other difference fails.
+ENUMERATOR_MISSES = {
+    "cyclooctatetraene": "it gives each setting with an even number of trans bonds twice and"
+    " none with an odd number (RDKit 2026.09.1)",
 }
 COMPARED = ("outcome", "count", "pairs", "achiral", "meso", "matches", "notes", "exist")
 
@@ -75,6 +83,18 @@ def unexplained_merges(compounds: list[dict], reviewed: dict[str, str]) -> list[
     ]
 
 
+def enumerator_differences(generated: dict[str, str], compounds: list[dict], misses: dict) -> list:
+    out = []
+    for compound in compounds:
+        if compound["outcome"] not in ("listed", "counted") or compound["name"] in misses:
+            continue
+        drawing = Chem.MolFromMolBlock(generated[compound["file"]], removeHs=False)
+        classes, _ = gen.enumerate_classes(drawing, gen.potential(drawing))
+        if set(classes) != gen.rdkit_enumerator_classes(drawing):
+            out.append(compound["name"])
+    return out
+
+
 def test_generated_files_match_committed(generated):
     for rel, text in generated.items():
         assert (gen.FIXTURES / rel).read_text(encoding="utf-8") == text, rel
@@ -89,7 +109,8 @@ def test_made_with_the_pinned_rdkit_and_its_settings(generated):
     data = json.loads(generated[gen.EXPECTED_FILE])
     assert data["rdkit_version"] == locked_version("rdkit")
     assert data["settings"]["legacy_stereo_perception"] is False
-    assert data["limits"] == gen.LIMITS
+    # Decision 7, as Jeff approved it; the browser's limits are checked the same way.
+    assert data["limits"] == {"elements": 8, "drawn": 32}
 
 
 def test_generated_answers_agree_with_the_judgement(compounds):
@@ -143,3 +164,29 @@ def test_every_listed_stereoisomer_has_its_mirror_and_is_numbered_in_order(compo
         matched = {group(s) for s in listed if s["matches"]}
         unmatched = {group(s) for s in listed} - matched
         assert not matched or not unmatched or max(matched) < min(unmatched), compound["name"]
+
+
+def test_rdkit_enumerator_gives_the_same_stereoisomers_except_where_reviewed(generated, compounds):
+    assert enumerator_differences(generated, compounds, ENUMERATOR_MISSES) == []
+    for name in ENUMERATOR_MISSES:
+        compound = next(c for c in compounds if c["name"] == name)
+        drawing = Chem.MolFromMolBlock(generated[compound["file"]], removeHs=False)
+        classes, _ = gen.enumerate_classes(drawing, gen.potential(drawing))
+        assert gen.rdkit_enumerator_classes(drawing) < set(classes), "it only leaves some out"
+
+
+def test_a_difference_from_rdkit_enumerator_is_caught(generated, compounds):
+    assert enumerator_differences(generated, compounds, {}) == list(ENUMERATOR_MISSES)
+
+
+def test_any_stereoisomer_drawn_gives_the_same_stereoisomers(generated, compounds):
+    """Whatever the drawing defines, the same stereoisomers are listed: an element that
+    depends on others (C3 of pentane-2,3,4-triol) is still varied when they are defined."""
+    for compound in compounds:
+        if compound["outcome"] != "listed":
+            continue
+        drawing = Chem.MolFromMolBlock(generated[compound["file"]], removeHs=False)
+        classes, _ = gen.enumerate_classes(drawing, gen.potential(drawing))
+        for key, members in classes.items():
+            again, _ = gen.enumerate_classes(members[0], gen.potential(members[0]))
+            assert set(again) == set(classes), (compound["name"], Chem.InchiToInchiKey(key))

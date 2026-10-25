@@ -37,7 +37,7 @@ export interface PanelValues {
   logp: string;
   lipinski: { rule: LipinskiRule; label: string; value: string; pass: boolean }[];
   lipinskiSummary: string;
-  stereo: { centres: number; doubleBonds: number; undefined: number; maxStereoisomers: string };
+  stereo: { centres: number; doubleBonds: number; undefined: number; maxStereoisomers: string; axis: boolean };
 }
 
 /** Rounded for display; a value that rounds to zero has no sign (ethanol's logP). */
@@ -115,6 +115,7 @@ export function panelValues(c: Computed): PanelValues {
       undefined: elements.filter((e) => !e.defined).length,
       // Exact, like Python's 2**n: a drawing can have more than 53 stereo elements.
       maxStereoisomers: (2n ** BigInt(elements.length)).toString(),
+      axis: c.axis,
     },
   };
 }

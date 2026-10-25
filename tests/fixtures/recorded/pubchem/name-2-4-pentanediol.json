@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C4-pentanediol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T20:34:40Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 12262,
+          "SMILES": "CC(CC(C)O)O",
+          "Title": "2,4-Pentanediol"
+        }
+      ]
+    }
+  }
+}

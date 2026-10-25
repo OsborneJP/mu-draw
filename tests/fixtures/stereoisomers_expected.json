@@ -1278,7 +1278,10 @@
       "name": "Troger's base",
       "file": "stereoisomers/troger-s-base.mol",
       "elements": 0,
-      "outcome": "no-elements"
+      "outcome": "no-elements",
+      "notes": [
+        "bridged"
+      ]
     },
     {
       "name": "aldehydo-D-glucose",
@@ -1599,7 +1602,10 @@
       "name": "2,3-pentadiene",
       "file": "stereoisomers/2-3-pentadiene.mol",
       "elements": 0,
-      "outcome": "no-elements"
+      "outcome": "no-elements",
+      "notes": [
+        "axial-planar"
+      ]
     },
     {
       "name": "trans-cyclooctene",
@@ -2061,20 +2067,288 @@
       "file": "stereoisomers/cholesterol.mol",
       "elements": 8,
       "outcome": "counted",
+      "notes": [],
       "count": 256,
-      "notes": []
+      "smiles_unique": 256
     },
     {
       "name": "erythromycin",
       "file": "stereoisomers/erythromycin.mol",
       "elements": 18,
-      "outcome": "too-many"
+      "outcome": "too-many",
+      "notes": []
     },
     {
       "name": "1,1'-bi-2-naphthol",
       "file": "stereoisomers/1-1-bi-2-naphthol.mol",
       "elements": 0,
-      "outcome": "no-elements"
+      "outcome": "no-elements",
+      "notes": [
+        "axial-planar"
+      ]
+    },
+    {
+      "name": "hepta-2,5-dien-4-ol",
+      "file": "stereoisomers/hepta-2-5-dien-4-ol.mol",
+      "elements": 3,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "WHVATOGVKXQKTQ-GGWOSOGESA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "1-2": "E",
+              "4-5": "E"
+            }
+          },
+          "relation": {
+            "kind": "meso"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "SZFNFTZCDMWDTM-WEUBHIEESA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "WHVATOGVKXQKTQ-GLIMQPGKSA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "1-2": "Z",
+              "4-5": "Z"
+            }
+          },
+          "relation": {
+            "kind": "meso"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "SZFNFTZCDMWDTM-VIOUERSGSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "WHVATOGVKXQKTQ-QOHNQTEWSA-N",
+          "labels": {
+            "atoms": {
+              "3": "R"
+            },
+            "bonds": {
+              "1-2": "Z",
+              "4-5": "E"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 4
+          },
+          "matches": false,
+          "with_drawing_inchikey": "SZFNFTZCDMWDTM-FHKPHIJHSA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "WHVATOGVKXQKTQ-URLPKOAZSA-N",
+          "labels": {
+            "atoms": {
+              "3": "S"
+            },
+            "bonds": {
+              "1-2": "E",
+              "4-5": "Z"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "SZFNFTZCDMWDTM-WHNABXCZSA-N"
+        }
+      ],
+      "count": 4,
+      "smiles_unique": 4
+    },
+    {
+      "name": "2,4-pentanediol",
+      "file": "stereoisomers/2-4-pentanediol.mol",
+      "elements": 2,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "GTCCGKPBSJZVRZ-RFZPGFLSSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "3": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VTCJVXMPYJTDAU-TYSVMGFPSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "GTCCGKPBSJZVRZ-WHFBIAKZSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VTCJVXMPYJTDAU-FHAQVOQBSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "GTCCGKPBSJZVRZ-SYDPRGILSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "meso"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VTCJVXMPYJTDAU-JEVYUYNZSA-N"
+        }
+      ],
+      "count": 3,
+      "smiles_unique": 3
+    },
+    {
+      "name": "cyclooctatetraene",
+      "file": "stereoisomers/cyclooctatetraene.mol",
+      "elements": 4,
+      "outcome": "listed",
+      "notes": [
+        "axial-planar"
+      ],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "KDUIUFJBNGTBMD-DLMDZQPMSA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "0-1": "Z",
+              "2-3": "Z",
+              "4-5": "Z",
+              "6-7": "Z"
+            }
+          },
+          "relation": {
+            "kind": "unjudged"
+          },
+          "matches": true,
+          "with_drawing_inchikey": "AVYBFUITAKQWNM-XWPSDIQNSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "KDUIUFJBNGTBMD-CNODTJPTSA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "0-1": "E",
+              "2-3": "Z",
+              "4-5": "E",
+              "6-7": "Z"
+            }
+          },
+          "relation": {
+            "kind": "unjudged"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "AVYBFUITAKQWNM-OOZYYOQQSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "KDUIUFJBNGTBMD-FXPPOMFJSA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "0-1": "E",
+              "2-3": "Z",
+              "4-5": "Z",
+              "6-7": "Z"
+            }
+          },
+          "relation": {
+            "kind": "unjudged"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "AVYBFUITAKQWNM-JYTVVMLFSA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "KDUIUFJBNGTBMD-KUQSFGJJSA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "0-1": "E",
+              "2-3": "E",
+              "4-5": "E",
+              "6-7": "Z"
+            }
+          },
+          "relation": {
+            "kind": "unjudged"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "AVYBFUITAKQWNM-SGBWMYDMSA-N"
+        },
+        {
+          "number": 5,
+          "inchikey": "KDUIUFJBNGTBMD-NTWHFSHASA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "0-1": "E",
+              "2-3": "E",
+              "4-5": "Z",
+              "6-7": "Z"
+            }
+          },
+          "relation": {
+            "kind": "unjudged"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "AVYBFUITAKQWNM-YRIPGLBXSA-N"
+        },
+        {
+          "number": 6,
+          "inchikey": "KDUIUFJBNGTBMD-UVYXMGIDSA-N",
+          "labels": {
+            "atoms": {},
+            "bonds": {
+              "0-1": "E",
+              "2-3": "E",
+              "4-5": "E",
+              "6-7": "E"
+            }
+          },
+          "relation": {
+            "kind": "unjudged"
+          },
+          "matches": false,
+          "with_drawing_inchikey": "AVYBFUITAKQWNM-HSWRJHRVSA-N"
+        }
+      ],
+      "count": 6,
+      "smiles_unique": 4
     },
     {
       "name": "L-threonine, one centre undefined",
@@ -2287,6 +2561,351 @@
       ],
       "count": 2,
       "smiles_unique": 2
+    },
+    {
+      "name": "3-ethylidenepentane-2,4-diol",
+      "file": "stereoisomers/3-ethylidenepentane-2-4-diol.mol",
+      "elements": 3,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "XZYDUSBDPFXZBQ-CFDJTYOJSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "R"
+            },
+            "bonds": {
+              "2-7": "z"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": false,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-NELBXXDUSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "XZYDUSBDPFXZBQ-CSPWTJDYSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "R"
+            },
+            "bonds": {
+              "2-7": "e"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-WHNMMESCSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "XZYDUSBDPFXZBQ-PHDIDXHHSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "3": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 4
+          },
+          "matches": false,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-KGZKBUQUSA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "XZYDUSBDPFXZBQ-WDSKDSINSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-GEMLJDPKSA-N"
+        }
+      ],
+      "count": 4,
+      "smiles_unique": 6
+    },
+    {
+      "name": "L-threonine, wedge and hash with H drawn",
+      "file": "stereoisomers/l-threonine-wedge-and-hash-with-h-drawn.mol",
+      "elements": 2,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "AYFVYJQAPQTCCC-GBXIJSLDSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": true,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-AAZKHNGSSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "AYFVYJQAPQTCCC-STHAYSLISA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "2": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-GKOIIHDWSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "AYFVYJQAPQTCCC-HRFVKAFMSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 4
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-PEVKHWPISA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "AYFVYJQAPQTCCC-PWNYCUMCSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "2": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-SYGOMXJDSA-N"
+        }
+      ],
+      "count": 4,
+      "smiles_unique": 4
+    },
+    {
+      "name": "(R)-2-butanol, wedge and hash with H drawn",
+      "file": "stereoisomers/r-2-butanol-wedge-and-hash-with-h-drawn.mol",
+      "elements": 1,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "BTANRVKWQNVYAZ-SCSAIBSYSA-N",
+          "labels": {
+            "atoms": {
+              "2": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": true,
+          "with_drawing_inchikey": "GKMQWTVAAMITHR-DGPROHSZSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "BTANRVKWQNVYAZ-BYPYZUCNSA-N",
+          "labels": {
+            "atoms": {
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "GKMQWTVAAMITHR-KRSQWWHXSA-N"
+        }
+      ],
+      "count": 2,
+      "smiles_unique": 2
+    },
+    {
+      "name": "L-threonine, wedges on other bonds",
+      "file": "stereoisomers/l-threonine-wedges-on-other-bonds.mol",
+      "elements": 2,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "AYFVYJQAPQTCCC-GBXIJSLDSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": true,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-AAZKHNGSSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "AYFVYJQAPQTCCC-STHAYSLISA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "2": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-GKOIIHDWSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "AYFVYJQAPQTCCC-HRFVKAFMSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 4
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-PEVKHWPISA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "AYFVYJQAPQTCCC-PWNYCUMCSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "2": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "VUUZLZXGRRDWBP-SYGOMXJDSA-N"
+        }
+      ],
+      "count": 4,
+      "smiles_unique": 4
+    },
+    {
+      "name": "2,3-dibromobutane, the meso form",
+      "file": "stereoisomers/2-3-dibromobutane-the-meso-form.mol",
+      "elements": 2,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "BXXWFOGWXLJPPA-ZXZARUISSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "meso"
+          },
+          "matches": true,
+          "with_drawing_inchikey": "UKVAFHFOIVKUGR-IZAMPWMMSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "BXXWFOGWXLJPPA-IMJSIDKUSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "2": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "UKVAFHFOIVKUGR-PDAUFWRXSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "BXXWFOGWXLJPPA-QWWZWVQMSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "2": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": false,
+          "with_drawing_inchikey": "UKVAFHFOIVKUGR-NBSXXGRVSA-N"
+        }
+      ],
+      "count": 3,
+      "smiles_unique": 3
     }
   ]
 }

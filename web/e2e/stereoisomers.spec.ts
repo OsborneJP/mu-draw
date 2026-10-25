@@ -53,7 +53,7 @@ async function show(page: Page): Promise<void> {
   await expect(page.getByTestId('stereo-panel')).toHaveAttribute('data-state', 'ready');
 }
 
-/** The cards as the panel shows them. */
+/** The cards as the panel shows them. A card that can't be drawn flat has no labels. */
 function cards(page: Page) {
   return page.getByTestId('stereo-card').evaluateAll((items) =>
     items.map((card) => {
@@ -71,10 +71,32 @@ function cards(page: Page) {
         labels,
         relation: of === null ? { kind } : { kind, of: Number(of) },
         matches: card.getAttribute('data-matches') === 'true',
+        drawn: card.getAttribute('data-drawn') === 'true',
       };
     }),
   );
 }
+
+/** What each card says, as a student reads it. */
+function cardText(page: Page) {
+  return page.getByTestId('stereo-card').evaluateAll((items) =>
+    items.map((card) => ({
+      match: card.querySelector('.stereo-match')?.textContent ?? null,
+      relation: card.querySelector('.stereo-relation')!.textContent,
+      add: card.querySelector('[data-testid="stereo-add"]')?.textContent ?? null,
+      undrawable: card.querySelector('[data-testid="stereo-undrawable"]')?.textContent ?? null,
+    })),
+  );
+}
+
+/** The numbers of the cards in each group: an enantiomer pair shares one, so it wraps together. */
+function groups(page: Page) {
+  return page.getByTestId('stereo-group').evaluateAll((items) =>
+    items.map((group) => [...group.querySelectorAll('[data-testid="stereo-card"]')].map((c) => Number(c.getAttribute('data-number')))),
+  );
+}
+
+const SAID = { achiral: 'Achiral', meso: 'Meso', unjudged: '' } as Record<string, string>;
 
 function notesShown(page: Page) {
   return page.getByTestId('stereo-note').evaluateAll((ps) => ps.map((p) => p.getAttribute('data-note')));
@@ -96,9 +118,33 @@ test('every test drawing: the stereoisomers RDKit lists, in order, labelled, pai
       relation,
       matches,
     }));
-    expect(await cards(page), c.name).toEqual(expected);
+    const shown = await cards(page);
+    // Every label as the fixture has it, on each card that has a picture.
+    expect(shown.map(({ drawn, labels, ...rest }) => ({ ...rest, labels: drawn ? labels : null })), c.name).toEqual(
+      expected.map((e, i) => ({ ...e, labels: shown[i]?.drawn ? e.labels : null })),
+    );
+    expect(shown.filter((s) => !s.drawn).length === 0 || c.notes!.includes('axial-planar'), c.name).toBe(true);
+    // What the student reads on each card.
+    expect(await cardText(page), c.name).toEqual(
+      expected.map((e, i) => ({
+        match: e.matches ? 'Matches your drawing' : null,
+        relation: e.relation.kind === 'enantiomer' ? `Enantiomer of ${e.relation.of}` : SAID[e.relation.kind],
+        add: shown[i].drawn ? 'Add' : null,
+        undrawable: shown[i].drawn ? null : 'RDKit can’t draw this one flat as itself.',
+      })),
+    );
+    await expect(page.getByTestId('stereo-summary')).toHaveText(
+      expected.length === 1 ? '1 stereoisomer.' : `${expected.length} stereoisomers. Any two that are not enantiomers are diastereomers.`,
+    );
+    // Each enantiomer pair in one group, everything else alone.
+    expect(await groups(page), c.name).toEqual(
+      expected.flatMap((e) =>
+        e.relation.kind !== 'enantiomer' ? [[e.number]] : e.relation.of! > e.number ? [[e.number, e.relation.of!]] : [],
+      ),
+    );
     const pseudo = expected.some((s) => Object.values(s.labels.atoms).some((l) => l === 'r' || l === 's'));
     expect(await notesShown(page), c.name).toEqual([...c.notes!, ...(pseudo ? ['pseudo-asymmetric'] : [])]);
+    for (const note of await page.getByTestId('stereo-note').all()) await expect(note).toBeVisible();
     // Where RDKit can't judge chirality, nothing is called achiral or meso.
     if (c.notes!.includes('axial-planar')) {
       await expect(page.getByTestId('stereo-panel').getByText(/^(Achiral|Meso)$/)).toHaveCount(0);
@@ -121,20 +167,33 @@ test('too many to draw, too many to list, and nothing to list', async ({ app }) 
   await expect(page.getByTestId('stereo-message')).toHaveText(
     `${tooMany.elements} stereocentres and stereogenic double bonds: too many to list here.`,
   );
-  for (const none of COMPOUNDS.filter((c) => c.outcome === 'no-elements')) {
-    await load(page, none.name);
-    await expect(page.getByTestId('stereo-show'), none.name).toHaveCount(0);
+  await expect(page.getByTestId('stereo-note')).toHaveCount(0);
+  // Nothing to list: no button, unless there may be an axis RDKit can't judge, when the panel
+  // opens to say so (bar B.9).
+  const none = COMPOUNDS.filter((c) => c.outcome === 'no-elements');
+  expect(none.some((c) => c.notes!.includes('axial-planar')) && none.some((c) => !c.notes!.includes('axial-planar'))).toBe(true);
+  for (const c of none) {
+    await load(page, c.name);
+    if (!c.notes!.includes('axial-planar')) {
+      await expect(page.getByTestId('stereo-show'), c.name).toHaveCount(0);
+      continue;
+    }
+    await show(page);
+    await expect(page.getByTestId('stereo-message')).toHaveText('RDKit finds no stereocentres or stereogenic double bonds in this structure.');
+    expect(await notesShown(page), c.name).toEqual(c.notes);
+    await expect(page.getByTestId('stereo-note')).toBeVisible();
   }
 });
 
-test('more than one structure: one at a time', async ({ app }) => {
+test('more than one structure: no button, and a note saying one at a time', async ({ app }) => {
   const { page } = app;
   await openEditor(app);
   await load(page, 'L-threonine');
+  await expect(page.getByTestId('stereo-show')).toBeVisible();
+  await expect(page.getByTestId('stereo-one-at-a-time')).toHaveCount(0);
   await page.evaluate((m) => window.ketcher!.addFragment(m), fixture(compound('(E)-cinnamic acid').file));
-  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'ready');
-  await page.getByTestId('stereo-show').click();
-  await expect(page.getByTestId('stereo-message')).toHaveText('Stereoisomers are listed for one structure at a time.');
+  await expect(page.getByTestId('stereo-one-at-a-time')).toHaveText('Stereoisomers are listed for one structure at a time.');
+  await expect(page.getByTestId('stereo-show')).toHaveCount(0);
 });
 
 /** Click on the canvas away from the drawing, after a move there (Ketcher's paste tool shows
@@ -161,6 +220,7 @@ test('Add places a stereoisomer beside the drawing, keeping its stereo, and the 
   const card = page.locator(`[data-testid="stereo-card"][data-number="${mirror.number}"]`);
   await card.getByTestId('stereo-add').click();
   await expect(card).toHaveAttribute('data-in-hand', 'true');
+  await expect(card.getByTestId('stereo-add')).toHaveText('In hand');
   await clickOnCanvas(page, 0.15);
   await expect(card).toHaveAttribute('data-in-hand', 'false');
   expect(await fragmentCount(page)).toBe(2);

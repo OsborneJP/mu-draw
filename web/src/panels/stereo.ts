@@ -98,12 +98,12 @@ export function createStereo(read: () => Drawing, send: (request: StereoRequest)
     },
     add(number) {
       if (state.kind !== 'ready' || state.result.outcome !== 'listed') return Promise.resolve();
-      const isomer = state.result.stereoisomers.find((s) => s.number === number);
-      if (!isomer) return Promise.resolve();
+      const molfile = state.result.stereoisomers.find((s) => s.number === number)?.molfile;
+      if (!molfile) return Promise.resolve(); // none, or one that can't be drawn flat
       putAway();
       const mine = adding;
       set({ ...state, inHand: number });
-      return place(isomer.molfile, ownChange).then((placement) => {
+      return place(molfile, ownChange).then((placement) => {
         if (mine !== adding) {
           placement.cancel();
           return;

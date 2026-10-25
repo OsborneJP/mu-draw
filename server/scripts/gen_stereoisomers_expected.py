@@ -8,12 +8,17 @@ Reads tests/fixtures/stereoisomer_compounds.csv (SMILES from PubChem) and writes
   tests/fixtures/stereoisomers_expected.json what the enumerator must answer for each
 
 This is the reference the browser's enumerator (web/src/chem/stereoisomers.ts, RDKit.js)
-is tested against: Python RDKit's own EnumerateStereoisomers, varying every potential stereo
-element (onlyUnassigned=False). Its unique=True compares SMILES, which an RDKit SMILES round
-trip can turn into a different stereoisomer, so it runs with unique=False and two
-stereoisomers are the same when their InChIs, taken without coordinates, are equal
-(docs/plans/v2-stereoisomers.md). The SMILES-unique count is kept too: the tests list the
-compounds where the two differ, with the reason.
+is tested against. Python RDKit's FindPotentialStereo finds the stereo elements of the
+drawing with its stereo taken off, so that an element whose stereogenicity depends on others
+the drawing defines is still varied (pentane-2,3,4-triol drawn (2R,4R) still has C3). Every
+setting of those elements is written into the molecule here, and two settings are the same
+stereoisomer when their InChIs, taken without coordinates, are equal: canonical SMILES keeps
+some apart that are the same (the SMILES-unique count is kept too, and the tests list the
+compounds where the two differ, with the reason). RDKit's own EnumerateStereoisomers
+(unique=False) must give the same stereoisomers wherever it gives every setting: it doesn't
+for cyclooctatetraene, where it gives the settings with an even number of trans bonds twice
+each and none with an odd number (measured, RDKit 2026.09.1), so tests list those compounds
+too (docs/plans/v2-stereoisomers.md).
 
 The counts and verdicts a chemist expects are in tests/fixtures/stereoisomers_judged.json,
 written by judgement, never generated; tests/test_stereoisomer_fixtures.py compares this
@@ -22,6 +27,7 @@ output with it, and regenerates it to compare bytes.
 
 from __future__ import annotations
 
+import itertools
 import json
 
 import rdkit
@@ -43,6 +49,19 @@ UNDEFINED_CENTRE = ("L-threonine, one centre undefined", "L-threonine")
 RACEMIC = ("(R)-2-butanol, racemic", "(R)-2-butanol")
 # An axis RDKit can't see beside a stereocentre it can, so the panel has a list to note it on.
 JOINED = (("2,3-pentadiene", "(R)-2-butanol"), ("1,1'-bi-2-naphthol", "(R)-2-butanol"))
+# A double bond stereogenic only through the centres beside it: =CH-CH3 put on the CH2 of
+# pentane-2,4-diol (3-ethylidenepentane-2,4-diol; not in PubChem).
+ETHYLIDENE = ("3-ethylidenepentane-2,4-diol", "2,4-pentanediol")
+# Drawings wedged the way students draw, not the way RDKit would: a wedge and a hash at each
+# centre with its H drawn, and single wedges on other bonds than RDKit's choice.
+TEXTBOOK = (
+    ("L-threonine, wedge and hash with H drawn", "L-threonine"),
+    ("(R)-2-butanol, wedge and hash with H drawn", "(R)-2-butanol"),
+)
+OTHER_WEDGES = ("L-threonine, wedges on other bonds", "L-threonine")
+# A meso form drawn as the setting the smallest-signature rule would not pick, so the panel
+# must draw the stereoisomer the student drew as they drew it, not as its other setting.
+MESO = ("2,3-dibromobutane, the meso form", "2,3-dibromobutane")
 # 3D embedding, only to record which listed stereoisomers of a bridged compound can exist.
 EMBED_SEED = 0xF00D
 EMBED_ATTEMPTS = 5
@@ -71,10 +90,22 @@ def cumulated(bond: Chem.Bond) -> bool:
     )
 
 
+def stripped(mol: Chem.Mol) -> Chem.Mol:
+    """The drawing with no stereo and no coordinates, so nothing it defines hides an element
+    that depends on it, and no geometry is read from the layout."""
+    copy = bare(mol)
+    for atom in copy.GetAtoms():
+        atom.SetChiralTag(Chem.ChiralType.CHI_UNSPECIFIED)
+    for bond in copy.GetBonds():
+        bond.SetStereo(Chem.BondStereo.STEREONONE)
+        bond.SetBondDir(Chem.BondDir.NONE)
+    return copy
+
+
 def potential(mol: Chem.Mol) -> list:
-    """The potential stereo elements, as RDKit.js's get_stereo_tags lists them: Python's
-    FindPotentialStereo also flags cumulated double bonds, which the browser can't vary."""
-    found = Chem.FindPotentialStereo(Chem.Mol(mol), cleanIt=True, flagPossible=True)
+    """The potential stereo elements of the stereo-free drawing; Python's FindPotentialStereo
+    also flags cumulated double bonds, which the browser can't vary, so those are left out."""
+    found = Chem.FindPotentialStereo(stripped(mol), cleanIt=True, flagPossible=True)
     return [
         e
         for e in found
@@ -164,13 +195,10 @@ def bridged(mol: Chem.Mol) -> bool:
     return any(len(a & b) >= 3 for i, a in enumerate(rings) for b in rings[i + 1 :])
 
 
-# An axis between two aromatic rings with a substituent beside it on each: X-a:a-a:a-Y, the
-# bond in the middle outside any ring. The browser matches the same SMARTS.
-BIARYL_AXIS = Chem.MolFromSmarts("[!#1]!@a:a!@a:a!@[!#1]")
-
-
-def biaryl_axis(mol: Chem.Mol) -> bool:
-    return mol.HasSubstructMatch(BIARYL_AXIS)
+# An axis RDKit can't judge: an allene (C=C=C; not S(=O)=O, azides or ketenes), or one
+# between two aromatic rings with a substituent beside it on each (X-a:a-a:a-Y, the middle
+# bond outside any ring). The browser matches the same SMARTS.
+AXES = [Chem.MolFromSmarts("C=C=C"), Chem.MolFromSmarts("[!#1]!@a:a!@a:a!@[!#1]")]
 
 
 def notes(mol: Chem.Mol, elements: list) -> list[str]:
@@ -178,26 +206,64 @@ def notes(mol: Chem.Mol, elements: list) -> list[str]:
     found = []
     if bridged(mol):
         found.append("bridged")
-    allene = any(cumulated(b) for b in mol.GetBonds())
     ring_double = any(
         e.type == Chem.StereoType.Bond_Double and mol.GetBondWithIdx(e.centeredOn).IsInRing()
         for e in elements
     )
-    if allene or ring_double or biaryl_axis(mol):
+    if ring_double or any(mol.HasSubstructMatch(axis) for axis in AXES):
         found.append("axial-planar")
     return found
 
 
+def other_neighbour(mol: Chem.Mol, end: int, not_: int) -> int:
+    return next(n.GetIdx() for n in mol.GetAtomWithIdx(end).GetNeighbors() if n.GetIdx() != not_)
+
+
+def settings(drawing: Chem.Mol, elements: list) -> list[Chem.Mol]:
+    """The stereo-free drawing with every setting of its stereo elements written in: each
+    centre CW or CCW, each double bond cis or trans to the first other neighbour at each end."""
+    varied = {Chem.StereoType.Atom_Tetrahedral, Chem.StereoType.Bond_Double}
+    kinds = {e.type for e in elements} - varied
+    if kinds:
+        raise ValueError(f"stereo elements the browser can't vary: {sorted(map(str, kinds))}")
+    centres = sorted(e.centeredOn for e in elements if e.type == Chem.StereoType.Atom_Tetrahedral)
+    doubles = sorted(e.centeredOn for e in elements if e.type == Chem.StereoType.Bond_Double)
+    base = stripped(drawing)
+    out = []
+    for bits in itertools.product((0, 1), repeat=len(centres) + len(doubles)):
+        mol = Chem.RWMol(base)
+        for atom, bit in zip(centres, bits[: len(centres)], strict=True):
+            mol.GetAtomWithIdx(atom).SetChiralTag(TETRAHEDRAL[bit])
+        for index, bit in zip(doubles, bits[len(centres) :], strict=True):
+            bond = mol.GetBondWithIdx(index)
+            begin, end = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+            bond.SetStereoAtoms(other_neighbour(mol, begin, end), other_neighbour(mol, end, begin))
+            bond.SetStereo(Chem.BondStereo.STEREOCIS if bit else Chem.BondStereo.STEREOTRANS)
+        out.append(mol.GetMol())
+    return out
+
+
 def enumerate_classes(drawing: Chem.Mol, elements: list) -> tuple[dict[str, list[Chem.Mol]], int]:
-    """Every combination, grouped by coordinate-free InChI; and the SMILES-unique count."""
-    options = StereoEnumerationOptions(onlyUnassigned=False, unique=False)
+    """Every setting, grouped by coordinate-free InChI; and the SMILES-unique count."""
     classes: dict[str, list[Chem.Mol]] = {}
     smiles = set()
-    for found in EnumerateStereoisomers(Chem.Mol(drawing), options=options):
-        combination = without_cumulated_stereo(found)
+    for combination in settings(drawing, elements):
         classes.setdefault(inchi(combination), []).append(combination)
-        smiles.add(Chem.MolToSmiles(bare(combination)))
+        # As EnumerateStereoisomers does before its SMILES: settings on atoms and bonds that
+        # are not stereo in this combination are taken off.
+        cleaned = Chem.Mol(combination)
+        Chem.AssignStereochemistry(cleaned, cleanIt=True, force=True)
+        smiles.add(Chem.MolToSmiles(cleaned))
     return classes, len(smiles)
+
+
+def rdkit_enumerator_classes(drawing: Chem.Mol) -> set[str]:
+    """The stereoisomers RDKit's own EnumerateStereoisomers gives, by coordinate-free InChI."""
+    options = StereoEnumerationOptions(onlyUnassigned=False, unique=False)
+    return {
+        inchi(without_cumulated_stereo(found))
+        for found in EnumerateStereoisomers(stripped(drawing), options=options)
+    }
 
 
 def embedded(drawing: Chem.Mol, elements: list) -> list[str]:
@@ -221,15 +287,18 @@ def listing(drawing: Chem.Mol, elements: list, notes_: list[str]) -> dict[str, o
     if len(classes) > LIMITS["drawn"]:
         return {"count": len(classes), "smiles_unique": smiles_unique}
     defined, racemic = defines_stereo(drawing), is_racemic(drawing)
+    agreeing = {
+        key: [m for m in members if matches_drawing(drawing, m)] if defined else []
+        for key, members in classes.items()
+    }
+    # A stereoisomer the drawing matches is shown as drawn, from the combination that agrees
+    # with it; any other by the smallest signature.
     reps = {
-        key: min(members, key=lambda m: signature(m, elements)) for key, members in classes.items()
+        key: min(agreeing[key] or members, key=lambda m: signature(m, elements))
+        for key, members in classes.items()
     }
     mirrors = {key: inchi(mirror(rep)) for key, rep in reps.items()}
-    matching = {
-        key
-        for key, members in classes.items()
-        if defined and any(matches_drawing(drawing, m) for m in members)
-    }
+    matching = {key for key in classes if agreeing[key]}
     if racemic:
         matching |= {mirrors[key] for key in matching}
     judged = "axial-planar" not in notes_
@@ -280,19 +349,19 @@ def listing(drawing: Chem.Mol, elements: list, notes_: list[str]) -> dict[str, o
 
 def expected_for(name: str, drawing: Chem.Mol) -> dict[str, object]:
     elements = potential(drawing)
+    found = notes(drawing, elements)
     entry: dict[str, object] = {
         "name": name,
         "file": f"{DIR}/{slug(name)}.mol",
         "elements": len(elements),
     }
     if not elements:
-        return {**entry, "outcome": "no-elements"}
+        return {**entry, "outcome": "no-elements", "notes": found}
     if len(elements) > LIMITS["elements"]:
-        return {**entry, "outcome": "too-many"}
-    found = notes(drawing, elements)
+        return {**entry, "outcome": "too-many", "notes": found}
     result = listing(drawing, elements, found)
     if "stereoisomers" not in result:
-        return {**entry, "outcome": "counted", "count": result["count"], "notes": found}
+        return {**entry, "outcome": "counted", "notes": found, **result}
     entry.update({"outcome": "listed", "notes": found, **result})
     if "bridged" in found:
         entry["embeds_in_3d"] = embedded(drawing, elements)
@@ -316,7 +385,91 @@ def drawings(rows: list[dict[str, str]]) -> list[tuple[str, str]]:
     for first, second in JOINED:
         name = f"joined: {first} + {second}"
         out.append((name, molfile(join(by_name[first], by_name[second]), name)))
+
+    name, source = ETHYLIDENE
+    out.append((name, molfile(with_ethylidene(by_name[source]), name)))
+
+    for name, source in TEXTBOOK:
+        out.append((name, restyled(by_name[source], name, textbook=True)))
+    name, source = OTHER_WEDGES
+    out.append((name, restyled(by_name[source], name, textbook=False)))
+
+    name, source = MESO
+    out.append((name, molfile(meso_drawn_late(by_name[source]), name)))
     return out
+
+
+def meso_drawn_late(mol: Chem.Mol) -> Chem.Mol:
+    """The meso form of mol, as its setting with the larger signature."""
+    elements = potential(mol)
+    classes, _ = enumerate_classes(mol, elements)
+    (members,) = [m for key, m in classes.items() if inchi(mirror(m[0])) == key and len(m) == 2]
+    return max(members, key=lambda m: signature(m, elements))
+
+
+def with_ethylidene(mol: Chem.Mol) -> Chem.Mol:
+    """=CH-CH3 on the carbon between the two carbons that carry an O."""
+
+    def carries_o(atom: Chem.Atom) -> bool:
+        return any(n.GetSymbol() == "O" for n in atom.GetNeighbors())
+
+    (middle,) = [
+        a.GetIdx()
+        for a in mol.GetAtoms()
+        if a.GetSymbol() == "C"
+        and len([n for n in a.GetNeighbors() if n.GetSymbol() == "C" and carries_o(n)]) == 2
+    ]
+    edit = Chem.RWMol(mol)
+    first = edit.AddAtom(Chem.Atom(6))
+    second = edit.AddAtom(Chem.Atom(6))
+    edit.AddBond(middle, first, Chem.BondType.DOUBLE)
+    edit.AddBond(first, second, Chem.BondType.SINGLE)
+    made = edit.GetMol()
+    Chem.SanitizeMol(made)
+    return made
+
+
+def bond_lines(text: str) -> tuple[list[str], int, int]:
+    lines = text.split("\n")
+    atoms, bonds = int(lines[3][0:3]), int(lines[3][3:6])
+    return lines, 4 + atoms, bonds
+
+
+def write_bond(lines: list[str], line: int, first: int, second: int, stereo: int) -> None:
+    old = lines[line]
+    lines[line] = f"{first + 1:>3}{second + 1:>3}{old[6:9]}{stereo:>3}{old[12:]}"
+
+
+def restyled(mol: Chem.Mol, name: str, textbook: bool) -> str:
+    """mol's Molfile wedged as a student might: at each centre, a wedge on a bond to a heavy
+    atom and a hash on its drawn H (textbook), or one wedge on the heavy bond with the highest
+    index (other bonds than RDKit's). Wedge or hash is chosen so it reads back as mol."""
+    centres = [a.GetIdx() for a in mol.GetAtoms() if a.GetChiralTag() in TETRAHEDRAL]
+    drawn = Chem.AddHs(mol, onlyOnAtoms=centres) if textbook else Chem.Mol(mol)
+    text = molfile(drawn, name)
+    want, _ = cip(mol)
+    lines, start, count = bond_lines(text)
+    table = []
+    for i in range(count):
+        line = lines[start + i]
+        table.append((int(line[0:3]) - 1, int(line[3:6]) - 1))
+    for i, (a, b) in enumerate(table):
+        write_bond(lines, start + i, a, b, 0)
+    symbols = [a.GetSymbol() for a in drawn.GetAtoms()]
+    for centre in centres:
+        at = [(i, b if a == centre else a) for i, (a, b) in enumerate(table) if centre in (a, b)]
+        heavy = [x for x in at if symbols[x[1]] != "H"]
+        hydrogen = [x for x in at if symbols[x[1]] == "H"]
+        marks = [(heavy[0], 1), (hydrogen[0], 6)] if textbook else [(heavy[-1], 1)]
+        for flip in (False, True):
+            for (index, other), stereo in marks:
+                write_bond(lines, start + index, centre, other, (7 - stereo) if flip else stereo)
+            back, _ = cip(Chem.MolFromMolBlock("\n".join(lines), removeHs=False))
+            if back.get(str(centre)) == want[str(centre)]:
+                break
+        else:
+            raise ValueError(f"{name}: no wedging reads back as drawn at atom {centre}")
+    return "\n".join(lines)
 
 
 def generate(rows: list[dict[str, str]]) -> dict[str, str]:

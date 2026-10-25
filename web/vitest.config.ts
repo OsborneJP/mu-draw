@@ -7,5 +7,9 @@ export default defineConfig({
     exclude: ['e2e/**', 'node_modules/**', 'dist*/**'],
     environment: 'node',
     setupFiles: ['./src/test-setup.ts'],
+    // Vitest 5 keeps transformed test files on disk between runs, keyed on their own text, so
+    // an import.meta.glob kept its old file list: new fixture files went unseen until the
+    // test file changed (config/vitest.test.ts).
+    fsModuleCache: false,
   },
 });

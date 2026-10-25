@@ -26,3 +26,6 @@ cocaine,446220,Cocaine,CN1[C@H]2CC[C@@H]1[C@H]([C@H](C2)OC(=O)C3=CC=CC=C3)C(=O)O
 cholesterol,5997,Cholesterol,C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C
 erythromycin,12560,Erythromycin,CC[C@@H]1[C@@]([C@@H]([C@H](C(=O)[C@@H](C[C@@]([C@@H]([C@H]([C@@H]([C@H](C(=O)O1)C)O[C@H]2C[C@@]([C@H]([C@@H](O2)C)O)(C)OC)C)O[C@H]3[C@@H]([C@H](C[C@H](O3)C)N(C)C)O)(C)O)C)C)O)(C)O
 "1,1'-bi-2-naphthol",11762,Binol,C1=CC=C2C(=C1)C=CC(=C2C3=C(C=CC4=CC=CC=C43)O)O
+"hepta-2,5-dien-4-ol",54431547,"Hepta-2,5-dien-4-ol",CC=CC(C=CC)O
+"2,4-pentanediol",12262,"2,4-Pentanediol",CC(CC(C)O)O
+cyclooctatetraene,637866,Npc50861,C\1=C\C=C/C=C\C=C1

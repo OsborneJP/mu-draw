@@ -83,6 +83,15 @@ All notable changes to this project. The format follows
   drawing; clicking a carbon highlights its peak. A banner says these are predictions, not
   an answer key, and every prediction carries NMRShiftDB2's licence notice. Changing the
   drawing clears the prediction until it is predicted again.
+- Stereoisomers (version 2's first feature): "Show stereoisomers" in the properties panel
+  lists every stereoisomer of the drawing below the canvas, each drawn like the student's
+  drawing with R/S and E/Z at its atoms. Enantiomer pairs sit side by side; achiral and
+  meso forms are marked, and so are the ones that match the drawing. Add puts one in hand,
+  as Name to structure's Add does, and the panel stays open to add another. Notes say where
+  RDKit can't judge: bridged rings, allenes, biaryls and large-ring double bonds. Up to 8
+  stereocentres and stereogenic double bonds are listed, and up to 32 stereoisomers drawn.
+  Offline too. With more than one structure drawn, the properties panel says it works on
+  one at a time.
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name
@@ -108,6 +117,9 @@ All notable changes to this project. The format follows
   open source.
 
 ### Fixed
+- The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds
+  stereogenic only through the stereocentres beside them, so its stereogenic double bonds
+  and "Stereoisomers, at most" were too low.
 - Ketcher's image previews and exports could hang when two were made at once; they now
   take turns.
 - Get name could wait forever if Ketcher was converting another drawing at the same moment

@@ -136,6 +136,17 @@ describe('Add', () => {
     return h;
   }
 
+  it('one that can’t be drawn flat is never put in hand', async () => {
+    const h = harness();
+    h.stereo.show();
+    const [first, second] = (LISTED as Extract<StereoResult, { outcome: 'listed' }>).stereoisomers;
+    const result: StereoResult = { ...LISTED, stereoisomers: [first, { ...second, molfile: null, picture: null }] } as StereoResult;
+    h.stereo.reply(h.answer(result));
+    await h.stereo.add(2);
+    expect(h.placements).toEqual([]);
+    expect(h.last()).toEqual({ kind: 'ready', result, inHand: null });
+  });
+
   it('placing it is the panel’s own change: the panel stays open, and another can follow', async () => {
     const h = await inHand();
     let next = h.nextState();

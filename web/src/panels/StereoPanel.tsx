@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import type { Pictured, StereoResult } from '../chem/stereoPictures';
 import { PICTURE } from '../chem/stereoPictures';
 import type { Note } from '../chem/stereoisomers';
@@ -22,13 +22,14 @@ const MESSAGES: Record<StereoMessage, string> = {
 };
 
 const NOTES: Record<Note, string> = {
-  bridged: 'In a bridged ring system some of these cannot exist: RDKit cannot check that without 3D.',
+  bridged: 'In a bridged ring system some of these cannot exist, and stereo at a bridgehead nitrogen is missed: RDKit cannot check that without 3D.',
   'axial-planar':
-    'This structure has an axis or plane of chirality (an allene, a biaryl, or a double bond in a large ring), which RDKit cannot judge, so none of these is called achiral.',
+    'This structure may be chiral about an axis or a plane (an allene, a biaryl, or a double bond in a ring). RDKit cannot judge that kind of chirality, so it lists no mirror images for it and calls nothing here achiral or meso.',
 };
 
 const PSEUDO_NOTE = 'Lowercase r and s mark pseudo-asymmetric centres.';
 const DIASTEREOMERS = 'Any two that are not enantiomers are diastereomers.';
+const UNDRAWABLE = 'RDKit can’t draw this one flat as itself.';
 
 function relation(isomer: Pictured): string | null {
   switch (isomer.relation.kind) {
@@ -43,58 +44,10 @@ function relation(isomer: Pictured): string | null {
   }
 }
 
-function Card({ isomer, inHand }: { isomer: Pictured; inHand: boolean }) {
-  const src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(isomer.picture.svg)}`;
-  const said = relation(isomer);
-  return (
-    <li
-      className="stereo-card"
-      data-testid="stereo-card"
-      data-number={isomer.number}
-      data-inchikey={isomer.inchikey}
-      data-relation={isomer.relation.kind}
-      data-of={isomer.relation.kind === 'enantiomer' ? isomer.relation.of : undefined}
-      data-matches={isomer.matches}
-      data-in-hand={inHand}
-    >
-      <div className="stereo-card-head">
-        <span className="stereo-number">{isomer.number}</span>
-        {isomer.matches && <span className="stereo-match">Matches your drawing</span>}
-      </div>
-      <div className="stereo-picture" style={{ width: PICTURE.width, height: PICTURE.height }}>
-        <img src={src} width={PICTURE.width} height={PICTURE.height} alt={`Stereoisomer ${isomer.number}`} />
-        {isomer.picture.labels.map((l) => (
-          <span
-            key={l.atom ?? l.bond}
-            className="stereo-label"
-            data-testid="stereo-label"
-            data-atom={l.atom}
-            data-bond={l.bond}
-            style={{ left: l.x, top: l.y }}
-          >
-            {l.text}
-          </span>
-        ))}
-      </div>
-      <div className="stereo-card-foot">
-        <span className="stereo-relation">{said}</span>
-        <button type="button" data-testid="stereo-add" onClick={() => addStereoisomer(isomer.number)}>
-          {inHand ? 'In hand: click the canvas' : 'Add'}
-        </button>
-      </div>
-    </li>
-  );
-}
-
-function Listed({ result, inHand }: { result: Extract<StereoResult, { outcome: 'listed' }>; inHand: number | null }) {
-  const pseudo = result.stereoisomers.some((s) => Object.values(s.labels.atoms).some((l) => l === 'r' || l === 's'));
-  const n = result.stereoisomers.length;
+function Notes({ notes, pseudo = false }: { notes: Note[]; pseudo?: boolean }) {
   return (
     <>
-      <p className="stereo-summary" data-testid="stereo-summary">
-        {n === 1 ? '1 stereoisomer.' : `${n} stereoisomers.`} {n > 1 && DIASTEREOMERS}
-      </p>
-      {result.notes.map((note) => (
+      {notes.map((note) => (
         <p key={note} className="stereo-note" data-testid="stereo-note" data-note={note}>
           {NOTES[note]}
         </p>
@@ -104,12 +57,114 @@ function Listed({ result, inHand }: { result: Extract<StereoResult, { outcome: '
           {PSEUDO_NOTE}
         </p>
       )}
+    </>
+  );
+}
+
+function Card({ isomer, inHand }: { isomer: Pictured; inHand: boolean }) {
+  const said = relation(isomer);
+  const { picture } = isomer;
+  return (
+    <div
+      className="stereo-card"
+      data-testid="stereo-card"
+      data-number={isomer.number}
+      data-inchikey={isomer.inchikey}
+      data-relation={isomer.relation.kind}
+      data-of={isomer.relation.kind === 'enantiomer' ? isomer.relation.of : undefined}
+      data-matches={isomer.matches}
+      data-drawn={picture !== null}
+      data-in-hand={inHand}
+    >
+      <div className="stereo-card-head">
+        <span className="stereo-number">{isomer.number}</span>
+        {isomer.matches && <span className="stereo-match">Matches your drawing</span>}
+      </div>
+      <div className="stereo-picture" style={{ width: PICTURE.width, height: PICTURE.height }}>
+        {picture === null ? (
+          <p className="stereo-undrawable" data-testid="stereo-undrawable">
+            {UNDRAWABLE}
+          </p>
+        ) : (
+          <>
+            <img
+              src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(picture.svg)}`}
+              width={PICTURE.width}
+              height={PICTURE.height}
+              alt={`Stereoisomer ${isomer.number}`}
+            />
+            {picture.labels.map((l) => (
+              <span
+                key={l.atom ?? l.bond}
+                className="stereo-label"
+                data-testid="stereo-label"
+                data-atom={l.atom}
+                data-bond={l.bond}
+                style={{ left: l.x, top: l.y }}
+              >
+                {l.text}
+              </span>
+            ))}
+          </>
+        )}
+      </div>
+      <div className="stereo-card-foot">
+        <span className="stereo-relation">{said}</span>
+        {picture !== null && (
+          <button
+            type="button"
+            data-testid="stereo-add"
+            title={inHand ? 'Click the canvas to place it; Esc puts it away' : 'Put it in hand to place beside your drawing'}
+            onClick={() => addStereoisomer(isomer.number)}
+          >
+            {inHand ? 'In hand' : 'Add'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** The stereoisomers in their order, each enantiomer pair kept together in one group. */
+function grouped(isomers: Pictured[]): Pictured[][] {
+  const groups: Pictured[][] = [];
+  for (const isomer of isomers) {
+    const last = groups.at(-1);
+    const pairsWithLast =
+      last?.length === 1 && last[0].relation.kind === 'enantiomer' && last[0].relation.of === isomer.number;
+    if (pairsWithLast) last.push(isomer);
+    else groups.push([isomer]);
+  }
+  return groups;
+}
+
+function Listed({ result, inHand }: { result: Extract<StereoResult, { outcome: 'listed' }>; inHand: number | null }) {
+  const pseudo = result.stereoisomers.some((s) => Object.values(s.labels.atoms).some((l) => l === 'r' || l === 's'));
+  const n = result.stereoisomers.length;
+  return (
+    <>
+      <p className="stereo-summary" data-testid="stereo-summary">
+        {n === 1 ? '1 stereoisomer.' : `${n} stereoisomers. ${DIASTEREOMERS}`}
+      </p>
+      <Notes notes={result.notes} pseudo={pseudo} />
       <ol className="stereo-cards">
-        {result.stereoisomers.map((isomer) => (
-          <Card key={isomer.number} isomer={isomer} inHand={inHand === isomer.number} />
+        {grouped(result.stereoisomers).map((group) => (
+          <li key={group[0].number} className="stereo-group" data-testid="stereo-group">
+            {group.map((isomer) => (
+              <Card key={isomer.number} isomer={isomer} inHand={inHand === isomer.number} />
+            ))}
+          </li>
         ))}
       </ol>
     </>
+  );
+}
+
+function Message({ children }: { children: ReactNode }) {
+  return (
+    <p className="stereo-message" data-testid="stereo-message">
+      {children}
+    </p>
   );
 }
 
@@ -119,27 +174,26 @@ function Ready({ result, inHand }: { result: StereoResult; inHand: number | null
       return <Listed result={result} inHand={inHand} />;
     case 'counted':
       return (
-        <p className="stereo-message" data-testid="stereo-message">
-          {result.count} stereoisomers: too many to draw here.
-        </p>
+        <>
+          <Message>{result.count} stereoisomers: too many to draw here.</Message>
+          <Notes notes={result.notes} />
+        </>
       );
     case 'too-many':
       return (
-        <p className="stereo-message" data-testid="stereo-message">
-          {result.elements} stereocentres and stereogenic double bonds: too many to list here.
-        </p>
+        <>
+          <Message>{result.elements} stereocentres and stereogenic double bonds: too many to list here.</Message>
+          <Notes notes={result.notes} />
+        </>
       );
     case 'several':
-      return (
-        <p className="stereo-message" data-testid="stereo-message">
-          Stereoisomers are listed for one structure at a time.
-        </p>
-      );
+      return <Message>Stereoisomers are listed for one structure at a time.</Message>;
     case 'no-elements':
       return (
-        <p className="stereo-message" data-testid="stereo-message">
-          This structure has no stereocentres or stereogenic double bonds.
-        </p>
+        <>
+          <Message>RDKit finds no stereocentres or stereogenic double bonds in this structure.</Message>
+          <Notes notes={result.notes} />
+        </>
       );
   }
 }

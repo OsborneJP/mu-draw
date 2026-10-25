@@ -28,3 +28,6 @@ cocaine
 cholesterol
 erythromycin
 1,1'-bi-2-naphthol
+hepta-2,5-dien-4-ol
+2,4-pentanediol
+cyclooctatetraene

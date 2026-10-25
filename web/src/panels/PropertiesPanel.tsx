@@ -76,6 +76,7 @@ function Formula({ formula }: { formula: string }) {
 
 interface StereoProps {
   stereo: PanelValues['stereo'];
+  fragments: number;
   /** The values are for the drawing as it is now, so its atoms can be highlighted. */
   current: boolean;
   highlighted: boolean;
@@ -85,8 +86,10 @@ interface StereoProps {
 // Clicking either count highlights every stereo element on the canvas: defined ones blue,
 // undefined ones amber (src/editor/stereoHighlight.ts); clicking again, or any change to
 // the drawing, takes the highlight away.
-function Stereo({ stereo, current, highlighted, onToggle }: StereoProps) {
+function Stereo({ stereo, fragments, current, highlighted, onToggle }: StereoProps) {
   const total = stereo.centres + stereo.doubleBonds;
+  // An axis RDKit can't judge gets the button too, so the panel can say so (bar B.9).
+  const listable = total > 0 || stereo.axis;
   const count = (n: number, testId: string, what: string) => (
     <button
       type="button"
@@ -126,7 +129,12 @@ function Stereo({ stereo, current, highlighted, onToggle }: StereoProps) {
           Meso forms can make the real number of stereoisomers smaller.
         </p>
       )}
-      {total > 0 && (
+      {listable && fragments > 1 && (
+        <p className="properties-note" data-testid="stereo-one-at-a-time">
+          Stereoisomers are listed for one structure at a time.
+        </p>
+      )}
+      {listable && fragments === 1 && (
         <button
           type="button"
           className="stereo-show"
@@ -293,7 +301,7 @@ export default function PropertiesPanel() {
       </p>
       {state.kind === 'ready' && (
         <Values values={state.values}>
-          <Stereo stereo={state.values.stereo} current={current} highlighted={highlighted} onToggle={toggle} />
+          <Stereo stereo={state.values.stereo} fragments={state.values.fragments} current={current} highlighted={highlighted} onToggle={toggle} />
           <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
           <NmrButton />
         </Values>

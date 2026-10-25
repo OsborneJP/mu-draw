@@ -100,7 +100,28 @@ So a student sees why 2,3-dibromobutane has 3 stereoisomers, not 4.
 
 - No 3D. Impossible bridgehead combinations are listed, with a note.
 - No axial or planar chirality (allenes, biaryls, trans-cyclooctene): a note instead of "achiral".
-- Standard InChI can't see stereo at nitrogen: a note.
+- Stereo at a bridgehead nitrogen is invisible to RDKit (Tröger's base: no stereo elements, so
+  no button); the bridged note says so where there is a list.
+- Some settings of double bonds in a ring of 8 to 11 atoms can't be drawn flat as themselves
+  (cyclooctatetraene with one or three E): listed without a picture or Add.
+
+## After the first review (2026-10-25)
+
+A review of the first build found 20 problems; each fix has a test that fails without it.
+Three change the bar as written above, for Jeff to confirm:
+- **A.1, the reference.** Python's `EnumerateStereoisomers` misses half of cyclooctatetraene's
+  settings (it gives those with an even number of trans bonds twice each). The generator now
+  writes every setting of `FindPotentialStereo`'s elements itself, and a test requires
+  `EnumerateStereoisomers` to give the same stereoisomers for every other compound.
+- **B.1, the button.** It also shows when the drawing may have an axis RDKit can't judge
+  (penta-2,3-diene, BINOL), so the panel can say so (bar B.9). With more than one structure
+  there is no button, and the properties panel says "one structure at a time".
+- **Test compounds added:** hepta-2,5-dien-4-ol and 2,4-pentanediol (from PubChem),
+  cyclooctatetraene (PubChem's record is all-Z), and generated drawings: the ethylidene diol,
+  threonine and (R)-2-butanol wedged the textbook way and on other bonds, and meso
+  2,3-dibromobutane drawn as the setting the ordering rule would not pick. Their judgements
+  in stereoisomers_judged.json are provisional like the rest; cyclooctatetraene's was made
+  after a probe, not blind.
 
 ## Priority
 

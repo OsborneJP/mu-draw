@@ -1,17 +1,19 @@
 // The stereoisomer enumerator (docs/plans/v2-stereoisomers.md): every stereoisomer of a
 // drawing, how they relate, which ones the drawing matches, and a Molfile of each drawn like
 // the student's drawing. Runs in an RDKit worker and, in the unit tests, in Node against what
-// server-side RDKit's own EnumerateStereoisomers answered for the same drawings
-// (server/scripts/gen_stereoisomers_expected.py): the two must agree exactly.
+// server-side RDKit's own FindPotentialStereo and EnumerateStereoisomers answered for the same
+// drawings (server/scripts/gen_stereoisomers_expected.py): the two must agree exactly.
 //
 // RDKit.js has no enumerator. RDKit's JSON form of a molecule carries each atom's stereo
-// (cw/ccw) and each double bond's (cis/trans), so every combination of the drawing's
-// potential stereo elements is written into it and read back (measured to give Python's set).
-// Two combinations are the same stereoisomer when their InChIs, taken without coordinates,
-// are equal: canonical SMILES leaves duplicates in symmetric rings, an RDKit SMILES round trip
-// can change a stereoisomer, and with coordinates InChI reads E/Z from the drawn geometry.
+// (cw/ccw) and each double bond's (cis/trans), so every combination of the stereo elements is
+// written into it and read back (measured to give Python's set).
+// - The elements are those of the drawing with its stereo taken off: one that depends on
+//   others the drawing defines (C3 of pentane-2,3,4-triol drawn (2R,4R)) is still varied.
+// - Two combinations are the same stereoisomer when their InChIs, taken without coordinates,
+//   are equal: canonical SMILES leaves duplicates in symmetric rings, an RDKit SMILES round
+//   trip can change a stereoisomer, and with coordinates InChI reads E/Z from the layout.
 import type { MainModule, Mol } from '@rdkit/rdkit';
-import { stereoDoubleBonds } from './compute';
+import { hasAxis, serialise, setGeometry, stereoElements, withoutStereo, type RdkitJson } from './stereoElements';
 
 /** Decision 7: enumerate up to this many stereo elements, draw up to this many. */
 export const LIMITS = { elements: 8, drawn: 32 } as const;
@@ -40,15 +42,17 @@ export interface Stereoisomer {
   relation: Relation;
   matches: boolean;
   /** In the drawing's layout with the student's wedges, or laid out afresh where a double
-   * bond's geometry has to change; chiral flag 1. It reads back as this stereoisomer. */
-  molfile: string;
+   * bond's geometry has to change; chiral flag 1. It reads back as this stereoisomer. Null
+   * when no flat drawing does: some settings of the double bonds in a ring of 8 to 11 atoms
+   * (cyclooctatetraene with one or three E) can't be drawn flat as themselves. */
+  molfile: string | null;
 }
 
 export type Enumeration =
   /** More than one structure: the panel works on one at a time (bar B.1). */
   | { outcome: 'several' }
-  | { outcome: 'no-elements' }
-  | { outcome: 'too-many'; elements: number }
+  | { outcome: 'no-elements'; notes: Note[] }
+  | { outcome: 'too-many'; elements: number; notes: Note[] }
   | { outcome: 'counted'; elements: number; count: number; notes: Note[] }
   | { outcome: 'listed'; elements: number; notes: Note[]; stereoisomers: Stereoisomer[] };
 
@@ -63,57 +67,22 @@ export function listOutcome(count: number): 'listed' | 'counted' {
   return count > LIMITS.drawn ? 'counted' : 'listed';
 }
 
-interface JsonBond {
-  atoms: [number, number];
-  bo?: number;
-  stereo?: string;
-  stereoAtoms?: [number, number];
-}
-
-interface JsonMolecule {
-  atoms: { stereo?: string }[];
-  bonds?: JsonBond[];
-  conformers?: { dim: number; coords: number[][] }[];
-  extensions?: { atomRings?: number[][] }[];
-}
-
-interface Json {
-  molecules: [JsonMolecule];
-}
-
 interface Tags {
   CIP_atoms: [number, string][];
   CIP_bonds: [number, number, string][];
 }
 
 type Spin = 'cw' | 'ccw';
-type Geometry = 'cis' | 'trans';
 
-/** One way of setting every stereo element: centres in atom order, then double bonds. */
+/** One way of setting every element: centres in atom order, then double bonds. */
 interface Combination {
   spins: Spin[];
-  geometries: Geometry[];
+  geometries: ('cis' | 'trans')[];
 }
 
-interface Elements {
-  centres: number[];
-  /** Index into the JSON's bonds. */
-  doubles: number[];
-}
-
-const BIARYL_AXIS = '[!#1]!@a:a!@a:a!@[!#1]'; // as in gen_stereoisomers_expected.py
-
-/** RDKit's JSON reader rejects whole-number coordinates (0 for 0.0), which JSON.stringify
- * writes; so the coordinates are written by hand, each with a decimal point. */
-function serialise(json: Json, withCoords: boolean): string {
-  const { conformers, ...molecule } = json.molecules[0];
-  const text = JSON.stringify({ ...json, molecules: [molecule] });
-  if (!withCoords || !conformers) return text;
-  const number = (v: number) => (Number.isInteger(v) ? v.toFixed(1) : String(v));
-  const written = conformers
-    .map((c) => `{"dim":${c.dim},"coords":[${c.coords.map((p) => `[${p.map(number).join(',')}]`).join(',')}]}`)
-    .join(',');
-  return text.replace(/\}\]\}$/, `,"conformers":[${written}]}]}`);
+interface Member {
+  combination: Combination;
+  labels: Labels;
 }
 
 function bondKey(a: number, b: number): string {
@@ -129,36 +98,12 @@ function labelsOf(tags: Tags): Labels {
   return { atoms, bonds };
 }
 
-/** A copy of the drawing's JSON with a combination written in. */
-function withCombination(json: Json, elements: Elements, combination: Combination): Json {
-  const copy = structuredClone(json);
-  const molecule = copy.molecules[0];
-  const bonds = molecule.bonds ?? [];
-  elements.centres.forEach((atom, i) => (molecule.atoms[atom] = { ...molecule.atoms[atom], stereo: combination.spins[i] }));
-  elements.doubles.forEach((index, i) => {
-    const bond = bonds[index];
-    const [a, b] = bond.atoms;
-    const other = (end: number, not: number) =>
-      bonds.map((x) => x.atoms).find(([p, q]) => (p === end && q !== not) || (q === end && p !== not))!;
-    const nextTo = (end: number, not: number) => {
-      const [p, q] = other(end, not);
-      return p === end ? q : p;
-    };
-    bonds[index] = { ...bond, stereo: combination.geometries[i], stereoAtoms: [nextTo(a, b), nextTo(b, a)] };
-  });
-  return copy;
-}
-
-function mirrored(combination: Combination): Combination {
-  return { spins: combination.spins.map((s) => (s === 'cw' ? 'ccw' : 'cw')), geometries: combination.geometries };
-}
-
 class Reader {
-  constructor(private readonly rdkit: MainModule) {}
+  constructor(readonly rdkit: MainModule) {}
 
   /** Read text into RDKit, use it, and free it. */
-  with<T>(text: string, work: (mol: Mol) => T, details: object = { removeHs: false }): T {
-    const mol = this.rdkit.get_mol(text, JSON.stringify(details));
+  with<T>(text: string, work: (mol: Mol) => T): T {
+    const mol = this.rdkit.get_mol(text, JSON.stringify({ removeHs: false }));
     if (!mol) throw new Error('RDKit could not read a stereoisomer');
     try {
       return work(mol);
@@ -166,99 +111,153 @@ class Reader {
       mol.delete();
     }
   }
+
+  /** The InChI of a Molfile, read the same way as the combinations' (without coordinates,
+   * once its wedges and layout have set the stereo). */
+  inchiOf(molfile: string): string {
+    const json = this.with(molfile, (mol) => JSON.parse(mol.get_json()) as RdkitJson);
+    return this.with(serialise(json, false), (mol) => mol.get_inchi());
+  }
 }
 
-interface Read {
-  inchi: string;
+interface Drawing {
+  json: RdkitJson;
+  /** Its stereo elements, with its stereo taken off. */
+  centres: number[];
+  doubles: number[];
+  /** What it defines: the spin of each defined centre, the label of each defined bond. */
+  spins: Map<number, Spin>;
   labels: Labels;
+  racemic: boolean;
+  notes: Note[];
 }
 
-const NO_LABELS: Labels = { atoms: {}, bonds: {} };
+function readDrawing(rdkit: MainModule, molfile: string): Drawing | 'several' | null {
+  const mol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: false }));
+  if (!mol) return null;
+  try {
+    const frags = mol.get_frags() as { molList: { size(): number; delete(): void } };
+    const several = frags.molList.size() > 1;
+    frags.molList.delete();
+    if (several) return 'several';
+    const json = JSON.parse(mol.get_json()) as RdkitJson;
+    const stripped = rdkit.get_mol(serialise(withoutStereo(json), false), JSON.stringify({ removeHs: false }));
+    if (!stripped) return null;
+    let elements;
+    try {
+      elements = stereoElements(rdkit, stripped);
+    } finally {
+      stripped.delete();
+    }
+    const atoms = json.molecules[0].atoms;
+    const spins = new Map(
+      elements.centres.flatMap((atom) => {
+        const spin = atoms[atom].stereo;
+        return spin === 'cw' || spin === 'ccw' ? [[atom, spin] as const] : [];
+      }),
+    );
+    const flag = mol.has_prop('_MolFileChiralFlag') ? mol.get_prop('_MolFileChiralFlag') : '0';
+    return {
+      json,
+      ...elements,
+      spins,
+      labels: labelsOf(JSON.parse(mol.get_stereo_tags()) as Tags),
+      // Chiral flag 0 with a defined centre: Ketcher reads it as an AND (racemic) group.
+      racemic: flag === '0' && spins.size > 0,
+      notes: notesFor(json, elements.doubles, hasAxis(rdkit, mol)),
+    };
+  } finally {
+    mol.delete();
+  }
+}
+
+function notesFor(json: RdkitJson, doubles: number[], axial: boolean): Note[] {
+  const molecule = json.molecules[0];
+  const rings = (molecule.extensions ?? []).flatMap((e) => e.atomRings ?? []).map((r) => new Set(r));
+  const bonds = molecule.bonds ?? [];
+  const notes: Note[] = [];
+  const shared = (a: Set<number>, b: Set<number>) => [...a].filter((x) => b.has(x)).length;
+  if (rings.some((a, i) => rings.slice(i + 1).some((b) => shared(a, b) >= 3))) notes.push('bridged');
+  const inRing = (index: number) => rings.some((r) => bonds[index].atoms.every((x) => r.has(x)));
+  if (axial || doubles.some(inRing)) notes.push('axial-planar');
+  return notes;
+}
+
+/** A copy of the drawing's JSON (coordinates kept or not) with a combination written in. */
+function withCombination(drawing: Drawing, combination: Combination, withCoords: boolean): string {
+  const copy = structuredClone(drawing.json);
+  const molecule = copy.molecules[0];
+  drawing.centres.forEach((atom, i) => (molecule.atoms[atom] = { ...molecule.atoms[atom], stereo: combination.spins[i] }));
+  drawing.doubles.forEach((index, i) => setGeometry(copy, index, combination.geometries[i]));
+  return serialise(copy, withCoords);
+}
+
+function mirrored(combination: Combination): Combination {
+  return { spins: combination.spins.map((s) => (s === 'cw' ? 'ccw' : 'cw')), geometries: combination.geometries };
+}
+
+/** Plain code-point order, as Python sorts strings. */
+function compare(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
 
 /** Every stereoisomer of a Molfile, or null when RDKit can't read it. */
 export function enumerateStereoisomers(rdkit: MainModule, molfile: string): Enumeration | null {
-  const drawingMol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: false }));
-  if (!drawingMol) return null;
-  let json: Json, drawnTags: Tags, doublePairs: [number, number][], chiralFlag: string, biaryl: boolean;
-  try {
-    const frags = drawingMol.get_frags() as { molList: { size(): number; delete(): void } };
-    const several = frags.molList.size() > 1;
-    frags.molList.delete();
-    if (several) return { outcome: 'several' };
-    json = JSON.parse(drawingMol.get_json()) as Json;
-    drawnTags = JSON.parse(drawingMol.get_stereo_tags()) as Tags;
-    doublePairs = stereoDoubleBonds(rdkit, drawingMol);
-    chiralFlag = drawingMol.has_prop('_MolFileChiralFlag') ? drawingMol.get_prop('_MolFileChiralFlag') : '0';
-    const query = rdkit.get_qmol(BIARYL_AXIS);
-    biaryl = query !== null && drawingMol.get_substruct_match(query) !== '{}';
-    query?.delete();
-  } finally {
-    drawingMol.delete();
-  }
-  const molecule = json.molecules[0];
-  const bonds = molecule.bonds ?? [];
-  const elements: Elements = {
-    centres: drawnTags.CIP_atoms.map(([atom]) => atom).sort((a, b) => a - b),
-    doubles: doublePairs
-      .map(([a, b]) => bonds.findIndex((x) => bondKey(x.atoms[0], x.atoms[1]) === bondKey(a, b)))
-      .sort((a, b) => a - b),
-  };
-  const count = elements.centres.length + elements.doubles.length;
+  const drawing = readDrawing(rdkit, molfile);
+  if (drawing === null) return null;
+  if (drawing === 'several') return { outcome: 'several' };
+  const { centres, doubles, notes } = drawing;
+  const count = centres.length + doubles.length;
   const size = sizeOutcome(count);
-  if (size === 'no-elements') return { outcome: 'no-elements' };
-  if (size === 'too-many') return { outcome: 'too-many', elements: count };
+  if (size === 'no-elements') return { outcome: 'no-elements', notes };
+  if (size === 'too-many') return { outcome: 'too-many', elements: count, notes };
 
   const reader = new Reader(rdkit);
-  // CIP labels are slow on a big molecule; every combination needs them only to compare
-  // double bonds, the representatives always (for their pictures).
-  const read = (combination: Combination, labelled: boolean): Read =>
-    reader.with(serialise(withCombination(json, elements, combination), false), (mol) => ({
+  const bonds = drawing.json.molecules[0].bonds ?? [];
+  const doubleKeys = doubles.map((i) => bondKey(...bonds[i].atoms));
+  // CIP labels are slow on a big molecule: every combination needs them only to compare
+  // double bonds; the stereoisomers shown always (for their pictures).
+  const read = (combination: Combination, labelled: boolean) =>
+    reader.with(withCombination(drawing, combination, false), (mol) => ({
       inchi: mol.get_inchi(),
-      labels: labelled ? labelsOf(JSON.parse(mol.get_stereo_tags()) as Tags) : NO_LABELS,
+      labels: labelled ? labelsOf(JSON.parse(mol.get_stereo_tags()) as Tags) : { atoms: {}, bonds: {} },
     }));
 
   // Every combination, grouped by InChI.
-  const classes = new Map<string, { combination: Combination; labels: Labels }[]>();
+  const classes = new Map<string, Member[]>();
   for (let mask = 0; mask < 1 << count; mask++) {
     const bit = (i: number) => (mask >> i) & 1;
     const combination: Combination = {
-      spins: elements.centres.map((_, i) => (bit(i) ? 'ccw' : 'cw')),
-      geometries: elements.doubles.map((_, i) => (bit(elements.centres.length + i) ? 'cis' : 'trans')),
+      spins: centres.map((_, i) => (bit(i) ? 'ccw' : 'cw')),
+      geometries: doubles.map((_, i) => (bit(centres.length + i) ? 'cis' : 'trans')),
     };
-    const { inchi, labels } = read(combination, elements.doubles.length > 0);
+    const { inchi, labels } = read(combination, doubles.length > 0);
     classes.set(inchi, [...(classes.get(inchi) ?? []), { combination, labels }]);
   }
-  const notes = notesFor(molecule, elements, biaryl);
   if (listOutcome(classes.size) === 'counted') return { outcome: 'counted', elements: count, count: classes.size, notes };
 
-  // Which combination stands for each stereoisomer: the smallest signature, the same rule
-  // the generator uses (centres CW 0 / CCW 1 in atom order, then double bonds Z 1 / else 0).
-  const doubleKeys = elements.doubles.map((i) => bondKey(...bonds[i].atoms));
-  const signature = ({ combination, labels }: { combination: Combination; labels: Labels }) =>
+  // Which stereoisomers agree with all the drawing defines; a racemic drawing (an AND
+  // group) matches the mirror images too.
+  const defined = drawing.spins.size > 0 || doubleKeys.some((k) => k in drawing.labels.bonds);
+  const agrees = ({ combination, labels }: Member) =>
+    centres.every((atom, i) => !drawing.spins.has(atom) || drawing.spins.get(atom) === combination.spins[i]) &&
+    doubleKeys.every((k) => !(k in drawing.labels.bonds) || labels.bonds[k] === drawing.labels.bonds[k]);
+  const agreeing = new Map([...classes].map(([inchi, members]) => [inchi, defined ? members.filter(agrees) : []]));
+
+  // Which combination stands for each stereoisomer: for one the drawing matches, the one that
+  // agrees with it (so it is drawn as drawn); else the smallest signature. The generator uses
+  // the same rule (centres CW 0 / CCW 1 in atom order, then double bonds Z 1 / else 0).
+  const signature = ({ combination, labels }: Member) =>
     combination.spins.map((s) => (s === 'ccw' ? '1' : '0')).join('') +
     doubleKeys.map((k) => (labels.bonds[k] === 'Z' || labels.bonds[k] === 'z' ? '1' : '0')).join('');
+  const smallest = (members: Member[]) => members.reduce((best, m) => (signature(m) < signature(best) ? m : best));
   const reps = new Map(
-    [...classes].map(([inchi, members]) => [
-      inchi,
-      members.reduce((best, m) => (signature(m) < signature(best) ? m : best)),
-    ]),
+    [...classes].map(([inchi, members]) => [inchi, smallest(agreeing.get(inchi)!.length > 0 ? agreeing.get(inchi)! : members)]),
   );
 
-  // What the drawing defines, and which stereoisomers agree with all of it.
-  const drawnSpins = new Map(elements.centres.flatMap((atom) => {
-    const spin = molecule.atoms[atom].stereo;
-    return spin === 'cw' || spin === 'ccw' ? [[atom, spin] as const] : [];
-  }));
-  const drawnLabels = labelsOf(drawnTags);
-  const drawnBonds = doubleKeys.filter((k) => k in drawnLabels.bonds);
-  const defined = drawnSpins.size > 0 || drawnBonds.length > 0;
-  const agrees = ({ combination, labels }: { combination: Combination; labels: Labels }) =>
-    elements.centres.every((atom, i) => !drawnSpins.has(atom) || drawnSpins.get(atom) === combination.spins[i]) &&
-    drawnBonds.every((k) => labels.bonds[k] === drawnLabels.bonds[k]);
-
   const mirrors = new Map([...reps].map(([inchi, rep]) => [inchi, read(mirrored(rep.combination), false).inchi]));
-  const matching = new Set(defined ? [...classes].filter(([, members]) => members.some(agrees)).map(([inchi]) => inchi) : []);
-  if (chiralFlag === '0' && drawnSpins.size > 0) for (const inchi of [...matching]) matching.add(mirrors.get(inchi)!);
+  const matching = new Set([...agreeing].filter(([, members]) => members.length > 0).map(([inchi]) => inchi));
+  if (drawing.racemic) for (const inchi of [...matching]) matching.add(mirrors.get(inchi)!);
   const chiral = new Set([...classes.keys()].filter((inchi) => mirrors.get(inchi) !== inchi));
   const inchikey = new Map([...classes.keys()].map((inchi) => [inchi, rdkit.get_inchikey_for_inchi(inchi)]));
   const key = (inchi: string) => inchikey.get(inchi)!;
@@ -283,12 +282,12 @@ export function enumerateStereoisomers(rdkit: MainModule, molfile: string): Enum
       compare(firstKey(a), firstKey(b)),
   );
   const order = groups.flat();
-  const repLabels = new Map(order.map((inchi) => [inchi, read(reps.get(inchi)!.combination, true).labels]));
   const number = new Map(order.map((inchi, i) => [inchi, i + 1]));
   const judged = !notes.includes('axial-planar');
 
   const stereoisomers = order.map((inchi): Stereoisomer => {
     const rep = reps.get(inchi)!;
+    const labels = read(rep.combination, true).labels;
     const relation: Relation = chiral.has(inchi)
       ? { kind: 'enantiomer', of: number.get(mirrors.get(inchi)!)! }
       : !judged
@@ -297,35 +296,16 @@ export function enumerateStereoisomers(rdkit: MainModule, molfile: string): Enum
     return {
       number: number.get(inchi)!,
       inchikey: key(inchi),
-      labels: repLabels.get(inchi)!,
+      labels,
       relation,
       matches: matching.has(inchi),
-      molfile: drawnLike(reader, molfile, json, elements, rep.combination, repLabels.get(inchi)!, drawnLabels, inchi),
+      molfile: drawnLike(reader, molfile, drawing, rep.combination, labels, inchi),
     };
   });
   return { outcome: 'listed', elements: count, notes, stereoisomers };
 }
 
-/** Plain code-point order, as Python sorts strings. */
-function compare(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
-}
-
-function notesFor(molecule: JsonMolecule, elements: Elements, biaryl: boolean): Note[] {
-  const rings = (molecule.extensions ?? []).flatMap((e) => e.atomRings ?? []).map((r) => new Set(r));
-  const bonds = molecule.bonds ?? [];
-  const notes: Note[] = [];
-  const shared = (a: Set<number>, b: Set<number>) => [...a].filter((x) => b.has(x)).length;
-  if (rings.some((a, i) => rings.slice(i + 1).some((b) => shared(a, b) >= 3))) notes.push('bridged');
-  const doubles = bonds.filter((b) => b.bo === 2);
-  const allene = doubles.some((b, i) => doubles.some((c, j) => i !== j && c.atoms.some((x) => b.atoms.includes(x))));
-  const inRing = (bond: JsonBond) => rings.some((r) => bond.atoms.every((x) => r.has(x)));
-  const ringDouble = elements.doubles.some((i) => inRing(bonds[i]));
-  if (allene || ringDouble || biaryl) notes.push('axial-planar');
-  return notes;
-}
-
-/** A V2000 Molfile's bond lines: [first atom, second atom, stereo], 0-based atoms. */ // chem-literal-ok: format name
+/** The V2000 Molfile's bond lines: [first atom, second atom, stereo], 0-based atoms. */ // chem-literal-ok: format name
 function bondLines(molfile: string): { lines: string[]; start: number; bonds: [number, number, number][] } | null {
   const lines = molfile.split('\n');
   const counts = lines[3] ?? '';
@@ -345,29 +325,25 @@ function withChiralFlag(molfile: string): string {
   return lines.join('\n');
 }
 
-/** A Molfile of one stereoisomer, drawn like the drawing: its coordinates, and the bonds the
- * student wedged at each centre, wedge or hash as this stereoisomer needs (decision 3). A
- * double bond whose geometry must change can't keep the coordinates, so then the molecule
- * is laid out afresh, with RDKit's wedges. Whatever the route, it must read back as the
- * stereoisomer, or the next route is taken. */
-function drawnLike(
-  reader: Reader,
-  drawing: string,
-  json: Json,
-  elements: Elements,
-  combination: Combination,
-  labels: Labels,
-  drawnLabels: Labels,
-  inchi: string,
-): string {
-  const text = serialise(withCombination(json, elements, combination), true);
-  const flagged = (molfile: string) => (elements.centres.length > 0 ? withChiralFlag(molfile) : molfile);
-  const readsBack = (molfile: string) => reader.with(molfile, (mol) => mol.get_inchi()) === inchi;
-  const bondsMatchDrawing = Object.keys(labels.bonds).every((k) => drawnLabels.bonds[k] === labels.bonds[k]);
+/** A Molfile of one stereoisomer, drawn like the drawing: its coordinates, with the
+ * student's wedges and hashes at each centre the drawing defines, kept where this
+ * stereoisomer has the drawing's setting and all swapped (wedge for hash) where it has the
+ * other (decision 3). A double bond whose geometry must change can't keep the coordinates, so
+ * then the molecule is laid out afresh, with RDKit's wedges. Whatever the route, it must
+ * read back as the stereoisomer, or the next route is taken; null when none does. */
+function drawnLike(reader: Reader, molfile: string, drawing: Drawing, combination: Combination, labels: Labels, inchi: string): string | null {
+  const text = withCombination(drawing, combination, true);
+  const flagged = (m: string) => (drawing.centres.length > 0 ? withChiralFlag(m) : m);
+  const readsBack = (m: string) => reader.inchiOf(m) === inchi;
+  const bonds = drawing.json.molecules[0].bonds ?? [];
+  const keepsLayout = drawing.doubles.every((i) => {
+    const k = bondKey(...bonds[i].atoms);
+    return labels.bonds[k] === undefined || labels.bonds[k] === drawing.labels.bonds[k];
+  });
 
-  if (bondsMatchDrawing) {
+  if (keepsLayout) {
     const rdkitDrawn = reader.with(text, (mol) => mol.get_molblock());
-    const student = withStudentWedges(reader, drawing, rdkitDrawn, elements, combination);
+    const student = withStudentWedges(molfile, rdkitDrawn, drawing, combination);
     for (const candidate of [student, rdkitDrawn]) {
       if (candidate !== null && readsBack(flagged(candidate))) return flagged(candidate);
     }
@@ -376,43 +352,35 @@ function drawnLike(
     mol.set_new_coords();
     return mol.get_molblock();
   });
-  if (readsBack(flagged(fresh))) return flagged(fresh);
-  throw new Error('a stereoisomer could not be drawn as itself');
+  return readsBack(flagged(fresh)) ? flagged(fresh) : null;
 }
 
-/** RDKit's Molfile of a stereoisomer, with each centre the student wedged wedged on the same
- * bond again: wedge or hash, whichever reads back as this stereoisomer's setting. */
-function withStudentWedges(
-  reader: Reader,
-  drawing: string,
-  rdkitDrawn: string,
-  elements: Elements,
-  combination: Combination,
-): string | null {
-  const drawn = bondLines(drawing);
+/** RDKit's Molfile of a stereoisomer, with RDKit's wedges taken off each centre the student
+ * wedged, and the student's wedges and hashes there instead: as drawn where this
+ * stereoisomer's setting is the drawing's, every one swapped where it is the other. */
+function withStudentWedges(drawn: string, rdkitDrawn: string, drawing: Drawing, combination: Combination): string | null {
+  const student = bondLines(drawn);
   const ours = bondLines(rdkitDrawn);
-  if (!drawn || !ours || drawn.bonds.length !== ours.bonds.length) return null;
-  const centres = new Map(elements.centres.map((atom, i) => [atom, combination.spins[i]]));
+  if (!student || !ours || student.bonds.length !== ours.bonds.length) return null;
+  const spinOf = new Map(drawing.centres.map((atom, i) => [atom, combination.spins[i]]));
+  const marked = student.bonds.flatMap(([first, second, stereo], index) =>
+    (stereo === 1 || stereo === 6) && drawing.spins.has(first) ? [{ index, first, second, stereo }] : [],
+  );
+  if (marked.length === 0) return null;
+  const centres = new Set(marked.map((m) => m.first));
   const lines = [...ours.lines];
   const write = (index: number, first: number, second: number, stereo: number) => {
     const old = lines[ours.start + index];
     const pad = (n: number) => String(n).padStart(3, ' ');
     lines[ours.start + index] = `${pad(first + 1)}${pad(second + 1)}${old.slice(6, 9)}${pad(stereo)}${old.slice(12)}`;
   };
-  const spinOf = (molfile: string, atom: number) =>
-    reader.with(molfile, (mol) => (JSON.parse(mol.get_json()) as Json).molecules[0].atoms[atom].stereo);
-  let changed = false;
-  for (const [index, [first, , stereo]] of drawn.bonds.entries()) {
-    const spin = centres.get(first);
-    if (spin === undefined || (stereo !== 1 && stereo !== 6)) continue;
-    // Take RDKit's wedges off this centre, then wedge the student's bond.
-    ours.bonds.forEach(([a, b, s], i) => {
-      if (a === first && (s === 1 || s === 6)) write(i, a, b, 0);
-    });
-    const second = drawn.bonds[index][1];
-    write(index, first, second, 1);
-    if (spinOf(lines.join('\n'), first) !== spin) write(index, first, second, 6);
-    changed = true;
+  // First RDKit's wedges off those centres, then the student's on.
+  ours.bonds.forEach(([a, b, s], i) => {
+    if (centres.has(a) && (s === 1 || s === 6)) write(i, a, b, 0);
+  });
+  for (const { index, first, second, stereo } of marked) {
+    const same = spinOf.get(first) === drawing.spins.get(first);
+    write(index, first, second, same ? stereo : 7 - stereo);
   }
-  return changed ? lines.join('\n') : null;
+  return lines.join('\n');
 }
