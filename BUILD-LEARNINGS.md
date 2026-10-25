@@ -962,3 +962,29 @@ Acceptance bar: docs/plans/placement-toolbar-branding.md.
 - Each run warms the target's cache with the structures it used. The fixtures hold 77, so
   a target can be load-checked twice.
 
+## Plainer Save and Open, Kekulé icon, public production (2026-10-25)
+
+Acceptance bar: docs/plans/dialogs-icon-offcampus.md.
+- **Save dialog.** Its `data-testid="save-dialog"` is on the overlay around the `<dialog>`, not
+  on the dialog itself; a test id read from the source ("save-structure-dialog") never
+  reached the page. The Preview tab's content is a `div` around `[data-testid=preview-area]`
+  (a textarea, or an `img` for SVG/PNG), hidden with `:has()`. The form keeps a fixed
+  310px height, so it is set to `auto` or the dialog keeps a blank middle.
+- Ketcher adds a Warnings tab only when the format would lose something. A test draws two
+  reactions (`A>>B`, then `addFragment` of `C>>D`), since a Molfile keeps one arrow.
+- **Open dialog.** Esc does not close it (a test waiting for that hung); its file text is
+  `[data-testid=open-structure-textarea]`. A ChemDraw file with several structures shows
+  pictures to pick from instead, which stays. "Add to Canvas" and Ctrl+V both hand the
+  structure to Ketcher's paste tool: tests wait until the editor's tool holds a `struct`,
+  then click on the canvas.
+- The hidden preview and file text still hold the file, so tests read them (`toHaveValue`)
+  as the positive control, and the smoke test's Save still waits on the preview's text.
+- Each rule removed in turn failed a test: the Preview tab, the preview content, the paste
+  tile, the file text, the form's height and the centred tile.
+- **Icon.** The inner circle became three double-bond lines on alternating edges, each the
+  edge pulled a quarter of the way to the centre.
+- **Public production.** `PRODUCTION_CAMPUS_ONLY = False` renders the production block with
+  its campus rule commented out; the live vhost changes by those 5 lines (applied by Jeff).
+  The naming API is public with it: anyone's lookups share the server's PubChem budget
+  (5 a second, 400 a minute), and heavy outside use would show students "Busy".
+

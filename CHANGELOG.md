@@ -85,6 +85,13 @@ All notable changes to this project. The format follows
   drawing clears the prediction until it is predicted again.
 
 ### Changed
+- Save and Open no longer show the raw text of the file. Save asks only for the file name
+  and format (Ketcher's warnings still show when a format would lose something). Open goes
+  from choosing a file straight to "Open as New Project" or "Add to Canvas"; the "Paste
+  from clipboard" tile is gone, and Ctrl+V on the canvas still pastes.
+- The icon is a gold benzene ring with alternating double bonds, on black.
+- Production (/draw/) opens off campus too, like /chemtutor, so CHEM-311 students can use
+  and install it at home. Staging stays campus and VPN only.
 - The app is called MU Draw ("MU Draw (staging)" on staging), in black and gold: a black
   header with a gold rule and a gold "MU", gold hover and focus on its buttons, and
   gold-on-black icons. An installed app picks up the new name and icon with the update.
