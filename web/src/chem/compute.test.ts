@@ -128,6 +128,28 @@ describe('stereo elements', () => {
     },
   );
 
+  // The stereoisomer test drawings include double bonds drawn crossed (E/Z undefined), which
+  // RDKit.js's get_stereo_tags leaves out; the panel used to miss them.
+  const stereoSet = Object.values(
+    import.meta.glob<{ compounds: { name: string; file: string; elements: number }[] }>(
+      '../../../tests/fixtures/stereoisomers_expected.json',
+      { eager: true, import: 'default' },
+    ),
+  )[0].compounds;
+  const stereoDrawings = import.meta.glob<string>('../../../tests/fixtures/stereoisomers/*.mol', {
+    eager: true,
+    query: '?raw',
+    import: 'default',
+  });
+
+  it.each(stereoSet.map((c) => [c.name, c] as const))(
+    '%s: as many stereo elements as Python RDKit finds, crossed double bonds included',
+    (_name, compound) => {
+      const c = computeProperties(rdkit, stereoDrawings[`../../../tests/fixtures/${compound.file}`])!;
+      expect(c.centres.length + c.doubleBonds.length).toBe(compound.elements);
+    },
+  );
+
   it("needs RDKit's current stereo perception: the legacy one misses ring cis/trans centres", () => {
     const ring = expected.compounds.find((c) => c.typed_name === '1,4-dimethylcyclohexane')!;
     expect(compute(ring).centres.length).toBe(Number(ring.panel!.stereo.centres));

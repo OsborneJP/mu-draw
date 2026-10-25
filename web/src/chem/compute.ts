@@ -2,7 +2,7 @@
 // descriptors, the atoms counted by element, the stereo elements and the functional groups.
 // Runs in the RDKit worker (rdkitWorker.ts) and, in the unit tests, in Node with the same
 // RDKit.js. Nothing here rounds or decides what is shown; properties.ts does that.
-import type { MainModule } from '@rdkit/rdkit';
+import type { MainModule, Mol } from '@rdkit/rdkit';
 import { findGroups, type GroupsResult, type Patterns } from './functionalGroups';
 
 // The rdMolDescriptors.Properties values the panel shows. Lipinski's own counts (NH + OH;
@@ -51,7 +51,9 @@ interface JsonAtom {
 
 interface JsonBond {
   atoms: [number, number];
+  bo: number;
   stereo: string;
+  stereoAtoms?: [number, number];
 }
 
 interface RdkitJson {
@@ -78,6 +80,56 @@ function symbolFor(rdkit: MainModule, z: number, cache: Map<number, string>): st
 }
 
 const symbols = new Map<number, string>();
+
+interface StereoTags {
+  CIP_atoms: [number, string][];
+  CIP_bonds: [number, number, string][];
+}
+
+/** The double bonds that can have E/Z, by their two atoms, in bond order. get_stereo_tags
+ * lists a double bond only once its geometry is fixed: one drawn crossed (E/Z undefined)
+ * comes through as "either" and is left out, so the panel used to miss it. So every double
+ * bond not yet fixed is set to cis and RDKit is asked again: it keeps stereo only where it
+ * can be, which gives Python's FindPotentialStereo (stereoisomers.test.ts checks every test
+ * drawing). Cumulated double bonds (allenes) stay out, as RDKit.js leaves them. */
+export function stereoDoubleBonds(rdkit: MainModule, mol: Mol): [number, number][] {
+  const json = JSON.parse(mol.get_json()) as RdkitJson;
+  const tags = JSON.parse(mol.get_stereo_tags()) as StereoTags;
+  const molecule = json.molecules[0];
+  const bonds = (molecule.bonds ?? []).map((b) => ({ ...json.defaults.bond, ...b }));
+  const same = (b: { atoms: [number, number] }, x: number, y: number) =>
+    (b.atoms[0] === x && b.atoms[1] === y) || (b.atoms[0] === y && b.atoms[1] === x);
+  const fixed = new Set(tags.CIP_bonds.map(([a, b]) => bonds.findIndex((x) => same(x, a, b))));
+  const doubles = bonds.flatMap((b, i) => (b.bo === 2 ? [i] : []));
+  const cumulated = (i: number) => doubles.some((j) => j !== i && bonds[j].atoms.some((x) => bonds[i].atoms.includes(x)));
+  const neighbour = (end: number, not: number) =>
+    bonds.map((b) => b.atoms).find(([p, q]) => (p === end && q !== not) || (q === end && p !== not));
+  const open = doubles.filter((i) => !fixed.has(i) && !cumulated(i) && bonds[i].atoms.every((end, k) => neighbour(end, bonds[i].atoms[1 - k])));
+  const found = new Set(fixed);
+  if (open.length > 0) {
+    const probe = structuredClone(json);
+    const probed = probe.molecules[0];
+    delete (probed as { conformers?: unknown }).conformers;
+    for (const i of open) {
+      const [a, b] = bonds[i].atoms;
+      const other = (end: number, not: number) => {
+        const [p, q] = neighbour(end, not)!;
+        return p === end ? q : p;
+      };
+      probed.bonds![i] = { ...probed.bonds![i], stereo: 'cis', stereoAtoms: [other(a, b), other(b, a)] };
+    }
+    const settled = rdkit.get_mol(JSON.stringify(probe), JSON.stringify({ removeHs: false }));
+    if (settled) {
+      try {
+        const kept = JSON.parse(settled.get_stereo_tags()) as StereoTags;
+        for (const [a, b] of kept.CIP_bonds) found.add(bonds.findIndex((x) => same(x, a, b)));
+      } finally {
+        settled.delete();
+      }
+    }
+  }
+  return [...found].sort((x, y) => x - y).map((i) => bonds[i].atoms);
+}
 
 /** RDKit settings the fixtures were made with (gen_reference_expected.py). RDKit.js
  * defaults to the legacy stereo perception, which misses ring cis/trans centres
@@ -118,15 +170,12 @@ export function computeProperties(
 
     // get_stereo_tags lists every potential stereo element (RDKit's FindPotentialStereo
     // with flagPossible, under the non-legacy perception rdkitWorker.ts switches on).
-    const tags = JSON.parse(mol.get_stereo_tags()) as {
-      CIP_atoms: [number, string][];
-      CIP_bonds: [number, number, string][];
-    };
+    const tags = JSON.parse(mol.get_stereo_tags()) as StereoTags;
     const centres = tags.CIP_atoms.map(([index]) => ({
       atoms: [index],
       defined: DEFINED_ATOM.has(atoms[index].stereo),
     }));
-    const doubleBonds = tags.CIP_bonds.map(([a, b]) => {
+    const doubleBonds = stereoDoubleBonds(rdkit, mol).map(([a, b]) => {
       const bond = bonds.find((x) => (x.atoms[0] === a && x.atoms[1] === b) || (x.atoms[0] === b && x.atoms[1] === a));
       return { atoms: [a, b], defined: bond !== undefined && DEFINED_BOND.has(bond.stereo) };
     });
