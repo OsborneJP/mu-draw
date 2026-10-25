@@ -55,17 +55,19 @@ interface JsonAtom {
   z: number;
   impHs: number;
   chg: number;
+  isotope: number;
 }
 
-/** What RDKit draws in place of a stereocentre labelled `label`: "(R)" at a carbon; at any
- * other atom, its symbol (with its H and charge, as RDKit would write them) then "(R)",
- * smaller. */
+/** What RDKit draws in place of a stereocentre labelled `label`: "(R)" at a plain carbon; at
+ * any other atom (a carbon with an isotope or a charge included), its symbol with its
+ * isotope, H and charge then "(R)", smaller, so nothing the drawing shows is lost. */
 export function atomLabel(rdkit: MainModule, atom: JsonAtom, label: string): string {
-  if (atom.z === 6) return `(${label})`;
+  if (atom.z === 6 && atom.isotope === 0 && atom.chg === 0) return `(${label})`;
+  const isotope = atom.isotope === 0 ? '' : `<sup>${atom.isotope}</sup>`;
   const hydrogens = atom.impHs === 0 ? '' : atom.impHs === 1 ? 'H' : `H<sub>${atom.impHs}</sub>`;
   const size = Math.abs(atom.chg);
   const charge = atom.chg === 0 ? '' : `<sup>${size > 1 ? size : ''}${atom.chg > 0 ? '+' : '-'}</sup>`;
-  return `${elementSymbol(rdkit, atom.z)}${hydrogens}${charge}<sub>(${label})</sub>`;
+  return `${isotope}${elementSymbol(rdkit, atom.z)}${hydrogens}${charge}<sub>(${label})</sub>`;
 }
 
 export function picture(rdkit: MainModule, molfile: string, labels: Labels): Picture {

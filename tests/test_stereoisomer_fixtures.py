@@ -23,6 +23,11 @@ REVIEWED = {
     " the same (the R,R and S,S forms)",
     "3-ethylidenepentane-2,4-diol, one centre and the double bond drawn": "as"
     " 3-ethylidenepentane-2,4-diol, which it is drawn from",
+    "3-ethylidenepentane-2,4-diol, one centre and the double bond drawn, a neighbour in line": "as"
+    " 3-ethylidenepentane-2,4-diol, which it is drawn from",
+    "2,6-dimethylcyclohexanone oxime, the methyl drawn with its H": "with one ring H drawn, SMILES"
+    " sees the ring's two sides as different, so it keeps E/Z on C=N where that is not"
+    " stereogenic and writes each form two ways",
 }
 # Where RDKit's own EnumerateStereoisomers (unique=False) leaves settings out, so the
 # stereoisomers it gives differ from every setting's. Any other difference fails.
@@ -218,4 +223,5 @@ def test_matches_are_what_rdkit_says_agrees_with_the_drawing(generated, compound
         drawing = Chem.MolFromMolBlock(generated[compound["file"]], removeHs=False)
         assert matched == agreeing_by_rdkit(drawing), compound["name"]
         checked.append(compound["name"])
-    assert {name for name, _ in gen.PARTLY_DRAWN} <= set(checked)
+    partly = [gen.IN_LINE[0], gen.TEXTBOOK_PARTLY[0], *(name for name, _ in gen.PARTLY_DRAWN)]
+    assert set(partly) <= set(checked)

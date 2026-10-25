@@ -1062,4 +1062,13 @@ what changed). Measured with RDKit.js 2026.9.1 and Python RDKit 2026.09.1.
   stereo taken off and the other end as a dummy atom, compared.
 - Playwright's `toBeInViewport` honours clipping by a scrolling panel, so it can tell
   whether a hint scrolled out of the stereoisomer panel.
+- Round 4: geometry read from a layout by the app went wrong where a neighbour is drawn in
+  line with its double bond (on neither side), a Ketcher snap angle; RDKit's own reading
+  (JSON `stereo` cis/trans with `stereoAtoms`, Python STEREOCIS/STEREOTRANS with
+  GetStereoAtoms) uses the end's other neighbour and gets it right, so matching reads that.
+- Comparing two branches by canonical SMILES must not keep drawn H as atoms: with an H
+  drawn on one branch only, alike branches looked different, and a dependent double bond
+  was lost. The comparison was removed rather than fixed (Jeff, round 4).
+- RDKit's JSON carries an atom's isotope as `isotope`; an atom label passed to the drawer
+  replaces everything RDKit would have drawn there, the isotope included.
 

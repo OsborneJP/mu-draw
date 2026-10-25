@@ -104,6 +104,8 @@ So a student sees why 2,3-dibromobutane has 3 stereoisomers, not 4.
   no button); the bridged note says so where there is a list.
 - Some settings of double bonds in a ring of 8 to 11 atoms can't be drawn flat as themselves
   (cyclooctatetraene with one or three E): listed without a picture or Add.
+- RDKit reads no stereo from wedges at selenium, so a selenoxide's stereoisomers are listed
+  without pictures or Add, as if they could not be drawn flat.
 
 ## After the first review (2026-10-25)
 
@@ -189,6 +191,31 @@ Accepted limits from round 3 (low): a failed Add's message sits in the same stic
 the in-hand hint, but no test makes Ketcher refuse a placement, so it is never rendered in a
 test; the E/Z placement rules beyond the first spot are tested on SVGs of a few lines, since
 no test drawing crowds them.
+
+
+**Round 4** (capped) confirmed two highs, both from round 3's own changes: a dependent double
+bond was lost when an H was drawn on only one of its alike branches (the round-3 check that
+the branches are alike), and "matches" read a neighbour drawn straight on from a double bond
+as on neither side (the round-3 geometry code). Two mediums: an isotope on a stereocentre
+was dropped from its label, and selenoxides have no pictures. Jeff chose (2026-10-25) to lean
+on RDKit and stop: one last review of these changes only, whose findings become accepted
+limits rather than more fixes.
+
+Acceptance bar for these last changes:
+1. **Matching reads RDKit's own cis/trans** for each double bond the drawing fixes (the
+   browser from RDKit's JSON, the generator from RDKit's bond stereo), turned to the first
+   other neighbours the settings use; no geometry code of the app's own. Test: a generated
+   drawing with that neighbour drawn straight on from its double bond, compared with the
+   fixture and with EnumerateStereoisomers(onlyUnassigned=True).
+2. **The round-3 alike-branches check is gone**; round 2's rule stands (both branches at one
+   end hold an open element). Test: a generated drawing with the H drawn at one centre the
+   textbook way beside a dependent double bond.
+3. **Isotopes stay in the labels**: a labelled atom with an isotope, or a charge, is drawn
+   with its symbol (¹³C₍R₎), never as a bare "(R)". Test: the label function.
+4. Known limit: selenoxides (RDKit reads no stereo from wedges at Se). Accepted limit: the
+   search for dependent double bonds tries =CH2 against every setting of the elements
+   around its other end when that end's two sides both hold open elements: about 0.3-1 s
+   per edit, in the worker, for a steroid drawn with =CH2, every H and no stereo.
 
 ## Priority
 

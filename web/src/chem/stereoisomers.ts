@@ -129,7 +129,7 @@ interface Drawing {
   centres: number[];
   doubles: number[];
   /** What it defines: the spin of each defined centre, and for each double bond it fixes,
-   * the geometry its layout shows (cis when the first other neighbours of its two ends,
+   * its geometry as RDKit reads it (cis when the first other neighbours of its two ends,
    * those setGeometry uses, are on the same side). Not E/Z: a double bond's label can turn
    * with a centre the drawing leaves open. */
   spins: Map<number, Spin>;
@@ -186,18 +186,21 @@ function readDrawing(rdkit: MainModule, molfile: string): Drawing | 'several' | 
   }
 }
 
-/** The geometry a layout shows for double bond `index`, relative to the first other
- * neighbour of each end (as setGeometry writes one). */
+/** The geometry RDKit reads for double bond `index` of the drawing (its cis or trans, to its
+ * own stereo atoms), turned to the first other neighbour of each end, as setGeometry writes
+ * one. RDKit's reading, not the app's: a neighbour drawn in line with the bond is on
+ * neither side, and RDKit then reads the end's other neighbour. */
 function drawnGeometry(json: RdkitJson, index: number): 'cis' | 'trans' {
-  const molecule = json.molecules[0];
-  const bonds = molecule.bonds ?? [];
-  const [a, b] = bonds[index].atoms;
-  const at = (atom: number) => molecule.conformers![0].coords[atom];
-  const side = (atom: number) => {
-    const [[ax, ay], [bx, by], [px, py]] = [at(a), at(b), at(atom)];
-    return Math.sign((bx - ax) * (py - ay) - (by - ay) * (px - ax));
-  };
-  return side(neighbour(bonds, a, b)!) === side(neighbour(bonds, b, a)!) ? 'cis' : 'trans';
+  const bonds = json.molecules[0].bonds ?? [];
+  const {
+    atoms: [a, b],
+    stereo,
+    stereoAtoms,
+  } = bonds[index];
+  let same = stereo === 'cis';
+  if (stereoAtoms![0] !== neighbour(bonds, a, b)) same = !same;
+  if (stereoAtoms![1] !== neighbour(bonds, b, a)) same = !same;
+  return same ? 'cis' : 'trans';
 }
 
 function notesFor(json: RdkitJson, doubles: number[], axial: boolean): Note[] {

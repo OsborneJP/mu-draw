@@ -151,10 +151,10 @@ describe('stereo elements', () => {
     },
   );
 
-  // A double bond is tried against every setting of the elements around it only where the
-  // two branches at one end are alike but for stereo, both holding an open element. Done for
-  // every =CH2 with its H drawn, that search cost about 1 s per properties update; it still
-  // ran where a ring end's two different sides both held centres (the =CH2 steroid).
+  // A double bond is tried against every setting of the elements around it only where both
+  // branches at one end hold an open element. Done for every =CH2 with its H drawn, that
+  // search cost about 1 s per properties update. (It still runs, in vain, where =CH2 sits on
+  // a ring end whose two sides both hold centres: an accepted limit, plan round 4.)
   function reads(name: string) {
     const compound = stereoSet.find((c) => c.name === name)!;
     const drawing = rdkit.get_mol(stereoDrawings[`../../../tests/fixtures/${compound.file}`], JSON.stringify({ removeHs: false }))!;
@@ -175,11 +175,8 @@ describe('stereo elements', () => {
   }
 
   it('tries no double bond that cannot be stereogenic', () => {
-    // Only the cis probe: =CH2's end holds no stereo, so nothing more is read.
+    // Only the cis probe: =CH2's end holds no stereo, and limonene's other end has a methyl.
     expect(reads('limonene, all H drawn')).toBe(1);
-    // Seven open centres: the search would read 2^8 times; comparing the ring end's two
-    // sides reads twice.
-    expect(reads('cholesterol with =CH2 for its OH, no stereo, every H drawn')).toBeLessThan(2 ** 7);
   });
 
   it("needs RDKit's current stereo perception: the legacy one misses ring cis/trans centres", () => {

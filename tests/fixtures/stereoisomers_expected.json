@@ -4510,6 +4510,172 @@
       ],
       "count": 4,
       "smiles_unique": 4
+    },
+    {
+      "name": "3-ethylidenepentane-2,4-diol, one centre and the double bond drawn, a neighbour in line",
+      "file": "stereoisomers/3-ethylidenepentane-2-4-diol-one-centre-and-the-double-bond-drawn-a-neighbour-in-line.mol",
+      "elements": 3,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "XZYDUSBDPFXZBQ-CSPWTJDYSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "R"
+            },
+            "bonds": {
+              "2-7": "e"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": true,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-NFDDSEKQSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "XZYDUSBDPFXZBQ-CFDJTYOJSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "R"
+            },
+            "bonds": {
+              "2-7": "z"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-MSXDGYLOSA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "XZYDUSBDPFXZBQ-WDSKDSINSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "3": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 4
+          },
+          "matches": true,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-CEWDZBJUSA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "XZYDUSBDPFXZBQ-PHDIDXHHSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "3": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "CPKVGQTWEMUYIE-DENIILHGSA-N"
+        }
+      ],
+      "count": 4,
+      "smiles_unique": 6
+    },
+    {
+      "name": "2,6-dimethylcyclohexanone oxime, the methyl drawn with its H",
+      "file": "stereoisomers/2-6-dimethylcyclohexanone-oxime-the-methyl-drawn-with-its-h.mol",
+      "elements": 3,
+      "outcome": "listed",
+      "notes": [],
+      "stereoisomers": [
+        {
+          "number": 1,
+          "inchikey": "PHLQNGDQAIKEMA-BQBZGAKWSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "5": "S"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 2
+          },
+          "matches": true,
+          "with_drawing_inchikey": "OGAFZMZUJPCZQO-TVXOGIHBSA-N"
+        },
+        {
+          "number": 2,
+          "inchikey": "PHLQNGDQAIKEMA-RNFRBKRXSA-N",
+          "labels": {
+            "atoms": {
+              "1": "R",
+              "5": "R"
+            },
+            "bonds": {}
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 1
+          },
+          "matches": false,
+          "with_drawing_inchikey": "OGAFZMZUJPCZQO-ZXVDYSDESA-N"
+        },
+        {
+          "number": 3,
+          "inchikey": "PHLQNGDQAIKEMA-PNZIDKJXSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "5": "R"
+            },
+            "bonds": {
+              "6-7": "e"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 4
+          },
+          "matches": true,
+          "with_drawing_inchikey": "OGAFZMZUJPCZQO-OQDJVVDISA-N"
+        },
+        {
+          "number": 4,
+          "inchikey": "PHLQNGDQAIKEMA-KNJDTQEKSA-N",
+          "labels": {
+            "atoms": {
+              "1": "S",
+              "5": "R"
+            },
+            "bonds": {
+              "6-7": "z"
+            }
+          },
+          "relation": {
+            "kind": "enantiomer",
+            "of": 3
+          },
+          "matches": false,
+          "with_drawing_inchikey": "OGAFZMZUJPCZQO-PBSGAENASA-N"
+        }
+      ],
+      "count": 4,
+      "smiles_unique": 8
     }
   ]
 }

@@ -171,12 +171,13 @@ function cipOf(molfile: string) {
 }
 
 /** Whether a Molfile's layout draws double bond "a-b" with the first other neighbour of each
- * end (lowest atom index) on the same side or opposite sides: plain geometry, no RDKit. */
+ * end (lowest atom index) on the same side or opposite sides: plain geometry, no RDKit. A
+ * neighbour drawn in line with the bond counts as opposite the end's other neighbour. */
 function sides(molfile: string, bond: string): 'same' | 'opposite' {
   const { atoms, bonds } = parts(molfile);
   const [a, b] = bond.split('-').map(Number);
-  const other = (end: number, not: number) =>
-    Math.min(...bonds.flatMap(([p, q]) => (p === end && q !== not ? [q] : q === end && p !== not ? [p] : [])));
+  const others = (end: number, not: number) =>
+    bonds.flatMap(([p, q]) => (p === end && q !== not ? [q] : q === end && p !== not ? [p] : [])).sort((x, y) => x - y);
   const xy = (i: number) => atoms[i] as number[];
   const side = (i: number) => {
     const [ax, ay] = xy(a);
@@ -184,7 +185,11 @@ function sides(molfile: string, bond: string): 'same' | 'opposite' {
     const [px, py] = xy(i);
     return Math.sign((bx - ax) * (py - ay) - (by - ay) * (px - ax));
   };
-  return side(other(a, b)) === side(other(b, a)) ? 'same' : 'opposite';
+  const sideOfFirst = (end: number, not: number) => {
+    const [first, second] = others(end, not);
+    return side(first) !== 0 || second === undefined ? side(first) : -side(second);
+  };
+  return sideOfFirst(a, b) === sideOfFirst(b, a) ? 'same' : 'opposite';
 }
 
 describe('each picture is the stereoisomer it shows', () => {
@@ -367,10 +372,16 @@ describe('the pictures', () => {
   });
 
   it('labels a heteroatom stereocentre with its symbol, H and charge as RDKit writes them', () => {
-    expect(atomLabel(rdkit, { z: 16, impHs: 0, chg: 0 }, 'R')).toBe('S<sub>(R)</sub>');
-    expect(atomLabel(rdkit, { z: 7, impHs: 1, chg: 1 }, 's')).toBe('NH<sup>+</sup><sub>(s)</sub>');
-    expect(atomLabel(rdkit, { z: 15, impHs: 2, chg: -2 }, 'S')).toBe('PH<sub>2</sub><sup>2-</sup><sub>(S)</sub>');
-    expect(atomLabel(rdkit, { z: 6, impHs: 1, chg: 0 }, 'R')).toBe('(R)');
+    expect(atomLabel(rdkit, { z: 16, impHs: 0, chg: 0, isotope: 0 }, 'R')).toBe('S<sub>(R)</sub>');
+    expect(atomLabel(rdkit, { z: 7, impHs: 1, chg: 1, isotope: 0 }, 's')).toBe('NH<sup>+</sup><sub>(s)</sub>');
+    expect(atomLabel(rdkit, { z: 15, impHs: 2, chg: -2, isotope: 0 }, 'S')).toBe('PH<sub>2</sub><sup>2-</sup><sub>(S)</sub>');
+    expect(atomLabel(rdkit, { z: 6, impHs: 1, chg: 0, isotope: 0 }, 'R')).toBe('(R)');
+  });
+
+  it('keeps an isotope or a charge at a labelled carbon: the label never hides them', () => {
+    expect(atomLabel(rdkit, { z: 6, impHs: 1, chg: 0, isotope: 13 }, 'R')).toBe('<sup>13</sup>CH<sub>(R)</sub>');
+    expect(atomLabel(rdkit, { z: 7, impHs: 0, chg: 0, isotope: 15 }, 'S')).toBe('<sup>15</sup>N<sub>(S)</sub>');
+    expect(atomLabel(rdkit, { z: 6, impHs: 0, chg: -1, isotope: 0 }, 'S')).toBe('C<sup>-</sup><sub>(S)</sub>');
   });
 
   // No test drawing crowds an E/Z label off its first spot, square to the bond above it; two

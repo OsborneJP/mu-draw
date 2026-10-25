@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import math
 
 import rdkit
 from rdkit import Chem
@@ -89,6 +90,14 @@ PARTLY_DRAWN = (
         "2,6-dimethylcyclohexanone oxime, one methyl and the OH drawn",
         "2,6-dimethylcyclohexanone oxime",
     ),
+)
+# The same, drawn the ways round 4 found wrong: the first other neighbour of the double bond's
+# end drawn exactly in line with it (only RDKit's reading of the drawing gets it right), and
+# the one centre drawn the textbook way, with its H (the H then sits in only one branch).
+IN_LINE = (f"{PARTLY_DRAWN[0][0]}, a neighbour in line", PARTLY_DRAWN[0][0])
+TEXTBOOK_PARTLY = (
+    "2,6-dimethylcyclohexanone oxime, the methyl drawn with its H",
+    PARTLY_DRAWN[1][0],
 )
 # 3D embedding, only to record which listed stereoisomers of a bridged compound can exist.
 EMBED_SEED = 0xF00D
@@ -198,10 +207,10 @@ Defined = tuple[dict[int, object], dict[int, bool]]
 
 def defined_by(drawing: Chem.Mol, elements: list) -> Defined:
     """What the drawing sets of the elements varied: each centre's chiral tag, and for each
-    double bond it fixes, whether the first other neighbours at its two ends are drawn on the
-    same side (read from the 2D layout, not from E/Z: a label can turn with a centre the
-    drawing leaves open). Nothing else counts: a wedged biaryl axis (RDKit reads atropisomer
-    stereo from it) is not varied, and neither does the browser count it."""
+    double bond it fixes, whether the first other neighbours at its two ends are on the same
+    side, from RDKit's own reading of the drawing (not from E/Z: a label can turn with a
+    centre the drawing leaves open). Nothing else counts: a wedged biaryl axis (RDKit reads
+    atropisomer stereo from it) is not varied, and neither does the browser count it."""
     tags = {
         e.centeredOn: drawing.GetAtomWithIdx(e.centeredOn).GetChiralTag()
         for e in elements
@@ -210,7 +219,7 @@ def defined_by(drawing: Chem.Mol, elements: list) -> Defined:
     }
     open_ = (Chem.BondStereo.STEREONONE, Chem.BondStereo.STEREOANY)
     sides = {
-        e.centeredOn: same_side_drawn(drawing, e.centeredOn)
+        e.centeredOn: same_side_read(drawing, e.centeredOn)
         for e in elements
         if e.type == Chem.StereoType.Bond_Double
         and drawing.GetBondWithIdx(e.centeredOn).GetStereo() not in open_
@@ -218,19 +227,18 @@ def defined_by(drawing: Chem.Mol, elements: list) -> Defined:
     return tags, sides
 
 
-def same_side_drawn(mol: Chem.Mol, index: int) -> bool:
-    """Whether the layout draws double bond `index` with the first other neighbour of each end
-    on the same side."""
+def same_side_read(mol: Chem.Mol, index: int) -> bool:
+    """Whether RDKit reads double bond `index` with the first other neighbour of each end on
+    the same side: its cis or trans, to its own stereo atoms, turned to those neighbours."""
     bond = mol.GetBondWithIdx(index)
+    if bond.GetStereo() not in (Chem.BondStereo.STEREOCIS, Chem.BondStereo.STEREOTRANS):
+        raise ValueError(f"bond {index}: RDKit read {bond.GetStereo()}, not cis or trans")
     a, b = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-    at = mol.GetConformer().GetAtomPosition
-
-    def side(i: int) -> float:
-        p, q, r = at(a), at(b), at(i)
-        cross = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x)
-        return (cross > 0) - (cross < 0)
-
-    return side(other_neighbour(mol, a, b)) == side(other_neighbour(mol, b, a))
+    first, second = bond.GetStereoAtoms()
+    same = bond.GetStereo() == Chem.BondStereo.STEREOCIS
+    same ^= first != other_neighbour(mol, a, b)
+    same ^= second != other_neighbour(mol, b, a)
+    return same
 
 
 def same_side_set(mol: Chem.Mol, index: int) -> bool:
@@ -484,9 +492,62 @@ def drawings(rows: list[dict[str, str]]) -> list[tuple[str, str]]:
     out.append((name, molfile(Chem.AddHs(methylene_for_hydroxyl(by_name[source])), name)))
 
     made = {ETHYLIDENE[0]: with_ethylidene(by_name[ETHYLIDENE[1]])}
+    partly = {}
     for name, source in PARTLY_DRAWN:
-        out.append((name, partly_drawn(made.get(source) or by_name[source], name)))
+        partly[name] = partly_drawn(made.get(source) or by_name[source], name)
+        out.append((name, partly[name]))
+
+    name, source = IN_LINE
+    out.append((name, in_line(partly[source], name)))
+    name, source = TEXTBOOK_PARTLY
+    out.append((name, restyled(Chem.MolFromMolBlock(partly[source]), name, textbook=True)))
     return out
+
+
+def in_line(text: str, name: str) -> str:
+    """A drawing of a fixed double bond, turned so the bond lies along x, with the first
+    other neighbour of an end that has two moved (with its branch) onto that line, exactly:
+    the same stereo, as RDKit reads it."""
+    mol = Chem.MolFromMolBlock(text, removeHs=False)
+    fixed = (Chem.BondStereo.STEREOCIS, Chem.BondStereo.STEREOTRANS)
+    (bond,) = [b for b in mol.GetBonds() if b.GetStereo() in fixed]
+    ends = (bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+    (end, other), *_ = [
+        (e, o) for e, o in (ends, ends[::-1]) if mol.GetAtomWithIdx(e).GetDegree() == 3
+    ]
+    moved = other_neighbour(mol, end, other)
+    conf = mol.GetConformer()
+    at = [conf.GetAtomPosition(i) for i in range(mol.GetNumAtoms())]
+    angle = math.atan2(at[end].y - at[other].y, at[end].x - at[other].x)
+    turned = {}
+    for i, p in enumerate(at):
+        x, y = p.x - at[end].x, p.y - at[end].y
+        turned[i] = (
+            x * math.cos(-angle) - y * math.sin(-angle),
+            x * math.sin(-angle) + y * math.cos(-angle),
+        )
+    turned[end] = (0.0, 0.0)
+    turned[other] = (turned[other][0], 0.0)
+    length = math.hypot(*turned[moved])
+    shift = (length - turned[moved][0], -turned[moved][1])
+    branch, todo = {moved}, [moved]
+    while todo:
+        for n in mol.GetAtomWithIdx(todo.pop()).GetNeighbors():
+            if n.GetIdx() not in branch and n.GetIdx() != end:
+                branch.add(n.GetIdx())
+                todo.append(n.GetIdx())
+    for i in branch:
+        turned[i] = (turned[i][0] + shift[0], turned[i][1] + shift[1])
+    turned[moved] = (length, 0.0)
+    for i, (x, y) in turned.items():
+        conf.SetAtomPosition(i, (x, y, 0.0))
+    mol.SetProp("_Name", name)
+    mol.SetIntProp("_MolFileChiralFlag", 1)
+    drawn = Chem.MolToMolBlock(mol)
+    back = Chem.MolFromMolBlock(drawn, removeHs=False)
+    if same_side_read(back, bond.GetIdx()) != same_side_read(mol, bond.GetIdx()):
+        raise ValueError(f"{name}: RDKit reads the double bond differently once in line")
+    return drawn
 
 
 def methylene_for_hydroxyl(mol: Chem.Mol) -> Chem.Mol:
