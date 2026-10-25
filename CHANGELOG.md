@@ -83,6 +83,10 @@ All notable changes to this project. The format follows
   drawing; clicking a carbon highlights its peak. A banner says these are predictions, not
   an answer key, and every prediction carries NMRShiftDB2's licence notice. Changing the
   drawing clears the prediction until it is predicted again.
+- Templates (header): conformation and projection templates to drop onto the canvas. A click
+  on one puts it in hand, as Add does: it follows the mouse until a click places it, Esc
+  puts it away, and one Undo removes it. Works offline. First: the cyclohexane chair with
+  all 12 hydrogens, axial and equatorial, and the same chair ring-flipped.
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name

@@ -991,3 +991,24 @@ Acceptance bar: docs/plans/dialogs-icon-offcampus.md.
   unchanged vhost (same checksum) and Jeff ran it. `--production` then passed the full
   check on the production build, 14 live checks and 85 browser tests against /draw/. Jeff
   opened /draw/ on his phone off campus.
+
+## Conformation and projection templates (v2, 2026-10-25)
+
+Acceptance bar and measurements: docs/plans/v2-templates.md.
+- Ketcher's Structure Library ships inside ketcher-react's bundle. An app can add templates
+  only through localStorage `ketcher-tmpls`, and Ketcher shows those as "User Templates",
+  which students can edit or delete. So the templates have their own menu and are placed
+  with the paste tool, which also carries shapes and text (one Undo removes all of it).
+- RDKit's real chair (MMFF) is not the textbook drawing: its axial C-H bonds are up to 3°
+  off the ring axis in projection, and its equatorial C-H bonds are 4° off the ring bonds
+  one removed (9° once projected). The template keeps RDKit's ring and puts each hydrogen in
+  the textbook direction; tests/test_templates.py checks the real chair is within 5° of it.
+- In a true projection, the axial bonds of the two inner carbons always cross the opposite
+  ring edge (at every tilt from 18° to 35°). The template keeps the real geometry.
+- `Chem.RemoveHs(m).GetRingInfo()` raised MemoryError: the ring info of a temporary
+  molecule. Assign the molecule first.
+- ketcher-react's `StructRender` caches pictures by structure name; unnamed structures share
+  one entry, so the menu passes `needCache: false`. Its SVG's text (Raphaël's credit, atom
+  labels) became each menu button's accessible name; the picture is `aria-hidden`.
+- Ketcher's bottom toolbar already uses `data-testid` `template-0`..`template-7` and
+  `template-lib`; the menu's items are `template-item-<id>`.

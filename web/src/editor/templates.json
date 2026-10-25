@@ -1,0 +1,595 @@
+{
+  "generator": "server/scripts/gen_templates.py",
+  "rdkit_version": "2026.09.1",
+  "chair": {
+    "conformers": 20,
+    "seed": 42,
+    "stretch": 1.5,
+    "elevation_deg": 18.0,
+    "turn_deg": 9.0
+  },
+  "templates": [
+    {
+      "id": "chair",
+      "group": "Chair",
+      "name": "Cyclohexane chair",
+      "ket": {
+        "root": {
+          "nodes": [
+            {
+              "$ref": "mol0"
+            }
+          ]
+        },
+        "mol0": {
+          "type": "molecule",
+          "atoms": [
+            {
+              "label": "C",
+              "location": [
+                0.8957,
+                0.2442,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                0.325,
+                0.0613,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                -0.5707,
+                0.4181,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                -0.8957,
+                -0.2442,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                -0.325,
+                -0.0613,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                0.5707,
+                -0.4181,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                1.7915,
+                -0.1127,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.8957,
+                1.1952,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.65,
+                0.7236,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.325,
+                -0.8898,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.5707,
+                1.3692,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -1.1415,
+                0.2352,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.8957,
+                -1.1952,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -1.7915,
+                0.1127,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.325,
+                0.8898,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.65,
+                -0.7236,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.5707,
+                -1.3692,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                1.1415,
+                -0.2352,
+                0.0
+              ]
+            }
+          ],
+          "bonds": [
+            {
+              "type": 1,
+              "atoms": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                1,
+                2
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                2,
+                3
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                3,
+                4
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                4,
+                5
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                5,
+                0
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                0,
+                6
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                0,
+                7
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                1,
+                8
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                1,
+                9
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                2,
+                10
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                2,
+                11
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                3,
+                12
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                3,
+                13
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                4,
+                14
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                4,
+                15
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                5,
+                16
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                5,
+                17
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "chair-flipped",
+      "group": "Chair",
+      "name": "Cyclohexane chair, ring-flipped",
+      "ket": {
+        "root": {
+          "nodes": [
+            {
+              "$ref": "mol0"
+            }
+          ]
+        },
+        "mol0": {
+          "type": "molecule",
+          "atoms": [
+            {
+              "label": "C",
+              "location": [
+                -0.8957,
+                0.2442,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                -0.325,
+                0.0613,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                0.5707,
+                0.4181,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                0.8957,
+                -0.2442,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                0.325,
+                -0.0613,
+                0.0
+              ]
+            },
+            {
+              "label": "C",
+              "location": [
+                -0.5707,
+                -0.4181,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -1.7915,
+                -0.1127,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.8957,
+                1.1952,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.65,
+                0.7236,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.325,
+                -0.8898,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.5707,
+                1.3692,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                1.1415,
+                0.2352,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.8957,
+                -1.1952,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                1.7915,
+                0.1127,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.325,
+                0.8898,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                0.65,
+                -0.7236,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -0.5707,
+                -1.3692,
+                0.0
+              ]
+            },
+            {
+              "label": "H",
+              "location": [
+                -1.1415,
+                -0.2352,
+                0.0
+              ]
+            }
+          ],
+          "bonds": [
+            {
+              "type": 1,
+              "atoms": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                1,
+                2
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                2,
+                3
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                3,
+                4
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                4,
+                5
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                5,
+                0
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                0,
+                6
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                0,
+                7
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                1,
+                8
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                1,
+                9
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                2,
+                10
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                2,
+                11
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                3,
+                12
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                3,
+                13
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                4,
+                14
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                4,
+                15
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                5,
+                16
+              ]
+            },
+            {
+              "type": 1,
+              "atoms": [
+                5,
+                17
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

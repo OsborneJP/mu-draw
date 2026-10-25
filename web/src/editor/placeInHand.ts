@@ -1,11 +1,12 @@
 import { prepareStructToRender, type Ketcher, type Struct } from 'ketcher-core';
 import { KETCHER_ROOT_NODE_CSS_SELECTOR } from 'ketcher-react';
 
-// Name to structure's Add puts the compound in the student's hand: it follows the mouse over
-// the canvas until a click puts it down there. This is Ketcher's own paste tool, the one its
-// "Add to canvas" uses, so the click is one change and one Undo. Ketcher says nothing when
-// its paste tool is done, so the tool armed here is watched: its click puts the compound
-// down; its cancel, when another tool takes over (a toolbar tool), puts it away.
+// Name to structure's Add, and the Templates menu, put a structure in the student's hand: it
+// follows the mouse over the canvas until a click puts it down there. This is Ketcher's own
+// paste tool, the one its "Add to canvas" uses, so the click is one change and one Undo.
+// Ketcher says nothing when its paste tool is done, so the tool armed here is watched: its
+// click puts the compound down; its cancel, when another tool takes over (a toolbar tool),
+// puts it away.
 
 /** Ketcher's paste tool (ketcher-react), as far as this file uses it. */
 interface PasteTool {
@@ -30,16 +31,17 @@ export interface Placement {
   cancel(): void;
 }
 
-/** Puts `molfile` in the student's hand. `dropping` runs the click that puts it down: the
- * drawing's change event fires inside it, so the caller can tell that change is its own. */
+/** Puts `structure` (a Molfile, or KET with shapes and text) in the student's hand.
+ * `dropping` runs the click that puts it down: the drawing's change event fires inside it, so
+ * the caller can tell that change is its own. */
 export async function placeInHand(
   ketcher: Ketcher,
-  molfile: string,
+  structure: string,
   dropping: (drop: () => void) => void,
 ): Promise<Placement> {
   // The parse addFragment uses (stereo and the chiral flag read the same way), then scaled
   // to the canvas's bond length.
-  const struct = await prepareStructToRender(molfile, ketcher.structService, ketcher);
+  const struct = await prepareStructToRender(structure, ketcher.structService, ketcher);
   struct.rescale();
   const editor = ketcher.editor as unknown as Tools;
   const tool = editor.tool('paste', struct);

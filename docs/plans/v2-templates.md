@@ -44,7 +44,7 @@ Requested by Jeff on 2026-10-25, for CHEM-311 as soon as possible. docs/SPEC.md,
 ## Design
 
 **Where the templates come from**
-- `scripts/gen_templates.py` (RDKit, in the project env) writes `web/src/editor/templates.json`: each template's name, group, and KET.
+- `server/scripts/gen_templates.py` (RDKit, in the project env) writes `web/src/editor/templates.json`: each template's name, group, and KET.
 - The app imports that file, so it ships in the precached JavaScript bundle: it works offline with no extra request.
 - The generator also writes `tests/fixtures/templates_expected.json` (formula, InChIKey and stereocentre counts, from RDKit) for the browser tests. A pytest drift test re-runs it and finds both files unchanged.
 

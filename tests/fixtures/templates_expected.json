@@ -1,0 +1,70 @@
+{
+  "generator": "server/scripts/gen_templates.py",
+  "rdkit_version": "2026.09.1",
+  "templates": [
+    {
+      "id": "chair",
+      "source": "cyclohexane",
+      "atoms": 18,
+      "bonds": 18,
+      "canonical_smiles": "C1CCCCC1",
+      "inchikey": "XDTMQSROBMDMFD-UHFFFAOYSA-N",
+      "panel": {
+        "formula": "C6H12",
+        "fragments": "1",
+        "average_mw": "84.16",
+        "exact_mass": "84.0939",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "0",
+        "rotatable_bonds": "0",
+        "tpsa": "0.0",
+        "logp": "2.34",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      }
+    },
+    {
+      "id": "chair-flipped",
+      "source": "cyclohexane",
+      "atoms": 18,
+      "bonds": 18,
+      "canonical_smiles": "C1CCCCC1",
+      "inchikey": "XDTMQSROBMDMFD-UHFFFAOYSA-N",
+      "panel": {
+        "formula": "C6H12",
+        "fragments": "1",
+        "average_mw": "84.16",
+        "exact_mass": "84.0939",
+        "degree_of_unsaturation": "1",
+        "hbd": "0",
+        "hba": "0",
+        "rotatable_bonds": "0",
+        "tpsa": "0.0",
+        "logp": "2.34",
+        "lipinski": {
+          "mw": true,
+          "logp": true,
+          "hbd": true,
+          "hba": true
+        },
+        "stereo": {
+          "centres": "0",
+          "double_bonds": "0",
+          "undefined": "0",
+          "max_stereoisomers": "1"
+        }
+      }
+    }
+  ]
+}
