@@ -9,9 +9,10 @@ import { addStereoisomer, closeStereoisomers, getStereoState, startStereo, subsc
 import './stereo.css';
 
 // The stereoisomers (docs/plans/v2-stereoisomers.md), below the canvas like the ¹³C NMR
-// preview: one numbered picture each, R/S and E/Z beside the atoms (never as a caption: RDKit
-// has no IUPAC numbering), how each relates to the others, which match the drawing, and Add
-// to put one in hand. data-* attributes let the tests read every card exactly.
+// preview: one numbered picture each, R/S drawn by RDKit at its atom and E/Z beside its double
+// bond (never as a caption: RDKit has no IUPAC numbering), how each relates to the others,
+// which match the drawing, and Add to put one in hand. data-* attributes let the tests read
+// every card exactly.
 
 const MESSAGES: Record<StereoMessage, string> = {
   empty: 'Draw a structure to list its stereoisomers.',
@@ -80,7 +81,11 @@ function Card({ isomer, inHand }: { isomer: Pictured; inHand: boolean }) {
         <span className="stereo-number">{isomer.number}</span>
         {isomer.matches && <span className="stereo-match">Matches your drawing</span>}
       </div>
-      <div className="stereo-picture" style={{ width: PICTURE.width, height: PICTURE.height }}>
+      <div
+        className="stereo-picture"
+        style={{ width: PICTURE.width, height: PICTURE.height }}
+        data-atom-labels={picture === null ? undefined : JSON.stringify(picture.atomLabels)}
+      >
         {picture === null ? (
           <p className="stereo-undrawable" data-testid="stereo-undrawable">
             {UNDRAWABLE}
@@ -94,14 +99,7 @@ function Card({ isomer, inHand }: { isomer: Pictured; inHand: boolean }) {
               alt={`Stereoisomer ${isomer.number}`}
             />
             {picture.labels.map((l) => (
-              <span
-                key={l.atom ?? l.bond}
-                className="stereo-label"
-                data-testid="stereo-label"
-                data-atom={l.atom}
-                data-bond={l.bond}
-                style={{ left: l.x, top: l.y }}
-              >
+              <span key={l.bond} className="stereo-label" data-testid="stereo-label" data-bond={l.bond} style={{ left: l.x, top: l.y }}>
                 {l.text}
               </span>
             ))}
@@ -154,16 +152,19 @@ function Listed({ result, inHand, failedAdd }: ListedProps) {
       <p className="stereo-summary" data-testid="stereo-summary">
         {n === 1 ? '1 stereoisomer.' : `${n} stereoisomers. ${DIASTEREOMERS}`}
       </p>
-      {inHand !== null && (
-        <p className="stereo-hint" data-testid="stereo-hint" role="status">
-          Stereoisomer {inHand} is in hand: click the canvas to place it, or press Esc.
-        </p>
-      )}
-      {failedAdd !== null && (
-        <p className="stereo-hint" data-testid="stereo-add-failed" role="alert">
-          Stereoisomer {failedAdd} could not be put in hand. Try Add again.
-        </p>
-      )}
+      {/* Stays at the top of the panel while the cards scroll beneath it. */}
+      <div className="stereo-status">
+        {inHand !== null && (
+          <p className="stereo-hint" data-testid="stereo-hint" role="status">
+            Stereoisomer {inHand} is in hand: click the canvas to place it, or press Esc.
+          </p>
+        )}
+        {failedAdd !== null && (
+          <p className="stereo-hint" data-testid="stereo-add-failed" role="alert">
+            Stereoisomer {failedAdd} could not be put in hand. Try Add again.
+          </p>
+        )}
+      </div>
       <Notes notes={result.notes} pseudo={pseudo} />
       <ol className="stereo-cards">
         {grouped(result.stereoisomers).map((group) => (

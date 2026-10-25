@@ -13,7 +13,7 @@
 //   are equal: canonical SMILES leaves duplicates in symmetric rings, an RDKit SMILES round
 //   trip can change a stereoisomer, and with coordinates InChI reads E/Z from the layout.
 import type { MainModule, Mol } from '@rdkit/rdkit';
-import { hasAxis, serialise, setGeometry, stereoElements, withoutStereo, type RdkitJson } from './stereoElements';
+import { hasAxis, neighbour, serialise, setGeometry, stereoElements, withoutStereo, type RdkitJson } from './stereoElements';
 
 /** Decision 7: enumerate up to this many stereo elements, draw up to this many. */
 export const LIMITS = { elements: 8, drawn: 32 } as const;
@@ -128,9 +128,12 @@ interface Drawing {
   /** Its stereo elements, with its stereo taken off. */
   centres: number[];
   doubles: number[];
-  /** What it defines: the spin of each defined centre, the label of each defined bond. */
+  /** What it defines: the spin of each defined centre, and for each double bond it fixes,
+   * the geometry its layout shows (cis when the first other neighbours of its two ends,
+   * those setGeometry uses, are on the same side). Not E/Z: a double bond's label can turn
+   * with a centre the drawing leaves open. */
   spins: Map<number, Spin>;
-  labels: Labels;
+  geometries: Map<number, 'cis' | 'trans'>;
   racemic: boolean;
   notes: Note[];
 }
@@ -160,13 +163,20 @@ function readDrawing(rdkit: MainModule, molfile: string): Drawing | 'several' | 
         return spin === 'cw' || spin === 'ccw' ? [[atom, spin] as const] : [];
       }),
     );
+    const bonds = json.molecules[0].bonds ?? [];
+    const geometries = new Map(
+      elements.doubles.flatMap((index) => {
+        const fixed = bonds[index].stereo === 'cis' || bonds[index].stereo === 'trans';
+        return fixed ? [[index, drawnGeometry(json, index)] as const] : [];
+      }),
+    );
     const flag = mol.has_prop('_MolFileChiralFlag') ? mol.get_prop('_MolFileChiralFlag') : '0';
     return {
       json,
       bare,
       ...elements,
       spins,
-      labels: labelsOf(JSON.parse(mol.get_stereo_tags()) as Tags),
+      geometries,
       // Chiral flag 0 with a defined centre: Ketcher reads it as an AND (racemic) group.
       racemic: flag === '0' && spins.size > 0,
       notes: notesFor(json, elements.doubles, hasAxis(rdkit, mol)),
@@ -174,6 +184,20 @@ function readDrawing(rdkit: MainModule, molfile: string): Drawing | 'several' | 
   } finally {
     mol.delete();
   }
+}
+
+/** The geometry a layout shows for double bond `index`, relative to the first other
+ * neighbour of each end (as setGeometry writes one). */
+function drawnGeometry(json: RdkitJson, index: number): 'cis' | 'trans' {
+  const molecule = json.molecules[0];
+  const bonds = molecule.bonds ?? [];
+  const [a, b] = bonds[index].atoms;
+  const at = (atom: number) => molecule.conformers![0].coords[atom];
+  const side = (atom: number) => {
+    const [[ax, ay], [bx, by], [px, py]] = [at(a), at(b), at(atom)];
+    return Math.sign((bx - ax) * (py - ay) - (by - ay) * (px - ax));
+  };
+  return side(neighbour(bonds, a, b)!) === side(neighbour(bonds, b, a)!) ? 'cis' : 'trans';
 }
 
 function notesFor(json: RdkitJson, doubles: number[], axial: boolean): Note[] {
@@ -243,10 +267,10 @@ export function enumerateStereoisomers(rdkit: MainModule, molfile: string): Enum
 
   // Which stereoisomers agree with all the drawing defines; a racemic drawing (an AND
   // group) matches the mirror images too.
-  const defined = drawing.spins.size > 0 || doubleKeys.some((k) => k in drawing.labels.bonds);
-  const agrees = ({ combination, labels }: Member) =>
+  const defined = drawing.spins.size > 0 || drawing.geometries.size > 0;
+  const agrees = ({ combination }: Member) =>
     centres.every((atom, i) => !drawing.spins.has(atom) || drawing.spins.get(atom) === combination.spins[i]) &&
-    doubleKeys.every((k) => !(k in drawing.labels.bonds) || labels.bonds[k] === drawing.labels.bonds[k]);
+    doubles.every((index, i) => !drawing.geometries.has(index) || drawing.geometries.get(index) === combination.geometries[i]);
   const agreeing = new Map([...classes].map(([inchi, members]) => [inchi, defined ? members.filter(agrees) : []]));
 
   // Which combination stands for each stereoisomer: for one the drawing matches, the one that

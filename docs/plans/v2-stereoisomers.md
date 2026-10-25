@@ -23,7 +23,7 @@ So a student sees why 2,3-dibromobutane has 3 stereoisomers, not 4.
 1. **Which stereo elements are varied: all of them**, including those the drawing already fixes. The ones that agree with the drawing are marked "Matches your drawing". The alternative is only the undefined ones.
 2. **Marking.** **Every stereoisomer that agrees with what the drawing defines is marked**, so a partly defined drawing marks several. A drawing marked racemic ("and Enantiomer" in Ketcher, or any Molfile opened with chiral flag 0) marks both enantiomers.
 3. **Layout. Each picture keeps the drawing's layout, with the student's own wedges flipped as needed**, the way enantiomers are taught. Only a stereoisomer whose double bond is flipped is laid out afresh, since its geometry has to change.
-4. **Labels. R/S and E/Z go next to their atoms only, never as a caption.** RDKit has no IUPAC numbering, so a caption such as "(S,R)" would follow drawing order, not locants. Lowercase r/s (pseudo-asymmetric centres) show with a one-line note. "?" is never shown.
+4. **Labels. R/S and E/Z go next to their atoms only, never as a caption** (since round 3, R/S at the atom itself). RDKit has no IUPAC numbering, so a caption such as "(S,R)" would follow drawing order, not locants. Lowercase r/s (pseudo-asymmetric centres) show with a one-line note. "?" is never shown.
 5. **Bridged rings. A note, not a fix.** In bridged rings (camphor, cocaine, tropine) RDKit lists stereoisomers that cannot exist: camphor gives 4 where 2 exist. Telling them apart needs 3D, which RDKit.js can't do. The panel says "In a bridged ring system some of these cannot exist." Building a bridgehead rule could come later.
 6. **What RDKit can't judge. A note instead of "achiral".** RDKit has no axial or planar chirality: allenes, ortho-substituted biaryls, and (E)-cyclooctene and similar rings. Where the drawing has one of these, the panel says RDKit can't judge it and never prints "achiral". Standard InChI can't see stereo at nitrogen (Tröger's base), so there the same note replaces "achiral".
 7. **Limits. Up to 8 stereo elements** (256 combinations; cholesterol) **are enumerated, and up to 32 stereoisomers are drawn.** Beyond 32, the panel gives the exact count and says there are too many to draw. Beyond 8 elements, it says there are too many to list. "Working…" shows while it runs.
@@ -151,6 +151,44 @@ but no test compound shows one there; where labels land on screen (the CSS) is n
 only their computed positions; the generator's cross-check with EnumerateStereoisomers
 shares FindPotentialStereo, so only stereoisomers_judged.json checks which elements are
 varied; a dependent double bond with 10 or more open elements around it is not found.
+
+
+**Round 3** (capped) confirmed a high: in every estradiol picture a label sat nearer another
+stereocentre than its own, caused by round 2's placement fix. That was the third round of
+label-placement fixes, so Jeff chose to step back (2026-10-25): RDKit draws R/S in place of
+the atom, and "matches" compares drawn geometry, not E/Z labels (round 3's medium: a double
+bond whose label depends on a centre left undefined was matched wrongly, in the browser and
+the generator alike). Decision 4 now reads: R/S is drawn at the atom itself, E/Z beside the
+middle of its double bond, never as a caption.
+
+Acceptance bar for this change (round 4 reviews against it):
+1. **R/S at the atom.** RDKit draws each stereocentre's label in place of the atom: "(R)" at
+   a carbon (no letter C, bonds stop short of it as at a heteroatom), and at a heteroatom its
+   symbol with the label after it, smaller: N₍R₎, S₍R₎. Lowercase r/s the same way. No atom
+   is highlighted. Tests: every listed picture's labels as given to RDKit equal the fixture's
+   (Vitest and, read from the card, Playwright); every labelled atom has its own glyphs in
+   the SVG; a heteroatom's label starts with its symbol.
+2. **E/Z beside its bond.** The app's own text, beside the middle of its double bond: on no
+   atom symbol or label (RDKit's R/S included) and no other E/Z label, inside the picture,
+   and nearer the middle of its own bond than the middle of any other labelled bond. Tests:
+   every listed picture of every test drawing.
+3. **Matching by geometry.** A double bond the drawing defines agrees with a setting when its
+   first other neighbours at each end are on the same side in both, or opposite in both
+   (from the drawing's 2D layout); centres as before. The browser and the generator do the
+   same. Tests: the browser equals the fixture; the generator's matches equal RDKit's
+   EnumerateStereoisomers(onlyUnassigned=True) on every test drawing that defines stereo
+   (an independent check); new generated drawings where a double bond depends on a centre
+   the drawing leaves undefined.
+4. **Round 3's lows.** The in-hand hint and a failed Add's message stay in view while the
+   cards scroll (Playwright, on estradiol's last card). The dependent-double-bond search runs
+   only where one end's two branches are alike apart from stereo and both hold an open
+   element (a test drawing: cholesterol with =CH2 for its OH, every H drawn, read far fewer
+   than 2^7 times). The wedged-axis drawing wedges a single bond, as Ketcher can.
+
+Accepted limits from round 3 (low): a failed Add's message sits in the same sticky strip as
+the in-hand hint, but no test makes Ketcher refuse a placement, so it is never rendered in a
+test; the E/Z placement rules beyond the first spot are tested on SVGs of a few lines, since
+no test drawing crowds them.
 
 ## Priority
 

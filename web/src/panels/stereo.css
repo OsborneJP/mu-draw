@@ -33,6 +33,13 @@
   margin: 6px 0;
 }
 
+.stereo-status {
+  position: sticky;
+  top: -8px; /* the panel's top padding */
+  z-index: 1;
+  background: #fff;
+}
+
 .stereo-hint {
   margin: 4px 0;
   font-weight: 600;

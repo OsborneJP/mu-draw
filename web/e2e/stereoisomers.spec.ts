@@ -58,10 +58,16 @@ function cards(page: Page) {
   return page.getByTestId('stereo-card').evaluateAll((items) =>
     items.map((card) => {
       const labels = { atoms: {} as Record<string, string>, bonds: {} as Record<string, string> };
+      // R/S as RDKit was asked to draw it at each atom ("(R)", or "S<sub>(R)</sub>" at a
+      // heteroatom), and only where RDKit's SVG has that atom's own glyphs.
+      const picture = card.querySelector('.stereo-picture')!;
+      const svg = decodeURIComponent(card.querySelector('img')?.getAttribute('src')?.replace(/^data:[^,]*,/, '') ?? '');
+      const given = JSON.parse(picture.getAttribute('data-atom-labels') ?? '{}') as Record<string, string>;
+      for (const [atom, text] of Object.entries(given)) {
+        if (svg.includes(`<path class='atom-${atom}' d=`)) labels.atoms[atom] = /\(([RSrs])\)(<\/sub>)?$/.exec(text)![1];
+      }
       for (const label of card.querySelectorAll('[data-testid="stereo-label"]')) {
-        const atom = label.getAttribute('data-atom');
-        if (atom !== null) labels.atoms[atom] = label.textContent!;
-        else labels.bonds[label.getAttribute('data-bond')!] = label.textContent!;
+        labels.bonds[label.getAttribute('data-bond')!] = label.textContent!;
       }
       const of = card.getAttribute('data-of');
       const kind = card.getAttribute('data-relation')!;
@@ -243,6 +249,21 @@ test('Add places a stereoisomer beside the drawing, keeping its stereo, and the 
   await expect(third).toHaveAttribute('data-in-hand', 'false');
   expect(await fragmentCount(page)).toBe(3);
   await expect(page.getByTestId('stereo-panel')).toHaveAttribute('data-state', 'ready');
+});
+
+test('the in-hand hint stays in view while the cards scroll', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  const c = compound('estradiol');
+  await load(page, c.name);
+  await show(page);
+  const last = page.locator(`[data-testid="stereo-card"][data-number="${c.stereoisomers!.length}"]`);
+  await last.scrollIntoViewIfNeeded();
+  await expect(page.getByTestId('stereo-summary')).not.toBeInViewport();
+  await last.getByTestId('stereo-add').click();
+  await expect(page.getByTestId('stereo-hint')).toBeInViewport();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('stereo-hint')).toHaveCount(0);
 });
 
 test('Esc puts the stereoisomer in hand away; any other change closes the panel', async ({ app }) => {

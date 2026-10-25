@@ -1046,4 +1046,20 @@ what changed). Measured with RDKit.js 2026.9.1 and Python RDKit 2026.09.1.
 - Trying every setting near a double bond costs 2^n InChIs: done for every =CH2 with its H
   drawn, it took about 1 s per properties update. Only an end whose two branches both hold
   an open element can make a double bond stereogenic through them.
+- Round 3: RDKit.js draws its own CIP annotations (`addStereoAnnotation`) only under the
+  legacy stereo perception; under the current one it draws none. Its `atomLabels` drawing
+  option does work: the text replaces the atom, bonds stop short of it as at a heteroatom,
+  and `<sub>`/`<sup>` mark-up is drawn smaller. The label takes the element's colour (a
+  sulfur's "(R)" is yellow), so a heteroatom keeps its symbol with the label as a subscript.
+- RDKit's SVG draws a carbon with no glyphs of its own; with an atom label it has paths of
+  class `atom-N`, which is how the tests know RDKit drew it.
+- An E/Z label is CIP's, and its priorities can depend on a centre the drawing leaves open:
+  drawn so, it can come out the other way, lowercase, or not at all once every element is
+  set. "Matches" therefore compares the drawn geometry. RDKit's own
+  EnumerateStereoisomers(onlyUnassigned=True) on the drawing gives exactly the stereoisomers
+  that agree with it, which makes an independent test.
+- Whether two branches are alike in constitution: RDKit's canonical SMILES of each branch,
+  stereo taken off and the other end as a dummy atom, compared.
+- Playwright's `toBeInViewport` honours clipping by a scrolling panel, so it can tell
+  whether a hint scrolled out of the stereoisomer panel.
 

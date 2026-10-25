@@ -20,7 +20,7 @@ const LISTED: StereoResult = {
     relation: { kind: 'enantiomer', of: 3 - number },
     matches: number === 1,
     molfile: `molfile ${number}`,
-    picture: { svg: '', labels: [] },
+    picture: { svg: '', atomLabels: {}, labels: [] },
   })),
 };
 

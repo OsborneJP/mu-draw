@@ -85,7 +85,8 @@ All notable changes to this project. The format follows
   drawing clears the prediction until it is predicted again.
 - Stereoisomers (version 2's first feature): "Show stereoisomers" in the properties panel
   lists every stereoisomer of the drawing below the canvas, each drawn like the student's
-  drawing with R/S and E/Z at its atoms. Enantiomer pairs sit side by side; achiral and
+  drawing, with (R) or (S) in place of each stereocentre and E or Z beside each stereogenic
+  double bond. Enantiomer pairs sit side by side; achiral and
   meso forms are marked, and so are the ones that match the drawing. Add puts one in hand,
   as Name to structure's Add does, and the panel stays open to add another. Notes say where
   RDKit can't judge: bridged rings, allenes, biaryls and large-ring double bonds. Up to 8

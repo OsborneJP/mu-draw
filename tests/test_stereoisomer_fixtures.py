@@ -10,6 +10,7 @@ import json
 import gen_stereoisomers_expected as gen
 import pytest
 from rdkit import Chem
+from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 from test_reference_fixtures import locked_version
 
 JUDGED = gen.FIXTURES / "stereoisomers_judged.json"
@@ -20,6 +21,8 @@ REVIEWED = {
     "2,3,4-pentanetriol": "SMILES keeps a setting at C3 even where C3 is not a stereocentre",
     "3-ethylidenepentane-2,4-diol": "SMILES keeps E/Z on the double bond where its two sides are"
     " the same (the R,R and S,S forms)",
+    "3-ethylidenepentane-2,4-diol, one centre and the double bond drawn": "as"
+    " 3-ethylidenepentane-2,4-diol, which it is drawn from",
 }
 # Where RDKit's own EnumerateStereoisomers (unique=False) leaves settings out, so the
 # stereoisomers it gives differ from every setting's. Any other difference fails.
@@ -190,3 +193,29 @@ def test_any_stereoisomer_drawn_gives_the_same_stereoisomers(generated, compound
         for key, members in classes.items():
             again, _ = gen.enumerate_classes(members[0], gen.potential(members[0]))
             assert set(again) == set(classes), (compound["name"], Chem.InchiToInchiKey(key))
+
+
+def agreeing_by_rdkit(drawing: Chem.Mol) -> set[str]:
+    """The stereoisomers that agree with all the drawing defines, by RDKit's own enumerator:
+    EnumerateStereoisomers(onlyUnassigned=True) keeps what is drawn and varies the rest."""
+    options = StereoEnumerationOptions(onlyUnassigned=True, unique=False)
+    return {
+        Chem.InchiToInchiKey(gen.inchi(gen.without_cumulated_stereo(found)))
+        for found in EnumerateStereoisomers(drawing, options=options)
+    }
+
+
+def test_matches_are_what_rdkit_says_agrees_with_the_drawing(generated, compounds):
+    """An independent check of "Matches your drawing" (bar B.2): on every drawing that
+    defines stereo (not the racemic one, which also matches mirror images)."""
+    checked = []
+    for compound in compounds:
+        if compound["outcome"] != "listed" or compound["name"] == gen.RACEMIC[0]:
+            continue
+        matched = {s["inchikey"] for s in compound["stereoisomers"] if s["matches"]}
+        if not matched:
+            continue
+        drawing = Chem.MolFromMolBlock(generated[compound["file"]], removeHs=False)
+        assert matched == agreeing_by_rdkit(drawing), compound["name"]
+        checked.append(compound["name"])
+    assert {name for name, _ in gen.PARTLY_DRAWN} <= set(checked)

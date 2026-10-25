@@ -8,7 +8,7 @@ import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
 import { AXES, serialise, type RdkitJson } from './stereoElements';
-import { crosses, HIGHLIGHT, LABEL, obstacles, overlaps, PICTURE, picture, placeLabels } from './stereoPictures';
+import { atomLabel, boxAt, crosses, LABEL, obstacles, overlaps, PICTURE, picture, placeLabels } from './stereoPictures';
 import { enumerateStereoisomers, LIMITS, listOutcome, sizeOutcome, type Enumeration, type Stereoisomer } from './stereoisomers';
 
 interface Expected {
@@ -305,33 +305,56 @@ describe('each picture is the stereoisomer it shows', () => {
   });
 });
 
+/** A double bond's middle as RDKit draws it: the mean of the ends of its lines. */
+function drawnMiddle(svg: string, bond: string) {
+  const [a, b] = bond.split('-');
+  const ends = [...svg.matchAll(/<path class='bond-\d+ atom-(\d+) atom-(\d+)' d='([^']*)'/g)]
+    .filter((m) => [m[1], m[2]].sort().join() === [a, b].sort().join())
+    .flatMap((m) => {
+      const n = (m[3].match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+      return Array.from({ length: n.length / 2 }, (_, i) => ({ x: n[2 * i], y: n[2 * i + 1] }));
+    });
+  return { x: ends.reduce((t, p) => t + p.x, 0) / ends.length, y: ends.reduce((t, p) => t + p.y, 0) / ends.length };
+}
+
 describe('the pictures', () => {
-  it.each(listed.map((c) => [c.name, c] as const))('%s: every label beside its atom, covering no symbol; every wedge drawn', (_, compound) => {
+  // Bar, round 3, item 1: RDKit draws R/S in place of its atom, "(R)" at a carbon and the
+  // symbol then a smaller "(R)" at a heteroatom; no atom is highlighted.
+  it.each(listed.map((c) => [c.name, c] as const))('%s: R/S at its atom, E/Z beside its bond, every wedge drawn', (_, compound) => {
     for (const isomer of stereoisomersOf(compound)) {
       if (isomer.molfile === null) continue;
-      const { svg, labels } = picture(rdkit, isomer.molfile, isomer.labels);
+      const { svg, atomLabels, labels } = picture(rdkit, isomer.molfile, isomer.labels);
       const where = `stereoisomer ${isomer.number}`;
-      // One placed label per CIP label, with its text.
-      const atoms = Object.fromEntries(labels.filter((l) => l.atom !== undefined).map((l) => [String(l.atom), l.text]));
-      const bonds = Object.fromEntries(labels.filter((l) => l.bond !== undefined).map((l) => [l.bond!, l.text]));
-      expect({ atoms, bonds }, where).toEqual(isomer.labels);
-      // Each inside the picture, off its own atom, over no atom symbol and no other label.
-      const centres = new Map(
-        [...svg.matchAll(/<ellipse cx='([-\d.]+)' cy='([-\d.]+)'[^>]*class='atom-(\d+)'/g)].map((m) => [Number(m[3]), { x: Number(m[1]), y: Number(m[2]) }]),
-      );
-      const { symbols } = obstacles(svg);
+      const symbols = parts(isomer.molfile).atoms.map((a) => a[3] as string);
+      expect(Object.keys(atomLabels).sort(), where).toEqual(Object.keys(isomer.labels.atoms).sort());
+      for (const [atom, label] of Object.entries(isomer.labels.atoms)) {
+        const text = atomLabels[atom];
+        const symbol = symbols[Number(atom)];
+        if (symbol === 'C') expect(text, `${where}, atom ${atom}`).toBe(`(${label})`);
+        else expect(text.startsWith(symbol) && text.endsWith(`<sub>(${label})</sub>`), `${where}, atom ${atom}: ${text}`).toBe(true);
+        // RDKit drew it: a carbon has no glyphs of its own otherwise.
+        expect(svg, `${where}, atom ${atom}`).toMatch(new RegExp(`<path class='atom-${atom}' d=`));
+      }
+      expect(svg, where).not.toContain('<ellipse');
+
+      // Item 2: each E/Z beside its own bond: inside the picture, on no atom symbol or label
+      // (RDKit's R/S included) and no other E/Z, nearer its own bond's middle than any other.
+      expect(Object.fromEntries(labels.map((l) => [l.bond, l.text])), where).toEqual(isomer.labels.bonds);
+      const { symbols: drawn } = obstacles(svg);
       const boxes = labels.map((l) => ({ left: l.x - LABEL.halfWidth, top: l.y - LABEL.halfHeight, right: l.x + LABEL.halfWidth, bottom: l.y + LABEL.halfHeight }));
+      const middles = Object.fromEntries(labels.map((l) => [l.bond, drawnMiddle(svg, l.bond)]));
+      const distance = (l: { x: number; y: number }, m: { x: number; y: number }) => Math.hypot(l.x - m.x, l.y - m.y);
       boxes.forEach((box, i) => {
         const label = labels[i];
-        const what = `${where}, label ${label.atom ?? label.bond}`;
+        const what = `${where}, label ${label.bond}`;
         expect(box.left >= 0 && box.top >= 0 && box.right <= PICTURE.width && box.bottom <= PICTURE.height, what).toBe(true);
-        expect(symbols.filter((s) => overlaps(box, s)), what).toEqual([]);
+        expect(drawn.filter((s) => overlaps(box, s)), what).toEqual([]);
         expect(boxes.filter((other, j) => j !== i && overlaps(box, other)), what).toEqual([]);
-        if (label.atom !== undefined) {
-          const at = centres.get(label.atom)!;
-          expect(at.x > box.left && at.x < box.right && at.y > box.top && at.y < box.bottom, `${what} covers its atom`).toBe(false);
+        for (const [bond, middle] of Object.entries(middles)) {
+          if (bond !== label.bond) expect(distance(label, middles[label.bond]) < distance(label, middle), `${what} nearer ${bond}`).toBe(true);
         }
       });
+
       // Each bond the Molfile wedges is drawn as a wedge (a filled path) or a hash (many
       // short strokes), not as a plain line.
       parts(isomer.molfile).bonds.forEach(([, , stereo], index) => {
@@ -343,12 +366,34 @@ describe('the pictures', () => {
     }
   });
 
-  // A big molecule is drawn small, with a highlight smaller than a label: the label still
-  // keeps off its atom. (No test drawing is that crowded; an SVG with one atom stands in.)
-  it("keeps a label off its atom however small the atom's highlight", () => {
-    const svg = "<svg><ellipse cx='110.0' cy='85.0' rx='3.0' ry='3.0' class='atom-0'  style='fill:#9ECBFF' /></svg>";
-    const [label] = placeLabels(svg, { atoms: { '0': 'R' }, bonds: {} });
-    expect(Math.abs(label.x - 110) >= LABEL.halfWidth || Math.abs(label.y - 85) >= LABEL.halfHeight).toBe(true);
+  it('labels a heteroatom stereocentre with its symbol, H and charge as RDKit writes them', () => {
+    expect(atomLabel(rdkit, { z: 16, impHs: 0, chg: 0 }, 'R')).toBe('S<sub>(R)</sub>');
+    expect(atomLabel(rdkit, { z: 7, impHs: 1, chg: 1 }, 's')).toBe('NH<sup>+</sup><sub>(s)</sub>');
+    expect(atomLabel(rdkit, { z: 15, impHs: 2, chg: -2 }, 'S')).toBe('PH<sub>2</sub><sup>2-</sup><sub>(S)</sub>');
+    expect(atomLabel(rdkit, { z: 6, impHs: 1, chg: 0 }, 'R')).toBe('(R)');
+  });
+
+  // No test drawing crowds an E/Z label off its first spot, square to the bond above it; two
+  // bonds drawn as an SVG of lines and one symbol stand in.
+  const line = (bond: number, a: number, b: number, d: string) => `<path class='bond-${bond} atom-${a} atom-${b}' d='${d}' />`;
+  it('moves an E/Z label off an atom symbol', () => {
+    const symbol = "<path class='atom-2' d='M 110.0 62.0 Q 120.0 62.0, 120.0 75.0' />";
+    const svg = `<svg>${line(0, 0, 1, 'M 100.0,80.0 L 130.0,80.0')}${symbol}</svg>`;
+    const [label] = placeLabels(svg, { '0-1': 'E' });
+    expect(overlaps(boxAt(label), { left: 110, top: 62, right: 120, bottom: 75 })).toBe(false);
+    expect(Math.hypot(label.x - 115, label.y - 80)).toBeLessThan(22);
+  });
+
+  it('keeps an E/Z label nearer its own bond than another labelled one', () => {
+    // The first spot for 0-1, above its middle, touches no line but is nearer 2-3's middle.
+    const svg = `<svg>${line(0, 0, 1, 'M 85.0,80.0 L 115.0,80.0')}${line(1, 2, 3, 'M 108.0,47.0 L 108.0,77.0')}</svg>`;
+    const placed = placeLabels(svg, { '0-1': 'E', '2-3': 'Z' });
+    const middles: Record<string, { x: number; y: number }> = { '0-1': { x: 100, y: 80 }, '2-3': { x: 108, y: 62 } };
+    for (const label of placed) {
+      const other = label.bond === '0-1' ? '2-3' : '0-1';
+      const near = (m: { x: number; y: number }) => Math.hypot(label.x - m.x, label.y - m.y);
+      expect(near(middles[label.bond]), label.bond).toBeLessThan(near(middles[other]));
+    }
   });
 
   it('reads what a label must not cover from the SVG', () => {
@@ -358,12 +403,6 @@ describe('the pictures', () => {
     expect(crosses(box, [{ x: 12, y: 0 }, { x: 12, y: 10 }])).toBe(false);
     expect(overlaps(box, { left: 9, top: 9, right: 20, bottom: 20 })).toBe(true);
     expect(overlaps(box, { left: 10, top: 0, right: 20, bottom: 10 })).toBe(false);
-  });
-
-  it("highlights stereo atoms in the canvas's colour for a defined stereo element", async () => {
-    const { readFileSync } = await import('node:fs');
-    const source = readFileSync(new URL('../editor/stereoHighlight.ts', import.meta.url), 'utf8');
-    expect(/export const DEFINED_COLOR = '(#[0-9a-f]{6})'/.exec(source)?.[1]).toBe(HIGHLIGHT);
   });
 });
 

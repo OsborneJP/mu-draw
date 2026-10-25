@@ -10,9 +10,10 @@
 // - A double bond whose two sides are the same but for stereo (=C(CH(OH)CH3)2) is
 //   stereogenic only for some settings of the centres in them, which the cis probe can't
 //   see with those centres open. So a bond the probe drops is tried where, at one end, both
-//   branches hold an open element: every setting of the open elements in those branches is
-//   written into RDKit's JSON, and the bond counts if setting it differently changes the
-//   InChI for any of them. Only those bonds: =CH2 with its H drawn, or =C(CH3)2, never is.
+//   branches are alike in constitution and both hold an open element: every setting of the
+//   open elements in those branches is written into RDKit's JSON, and the bond counts if
+//   setting it differently changes the InChI for any of them. Only those bonds: =CH2 with its
+//   H drawn, =C(CH3)2, or a ring end whose two sides differ, never is.
 // - get_stereo_tags also lists a biaryl axis wedged at one end (RDKit reads atropisomer
 //   stereo from it) among its bonds; that is no double bond, and isn't counted.
 import type { MainModule, Mol } from '@rdkit/rdkit';
@@ -25,7 +26,7 @@ interface JsonBond {
 }
 
 export interface JsonMolecule {
-  atoms: { stereo?: string }[];
+  atoms: { stereo?: string; z?: number }[];
   bonds?: JsonBond[];
   conformers?: { dim: number; coords: number[][] }[];
   extensions?: { atomRings?: number[][] }[];
@@ -100,7 +101,7 @@ function key(a: number, b: number): string {
 }
 
 /** A neighbour of `end` other than `not`, by bond order; undefined if it has none. */
-function neighbour(bonds: JsonBond[], end: number, not: number): number | undefined {
+export function neighbour(bonds: JsonBond[], end: number, not: number): number | undefined {
   for (const { atoms: [p, q] } of bonds) {
     if (p === end && q !== not) return q;
     if (q === end && p !== not) return p;
@@ -168,8 +169,12 @@ export function stereoElements(rdkit: MainModule, mol: Mol): StereoElements {
   const openCentres = centres.filter((atom) => molecule.atoms[atom].stereo !== 'cw' && molecule.atoms[atom].stereo !== 'ccw');
   const openDoubles = [...doubles].filter((i) => !fixed.has(i));
   const openAtoms = new Set([...openCentres, ...openDoubles.flatMap((d) => bonds[d].atoms)]);
+  const alike = (end: number, sides: number[]) => {
+    const [first, second] = sides.map((side) => reader.read(rootedBranch(json, side, end), (m) => m.get_smiles()));
+    return first !== null && first === second;
+  };
   for (const i of open.filter((x) => !kept.has(x))) {
-    const near = alikeBranches(bonds, i, openAtoms);
+    const near = alikeBranches(bonds, i, openAtoms, alike);
     if (near === null) continue;
     const nearCentres = openCentres.filter((atom) => near.has(atom));
     const nearDoubles = openDoubles.filter((d) => bonds[d].atoms.some((atom) => near.has(atom)));
@@ -196,18 +201,41 @@ function branch(bonds: JsonBond[], start: number, not: number): Set<number> {
   return seen;
 }
 
-/** For double bond `index`, the atoms of the two branches at each end where both branches
- * hold an open atom (only there can they be alike but for stereo), or null if no end does. */
-function alikeBranches(bonds: JsonBond[], index: number, open: Set<number>): Set<number> | null {
+/** For double bond `index`, the atoms of the two branches at each end where they are alike
+ * but for stereo: both hold an open atom (checked first, without RDKit) and `alike` says
+ * so. Null if no end has such branches: then no setting can make the bond stereogenic. */
+function alikeBranches(
+  bonds: JsonBond[],
+  index: number,
+  open: Set<number>,
+  alike: (end: number, sides: number[]) => boolean,
+): Set<number> | null {
   const near = new Set<number>();
   for (const [k, end] of bonds[index].atoms.entries()) {
     const other = bonds[index].atoms[1 - k];
     const sides = bonds.flatMap(({ atoms: [p, q] }) => (p === end && q !== other ? [q] : q === end && p !== other ? [p] : []));
     if (sides.length !== 2) continue;
     const branches = sides.map((side) => branch(bonds, side, end));
-    if (branches.every((atoms) => [...atoms].some((atom) => open.has(atom)))) branches.forEach((atoms) => atoms.forEach((a) => near.add(a)));
+    if (!branches.every((atoms) => [...atoms].some((atom) => open.has(atom)))) continue;
+    if (alike(end, sides)) branches.forEach((atoms) => atoms.forEach((a) => near.add(a)));
   }
   return near.size > 0 ? near : null;
+}
+
+/** RDKit's JSON of the branch from `side` away from `end`, without stereo, with `end` as a
+ * dummy atom on `side` only: its canonical SMILES is the same for two branches exactly when
+ * they are alike in constitution (a ring through both is opened at `end` each way). */
+function rootedBranch(json: RdkitJson, side: number, end: number): string {
+  const molecule = json.molecules[0];
+  const atoms = [...branch(molecule.bonds ?? [], side, end)];
+  const at = new Map(atoms.map((atom, i) => [atom, i]));
+  const bonds = (molecule.bonds ?? []).flatMap(({ atoms: [p, q], bo }) =>
+    at.has(p) && at.has(q) ? [{ atoms: [at.get(p)!, at.get(q)!] as [number, number], ...(bo === undefined ? {} : { bo }) }] : [],
+  );
+  const toEnd = (molecule.bonds ?? []).find(({ atoms: [p, q] }) => (p === side && q === end) || (p === end && q === side))!;
+  bonds.push({ atoms: [at.get(side)!, atoms.length], ...(toEnd.bo === undefined ? {} : { bo: toEnd.bo }) });
+  const copy = withoutStereo({ ...json, molecules: [{ atoms: [...atoms.map((a) => molecule.atoms[a]), { z: 0 }], bonds }] } as RdkitJson);
+  return JSON.stringify(copy);
 }
 
 function withoutCoords(json: RdkitJson): RdkitJson {

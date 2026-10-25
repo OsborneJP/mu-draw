@@ -84,6 +84,11 @@ function symbolFor(rdkit: MainModule, z: number, cache: Map<number, string>): st
 
 const symbols = new Map<number, string>();
 
+/** The element symbol for an atomic number, as RDKit writes it. */
+export function elementSymbol(rdkit: MainModule, z: number): string {
+  return symbolFor(rdkit, z, symbols);
+}
+
 /** RDKit settings the fixtures were made with (gen_reference_expected.py). RDKit.js
  * defaults to the legacy stereo perception, which misses ring cis/trans centres
  * (1,4-dimethylcyclohexane). */

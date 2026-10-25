@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C6-dimethylcyclohexanone%20oxime/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T22:40:26Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 3729583,
+          "SMILES": "CC1CCCC(C1=NO)C",
+          "Title": "2,6-Dimethylcyclohexanone oxime"
+        }
+      ]
+    }
+  }
+}

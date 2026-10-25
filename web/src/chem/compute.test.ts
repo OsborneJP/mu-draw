@@ -151,27 +151,35 @@ describe('stereo elements', () => {
     },
   );
 
-  // A double bond is tried against every setting of the elements around it only where both
-  // branches at one end hold one: =CH2 with its H drawn never is, so limonene with every H
-  // drawn is read once more than the drawing (the cis probe), not 2^n times. That search
-  // took about 1 s per properties update on sugars with an allyl group drawn with its H.
-  it('tries no double bond that cannot be stereogenic', () => {
-    const compound = stereoSet.find((c) => c.name === 'limonene, all H drawn')!;
+  // A double bond is tried against every setting of the elements around it only where the
+  // two branches at one end are alike but for stereo, both holding an open element. Done for
+  // every =CH2 with its H drawn, that search cost about 1 s per properties update; it still
+  // ran where a ring end's two different sides both held centres (the =CH2 steroid).
+  function reads(name: string) {
+    const compound = stereoSet.find((c) => c.name === name)!;
     const drawing = rdkit.get_mol(stereoDrawings[`../../../tests/fixtures/${compound.file}`], JSON.stringify({ removeHs: false }))!;
-    let reads = 0;
+    let count = 0;
     const counting = new Proxy(rdkit, {
-      get: (target, name) =>
-        name === 'get_mol'
+      get: (target, key) =>
+        key === 'get_mol'
           ? (...args: Parameters<MainModule['get_mol']>) => {
-              reads += 1;
+              count += 1;
               return target.get_mol(...args);
             }
-          : Reflect.get(target, name),
+          : Reflect.get(target, key),
     });
     const found = stereoElements(counting, drawing);
     drawing.delete();
-    expect(found.centres.length + found.doubles.length).toBe(compound.elements);
-    expect(reads).toBe(1);
+    expect(found.centres.length + found.doubles.length, name).toBe(compound.elements);
+    return count;
+  }
+
+  it('tries no double bond that cannot be stereogenic', () => {
+    // Only the cis probe: =CH2's end holds no stereo, so nothing more is read.
+    expect(reads('limonene, all H drawn')).toBe(1);
+    // Seven open centres: the search would read 2^8 times; comparing the ring end's two
+    // sides reads twice.
+    expect(reads('cholesterol with =CH2 for its OH, no stereo, every H drawn')).toBeLessThan(2 ** 7);
   });
 
   it("needs RDKit's current stereo perception: the legacy one misses ring cis/trans centres", () => {

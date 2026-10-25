@@ -76,6 +76,20 @@ ALL_H = (
 PENTENOL = "(3E)-3-penten-2-ol"
 CENTRE_AND_DOUBLE = (f"{PENTENOL}, centre drawn", PENTENOL)
 CENTRE_AND_CROSSED = ("3-penten-2-ol, centre drawn, double bond crossed", PENTENOL)
+# Cholesterol with =CH2 for its OH, no stereo drawn and every H drawn: that double bond can
+# never be stereogenic (two H at one end, two different ring sides at the other), so the
+# browser must not search it against every setting of the centres around it.
+METHYLENE = ("cholesterol with =CH2 for its OH, no stereo, every H drawn", "cholesterol")
+# A double bond stereogenic only through the centres beside it, drawn with one of them and
+# the double bond fixed: what it matches must come from its drawn geometry, since its E/Z
+# label turns with the centre left open.
+PARTLY_DRAWN = (
+    ("3-ethylidenepentane-2,4-diol, one centre and the double bond drawn", ETHYLIDENE[0]),
+    (
+        "2,6-dimethylcyclohexanone oxime, one methyl and the OH drawn",
+        "2,6-dimethylcyclohexanone oxime",
+    ),
+)
 # 3D embedding, only to record which listed stereoisomers of a bridged compound can exist.
 EMBED_SEED = 0xF00D
 EMBED_ATTEMPTS = 5
@@ -179,9 +193,14 @@ def signature(mol: Chem.Mol, elements: list) -> str:
     return "".join(parts)
 
 
-def defined_by(drawing: Chem.Mol, elements: list) -> tuple[dict[int, object], dict[str, str]]:
-    """What the drawing sets of the elements varied: each centre's chiral tag, and each double
-    bond's CIP label. Nothing else counts: a wedged biaryl axis (RDKit reads atropisomer
+Defined = tuple[dict[int, object], dict[int, bool]]
+
+
+def defined_by(drawing: Chem.Mol, elements: list) -> Defined:
+    """What the drawing sets of the elements varied: each centre's chiral tag, and for each
+    double bond it fixes, whether the first other neighbours at its two ends are drawn on the
+    same side (read from the 2D layout, not from E/Z: a label can turn with a centre the
+    drawing leaves open). Nothing else counts: a wedged biaryl axis (RDKit reads atropisomer
     stereo from it) is not varied, and neither does the browser count it."""
     tags = {
         e.centeredOn: drawing.GetAtomWithIdx(e.centeredOn).GetChiralTag()
@@ -189,23 +208,47 @@ def defined_by(drawing: Chem.Mol, elements: list) -> tuple[dict[int, object], di
         if e.type == Chem.StereoType.Atom_Tetrahedral
         and drawing.GetAtomWithIdx(e.centeredOn).GetChiralTag() in TETRAHEDRAL
     }
-    keys = set()
-    for e in elements:
-        if e.type == Chem.StereoType.Bond_Double:
-            bond = drawing.GetBondWithIdx(e.centeredOn)
-            first, second = sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()))
-            keys.add(f"{first}-{second}")
-    _, labels = cip(drawing)
-    return tags, {key: label for key, label in labels.items() if key in keys}
+    open_ = (Chem.BondStereo.STEREONONE, Chem.BondStereo.STEREOANY)
+    sides = {
+        e.centeredOn: same_side_drawn(drawing, e.centeredOn)
+        for e in elements
+        if e.type == Chem.StereoType.Bond_Double
+        and drawing.GetBondWithIdx(e.centeredOn).GetStereo() not in open_
+    }
+    return tags, sides
 
 
-def matches_drawing(defined: tuple[dict[int, object], dict[str, str]], mol: Chem.Mol) -> bool:
+def same_side_drawn(mol: Chem.Mol, index: int) -> bool:
+    """Whether the layout draws double bond `index` with the first other neighbour of each end
+    on the same side."""
+    bond = mol.GetBondWithIdx(index)
+    a, b = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+    at = mol.GetConformer().GetAtomPosition
+
+    def side(i: int) -> float:
+        p, q, r = at(a), at(b), at(i)
+        cross = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x)
+        return (cross > 0) - (cross < 0)
+
+    return side(other_neighbour(mol, a, b)) == side(other_neighbour(mol, b, a))
+
+
+def same_side_set(mol: Chem.Mol, index: int) -> bool:
+    """Whether a setting (settings()) puts the first other neighbours of double bond `index`
+    on the same side: cis to its stereo atoms, which are those neighbours."""
+    bond = mol.GetBondWithIdx(index)
+    a, b = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+    if list(bond.GetStereoAtoms()) != [other_neighbour(mol, a, b), other_neighbour(mol, b, a)]:
+        raise ValueError(f"bond {index} is not set relative to its first other neighbours")
+    return bond.GetStereo() == Chem.BondStereo.STEREOCIS
+
+
+def matches_drawing(defined: Defined, mol: Chem.Mol) -> bool:
     """Every element the drawing sets is set the same way in mol."""
-    tags, labels = defined
+    tags, sides = defined
     if any(mol.GetAtomWithIdx(atom).GetChiralTag() != tag for atom, tag in tags.items()):
         return False
-    _, these = cip(mol)
-    return all(these.get(bond) == label for bond, label in labels.items())
+    return all(same_side_set(mol, index) == same for index, same in sides.items())
 
 
 def is_racemic(drawing: Chem.Mol) -> bool:
@@ -436,7 +479,50 @@ def drawings(rows: list[dict[str, str]]) -> list[tuple[str, str]]:
         if bond.GetBondType() == Chem.BondType.DOUBLE:
             bond.SetStereo(Chem.BondStereo.STEREOANY)
     out.append((name, molfile(crossed, name)))
+
+    name, source = METHYLENE
+    out.append((name, molfile(Chem.AddHs(methylene_for_hydroxyl(by_name[source])), name)))
+
+    made = {ETHYLIDENE[0]: with_ethylidene(by_name[ETHYLIDENE[1]])}
+    for name, source in PARTLY_DRAWN:
+        out.append((name, partly_drawn(made.get(source) or by_name[source], name)))
     return out
+
+
+def methylene_for_hydroxyl(mol: Chem.Mol) -> Chem.Mol:
+    """mol without stereo, its one OH made =CH2."""
+    edit = Chem.RWMol(stripped(mol))
+    (oxygen,) = [
+        a.GetIdx() for a in edit.GetAtoms() if a.GetSymbol() == "O" and a.GetTotalNumHs() == 1
+    ]
+    edit.GetAtomWithIdx(oxygen).SetAtomicNum(6)
+    (bond,) = edit.GetAtomWithIdx(oxygen).GetBonds()
+    bond.SetBondType(Chem.BondType.DOUBLE)
+    # The carbon it hangs from gives up its H (written explicitly by the SMILES, [C@H]).
+    carbon = edit.GetAtomWithIdx(bond.GetOtherAtomIdx(oxygen))
+    carbon.SetNumExplicitHs(0)
+    carbon.SetNoImplicit(False)
+    made = edit.GetMol()
+    Chem.SanitizeMol(made)
+    return made
+
+
+def partly_drawn(mol: Chem.Mol, name: str) -> str:
+    """mol with its two centres set apart (R and S, so its double bond is stereogenic), its
+    double bond one way, and then the centre with the higher index left undefined."""
+    elements = potential(mol)
+    apart = [
+        m for m in settings(mol, elements) if sorted(cip(m)[0].values()) == ["R", "S"] and cip(m)[1]
+    ]
+    drawn = Chem.Mol(min(apart, key=lambda m: signature(m, elements)))
+    centres = sorted(e.centeredOn for e in elements if e.type == Chem.StereoType.Atom_Tetrahedral)
+    drawn.GetAtomWithIdx(centres[-1]).SetChiralTag(Chem.ChiralType.CHI_UNSPECIFIED)
+    text = molfile(drawn, name)
+    back = Chem.MolFromMolBlock(text, removeHs=False)
+    tags, sides = defined_by(back, potential(back))
+    if len(tags) != 1 or len(sides) != 1:
+        raise ValueError(f"{name}: the drawing should fix one centre and one double bond")
+    return text
 
 
 def set_as(mol: Chem.Mol, centres: str, double_bonds: str) -> Chem.Mol:
@@ -450,16 +536,19 @@ def set_as(mol: Chem.Mol, centres: str, double_bonds: str) -> Chem.Mol:
 
 
 def axis_wedged(mol: Chem.Mol, name: str) -> str:
-    """mol's Molfile with a wedge from one atom of its biaryl axis onto that atom's own ring
-    bond, which RDKit must read as atropisomer stereo."""
+    """mol's Molfile with a wedge from one atom of its biaryl axis onto that atom's own single
+    ring bond, which RDKit must read as atropisomer stereo."""
     text = molfile(mol, name)
     drawn = Chem.MolFromMolBlock(text, removeHs=False)
     (match,) = drawn.GetSubstructMatches(Chem.MolFromSmarts("[!#1]!@a:a!@a:a!@[!#1]"))[:1]
     axis, other = match[2], match[3]
+    # A single ring bond (of the Kekulé form): Ketcher wedges only single bonds.
     ring = next(
         b.GetIdx()
-        for b in drawn.GetAtomWithIdx(axis).GetBonds()
-        if b.GetOtherAtomIdx(axis) != other and b.IsInRing()
+        for b in Chem.MolFromMolBlock(text, removeHs=False, sanitize=False)
+        .GetAtomWithIdx(axis)
+        .GetBonds()
+        if b.GetOtherAtomIdx(axis) != other and b.GetBondType() == Chem.BondType.SINGLE
     )
     lines, start, _ = bond_lines(text)
     bond = drawn.GetBondWithIdx(ring)
