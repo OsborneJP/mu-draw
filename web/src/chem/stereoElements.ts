@@ -12,9 +12,10 @@
 //   see with those centres open. So a bond the probe drops is tried where, at one end, both
 //   branches hold an open element: every setting of the open elements in those branches is
 //   written into RDKit's JSON, and the bond counts if setting it differently changes the
-//   InChI for any of them. =CH2 with its H drawn, or =C(CH3)2, never is. (Comparing the two
-//   branches as well lost a bond when one had its H drawn; without it, =CH2 beside a ring
-//   end whose sides both hold centres is tried in vain: an accepted limit, plan round 4.)
+//   InChI for any of them. So =CH2 with its H drawn, or =C(CH3)2, is tried only where its
+//   other end has two sides that both hold open elements, and then in vain: an accepted
+//   limit (plan, round 4 and the last review). Comparing the two branches as well lost a
+//   bond when one had its H drawn.
 // - get_stereo_tags also lists a biaryl axis wedged at one end (RDKit reads atropisomer
 //   stereo from it) among its bonds; that is no double bond, and isn't counted.
 import type { MainModule, Mol } from '@rdkit/rdkit';

@@ -217,6 +217,18 @@ Acceptance bar for these last changes:
    around its other end when that end's two sides both hold open elements: about 0.3-1 s
    per edit, in the worker, for a steroid drawn with =CH2, every H and no stereo.
 
+
+**Last review** (capped, of the round-4 changes only): nothing high or medium; the review
+stops here. Its three lows are accepted limits (Jeff, 2026-10-25: findings become limits, not
+fixes):
+- The vain search for a dependent double bond also runs for =C(CH3)2 on a ring end whose two
+  sides both hold open centres, with no H drawn (about 0.3-0.7 s per edit, answers right).
+- No test exercises turning RDKit's cis/trans to the first other neighbours: RDKit.js has
+  chosen those same neighbours on every drawing tried, so a mistake there would go unseen.
+- The per-drawing picture test still expects a bare "(R)" at every labelled carbon; a test
+  drawing with ¹³C or a charge at a stereocentre would need it changed (the label function's
+  own tests cover those).
+
 ## Priority
 
 The v1 checklist items that remain come before this for CHEM-311's start: the Mac checks, and "(R)- and (S)-2-butanol give different names and draw with the right wedges". This feature is built alongside them, not instead.
