@@ -550,4 +550,40 @@ export function holdableRdkitReplies() {
   };
 }
 
+/** An init script (context.addInitScript): Indigo's worker's replies reach Ketcher only while
+ * not held, so a test decides when Indigo "answers" (images, conversions, InChIKeys):
+ * window.__holdIndigo(), window.__releaseIndigo(), and window.__heldIndigo() counts the
+ * replies held now. */
+export function holdableIndigoReplies() {
+  const RealWorker = window.Worker;
+  let holding = false;
+  const held: MessageEvent[] = [];
+  let release = () => {};
+  Object.assign(window, {
+    __holdIndigo: () => (holding = true),
+    __releaseIndigo: () => {
+      holding = false;
+      release();
+    },
+    __heldIndigo: () => held.length,
+  });
+  window.Worker = class extends RealWorker {
+    constructor(url: string | URL, options?: WorkerOptions) {
+      super(url, options);
+      if (!String(url).includes('indigoWorker')) return;
+      let ketcherHandler: ((event: MessageEvent) => void) | null = null;
+      // ketcher-standalone sets worker.onmessage after construction; deliver through this filter.
+      RealWorker.prototype.addEventListener.call(this, 'message', (event: Event) => {
+        if (holding) held.push(event as MessageEvent);
+        else ketcherHandler?.(event as MessageEvent);
+      });
+      Object.defineProperty(this, 'onmessage', {
+        get: () => ketcherHandler,
+        set: (handler: ((event: MessageEvent) => void) | null) => (ketcherHandler = handler),
+      });
+      release = () => held.splice(0).forEach((event) => ketcherHandler?.(event));
+    }
+  };
+}
+
 export { expect };

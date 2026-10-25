@@ -159,7 +159,8 @@ def formula_of(inchi: str) -> str:
 
 
 def components(formula: str) -> int:
-    """How many parts an InChI formula has: "C2H6O.CH4" has 2, "2Na.C2H2O4" 3."""
+    """How many parts an InChI formula has: parts are separated by dots, and a part may start
+    with how many of it there are."""
     return sum(int(m.group(1) or 1) for m in re.finditer(r"(?:^|\.)(\d*)[A-Z]", formula))
 
 

@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-8aqlHzY4.js",
-    "size": 7921621
+    "path": "assets/index-CQOY7XYm.js",
+    "size": 7931188
   },
   {
-    "path": "assets/index-DZ5mvGmw.css",
-    "size": 188258
+    "path": "assets/index-D9SPNY_a.css",
+    "size": 190457
   },
   {
-    "path": "assets/index.modern-55d8e3ef-CMZXhdZW.js",
+    "path": "assets/index.modern-55d8e3ef-DUNAuui2.js",
     "size": 425354
   },
   {
@@ -37,23 +37,23 @@
   },
   {
     "path": "icons/icon-192.png",
-    "size": 12996
+    "size": 8210
   },
   {
     "path": "icons/icon-512.png",
-    "size": 32809
+    "size": 20821
   },
   {
     "path": "icons/icon-maskable-512.png",
-    "size": 21994
+    "size": 14872
   },
   {
     "path": "index.html",
-    "size": 1200
+    "size": 1191
   },
   {
     "path": "manifest.webmanifest",
-    "size": 553
+    "size": 535
   },
   {
     "path": "nmr/LICENSE-nmrshiftdb2.txt",
@@ -62,6 +62,10 @@
   {
     "path": "nmr/carbon-shifts.bin",
     "size": 1971438
+  },
+  {
+    "path": "practice.json",
+    "size": 16711
   },
   {
     "path": "rdkit/RDKit_minimal.wasm",
@@ -73,7 +77,7 @@
   },
   {
     "path": "sw.js",
-    "size": 2079
+    "size": 2145
   },
   {
     "path": "workbox-2fbc6a65.js",

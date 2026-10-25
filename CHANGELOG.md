@@ -83,6 +83,13 @@ All notable changes to this project. The format follows
   drawing; clicking a carbon highlights its peak. A banner says these are predictions, not
   an answer key, and every prediction carries NMRShiftDB2's licence notice. Changing the
   drawing clears the prediction until it is predicted again.
+- Practice mode (version 2): the Practice button shows a name, the student draws it, and
+  Check compares the drawing's InChIKey with the answer's, on the device, offline too.
+  Stereochemistry counts only where the name states it (either enantiomer for cis/trans
+  alone). A wrong answer gets one hint: the stereochemistry, the hydrogens or charges, an
+  isomer, or a different formula. Then Show answer draws a picture of the answer. Next and
+  Previous clear the canvas, and one Undo brings the drawing back. Nothing is stored or
+  sent. The first list is a provisional CHEM-311 one.
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name

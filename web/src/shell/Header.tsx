@@ -4,6 +4,7 @@ import CopyImageButton from '../panels/CopyImageButton';
 import ExportDialog from '../panels/ExportDialog';
 import GetNameButton from '../panels/GetNameButton';
 import NameToStructure from '../panels/NameToStructure';
+import PracticeButton from '../panels/PracticeButton';
 import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
@@ -43,6 +44,7 @@ export default function Header() {
             </span>
           )}
         </span>
+        <PracticeButton />
         <NameToStructure />
         <GetNameButton />
         <CopyImageButton />

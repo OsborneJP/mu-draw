@@ -101,7 +101,8 @@ def test_which_names_state_their_stereo(name, stated):
     assert build.stated_stereo(name) == stated
 
 
-@pytest.mark.parametrize("formula, parts", [("C4H10O", 1), ("C2H6O.CH4", 2), ("2Na.C2H2O4", 3)])
+# The format alone: dot-separated parts, each with an optional count in front.
+@pytest.mark.parametrize("formula, parts", [("A", 1), ("A.B", 2), ("2A.B", 3), ("12A", 12)])
 def test_components_of_an_inchi_formula(formula, parts):
     assert build.components(formula) == parts
 

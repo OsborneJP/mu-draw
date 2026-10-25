@@ -58,7 +58,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
-  then in server/scripts: gen_reference_expected, record_pubchem_names, record_name_lookups.
+  then in server/scripts: gen_reference_expected, record_pubchem_names, record_name_lookups, build_practice_lists.
   ¹³C table: in web/, `node scripts/build-carbon-table.ts <nmrshiftdb2withsignals.sd>` (plans/nmr).
 
 ## Layout (spec layout; "later" marks where future code goes)
@@ -70,16 +70,16 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   overlap rule), hose.ts (symmetry, HOSE codes), carbonTable.ts (¹³C table), nmr.ts (peaks).
 - `web/src/panels/`: Export, Copy image (exportImage.ts), properties panel (+ FunctionalGroups,
   NmrButton), Get name, Name to structure (naming.ts: shared state; NamePanel floats over
-  `.canvas-area`), NMR preview (nmr.ts state, nmrStore.ts wiring, NmrPanel docks below).
+  `.canvas-area`); NMR preview (nmr.ts, nmrStore.ts) and Practice (practice.ts) dock below.
 - `web/src/api.ts`: calls to `<base>api/*` (name, structure), with the 8 s deadline.
 - `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; functional-groups.json (editable patterns); nmr/ (¹³C table, licence).
+- `web/public/`: icons; functional-groups.json (editable patterns); nmr/ (¹³C table, licence); practice.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
-  export.spec.ts reads PNG headers, pixels and the clipboard back; `holdableRdkitReplies()` (in
-  fixtures.ts) holds RDKit's replies; getname and nametostructure specs hold API answers.
+  export.spec.ts reads PNG headers, pixels and the clipboard back; `holdableRdkitReplies()` and
+  `holdableIndigoReplies()` (fixtures.ts) hold workers' replies; naming specs hold API answers.
 - `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
   test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
   `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
