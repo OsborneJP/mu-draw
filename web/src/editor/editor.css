@@ -17,6 +17,27 @@
   display: none !important;
 }
 
+/* Ketcher's Save and Open dialogs show the raw text of the file (Molfile lines and the
+   like), which students don't need and found confusing (Jeff, 2026-10-25). Save keeps the
+   file name, the format and its buttons, and still shows the Warnings tab when a format
+   would lose something. Open goes straight to "Open from file", then to the choice between
+   "Open as New Project" and "Add to Canvas"; Ctrl+V on the canvas still pastes. */
+[data-testid='save-dialog'] [data-testid='Preview-tab'],
+[data-testid='save-dialog'] div:has(> [data-testid='preview-area']),
+[data-testid='openStructureModal'] [data-testid='paste-from-clipboard-button'],
+[data-testid='openStructureModal'] [data-testid='open-structure-textarea'] {
+  display: none !important;
+}
+
+/* Without the preview, Save's fixed 310px would be blank space; Open's one tile is centred. */
+[data-testid='save-dialog'] [class*='Save-module_formContainer'] {
+  height: auto;
+}
+
+[data-testid='openStructureModal'] [class*='OpenOptions-module_optionsContainer'] {
+  justify-content: center;
+}
+
 /* Hand, select and eraser stay put while the tools below them scroll (Jeff, 2026-10-25).
    The column is still Ketcher's own scroller, so its arrow buttons move it; the wheel and
    touch now do too, with its scrollbar hidden as before. */
