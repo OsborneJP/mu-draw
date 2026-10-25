@@ -750,6 +750,13 @@ that fails without the fix. Accepted as known limits:
   groups of their own; where the stereo highlight and a group mark the same bond (a
   stereogenic C=C is also an alkene), one colour covers the other; on a first visit the
   properties wait for the 3 kB pattern file.
+- Staging and production (2026-10-24): ae6fe54 went to staging and stopped for the API
+  restart (the fixture generator lives under server/, so deploy.sh asks for one); after
+  Jeff's restart the first live run failed the two edited-copy tests (above). 0dd7350, with
+  the fix, passed `scripts/deploy.sh staging` (check.sh, then check_live's 12 checks, the
+  pattern file through Apache among them, and 62 Playwright tests; 6 skip by design).
+  `--production` ran 66 Playwright tests on the production build, then stopped for the
+  restart; after it, production passed the same 12 checks and 62 tests at 0dd7350.
 
 ## ¹³C NMR preview (session 7, 2026-10-24)
 
@@ -825,3 +832,17 @@ that fails without the fix. Accepted as known limits:
   solvents; sticks closer than about a ppm overlap (the table selects any peak); the
   table describes 4 bonds out, so a substituent 5 bonds away (a benzoyl ring's para
   carbon) is seen only through the 'u' flag; ¹H prediction is "Later" in the spec.
+- Going public (Jeff, 2026-10-24): LICENSE (MIT, Copyright (c) 2026 Jeff Osborne) was
+  pushed before the repository was switched to public, so it was never public unlicensed.
+  gh 2.45 has no `--accept-visibility-change-consequences`; the API call
+  (`gh api -X PATCH repos/<owner>/<repo> -f visibility=public`) did it. GitHub read the
+  licence as "Other" while a third-party note shared the file; with the MIT text alone and
+  the note in THIRD-PARTY-NOTICES.md it says MIT. The history scan before the switch found
+  no secrets or student data (author email and server details are public now).
+- Staging and production (2026-10-25, bf81dd5): `scripts/deploy.sh staging` ran check.sh
+  (420 pytest, 413 Vitest, 75 Playwright tests) and stopped for the API restart; after it,
+  check_live's 14 checks (the ¹³C table and its licence through Apache added) and 69
+  Playwright tests passed against /draw-staging/, the NMR tests among them (offline, and
+  the 2 s timing over the network); 8 skip by design. `--production` ran the 75 tests on
+  the production build, stopped for the restart, then passed the same 14 checks and 69
+  tests against /draw/. Recorded after promoting, in one docs commit.

@@ -94,5 +94,5 @@ Not in scope (spec "Later"): ¹H prediction, multiplets, solvent choice.
 6. Banner and notice on every prediction; licence file in the app; header checked.
 7. Ordering: a held answer for a changed drawing is dropped.
 8. Precache 30,508 KiB in 18 entries; largest file 11.8 MB.
-9. Guard proofs: BUILD-LEARNINGS.md. Deployment waits for the MIT licence and the public
-   repository (Jeff's decision above).
+9. Guard proofs: BUILD-LEARNINGS.md. The repository went public under MIT; staging and
+   production verified at bf81dd5 (2026-10-25).
