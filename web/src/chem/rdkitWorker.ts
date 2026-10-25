@@ -7,9 +7,11 @@
 // an EvalError, on the page and in a worker alike.
 //
 // Messages: the properties panel sends {id, molfile}; the worker answers {id, computed}
-// (null when RDKit can't read the drawing). The NMR preview's copy (rdkitWorkers.ts) is sent
-// {kind: 'nmr', id, molfile} and answers with the predicted peaks (src/chem/nmr.ts). Either
-// copy sends {failed} once if RDKit can't start. Nothing leaves the device: the worker's
+// (null when RDKit can't read the drawing). The panels' copy (rdkitWorkers.ts) is sent
+// {kind: 'nmr', id, molfile} and answers with the predicted peaks (src/chem/nmr.ts), or
+// {kind: 'stereoisomers', id, molfile} and answers with them and their pictures
+// (src/chem/stereoisomers.ts, stereoPictures.ts). Either copy sends {failed} once if RDKit
+// can't start. Nothing leaves the device: the worker's
 // only requests are for RDKit's own wasm, the functional-group patterns (on the first
 // properties request) and the ¹³C table (on the first prediction), all from the precache.
 import initRDKitModule from '@rdkit/rdkit';
@@ -18,11 +20,13 @@ import { computeProperties, configureRdkit, type PatternsOrReason } from './comp
 import { readPatterns } from './functionalGroups';
 import { predictCarbon, type NmrReply, type NmrRequest } from './nmr';
 import { CARBON_TABLE_FILE, PATTERNS_FILE, RDKIT_WASM_FILE } from './rdkitFiles';
+import { enumerateStereoisomers } from './stereoisomers';
+import { withPictures, type StereoReply, type StereoRequest } from './stereoPictures';
 import type { WorkerReply, WorkerRequest } from './tracker';
 
 const scope = self as unknown as {
-  postMessage(message: WorkerReply | NmrReply): void;
-  onmessage: ((event: MessageEvent<WorkerRequest | NmrRequest>) => void) | null;
+  postMessage(message: WorkerReply | NmrReply | StereoReply): void;
+  onmessage: ((event: MessageEvent<WorkerRequest | NmrRequest | StereoRequest>) => void) | null;
 };
 
 const ready = initRDKitModule({ locateFile: () => `${import.meta.env.BASE_URL}${RDKIT_WASM_FILE}` }).then(
@@ -88,9 +92,25 @@ function predict({ id, molfile }: NmrRequest): void {
   );
 }
 
+function stereoisomers({ id, molfile }: StereoRequest): void {
+  ready.then(
+    (rdkit) => {
+      try {
+        const found = enumerateStereoisomers(rdkit, molfile);
+        scope.postMessage({ kind: 'stereoisomers', id, result: found === null ? null : withPictures(rdkit, found) });
+      } catch (error) {
+        console.error('RDKit could not list the stereoisomers:', error);
+        scope.postMessage({ kind: 'stereoisomers', id, error: error instanceof Error ? error.message : String(error) });
+      }
+    },
+    () => {}, // already reported as {failed}
+  );
+}
+
 scope.onmessage = (event) => {
   if ('kind' in event.data) {
-    predict(event.data);
+    if (event.data.kind === 'nmr') predict(event.data);
+    else stereoisomers(event.data);
     return;
   }
   const { id, molfile } = event.data;

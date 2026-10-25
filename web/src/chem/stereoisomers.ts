@@ -45,6 +45,8 @@ export interface Stereoisomer {
 }
 
 export type Enumeration =
+  /** More than one structure: the panel works on one at a time (bar B.1). */
+  | { outcome: 'several' }
   | { outcome: 'no-elements' }
   | { outcome: 'too-many'; elements: number }
   | { outcome: 'counted'; elements: number; count: number; notes: Note[] }
@@ -179,6 +181,10 @@ export function enumerateStereoisomers(rdkit: MainModule, molfile: string): Enum
   if (!drawingMol) return null;
   let json: Json, drawnTags: Tags, doublePairs: [number, number][], chiralFlag: string, biaryl: boolean;
   try {
+    const frags = drawingMol.get_frags() as { molList: { size(): number; delete(): void } };
+    const several = frags.molList.size() > 1;
+    frags.molList.delete();
+    if (several) return { outcome: 'several' };
     json = JSON.parse(drawingMol.get_json()) as Json;
     drawnTags = JSON.parse(drawingMol.get_stereo_tags()) as Tags;
     doublePairs = stereoDoubleBonds(rdkit, drawingMol);

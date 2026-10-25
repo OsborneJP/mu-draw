@@ -196,6 +196,17 @@ describe('the pictures', () => {
   });
 });
 
+it('works on one structure at a time', () => {
+  const [first, second] = ['L-threonine', '(E)-cinnamic acid'].map((name) => fixture.compounds.find((c) => c.name === name)!);
+  const a = rdkit.get_mol(drawing(first), JSON.stringify({ removeHs: false }))!;
+  const b = rdkit.get_mol(drawing(second), JSON.stringify({ removeHs: false }))!;
+  a.combine_with(b);
+  const both = a.get_molblock();
+  a.delete();
+  b.delete();
+  expect(enumerateStereoisomers(rdkit, both)).toEqual({ outcome: 'several' });
+});
+
 describe('the limits', () => {
   it('enumerates up to 8 stereo elements', () => {
     expect(sizeOutcome(0)).toBe('no-elements');

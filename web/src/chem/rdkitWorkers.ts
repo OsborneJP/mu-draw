@@ -1,7 +1,8 @@
 // Starts a copy of the RDKit worker (rdkitWorker.ts). The URL is written in this one place,
 // so Vite bundles one worker file, rdkit/worker.js, which the server gives its own CSP
-// (web/csp-workers.json). The properties panel runs one copy; the NMR preview starts
-// another on its first prediction, so the properties never wait for it.
+// (web/csp-workers.json). The properties panel runs one copy; the panels below the canvas
+// (the NMR preview and the stereoisomers, src/panels/panelWorker.ts) share another, started
+// on their first request, so the properties never wait for them.
 export type RdkitWorkerName = 'rdkit' | 'rdkit-nmr';
 
 export function startRdkitWorker(name: RdkitWorkerName): Worker {

@@ -8,6 +8,8 @@ import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
+import { closeNmr } from './nmrStore';
+import { showStereoisomers } from './stereoStore';
 import './properties.css';
 
 // Properties panel (spec section 2): RDKit's values for the drawing as it changes, worked
@@ -123,6 +125,20 @@ function Stereo({ stereo, current, highlighted, onToggle }: StereoProps) {
         <p className="properties-note" data-testid="stereo-meso-note">
           Meso forms can make the real number of stereoisomers smaller.
         </p>
+      )}
+      {total > 0 && (
+        <button
+          type="button"
+          className="stereo-show"
+          data-testid="stereo-show"
+          disabled={!current}
+          onClick={() => {
+            closeNmr(); // one panel below the canvas at a time
+            showStereoisomers();
+          }}
+        >
+          Show stereoisomers
+        </button>
       )}
     </section>
   );

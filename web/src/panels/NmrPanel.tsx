@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import type { Ketcher } from 'ketcher-core';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { CARBON_TABLE_LICENCE_FILE } from '../chem/rdkitFiles';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
+import Docked from './Docked';
 import { BANNER, carbonType, type NmrMessage, type NmrState, type ShownPeak } from './nmr';
 import { closeNmr, getNmrState, predictNmr, selectPeak, startNmr, subscribeNmrState } from './nmrStore';
 import './nmr.css';
@@ -155,39 +155,6 @@ function Body({ state, tms }: { state: NmrState; tms: boolean }) {
   }
 }
 
-/** The panel takes the bottom of the canvas area, so the canvas gets shorter. Ketcher keeps
- * its view's top-left corner when the canvas resizes, which would leave the drawing low,
- * behind its bottom toolbar; so the view moves down by half of whatever height the panel
- * takes (and back when it closes): the middle of the canvas stays in the middle. Ketcher's
- * own resize sets only the view's size, so the order of the two doesn't matter.
- * data-docked says how much height has been made up for (tests wait on it). */
-function Docked({ ketcher, state, children }: { ketcher: Ketcher; state: NmrState; children: ReactNode }) {
-  const panel = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const element = panel.current;
-    if (!element) return;
-    const render = ketcher.editor.render;
-    let made = 0;
-    const makeUp = (height: number) => {
-      const dy = (height - made) / 2 / render.options.zoom;
-      made = height;
-      render.setViewBox((view) => ({ ...view, minY: view.minY + dy }));
-      element.dataset.docked = String(height);
-    };
-    const observer = new ResizeObserver(() => makeUp(element.offsetHeight));
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-      makeUp(0);
-    };
-  }, [ketcher]);
-  return (
-    <section ref={panel} className="nmr-panel" aria-label="Predicted ¹³C NMR" data-testid="nmr-panel" data-state={state.kind}>
-      {children}
-    </section>
-  );
-}
-
 export default function NmrPanel() {
   const ketcher = useSyncExternalStore(subscribeKetcher, getKetcher);
   const state = useSyncExternalStore(subscribeNmrState, getNmrState);
@@ -195,7 +162,7 @@ export default function NmrPanel() {
   useEffect(() => (ketcher ? startNmr(ketcher) : undefined), [ketcher]);
   if (state.kind === 'idle' || !ketcher) return null;
   return (
-    <Docked ketcher={ketcher} state={state}>
+    <Docked ketcher={ketcher} className="nmr-panel" label="Predicted ¹³C NMR" testId="nmr-panel" state={state.kind}>
       <div className="nmr-head">
         <h2>
           Predicted ¹³C NMR <span className="preview-tag">Preview</span>
