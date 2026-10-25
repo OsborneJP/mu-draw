@@ -241,9 +241,11 @@ mu-draw/
 
 v1 is ready for students when every box below is ticked on a Windows 11 laptop and a Mac.
 
+Status, 2026-10-25: Jeff has checked the Windows 11 side by hand (marked "Windows ✓" below) and the test sets; no Mac has been available yet. CHEM-311 is to start using it as soon as possible.
+
 **Install and offline**
 
-- [ ] Installs from Chrome and from Edge on Windows 11; Start menu and taskbar icon appear
+- [x] Installs from Chrome and from Edge on Windows 11; Start menu and taskbar icon appear
 - [ ] Installs from Chrome on macOS; Dock icon appears
 - [ ] With Wi-Fi off, the installed app launches and draws
 - [ ] Offline: properties, functional groups and export all work; naming buttons show the offline message
@@ -253,21 +255,21 @@ v1 is ready for students when every box below is ticked on a Windows 11 laptop a
 
 - [ ] Properties match server-side RDKit for the 10 reference compounds
 - [ ] Stereocenter count: 2-butanol shows 1; open-chain glucose shows 4, up to 16 stereoisomers
-- [ ] Functional group highlighter passes the 25-molecule CHEM-312 test set
+- [x] Functional group highlighter passes the 25-molecule CHEM-312 test set (Jeff, 2026-10-25)
 - [ ] Get name: 20 known compounds correct, 3 invented structures give the not-found message
-- [ ] Name to structure: 20 systematic names and 10 common names draw correctly
+- [x] Name to structure: 20 systematic names and 10 common names draw correctly (Jeff, 2026-10-25)
 - [ ] Name to structure: Add and Replace both work, and the round trip shows PubChem's name next to the typed name
 - [ ] Stereo: (R)- and (S)-2-butanol give different names and draw with the right wedges
 
 **Output**
 
-- [ ] Copy as image pastes into Word and Google Docs on both platforms
-- [ ] PNG at 4x is sharp on a printed page; SVG opens in a browser and in PowerPoint
-- [ ] 10 ChemDraw files (CDX and CDXML, including reactions) open correctly, and files saved from the app open correctly in ChemDraw
+- [ ] Copy as image pastes into Word and Google Docs on both platforms (Windows ✓)
+- [ ] PNG at 4x is sharp on a printed page; SVG opens in a browser and in PowerPoint (Windows ✓)
+- [ ] 10 ChemDraw files (CDX and CDXML, including reactions) open correctly, and files saved from the app open correctly in ChemDraw (Windows ✓)
 
 **Load**
 
-- [ ] 30 simultaneous naming requests (one lab section) complete without PubChem rate-limit errors
+- [x] 30 simultaneous naming requests (one lab section) complete without PubChem rate-limit errors. 2026-10-25, on staging, 30 structures none of them cached: all named, the slowest in 5.7 s against the browser's 8 s limit (`python scripts/load_naming.py staging`)
 
 **Privacy**
 
@@ -309,8 +311,8 @@ Students will compare the number of peaks with what they expect, so equivalent c
 
 ### Acceptance criteria
 
-- [ ] 15 compounds from CHEM-312 (you choose, mixing aromatics, carbonyls, alcohols and amines) give the correct number of signals
-- [ ] Predicted shifts sit within a tolerance you set (suggest ±3 ppm) of literature values for most signals; outliers are recorded, not hidden
+- [x] 15 compounds from CHEM-312 (you choose, mixing aromatics, carbonyls, alcohols and amines) give the correct number of signals (Jeff, 2026-10-25)
+- [x] Predicted shifts sit within a tolerance you set (suggest ±3 ppm) of literature values for most signals; outliers are recorded, not hidden (Jeff, 2026-10-25)
 - [ ] Peak-to-atom highlighting works both directions
 - [ ] Prediction for a 30-heavy-atom molecule returns in under 2 seconds
 - [ ] Option A only: offline shows the standard "Needs an internet connection" message
@@ -352,12 +354,12 @@ These are held back because each needs substantial new drawing code or heavy ser
 
 ### Open questions
 
-- [ ] App name and URL path (`/draw/` is a placeholder; Kenapocomochem under consideration)
+- [x] App name and URL path. Decided Oct 25, 2026: MU Draw, at /draw/.
 - [x] Is Java acceptable on osbornelab for the OPSIN .jar, or start with the EBI web service? Decided Oct 24, 2026: Java on osbornelab. Measured with OPSIN 2.9.0 on OpenJDK 21: one long-running process per site uses about 120-135 MB at rest (about 330 MB at most under a flood of 3,500 names/s) and parses a name in about 2.5 ms; starting Java per request costs 0.7 s and 115 MB each time, so keep one process running. OpenJDK from conda-forge takes 550 MB of disk.
 - [ ] Does osbornelab's HTTPS certificate cover this path, and is it reachable off campus?
 - [ ] Who besides you will maintain it (a student developer, IT)?
-- [ ] Which department courses adopt it first: CHEM-312 in Spring 2027, or a smaller pilot?
-- [ ] ChemDraw round-trip tests: Jeff runs them on his own ChemDraw
+- [x] Which department courses adopt it first: CHEM-312 in Spring 2027, or a smaller pilot? Decided Oct 25, 2026: CHEM-311, as soon as possible.
+- [x] ChemDraw round-trip tests: Jeff runs them on his own ChemDraw. Done on Windows, Oct 25, 2026.
 
 ## Sources
 

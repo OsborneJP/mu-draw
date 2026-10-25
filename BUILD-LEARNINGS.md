@@ -946,3 +946,19 @@ Acceptance bar: docs/plans/placement-toolbar-branding.md.
   production build, then passed the same 14 checks and 80 tests against /draw/. Manchester's
   brand gold (#eeb111) replaced the stand-in gold just after, in its own commit.
 
+## Load check (2026-10-25)
+
+- `python scripts/load_naming.py staging` sends 30 Get name requests at once, for 30
+  fixture structures the target hasn't cached (it reads the target's cache on osbornelab).
+  All 30 were named, none "busy". The answers came in steps of five a second, as the
+  server's rate limit lets them, and the slowest took 5.7 s against the browser's 8 s
+  limit (`NAMING_DEADLINE_MS`).
+- So about 35 different uncached structures at the same moment is the most one class can
+  ask before the last answers miss the browser's limit and show "not responding". A class
+  asking about the same compound is quicker: after the first answer it is cached.
+- Staging and production limit themselves separately, but PubChem counts requests per IP
+  address, and both run on osbornelab. Load-testing staging during a class could push
+  PubChem into answering "busy".
+- Each run warms the target's cache with the structures it used. The fixtures hold 77, so
+  a target can be load-checked twice.
+
