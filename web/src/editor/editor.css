@@ -16,3 +16,25 @@
 [data-testid='open-from-image-button'] {
   display: none !important;
 }
+
+/* Hand, select and eraser stay put while the tools below them scroll (Jeff, 2026-10-25).
+   The column is still Ketcher's own scroller, so its arrow buttons move it; the wheel and
+   touch now do too, with its scrollbar hidden as before. */
+[data-testid='left-toolbar'] > [data-testid='left-toolbar-buttons'] {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+[data-testid='left-toolbar'] > [data-testid='left-toolbar-buttons'] > div:first-child {
+  position: sticky;
+  /* 1px above the top: Ketcher shows its up arrow only while these first tools are not
+     wholly in view, so once the column has scrolled, 1px of them is hidden. At top: 0 the
+     up arrow would never show. */
+  top: -1px;
+  z-index: 1;
+  /* Ketcher's gap below the group, as padding over its own background, so nothing scrolled
+     shows through around the tools. */
+  margin-bottom: 0;
+  padding-bottom: 6px;
+  background: rgb(252 252 252);
+}

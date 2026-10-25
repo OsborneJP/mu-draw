@@ -37,7 +37,8 @@ This changes one point of docs/SPEC.md section 6: "Added fragments must not over
    - Browser tests click real points and wait on events and the panel's `data-state`, never on timers.
 
 **B. Pinned tools**
-1. At a window height where the left toolbar overflows (1280×600), scrolling the tools (mouse wheel, and Ketcher's arrow button) moves the lower tools. Hand, select and eraser stay exactly where they were, and nothing scrolled shows through around them.
+1. At a window height where the left toolbar overflows (1280×600), scrolling the tools (mouse wheel, and Ketcher's arrow buttons, down and back up) moves the lower tools. Hand, select and eraser stay where they were (within 1 px), and nothing scrolled shows through around them.
+   - Why 1 px: Ketcher shows its up arrow only while the first group is not wholly in view (an IntersectionObserver at threshold 1). Pinned at `top: -1px`, 1 px of it is hidden once the column has scrolled, so the up arrow still appears; at `top: 0` it never would.
 2. Where everything fits, nothing changes.
 3. The hidden-UI tests, compact toolbar included, still pass.
 4. Positive control: the column really scrolled, so its `scrollTop` is above 0 and a lower tool moved.
