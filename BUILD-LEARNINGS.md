@@ -928,6 +928,11 @@ Acceptance bar: docs/plans/placement-toolbar-branding.md.
 - Review (one capped round, 3 reviewers plus a refuting verifier per finding; 8 confirmed,
   5 rejected). One medium: a click with no move since the compound arrived placed nothing.
   Fixed, with the six lows that had cheap fixes; the bar's Review section lists them.
+- Round 2, on the fixes only: no high or medium findings, so review stopped. Its two lows
+  were fixed. Ketcher passes a release to the tool only when it lands on the canvas, so a
+  press released off it left `pressed` set; a window listener (after Ketcher's, on the
+  document) now clears it on any release. And `elementFromPoint` returns null off screen,
+  which `?.closest(...) !== null` counted as a hit.
 - Accepted limits:
   - A Ketcher dialog open at put-away makes Ketcher ignore the Escape. The editor is set to
     select directly, and the toolbar shows the old tool until one is picked.

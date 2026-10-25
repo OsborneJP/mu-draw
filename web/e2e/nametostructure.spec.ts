@@ -378,6 +378,27 @@ test('the release that ends a drag begun before the compound arrived does not pl
   expect(await changes()).toBe(1);
 });
 
+test('a press released off the canvas does not make a later release a click', async ({ app }) => {
+  const { page } = app;
+  const { panel } = ui(page);
+  const { changes } = await compoundInHand(app);
+  const point = await canvasPoint(page, 0.25, 0.7);
+  await moveTo(page, point);
+  // Pressed on the canvas, released on the header: the click is abandoned.
+  await page.mouse.down();
+  const title = (await page.getByTestId('app-title').boundingBox())!;
+  await page.mouse.move(title.x + 5, title.y + 5);
+  await page.mouse.up();
+  // Pressed on the name panel's heading, released on the canvas: no click either.
+  const heading = (await panel.getByRole('heading', { name: 'Name' }).boundingBox())!;
+  await page.mouse.move(heading.x + 5, heading.y + 5);
+  await page.mouse.down();
+  await moveTo(page, point);
+  await page.mouse.up();
+  expect(await changes()).toBe(0);
+  await expect(panel).toHaveAttribute('data-state', 'placing');
+});
+
 for (const [how, putAway, toolAfter] of [
   ['Esc', (page: Page) => page.keyboard.press('Escape'), 'select-rectangle'],
   ['another tool', (page: Page) => page.getByTestId('chain').filter({ visible: true }).click(), 'chain'],

@@ -129,10 +129,11 @@ test('in a very short editor the whole column scrolls, as Ketcher has it', async
   expect(hand.y + hand.height).toBeLessThanOrEqual(columnBox.y); // scrolled away with the rest
   const last = toolbar(page).root.getByTestId('images');
   const box = (await last.boundingBox())!;
-  const hit = await page.evaluate(
-    ([x, y]) => document.elementFromPoint(x, y)?.closest('[data-testid="images"]') !== null,
-    [box.x + box.width / 2, box.y + box.height / 2],
-  );
+  // elementFromPoint gives null off screen, which must not count as a hit.
+  const hit = await page.evaluate(([x, y]) => {
+    const at = document.elementFromPoint(x, y);
+    return at !== null && at.closest('[data-testid="images"]') !== null;
+  }, [box.x + box.width / 2, box.y + box.height / 2]);
   expect(hit).toBe(true);
 });
 

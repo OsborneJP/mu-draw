@@ -71,3 +71,7 @@ One capped round: three reviewers (placement, toolbar, brand), each finding chec
   - If a Ketcher dialog is open when the compound is put away (Esc closing the dialog, say), Ketcher ignores its Escape. The editor returns to select, but the toolbar keeps showing the tool from before Add until the student picks one.
   - A drag already under way when the compound arrives (moving a fragment with the select tool) is cut off. The fragment stays where it was dragged to, but that move is not in the undo history.
 
+Round 2, on the fix commit only (two reviewers, each refuting its own findings first): no high or medium findings, so review stops here. Two lows, both fixed:
+- A press released off the canvas left the "pressed" state set, so a later release that began off the canvas counted as a click. Any release now clears it; the browser test fails without the fix.
+- The very-short-editor test counted an off-screen point as a hit.
+

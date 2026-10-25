@@ -57,6 +57,7 @@ export async function placeInHand(
     if (settled) return;
     settled = true;
     document.removeEventListener('keydown', onKeyDown, true);
+    window.removeEventListener('mouseup', released);
     settle(placed);
   };
 
@@ -68,6 +69,10 @@ export async function placeInHand(
     pressed = true;
     mousedown(event);
   };
+  // Any release ends the press, also one off the canvas, which Ketcher doesn't pass on. On
+  // the window, so it runs after Ketcher's own listener (on the document) has used it.
+  const released = () => (pressed = false);
+  window.addEventListener('mouseup', released);
 
   const mousemove = tool.mousemove.bind(tool);
   const mouseup = tool.mouseup.bind(tool);
