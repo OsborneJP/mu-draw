@@ -189,3 +189,58 @@ def test_newman_labels_sit_beyond_the_bond_ends(made):
         for end, label in zip(ends, drawing.texts, strict=True):
             at = np.array(label["xy"])
             assert angle(at, end) < 1e-6 and np.linalg.norm(at) > np.linalg.norm(end), name
+
+
+FISCHER_SKELETONS = {"fischer-1": 1, "fischer-2": 2, "fischer-4": 4}
+
+
+def test_fischer_glucose_is_pubchem_aldehydo_d_glucose_with_its_stereo(made):
+    template = made["fischer-d-glucose"]
+    assert template.source == "aldehydo-D-glucose"
+    assert Chem.MolToInchiKey(template.drawing.mol()) == pubchem_inchikey("aldehydo-D-glucose")
+
+
+def test_fischer_horizontal_bonds_are_wedges_and_vertical_bonds_are_plain(made):
+    for name in [*FISCHER_SKELETONS, "fischer-d-glucose"]:
+        drawing = made[name].drawing
+        points = xy(drawing)
+        crosses = 0
+        for bond in drawing.bonds:
+            i, j = bond["atoms"]
+            d = points[j] - points[i]
+            if bond["wedge"]:
+                assert d[1] == pytest.approx(0), name  # horizontal
+                crosses += 1
+            elif abs(d[0]) < 1e-9:
+                assert not bond["wedge"]
+        assert crosses == 2 * FISCHER_SKELETONS.get(name, 4), name
+
+
+def test_fischer_glucose_without_its_wedges_has_no_stereo(made):
+    # The wedges carry the stereo: plain crosses would leave every centre undefined.
+    drawing = made["fischer-d-glucose"].drawing
+    plain = gen.Drawing(drawing.atoms, [b | {"wedge": False} for b in drawing.bonds])
+    mol = plain.mol()
+    assert Chem.FindMolChiralCenters(mol, includeUnassigned=True, useLegacyImplementation=False)
+    assert not Chem.FindMolChiralCenters(mol, useLegacyImplementation=False)
+
+
+def test_fischer_skeletons_have_a_cross_per_stereocentre(made):
+    for name, centres in FISCHER_SKELETONS.items():
+        template = made[name]
+        assert template.source is None
+        assert len(template.drawing.atoms) == 3 * centres + 2, name
+
+
+def test_a_relabelled_fischer_skeleton_is_read_the_fischer_way(made):
+    # Four different groups on the one-centre cross give a defined stereocentre because the
+    # horizontal bonds are wedges; with plain bonds it would be undefined.
+    drawing = made["fischer-1"].drawing
+    ends = [i for i, a in enumerate(drawing.atoms) if i != 1]  # atom 1 is the centre
+    labelled = [dict(a) for a in drawing.atoms]
+    for end, label in zip(ends, ("F", "Cl", "Br", "I"), strict=True):
+        labelled[end]["label"] = label
+    wedged = gen.Drawing(labelled, drawing.bonds)
+    plain = gen.Drawing(labelled, [b | {"wedge": False} for b in drawing.bonds])
+    assert len(Chem.FindMolChiralCenters(wedged.mol(), useLegacyImplementation=False)) == 1
+    assert not Chem.FindMolChiralCenters(plain.mol(), useLegacyImplementation=False)

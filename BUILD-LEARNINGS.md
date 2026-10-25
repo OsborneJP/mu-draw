@@ -1022,3 +1022,11 @@ Acceptance bar and measurements: docs/plans/v2-templates.md.
   overlapped; at 20° they don't.
 - Indigo's SVG strokes shapes as `<path fill="none">` (a circle with curves, a line with
   straight segments) and draws each letter as one `<use>` glyph, so a test can count them.
+- Fischer projections: with plain crosses RDKit reads every centre as undefined. With the
+  horizontal bonds wedged, exactly one of the 16 ways to put D-glucose's OH groups left or
+  right reads as PubChem's aldehydo-D-glucose, so the generator searches for it instead of
+  typing the layout. A template in KET with no stereo label loads as absolute stereo
+  (Indigo's InChIKey matches PubChem's); the same drawing as a Molfile with chiral flag 0
+  loaded as "AND Enantiomer".
+- Ketcher labels a lone bond end "CH3", so the Fischer skeletons show CH3 at each end until
+  the student relabels it.

@@ -9,14 +9,17 @@ Reads tests/fixtures/template_compounds.csv (SMILES from PubChem) and writes:
 
 What is chemistry comes from PubChem and RDKit: which molecule each template is, and the
 chair's bond directions (a real chair, projected). What is only a drawing convention is
-computed here: the bond length, the chair's viewing angle, and a Newman projection, which
-is a picture (lines, a circle and labels) rather than a molecule. Nothing is typed in.
+computed here: the bond length, the chair's viewing angle, a Newman projection, which is
+a picture (lines, a circle and labels) rather than a molecule, and the right angles of a
+Fischer projection. Which side of a Fischer cross each group goes is found, not typed: the
+one layout whose wedges RDKit reads as the PubChem compound. Nothing is typed in.
 
 Output is deterministic; tests/test_templates.py regenerates it and compares bytes.
 """
 
 from __future__ import annotations
 
+import itertools
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -64,6 +67,10 @@ NEWMAN = {
     "label_radius": 1.3,
     "label": "H",
 }
+# Fischer projections: the chain vertical, each stereocentre a cross whose horizontal bonds
+# are wedges toward the viewer, which is what the cross means, so the app reads the
+# stereoisomer (decided by Jeff). Skeletons with this many stereocentres, and D-glucose.
+FISCHER = {"skeleton_centres": [1, 2, 4]}
 # A one-letter label's box, in bond lengths, as Ketcher measures it at its default size.
 LABEL_BOX = (0.235, 0.375)
 
@@ -245,6 +252,103 @@ def newman(offset_deg: float) -> Drawing:
     return drawing
 
 
+def specified_stereocentres(mol: Chem.Mol) -> set[int]:
+    found = Chem.FindPotentialStereo(Chem.Mol(mol), cleanIt=False, flagPossible=False)
+    return {
+        s.centeredOn
+        for s in found
+        if str(s.type) == "Atom_Tetrahedral" and str(s.specified) == "Specified"
+    }
+
+
+def carbon_chain(mol: Chem.Mol) -> list[int]:
+    """An open-chain sugar's carbons, from the carbonyl carbon (C1) down."""
+    (carbonyl,) = (
+        a.GetIdx()
+        for a in mol.GetAtoms()
+        if a.GetSymbol() == "C"
+        and any(
+            b.GetBondType() == Chem.BondType.DOUBLE and b.GetOtherAtom(a).GetSymbol() == "O"
+            for b in a.GetBonds()
+        )
+    )
+    chain = [carbonyl]
+    while True:
+        last = mol.GetAtomWithIdx(chain[-1])
+        following = [n.GetIdx() for n in last.GetNeighbors() if n.GetSymbol() == "C"]
+        following = [i for i in following if i not in chain]
+        if not following:
+            return chain
+        (next_carbon,) = following  # unbranched
+        chain.append(next_carbon)
+
+
+def fischer_skeleton(centres: int) -> Drawing:
+    """A Fischer projection with this many stereocentres, every bond end a carbon until the
+    student relabels it: the chain down the middle, and at each centre a cross whose
+    horizontal bonds are wedges toward the viewer, which is what the cross means. So
+    whatever the student puts on the cross is read the Fischer way."""
+    drawing = Drawing()
+    previous = drawing.atom("C", (0.0, 1.0))
+    for k in range(centres):
+        centre = drawing.atom("C", (0.0, -float(k)))
+        drawing.bond(previous, centre)
+        for side in (-1.0, 1.0):
+            drawing.bond(centre, drawing.atom("C", (side, -float(k))), wedge=True)
+        previous = centre
+    drawing.bond(previous, drawing.atom("C", (0.0, -float(centres))))
+    return drawing
+
+
+def fischer_layout(mol: Chem.Mol, sides: dict[int, float]) -> Drawing:
+    """An open-chain sugar as a Fischer projection: C1 at the top, each stereocentre's
+    heteroatom on the side `sides` gives (1 right, -1 left) and its H on the other, both as
+    wedges toward the viewer. C1's =O and H, and the last carbon's O, go off the chain's
+    ends at 60° from it."""
+    chain = carbon_chain(mol)
+    drawing = Drawing()
+    index = {c: drawing.atom("C", (0.0, -float(k))) for k, c in enumerate(chain)}
+    for k, carbon in enumerate(chain):
+        others = [n for n in mol.GetAtomWithIdx(carbon).GetNeighbors() if n.GetIdx() not in chain]
+        others.sort(key=lambda n: n.GetSymbol() == "H")  # heavy atoms first
+        if carbon in sides:
+            (heavy, hydrogen) = others
+            for atom, side in ((heavy, sides[carbon]), (hydrogen, -sides[carbon])):
+                index[atom.GetIdx()] = drawing.atom(atom.GetSymbol(), (side, -float(k)))
+                drawing.bond(index[carbon], index[atom.GetIdx()], wedge=True)
+            continue
+        away = 90.0 if k == 0 else -90.0  # up from the top, down from the bottom
+        for atom, turn in zip(others, (-60.0, 60.0)[: len(others)], strict=True):
+            angle = np.radians(away + turn * np.sign(away))
+            xy = (np.cos(angle), -float(k) + np.sin(angle))
+            index[atom.GetIdx()] = drawing.atom(atom.GetSymbol(), xy)
+            order = int(mol.GetBondBetweenAtoms(carbon, atom.GetIdx()).GetBondTypeAsDouble())
+            drawing.bond(index[carbon], index[atom.GetIdx()], order=order)
+    for upper, lower in itertools.pairwise(chain):
+        drawing.bond(index[upper], index[lower])
+    return drawing
+
+
+def fischer(smiles: str) -> Drawing:
+    """The Fischer projection RDKit reads as this PubChem compound: of every way to put each
+    stereocentre's heteroatom left or right, the one (there must be exactly one) whose
+    drawing, wedges and all, is the compound."""
+    target = Chem.MolFromSmiles(smiles)
+    centres = sorted(specified_stereocentres(target))
+    chain = carbon_chain(target)
+    assert set(centres) <= set(chain), "every stereocentre on the chain"
+    # Explicit H on C1 (the aldehyde's) and on each stereocentre, as Fischer projections show.
+    mol = Chem.AddHs(target, onlyOnAtoms=tuple([chain[0], *centres]))
+    want = Chem.MolToSmiles(target)
+    matches = []
+    for choice in itertools.product((-1.0, 1.0), repeat=len(centres)):
+        drawing = fischer_layout(mol, dict(zip(centres, choice, strict=True)))
+        if Chem.MolToSmiles(Chem.RemoveHs(drawing.mol())) == want:
+            matches.append(drawing)
+    (drawing,) = matches
+    return drawing
+
+
 @dataclass
 class Template:
     id: str
@@ -283,6 +387,23 @@ def templates(smiles: dict[str, str]) -> list[Template]:
             "Newman, eclipsed",
             newman(NEWMAN["eclipsed_offset_deg"]),
             None,
+        ),
+        *(
+            Template(
+                f"fischer-{n}",
+                "Fischer",
+                f"Fischer, {n} stereocenter{'s' * (n > 1)}",
+                fischer_skeleton(n),
+                None,
+            )
+            for n in FISCHER["skeleton_centres"]
+        ),
+        Template(
+            "fischer-d-glucose",
+            "Fischer",
+            "Fischer, D-glucose",
+            fischer(smiles["aldehydo-D-glucose"]),
+            "aldehydo-D-glucose",
         ),
     ]
 
@@ -324,6 +445,7 @@ def generate() -> dict[Path, str]:
         "rdkit_version": rdkit.__version__,
         "chair": CHAIR,
         "newman": NEWMAN,
+        "fischer": FISCHER,
         "templates": [
             {"id": t.id, "group": t.group, "name": t.name, "ket": t.drawing.ket()} for t in made
         ],

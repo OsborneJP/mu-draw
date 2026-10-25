@@ -68,7 +68,7 @@ afterEach(() => putAwayTemplate());
 
 describe('the generated templates', () => {
   it('come in the groups the plan names, chair first', () => {
-    expect(GROUPS).toEqual(['Chair', 'Newman']);
+    expect(GROUPS).toEqual(['Chair', 'Newman', 'Fischer']);
     expect(new Set(TEMPLATES.map((t) => t.id)).size).toBe(TEMPLATES.length);
   });
 });
