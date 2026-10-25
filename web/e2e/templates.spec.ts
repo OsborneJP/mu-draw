@@ -350,3 +350,23 @@ test('a placed template survives a reload, its shapes and text too', async ({ ap
   await waitForEditor(app);
   expect(await counts(page)).toEqual(sizeOf(template));
 });
+
+test("Ketcher's own Haworth sugars (its Structure Library's Sugars group) are hidden; its other groups stay", async ({
+  app,
+}) => {
+  const { page } = app;
+  await openEditor(app);
+  await page.getByTestId('template-lib').filter({ visible: true }).click();
+  const sugars = page.getByTestId('Sugars-accordion-item');
+  // Ketcher still makes the group (so the test looks at the right thing); it is not shown.
+  await expect(sugars).toBeAttached();
+  await expect(sugars).toBeHidden();
+  for (const group of ['alpha-D-Sugars', 'beta-D-Sugars', 'D-Sugars', 'Rings']) {
+    await expect(page.getByTestId(`${group}-accordion-item`)).toBeVisible();
+  }
+  // A search that lists the group's sugars shows them only in Ketcher's other groups.
+  await page.getByPlaceholder('Search by elements...').fill('Glucopyranose');
+  await expect(page.getByTestId('alpha-D-Sugars-accordion-item')).toBeVisible();
+  await expect(sugars).toBeAttached();
+  await expect(sugars).toBeHidden();
+});

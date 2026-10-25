@@ -104,7 +104,7 @@ Jeff approved the plan as written: the starter set above, all four types, one co
 2. **Which templates first:** all four types, as in the starter set.
 3. **Fischer:** wedged horizontal bonds, so the app reads the stereoisomer. Not plain crosses.
 4. **Haworth:** plain bonds with no thick front edge, so the app never reads a wrong stereoisomer; its centres show as undefined.
-5. **Still open:** Ketcher's own Haworth sugars (Structure Library, "Sugars") are misread in the app today. They stay as they are unless Jeff decides otherwise.
+5. **Ketcher's own Haworth sugars** (Structure Library, "Sugars"), misread in the app: hidden (Jeff, after the build). The same eight sugars stay in Ketcher's "α-D-Sugars" group, drawn so they read correctly.
 
 ## Done (2026-10-25, on branch claude/zen-newton-b872d1)
 
@@ -115,4 +115,4 @@ Jeff approved the plan as written: the starter set above, all four types, one co
   - The Haworth rings are drawn in perspective with shorter inward bonds; on a regular flattened hexagon, a bond ran through another group's label.
   - The Haworth rings carry H atoms rather than bare bond ends, as the chair does.
 - For Jeff to look at: the chair's two inner axial bonds cross the opposite ring edge, as they do in any true projection (BUILD-LEARNINGS.md).
-- Still open: decision 5 (Ketcher's own "Sugars" Haworths, misread today).
+- Decision 5, afterwards: Ketcher's "Sugars" group is hidden (web/src/editor/editor.css). A browser test checks it is gone, also from search results, while "α-D-Sugars", "β-D-Sugars", "D-Sugars" and "Rings" stay; it fails without the rule.

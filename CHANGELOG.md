@@ -120,6 +120,10 @@ All notable changes to this project. The format follows
   open source.
 
 ### Fixed
+- Ketcher's Structure Library no longer offers its "Sugars" group: its Haworth drawings of
+  eight α-D-hexopyranoses were misread (α-D-glucopyranose came out with 2 of its 5
+  stereocenters undefined and one inverted). The same sugars are still in "α-D-Sugars",
+  drawn so they read correctly, and the Templates menu has Haworth projections.
 - Ketcher's image previews and exports could hang when two were made at once; they now
   take turns.
 - Get name could wait forever if Ketcher was converting another drawing at the same moment

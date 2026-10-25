@@ -1039,3 +1039,7 @@ Acceptance bar and measurements: docs/plans/v2-templates.md.
 - On a regular flattened hexagon, a back carbon's group pointing down and a front carbon's
   pointing up share one vertical line inside the ring and their labels collide. The ring is
   drawn in perspective (back edge narrower) and bonds into the ring are shorter.
+- Ketcher's Structure Library gives each group's summary row `data-testid="<group>-accordion-item"`
+  (the raw group name: "alpha-D-Sugars", shown as "α-D-Sugars"), a direct child of MUI's
+  `MuiAccordion-root`, so `:has(> [data-testid='Sugars-accordion-item'])` hides one whole
+  group, also when a search lists it. Its "Sugars" Haworths are hidden that way.
