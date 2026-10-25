@@ -991,3 +991,54 @@ Acceptance bar: docs/plans/dialogs-icon-offcampus.md.
   unchanged vhost (same checksum) and Jeff ran it. `--production` then passed the full
   check on the production build, 14 live checks and 85 browser tests against /draw/. Jeff
   opened /draw/ on his phone off campus.
+
+## Practice mode (version 2, 2026-10-25)
+
+- **`getInChIKey` answers say nothing about their drawing.** Indigo's worker answers every
+  InChIKey request on one shared event, and each request listens `once` without checking
+  the input. Two requests in flight both resolved with the first drawing's key (ethanol
+  and toluene: ethanol twice). They now wait in the image and conversion queue
+  (src/editor/imageQueue.ts).
+- **Chiral flag 0 changes Indigo's key.** A Molfile with chiral flag 0 opens as an AND
+  group, and Indigo then writes a non-standard InChI (`InChI=1/…/s3`), whose key has N
+  where a standard key has S (the 24th character). (R)- and (S)-butan-2-ol got one key.
+  The server's `chem.molfile()` sets the flag, so its Molfiles get standard keys. A wedge
+  drawn with the toolbar is absolute: its key equals RDKit's.
+- **A hand-drawn double bond is always E or Z.** A plain double bond takes its geometry
+  from the coordinates. The crossed ("either") bond makes `getInChIKey` fail with
+  "<query molecule> is not a molecule", even though `getInchi()` answers for the same
+  drawing, without its E/Z layer. So a name without E/Z can only be judged on the key's
+  first block. RDKit writes an unspecified stereogenic double bond as "either" (bond
+  stereo 3), which Ketcher draws crossed. build_practice_lists.py's `as_drawn()` redraws it
+  plain, as laid out, so Show answer never shows a bond the student is told not to draw.
+- Indigo gives an empty canvas a real key (the empty InChI's), and a carbon with five
+  bonds an ordinary one. Check refuses both itself: the button is greyed on an empty
+  canvas, and `badConn` atoms are refused.
+- **OPSIN and stated stereo.** "trans-1,2-dimethylcyclohexane" comes back as one
+  enantiomer; "alanine" comes back as L; "nicotine", "rac-…" and "(2RS)-…" come back with
+  no stereo. So whether stereo counts is read from the name's descriptors
+  (`stated_stereo()`), not from the structure. Relative-only names also accept the mirror
+  image.
+- Ketcher's bond-tool menu opens on a second click on the bond tool. Clicking the group's
+  drop-down corner did nothing in Playwright. Its items are `bond-up`, `bond-updown` and so on.
+- Ketcher writes `ketcher_polymer_sequence_type` to localStorage when its second editor
+  starts, about a second after the first `onInit`. The practice privacy test snapshots
+  storage after `__secondInit`, so the snapshot isn't racing Ketcher.
+- `setMolecule('')` settles after the click that called it. A test that loads a drawing
+  right after Next must first wait for the canvas to be blank, or the clear can land after
+  the load.
+- Ctrl+Z pressed while an app button has focus doesn't reach Ketcher. Tests click Ketcher's
+  Undo button instead.
+- `ketcher.generateImage()` turns Indigo's base64 into a Blob, and reading a Blob is one
+  more asynchronous step after Indigo's reply. Show answer calls
+  `structService.generateImageAsBase64` with the editor's `serverSettings`, which is what
+  generateImage does, and keeps the base64 as a `data:` image. The picture's answer is
+  then handled as soon as the reply arrives, so the stale-picture test is strictly ordered:
+  a later Check waits behind it in the queue.
+- Each ordering guard removed in turn failed its browser test: dropping a verdict for a
+  changed drawing (3 tests), a check on its way when Practice closes, and a picture on its
+  way when the name changes.
+- The chemistry-literal check caught an InChI typed into a code comment as an example.
+  Format tests now use abstract tokens ("2A.B"), not typed formulas.
+- The precache guard's fixture was recaptured with `scripts/capture-sw-fixture.ts`, because
+  the guard now requires practice.json.

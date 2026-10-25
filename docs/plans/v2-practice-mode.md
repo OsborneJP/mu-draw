@@ -104,3 +104,42 @@ Requested by Jeff on 2026-10-25, through the main session, as part of version 2.
 ## Not in this plan
 
 Scores, saved progress, Canvas/LTI, and teacher-made lists edited in the app. Shuffled order, timers, and names generated from structures. Other version 2 features.
+
+## Done (2026-10-25, on this branch; not deployed)
+
+Commits: plan 2d041e2; InChIKey queue fix 8497e0c; lists and builder b40dbdc; the panel
+4a94c90. Each item of the bar, and the test that holds it:
+
+- **A1–A5.** `practice/chem-311.txt` has the 19 provisional names. tests/test_practice_lists.py
+  covers the rest:
+  - the byte-for-byte rebuild, and the recorded lookups;
+  - RDKit's keys, formulas and components;
+  - each refusal: a name drawn by no one, several PubChem records, a skeleton disagreement,
+    partial stereo, stereo filled in from PubChem, and bad names files;
+  - the descriptor rule, on 17 names.
+- **B1.** "every shipped name". For names whose stereo isn't checked, the test compares the
+  key's first block and its protonation letter, which is the rule itself.
+- **B2.** The wedge tool, chosen from Ketcher's bond menu and clicked on the C–O bond.
+- **B3.** 17 hint cases in the browser (tests/fixtures/practice_cases.json), plus the
+  AND-group note and the "stereo isn't checked" note. The cases that a key decides are also
+  unit-tested on RDKit's keys (src/panels/practice.test.ts).
+- **B4.** Held Indigo replies: the drawing changes while checking; Next while checking;
+  Close while checking; Next while the answer's picture is being drawn. Each guard removed
+  in turn failed its test.
+- **B5.** The unit test and the browser test both fail without the queue change.
+- **C1–C4.** The panel docks below the canvas, so it covers nothing (asserted). Close, Esc
+  and the header button all close it. Next and Previous clear the canvas in one Undo step
+  and stop at both ends. Show answer leaves the canvas untouched. Naming stays available.
+  Two lists get a chooser. Lists that fail to load say so, and opening again retries.
+- **D1–D3.** Practice adds nothing to browser storage and makes no request except GETs.
+  (Ketcher's own settings keys exist without it.) The `offline:` test passes. The precache
+  guard requires practice.json, with a negative test, and the CSP is unchanged.
+
+Accepted limits:
+- The "couldn't read this drawing" message (an Indigo failure other than a query feature,
+  or a drawing Ketcher can't write) has no test. Nothing found makes Indigo fail that way.
+- Stereo words other than R/S, D/L, E/Z, cis/trans and rel- (endo/exo, syn/anti, α/β
+  without D or L) count as no descriptor, so stereo isn't checked for such names.
+- Nobody has tried it by hand in a browser yet, and it isn't on staging. Once the main
+  session deploys, Jeff should try a few names on staging. He replaces the provisional list
+  with CHEM-311's own: edit practice/chem-311.txt, then run build_practice_lists.py.
