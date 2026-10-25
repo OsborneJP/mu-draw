@@ -11,6 +11,7 @@ import json
 import pytest
 from rdkit import Chem
 
+import build_practice_lists as practice
 import record_name_lookups as rec
 import record_pubchem_names as structure_names
 from pubchem import NAME_URL, STRUCTURE_URL
@@ -46,6 +47,8 @@ def test_one_name_lookup_and_one_round_trip_recorded_per_name():
     recorded = {p.name for p in rec.RECORDINGS.glob("byname-*.json")}
     recorded |= {p.name for p in rec.RECORDINGS.glob("roundtrip-*.json")}
     wanted = {rec.byname_path(n).name for n in KIND} | {rec.roundtrip_path(n).name for n in KIND}
+    # Practice mode's names share the name lookups (server/scripts/build_practice_lists.py).
+    wanted |= {rec.byname_path(n).name for n in practice.every_name()}
     assert recorded == wanted
 
 

@@ -1,0 +1,27 @@
+# A practice list for MU Draw's Practice mode (docs/plans/v2-practice-mode.md): the app shows
+# each name, the student draws it, and Check compares InChIKeys. The first line is the
+# list's title; then one name per line, as a student reads it. After editing, run
+#   python server/scripts/build_practice_lists.py
+# (network only for names not recorded yet), then scripts/check.sh.
+# Provisional (2026-10-25): the systematic names already tested for Name to structure, less
+# the deliberately misnumbered "4-methyl-3-pentanol". Jeff replaces it with CHEM-311's own.
+title: CHEM-311 (provisional)
+(R)-butan-2-ol
+(S)-butan-2-ol
+3-ethyl-2-methylhexane
+2,2-dimethylpropane
+cyclohexanol
+(E)-pent-2-ene
+(Z)-but-2-enoic acid
+4-methylpent-3-en-2-one
+3-methylbutanal
+ethyl propanoate
+N,N-dimethylacetamide
+2-chloro-2-methylpropane
+1-bromo-3-nitrobenzene
+4-hydroxybenzoic acid
+(2R,3S)-2-bromo-3-chlorobutane
+hex-1-yn-3-ol
+propanenitrile
+benzoyl chloride
+2-methylpropan-2-amine

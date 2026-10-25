@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/property/SMILES,Title/JSON",
+    "form": {
+      "name": "trans-1,2-dimethylcyclohexane"
+    }
+  },
+  "recorded_at": "2026-10-25T18:25:58Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 23313,
+          "SMILES": "C[C@@H]1CCCC[C@H]1C",
+          "Title": "1,2-Dimethylcyclohexane, trans-"
+        }
+      ]
+    }
+  }
+}

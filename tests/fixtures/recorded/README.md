@@ -34,3 +34,7 @@ Rules:
   a 404 `PUGREST.NotFound`) and the structure-to-name answer for what the server draws.
   OPSIN isn't recorded: it runs locally from the pinned jar, so tests run the real thing.
   The script rebuilds tests/fixtures/structure_responses.json from these and OPSIN.
+- Practice mode's names (practice/*.txt and tests/fixtures/practice_test_names.txt) share the
+  `pubchem/byname-*.json` name lookups; `server/scripts/build_practice_lists.py` records any
+  that are missing, then builds web/public/practice.json and the practice test fixtures from
+  them and OPSIN.

@@ -1,0 +1,18 @@
+# Practice mode's test list (docs/plans/v2-practice-mode.md): names that each exercise one
+# rule of the check, for the browser tests' hint cases (CASES in
+# server/scripts/build_practice_lists.py). Nothing here is a chemistry value.
+title: Test list
+# The name states R/S: the whole key counts.
+(R)-butan-2-ol
+# No E/Z in the name: either geometry is right.
+pent-2-ene
+# A stereocentre the name doesn't state.
+hex-1-yn-3-ol
+# Relative stereo only: either enantiomer is right.
+trans-1,2-dimethylcyclohexane
+# An acid, for its anion.
+4-hydroxybenzoic acid
+# For isomers, other formulas, extra structures, reactions and generic atoms.
+3-methylbutanal
+# For a carbon with five bonds.
+2,2-dimethylpropane
