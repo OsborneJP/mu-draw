@@ -119,18 +119,18 @@ def cip(mol: Chem.Mol) -> tuple[dict[str, str], dict[str, str]]:
 
 def signature(mol: Chem.Mol, elements: list) -> str:
     """Which of its combinations stands for a stereoisomer: the one with the smallest string
-    of its settings, element by element in atom order. The browser picks the same way."""
-    has_bonds = any(e.type == Chem.StereoType.Bond_Double for e in elements)
-    _, bonds = cip(mol) if has_bonds else ({}, {})
-    parts = []
-    for element in sorted(elements, key=lambda e: e.centeredOn):
-        if element.type == Chem.StereoType.Atom_Tetrahedral:
-            tag = mol.GetAtomWithIdx(element.centeredOn).GetChiralTag()
-            parts.append("1" if tag == TETRAHEDRAL[1] else "0")
-        else:
-            bond = mol.GetBondWithIdx(element.centeredOn)
-            ends = sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()))
-            parts.append("1" if bonds.get(f"{ends[0]}-{ends[1]}") in ("Z", "z") else "0")
+    of its settings, the centres in atom order (CW 0, CCW 1), then the double bonds in bond
+    order (Z 1, else 0). The browser picks the same way (web/src/chem/stereoisomers.ts)."""
+    centres = sorted(e.centeredOn for e in elements if e.type == Chem.StereoType.Atom_Tetrahedral)
+    double = sorted(e.centeredOn for e in elements if e.type == Chem.StereoType.Bond_Double)
+    _, bonds = cip(mol) if double else ({}, {})
+    parts = [
+        "1" if mol.GetAtomWithIdx(i).GetChiralTag() == TETRAHEDRAL[1] else "0" for i in centres
+    ]
+    for i in double:
+        bond = mol.GetBondWithIdx(i)
+        ends = sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()))
+        parts.append("1" if bonds.get(f"{ends[0]}-{ends[1]}") in ("Z", "z") else "0")
     return "".join(parts)
 
 
@@ -164,35 +164,13 @@ def bridged(mol: Chem.Mol) -> bool:
     return any(len(a & b) >= 3 for i, a in enumerate(rings) for b in rings[i + 1 :])
 
 
+# An axis between two aromatic rings with a substituent beside it on each: X-a:a-a:a-Y, the
+# bond in the middle outside any ring. The browser matches the same SMARTS.
+BIARYL_AXIS = Chem.MolFromSmarts("[!#1]!@a:a!@a:a!@[!#1]")
+
+
 def biaryl_axis(mol: Chem.Mol) -> bool:
-    """A single bond outside any ring joining two aromatic atoms, each with a substituent
-    on an atom next to it in its ring."""
-
-    def ortho_substituted(atom: Chem.Atom, other: Chem.Atom) -> bool:
-        for ring_neighbour in atom.GetNeighbors():
-            if ring_neighbour.GetIdx() == other.GetIdx() or not ring_neighbour.GetIsAromatic():
-                continue
-            if any(
-                not n.IsInRing()
-                or not mol.GetBondBetweenAtoms(ring_neighbour.GetIdx(), n.GetIdx()).IsInRing()
-                for n in ring_neighbour.GetNeighbors()
-                if n.GetIdx() != atom.GetIdx() and n.GetAtomicNum() > 1
-            ):
-                return True
-        return False
-
-    for bond in mol.GetBonds():
-        a, b = bond.GetBeginAtom(), bond.GetEndAtom()
-        if bond.GetBondType() != Chem.BondType.SINGLE or bond.IsInRing():
-            continue
-        if (
-            a.GetIsAromatic()
-            and b.GetIsAromatic()
-            and ortho_substituted(a, b)
-            and ortho_substituted(b, a)
-        ):
-            return True
-    return False
+    return mol.HasSubstructMatch(BIARYL_AXIS)
 
 
 def notes(mol: Chem.Mol, elements: list) -> list[str]:
