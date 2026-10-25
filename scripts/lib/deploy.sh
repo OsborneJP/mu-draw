@@ -9,6 +9,11 @@
 # would otherwise look unchanged and the old one would stay (a test caught this).
 RSYNC_OPTS=(-a --checksum --chmod=D755,F644 --out-format=%n)
 
+# What the API service runs: server/ without its tests and fixture generators, which it
+# never imports. ship_server ships exactly these and server_changed compares exactly
+# these, so a change to a test or generator alone asks for no restart.
+SERVER_RUNS=(server ':(exclude)server/tests' ':(exclude)server/scripts')
+
 # The deploy folder for a target, after checking it is exactly $HOME/srv/<name>/<target>.
 # A bad config must never point rsync --delete somewhere else.
 target_dir() {
@@ -112,13 +117,12 @@ rsync_web() {
   rsync "${RSYNC_OPTS[@]}" --delete "$src/" "$dest/"
 }
 
-# Ship a commit's server code (not the working tree), without its tests and scripts. It
-# must import with the env's Python before it replaces the deployed copy.
+# Ship a commit's server code (not the working tree), only SERVER_RUNS. It must import
+# with the env's Python before it replaces the deployed copy.
 ship_server() {
   local dest="$1" commit="$2" tmp status=0
   tmp="$(mktemp -d)"
-  if git -C "$ROOT" archive "$commit" server | tar -x -C "$tmp" &&
-    rm -rf "$tmp/server/tests" "$tmp/server/scripts" &&
+  if git -C "$ROOT" archive "$commit" -- "${SERVER_RUNS[@]}" | tar -x -C "$tmp" &&
     (cd "$tmp/server" && PYTHONDONTWRITEBYTECODE=1 python -c 'import main'); then
     rsync "${RSYNC_OPTS[@]}" --delete "$tmp/server/" "$dest/" || status=$?
   else
@@ -129,12 +133,13 @@ ship_server() {
   return "$status"
 }
 
-# True if the server's code or environment changed between a deployed commit and another
-# (or if nothing was deployed before).
+# True if what the service runs (SERVER_RUNS or the env) changed between a deployed
+# commit and another (or if nothing was deployed before).
 server_changed() {
   local previous="$1" commit="$2"
   [[ -z "$previous" ]] && return 0
-  ! git -C "$ROOT" diff --quiet "$previous" "$commit" -- server environment.yml environment.lock.txt 2>/dev/null
+  ! git -C "$ROOT" diff --quiet "$previous" "$commit" -- \
+    "${SERVER_RUNS[@]}" environment.yml environment.lock.txt 2>/dev/null
 }
 
 # True if a systemd unit is active and was started at or after an epoch time.

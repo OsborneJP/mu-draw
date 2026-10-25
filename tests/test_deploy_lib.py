@@ -214,7 +214,16 @@ def test_require_unchanged(repo: Path):
 
 def test_ship_server_ships_the_given_commit_without_tests(repo: Path, tmp_path: Path):
     first = git("rev-parse", "HEAD", cwd=repo)
-    commit(repo, "second", {"server/main.py": "VALUE = 2\n", "server/tests/test_x.py": ""})
+    commit(
+        repo,
+        "second",
+        {
+            "server/main.py": "VALUE = 2\n",
+            "server/opsin/OpsinLines.java": "",
+            "server/tests/test_x.py": "",
+            "server/scripts/gen_x.py": "",
+        },
+    )
     dest = tmp_path / "deployed"
     scratch = tmp_path / "scratch"
     scratch.mkdir()
@@ -231,7 +240,9 @@ def test_ship_server_ships_the_given_commit_without_tests(repo: Path, tmp_path: 
     result = bash(f"ship_server {dest} HEAD", path=f"{ENV_BIN}:/usr/bin:/bin", ROOT=str(repo))
     assert result.returncode == 0, result.stderr
     assert (dest / "main.py").read_text() == "VALUE = 2\n"
+    assert (dest / "opsin" / "OpsinLines.java").is_file()
     assert not (dest / "tests").exists()
+    assert not (dest / "scripts").exists()
 
 
 def test_ship_server_leaves_the_deployed_copy_if_the_code_doesnt_import(repo: Path, tmp_path: Path):
@@ -252,6 +263,15 @@ def test_server_changed(repo: Path):
     assert bash(f"server_changed {first} {docs_only}", ROOT=str(repo)).returncode == 1
     assert bash(f"server_changed {first} {server}", ROOT=str(repo)).returncode == 0
     assert bash(f"server_changed {docs_only} {server}", ROOT=str(repo)).returncode == 0
+    # The service never runs its tests or the fixture generators, which aren't shipped.
+    not_run = commit(repo, "not run", {"server/scripts/gen.py": "x\n", "server/tests/t.py": "x\n"})
+    opsin = commit(repo, "opsin", {"server/opsin/OpsinLines.java": "x\n"})
+    env = commit(repo, "env", {"environment.yml": "x\n"})
+    lock = commit(repo, "lock", {"environment.lock.txt": "x\n"})
+    assert bash(f"server_changed {server} {not_run}", ROOT=str(repo)).returncode == 1
+    assert bash(f"server_changed {not_run} {opsin}", ROOT=str(repo)).returncode == 0
+    assert bash(f"server_changed {opsin} {env}", ROOT=str(repo)).returncode == 0
+    assert bash(f"server_changed {env} {lock}", ROOT=str(repo)).returncode == 0
 
 
 # --- markers, gates, restarts, probe ---------------------------------------------------
@@ -431,6 +451,16 @@ def test_publish_records_what_it_deployed(built_repo: Path, tmp_path: Path):
     result = deploy_sh(f"publish staging {docs}", built_repo, home)
     assert result.returncode == 0, result.stderr
     assert not (staging / "SERVER_DEPLOYED_AT").exists()
+    # Nor does one that changes only a fixture generator, which isn't shipped.
+    gen = commit(built_repo, "generator", {"server/scripts/gen_reference_expected.py": "x\n"})
+    result = deploy_sh(f"publish staging {gen}", built_repo, home)
+    assert result.returncode == 0, result.stderr
+    assert not (staging / "SERVER_DEPLOYED_AT").exists()
+    # The code the service runs does.
+    code = commit(built_repo, "server code", {"server/main.py": "VALUE = 2\n"})
+    result = deploy_sh(f"publish staging {code}", built_repo, home)
+    assert result.returncode == 0, result.stderr
+    assert (staging / "SERVER_DEPLOYED_AT").exists()
 
 
 def test_failed_publish_leaves_nothing_vouched_for(built_repo: Path, tmp_path: Path):

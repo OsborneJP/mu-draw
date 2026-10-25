@@ -237,7 +237,8 @@ systemctl status mu-draw-api --no-pager
 ## (c) Later
 
 - **Restarting after server changes.** deploy.sh can't restart services (no sudo). When
-  `server/` or `environment.yml` changed it prints the command, for example
+  the code the service runs changed (`server/`, but not its tests or fixture scripts,
+  which aren't deployed) or `environment.yml` did, it prints the command, for example
   `sudo systemctl restart mu-draw-api-staging`, and verifies only after the restart.
 - **Changing an installed unit.** When a unit above changes (Get name added
   `StateDirectory=`), run its install block again, then restart it (`enable --now` doesn't

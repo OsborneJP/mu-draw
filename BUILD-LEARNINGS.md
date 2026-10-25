@@ -194,13 +194,21 @@ Record why, not just what: the next person (or agent) should not have to redisco
   file it lists already in place.
 - deploy.sh never uses sudo. When server code changes it records the time, and the live
   check refuses to mark the commit verified until the unit was restarted after it.
+- "Server code" means what the service runs: `SERVER_RUNS` in scripts/lib/deploy.sh,
+  server/ without tests/ and scripts/ (main.py imports nothing from either). ship_server
+  archives exactly that list and server_changed diffs exactly that list (plus
+  environment.yml and its lock). Before, ship_server dropped tests/ and scripts/ but
+  server_changed diffed all of server/, so on 2026-10-24 four deploys (staging and
+  production) whose only server change was server/scripts/gen_reference_expected.py
+  made Jeff restart an API for nothing. test_server_changed and
+  test_publish_records_what_it_deployed fail if the two lists drift apart again.
 - Deploy decisions live in scripts/lib/deploy.sh as small functions. deploy.sh is
   sourceable, so tests/test_deploy_lib.py also runs its real mode functions in temp repos,
   with a temp HOME and shell-function stubs for the build, check.sh, curl, systemctl and
   the smoke tests. Two review rounds in a row found guard calls that could be deleted
   with every test green; patching one review at a time kept missing some. So
   `scripts/mutation_sweep.py` now deletes each executable line of both deploy scripts in
-  turn and fails if any deletion goes unnoticed. It reports 132 caught and 4 accepted
+  turn and fails if any deletion goes unnoticed. It reports 133 caught and 4 accepted
   survivors (help text and three equivalent mutants, each explained in the script). Run it
   after changing the deploy scripts; it takes ~5 min, so it isn't in check.sh.
 - rsync needs `--checksum` here. git archive stamps files with the commit time, so a file

@@ -95,3 +95,5 @@ All notable changes to this project. The format follows
   take turns.
 - Get name could wait forever if Ketcher was converting another drawing at the same moment
   (its Save dialog preview, say); Indigo's conversions now take turns too.
+- A deploy asked for an API restart when only the server's tests or fixture scripts had
+  changed. Now only a change to the code the service runs, or to its environment, does.
