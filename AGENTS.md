@@ -33,8 +33,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    `npm run build`) and the two "offline:" smoke tests.
 5. ketcher-react, ketcher-standalone, and @rdkit/rdkit are pinned to exact versions.
    Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
-6. Build only what's in "Version 1 features" and the NMR proof of concept. Nothing from
-   "After v1" or "Later version".
+6. Build only "Version 1 features", the NMR proof of concept, and the "After v1" features
+   Jeff has started, each with his approved plan in docs/plans/v2-*.md. Nothing else.
    Enforced by: review. Ketcher's 3D viewer, macromolecules mode, create-monomer and
    structure-from-image are hidden (web/src/editor/ketcherUi.ts and editor.css); the smoke
    tests check each is absent or display:none, in the compact toolbar too.
