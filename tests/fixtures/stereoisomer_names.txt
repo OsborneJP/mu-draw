@@ -31,3 +31,6 @@ erythromycin
 hepta-2,5-dien-4-ol
 2,4-pentanediol
 cyclooctatetraene
+estradiol
+limonene
+(3E)-3-penten-2-ol

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/limonene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T21:33:12Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 22311,
+          "SMILES": "CC1=CCC(CC1)C(=C)C",
+          "Title": "1-Methyl-4-Prop-1-En-2-Ylcyclohexene"
+        }
+      ]
+    }
+  }
+}

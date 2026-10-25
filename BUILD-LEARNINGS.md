@@ -1036,3 +1036,14 @@ what changed). Measured with RDKit.js 2026.9.1 and Python RDKit 2026.09.1.
 - A commit was once chained after a grep of check.sh's log that matched "CHECK FAILED", so
   it ran although the check had failed; it was undone. The check's exit status is now
   read in its own command before any commit.
+- Round 2: RDKit 2026.09 (Python and JS) reads a wedge from a biaryl axis atom onto its ring
+  bond as atropisomer stereo; get_stereo_tags then lists that single bond with (M) or (P),
+  and get_json gives it `atrop_cw`/`atrop_ccw`. Anything not varied must come off the
+  drawing before a setting is written in, or it rides along into every stereoisomer.
+- A label's box covers its atom whenever it sits nearer than half its diagonal (about 10 px);
+  RDKit's highlight radius drops to about 3 px for a 25-atom drawing in 220 x 170, so the
+  distance can't come from the highlight alone.
+- Trying every setting near a double bond costs 2^n InChIs: done for every =CH2 with its H
+  drawn, it took about 1 s per properties update. Only an end whose two branches both hold
+  an open element can make a double bond stereogenic through them.
+

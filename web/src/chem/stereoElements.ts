@@ -9,9 +9,12 @@
 //   cis and RDKit asked again: it keeps stereo only where it can be.
 // - A double bond whose two sides are the same but for stereo (=C(CH(OH)CH3)2) is
 //   stereogenic only for some settings of the centres in them, which the cis probe can't
-//   see with those centres open. Such bonds are tried: every setting of the open elements
-//   is written into RDKit's JSON, and the bond counts if setting it differently changes the
-//   InChI for any of them.
+//   see with those centres open. So a bond the probe drops is tried where, at one end, both
+//   branches hold an open element: every setting of the open elements in those branches is
+//   written into RDKit's JSON, and the bond counts if setting it differently changes the
+//   InChI for any of them. Only those bonds: =CH2 with its H drawn, or =C(CH3)2, never is.
+// - get_stereo_tags also lists a biaryl axis wedged at one end (RDKit reads atropisomer
+//   stereo from it) among its bonds; that is no double bond, and isn't counted.
 import type { MainModule, Mol } from '@rdkit/rdkit';
 
 interface JsonBond {
@@ -44,7 +47,8 @@ export interface StereoElements {
   doubles: number[];
 }
 
-/** At most this many open elements are tried for the rare bonds above (2^10 readings). */
+/** Fewer than this many open elements are tried for the rare bonds above (at most 2^10
+ * readings, the bond itself included). */
 const TRY_AT_MOST = 10;
 
 // An axis RDKit can't judge: an allene (C=C=C; not S(=O)=O, azides or ketenes), or one
@@ -78,11 +82,11 @@ export function serialise(json: RdkitJson, withCoords: boolean): string {
   return text.replace(/\}\]\}$/, `,"conformers":[${written}]}]}`);
 }
 
-/** The JSON with no stereo and no coordinates. */
-export function withoutStereo(json: RdkitJson): RdkitJson {
+/** The JSON with no stereo, and no coordinates unless `keepCoords`. */
+export function withoutStereo(json: RdkitJson, keepCoords = false): RdkitJson {
   const copy = structuredClone(json);
   const molecule = copy.molecules[0];
-  delete molecule.conformers;
+  if (!keepCoords) delete molecule.conformers;
   for (const atom of molecule.atoms) delete atom.stereo;
   for (const bond of molecule.bonds ?? []) {
     delete bond.stereo;
@@ -133,12 +137,12 @@ export function stereoElements(rdkit: MainModule, mol: Mol): StereoElements {
   const bonds = molecule.bonds ?? [];
   const rings = (molecule.extensions ?? []).flatMap((e) => e.atomRings ?? []);
   const indexOf = (a: number, b: number) => bonds.findIndex((x) => key(x.atoms[0], x.atoms[1]) === key(a, b));
+  const isDouble = (i: number) => bonds[i]?.bo === 2;
   const centres = tags.CIP_atoms.map(([atom]) => atom).sort((a, b) => a - b);
-  const fixed = new Set(tags.CIP_bonds.map(([a, b]) => indexOf(a, b)));
+  const fixed = new Set(tags.CIP_bonds.map(([a, b]) => indexOf(a, b)).filter(isDouble));
 
   // Double bonds that could have E/Z: not cumulated, not in a ring of fewer than 8 atoms,
   // another neighbour at each end.
-  const isDouble = (i: number) => bonds[i].bo === 2;
   const cumulated = (i: number) =>
     bonds.some((b, j) => j !== i && isDouble(j) && b.atoms.some((x) => bonds[i].atoms.includes(x)));
   const smallRing = (i: number) => rings.some((r) => r.length < 8 && bonds[i].atoms.every((x) => r.includes(x)));
@@ -159,19 +163,51 @@ export function stereoElements(rdkit: MainModule, mol: Mol): StereoElements {
   const kept = open.length > 0 ? stereoBondsOf(JSON.stringify(probe)) : new Set<number>();
   const doubles = new Set([...fixed, ...open.filter((i) => kept.has(i))]);
 
-  // The rest of the open candidates with two substituents at one end: stereogenic only for
-  // some settings of the elements around them, so tried against every setting.
-  const unsure = open.filter((i) => !kept.has(i) && bonds[i].atoms.some((end) => degree(bonds, end) === 3));
+  // The rest of the open candidates, where both branches at one end hold an open element:
+  // tried against every setting of the open elements in those branches.
   const openCentres = centres.filter((atom) => molecule.atoms[atom].stereo !== 'cw' && molecule.atoms[atom].stereo !== 'ccw');
   const openDoubles = [...doubles].filter((i) => !fixed.has(i));
-  if (unsure.length > 0 && openCentres.length + openDoubles.length + unsure.length <= TRY_AT_MOST) {
-    for (const i of decisive(reader, json, openCentres, [...openDoubles, ...unsure], unsure)) doubles.add(i);
+  const openAtoms = new Set([...openCentres, ...openDoubles.flatMap((d) => bonds[d].atoms)]);
+  for (const i of open.filter((x) => !kept.has(x))) {
+    const near = alikeBranches(bonds, i, openAtoms);
+    if (near === null) continue;
+    const nearCentres = openCentres.filter((atom) => near.has(atom));
+    const nearDoubles = openDoubles.filter((d) => bonds[d].atoms.some((atom) => near.has(atom)));
+    if (nearCentres.length + nearDoubles.length === 0 || nearCentres.length + nearDoubles.length >= TRY_AT_MOST) continue;
+    if (decisive(reader, json, nearCentres, [...nearDoubles, i], i)) doubles.add(i);
   }
   return { centres, doubles: [...doubles].sort((a, b) => a - b) };
 }
 
-function degree(bonds: JsonBond[], atom: number): number {
-  return bonds.filter((b) => b.atoms.includes(atom)).length;
+/** The atoms reachable from `start` without passing through `not`. */
+function branch(bonds: JsonBond[], start: number, not: number): Set<number> {
+  const seen = new Set([start]);
+  const queue = [start];
+  while (queue.length > 0) {
+    const atom = queue.pop()!;
+    for (const { atoms: [p, q] } of bonds) {
+      const next = p === atom ? q : q === atom ? p : undefined;
+      if (next !== undefined && next !== not && !seen.has(next)) {
+        seen.add(next);
+        queue.push(next);
+      }
+    }
+  }
+  return seen;
+}
+
+/** For double bond `index`, the atoms of the two branches at each end where both branches
+ * hold an open atom (only there can they be alike but for stereo), or null if no end does. */
+function alikeBranches(bonds: JsonBond[], index: number, open: Set<number>): Set<number> | null {
+  const near = new Set<number>();
+  for (const [k, end] of bonds[index].atoms.entries()) {
+    const other = bonds[index].atoms[1 - k];
+    const sides = bonds.flatMap(({ atoms: [p, q] }) => (p === end && q !== other ? [q] : q === end && p !== other ? [p] : []));
+    if (sides.length !== 2) continue;
+    const branches = sides.map((side) => branch(bonds, side, end));
+    if (branches.every((atoms) => [...atoms].some((atom) => open.has(atom)))) branches.forEach((atoms) => atoms.forEach((a) => near.add(a)));
+  }
+  return near.size > 0 ? near : null;
 }
 
 function withoutCoords(json: RdkitJson): RdkitJson {
@@ -180,9 +216,9 @@ function withoutCoords(json: RdkitJson): RdkitJson {
   return copy;
 }
 
-/** Of `tried`, the double bonds whose setting changes the InChI for some setting of the
+/** Whether double bond `tried` (one of `doubles`) changes the InChI for some setting of the
  * open centres and double bonds. */
-function decisive(reader: Reader, json: RdkitJson, centres: number[], doubles: number[], tried: number[]): number[] {
+function decisive(reader: Reader, json: RdkitJson, centres: number[], doubles: number[], tried: number): boolean {
   const base = withoutCoords(json);
   const count = centres.length + doubles.length;
   const inchi: (string | null)[] = [];
@@ -192,8 +228,6 @@ function decisive(reader: Reader, json: RdkitJson, centres: number[], doubles: n
     doubles.forEach((index, i) => setGeometry(copy, index, (mask >> (centres.length + i)) & 1 ? 'cis' : 'trans'));
     inchi.push(reader.read(JSON.stringify(copy), (m) => m.get_inchi()));
   }
-  return tried.filter((index) => {
-    const bit = 1 << (centres.length + doubles.indexOf(index));
-    return inchi.some((value, mask) => value !== inchi[mask ^ bit]);
-  });
+  const bit = 1 << (centres.length + doubles.indexOf(tried));
+  return inchi.some((value, mask) => value !== inchi[mask ^ bit]);
 }

@@ -81,7 +81,7 @@ describe('asking', () => {
     expect(h.sent).toEqual([{ kind: 'stereoisomers', id: 1, molfile: 'the drawing' }]);
     expect(h.last()).toEqual({ kind: 'working' });
     h.stereo.reply(h.answer(LISTED));
-    expect(h.last()).toEqual({ kind: 'ready', result: LISTED, inHand: null });
+    expect(h.last()).toEqual({ kind: 'ready', result: LISTED, inHand: null, failedAdd: null });
   });
 
   it.each([['empty'], ['reaction'], ['not-elements'], ['unreadable']] as const)('%s: says so, sends nothing', (kind) => {
@@ -144,20 +144,39 @@ describe('Add', () => {
     h.stereo.reply(h.answer(result));
     await h.stereo.add(2);
     expect(h.placements).toEqual([]);
-    expect(h.last()).toEqual({ kind: 'ready', result, inHand: null });
+    expect(h.last()).toEqual({ kind: 'ready', result, inHand: null, failedAdd: null });
+  });
+
+  it('one Ketcher can’t take is put down and reported, and Add works again', async () => {
+    const sent: StereoRequest[] = [];
+    const states: StereoState[] = [];
+    let fail = true;
+    const stereo = createStereo(
+      () => STRUCTURE,
+      (request) => sent.push(request),
+      (state) => states.push(state),
+      () => (fail ? Promise.reject(new Error('Ketcher did not arm its paste tool')) : new Promise<Placement>(() => {})),
+    );
+    stereo.show();
+    stereo.reply({ kind: 'stereoisomers', id: sent[0].id, result: LISTED });
+    await stereo.add(2);
+    expect(states.at(-1)).toEqual({ kind: 'ready', result: LISTED, inHand: null, failedAdd: 2 });
+    fail = false;
+    void stereo.add(2);
+    expect(states.at(-1)).toEqual({ kind: 'ready', result: LISTED, inHand: 2, failedAdd: null });
   });
 
   it('placing it is the panel’s own change: the panel stays open, and another can follow', async () => {
     const h = await inHand();
     let next = h.nextState();
     h.placements[0].held.placed();
-    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null });
+    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null, failedAdd: null });
     const added = h.stereo.add(1);
     h.readyPlacement();
     await added;
     next = h.nextState();
     h.placements[1].held.placed();
-    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null });
+    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null, failedAdd: null });
     expect(h.states.some((s) => s.kind === 'idle')).toBe(false);
   });
 
@@ -165,7 +184,7 @@ describe('Add', () => {
     const h = await inHand();
     const next = h.nextState();
     h.placements[0].held.putAway();
-    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null });
+    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null, failedAdd: null });
   });
 
   it('any other change while it is in hand puts it away and closes the panel', async () => {
@@ -193,7 +212,7 @@ describe('Add', () => {
     expect(h.last()).toMatchObject({ kind: 'ready', inHand: 1 });
     const next = h.nextState();
     h.placements[1].held.placed();
-    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null });
+    expect(await next).toEqual({ kind: 'ready', result: LISTED, inHand: null, failedAdd: null });
   });
 
   it('closed before the structure is in hand: it is put away as soon as it is ready', async () => {

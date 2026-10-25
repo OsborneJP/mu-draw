@@ -33,6 +33,11 @@
   margin: 6px 0;
 }
 
+.stereo-hint {
+  margin: 4px 0;
+  font-weight: 600;
+}
+
 .stereo-note {
   margin: 4px 0;
   padding: 4px 8px;

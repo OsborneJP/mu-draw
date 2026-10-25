@@ -122,6 +122,9 @@ class Reader {
 
 interface Drawing {
   json: RdkitJson;
+  /** The same with no stereo at all (its layout kept): each combination is written into it,
+   * so nothing else drawn (a wedged biaryl axis, read as atropisomer stereo) carries over. */
+  bare: RdkitJson;
   /** Its stereo elements, with its stereo taken off. */
   centres: number[];
   doubles: number[];
@@ -141,7 +144,8 @@ function readDrawing(rdkit: MainModule, molfile: string): Drawing | 'several' | 
     frags.molList.delete();
     if (several) return 'several';
     const json = JSON.parse(mol.get_json()) as RdkitJson;
-    const stripped = rdkit.get_mol(serialise(withoutStereo(json), false), JSON.stringify({ removeHs: false }));
+    const bare = withoutStereo(json, true);
+    const stripped = rdkit.get_mol(serialise(bare, false), JSON.stringify({ removeHs: false }));
     if (!stripped) return null;
     let elements;
     try {
@@ -159,6 +163,7 @@ function readDrawing(rdkit: MainModule, molfile: string): Drawing | 'several' | 
     const flag = mol.has_prop('_MolFileChiralFlag') ? mol.get_prop('_MolFileChiralFlag') : '0';
     return {
       json,
+      bare,
       ...elements,
       spins,
       labels: labelsOf(JSON.parse(mol.get_stereo_tags()) as Tags),
@@ -183,9 +188,9 @@ function notesFor(json: RdkitJson, doubles: number[], axial: boolean): Note[] {
   return notes;
 }
 
-/** A copy of the drawing's JSON (coordinates kept or not) with a combination written in. */
+/** The drawing with no stereo but a combination's (coordinates kept or not). */
 function withCombination(drawing: Drawing, combination: Combination, withCoords: boolean): string {
-  const copy = structuredClone(drawing.json);
+  const copy = structuredClone(drawing.bare);
   const molecule = copy.molecules[0];
   drawing.centres.forEach((atom, i) => (molecule.atoms[atom] = { ...molecule.atoms[atom], stereo: combination.spins[i] }));
   drawing.doubles.forEach((index, i) => setGeometry(copy, index, combination.geometries[i]));
@@ -299,7 +304,7 @@ export function enumerateStereoisomers(rdkit: MainModule, molfile: string): Enum
       labels,
       relation,
       matches: matching.has(inchi),
-      molfile: drawnLike(reader, molfile, drawing, rep.combination, labels, inchi),
+      molfile: drawnLike(reader, molfile, drawing, rep.combination, inchi),
     };
   });
   return { outcome: 'listed', elements: count, notes, stereoisomers };
@@ -328,25 +333,17 @@ function withChiralFlag(molfile: string): string {
 /** A Molfile of one stereoisomer, drawn like the drawing: its coordinates, with the
  * student's wedges and hashes at each centre the drawing defines, kept where this
  * stereoisomer has the drawing's setting and all swapped (wedge for hash) where it has the
- * other (decision 3). A double bond whose geometry must change can't keep the coordinates, so
- * then the molecule is laid out afresh, with RDKit's wedges. Whatever the route, it must
- * read back as the stereoisomer, or the next route is taken; null when none does. */
-function drawnLike(reader: Reader, molfile: string, drawing: Drawing, combination: Combination, labels: Labels, inchi: string): string | null {
+ * other (decision 3); else its coordinates with RDKit's wedges. Where the coordinates show a
+ * double bond the other way, neither reads back, and the molecule is laid out afresh. Each
+ * route must read back as the stereoisomer, or the next is taken; null when none does. */
+function drawnLike(reader: Reader, molfile: string, drawing: Drawing, combination: Combination, inchi: string): string | null {
   const text = withCombination(drawing, combination, true);
   const flagged = (m: string) => (drawing.centres.length > 0 ? withChiralFlag(m) : m);
   const readsBack = (m: string) => reader.inchiOf(m) === inchi;
-  const bonds = drawing.json.molecules[0].bonds ?? [];
-  const keepsLayout = drawing.doubles.every((i) => {
-    const k = bondKey(...bonds[i].atoms);
-    return labels.bonds[k] === undefined || labels.bonds[k] === drawing.labels.bonds[k];
-  });
-
-  if (keepsLayout) {
-    const rdkitDrawn = reader.with(text, (mol) => mol.get_molblock());
-    const student = withStudentWedges(molfile, rdkitDrawn, drawing, combination);
-    for (const candidate of [student, rdkitDrawn]) {
-      if (candidate !== null && readsBack(flagged(candidate))) return flagged(candidate);
-    }
+  const rdkitDrawn = reader.with(text, (mol) => mol.get_molblock());
+  const student = withStudentWedges(molfile, rdkitDrawn, drawing, combination);
+  for (const candidate of [student, rdkitDrawn]) {
+    if (candidate !== null && readsBack(flagged(candidate))) return flagged(candidate);
   }
   const fresh = reader.with(text, (mol) => {
     mol.set_new_coords();

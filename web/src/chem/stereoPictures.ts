@@ -5,9 +5,9 @@
 //   of its own choosing (measured: it hashed a different bond of (R)-2-butanol).
 // - RDKit draws text as glyph outlines, and has no option that labels atoms for a test to
 //   read, so the labels are the app's own text, placed beside their atoms (a bond's beside
-//   its middle): in the first spot around the atom's highlight that covers no atom symbol,
-//   no bond and no other label, read from the SVG's own shapes (stereoPictures.test.ts checks
-//   every test drawing).
+//   its middle): in the first spot round the atom that covers no atom symbol, no bond and no
+//   other label, read from the SVG's own shapes; where there is none, the first that covers
+//   no symbol or label (stereoisomers.test.ts checks every test drawing).
 import type { MainModule } from '@rdkit/rdkit';
 import type { Enumeration, Labels, Stereoisomer } from './stereoisomers';
 
@@ -154,7 +154,8 @@ function around(at: Point, distances: number[], first: number, turns: number[]):
   );
 }
 
-function placeLabels(svg: string, labels: Labels): PlacedLabel[] {
+/** Where each label goes over an RDKit SVG drawn with its stereo atoms highlighted. */
+export function placeLabels(svg: string, labels: Labels): PlacedLabel[] {
   const atoms = new Map<number, Point & { r: number }>();
   for (const match of svg.matchAll(/<ellipse cx='([-\d.]+)' cy='([-\d.]+)' rx='([-\d.]+)'[^>]*class='atom-(\d+)'/g)) {
     atoms.set(Number(match[4]), { x: Number(match[1]), y: Number(match[2]), r: Number(match[3]) });
@@ -162,13 +163,15 @@ function placeLabels(svg: string, labels: Labels): PlacedLabel[] {
   const { symbols, bonds } = obstacles(svg);
   const taken: Box[] = [];
   const inside = (b: Box) => b.left >= 0 && b.top >= 0 && b.right <= PICTURE.width && b.bottom <= PICTURE.height;
-  const clear = (b: Box) => !symbols.some((s) => overlaps(b, s)) && !taken.some((t) => overlaps(b, t));
-  // The first spot that covers nothing; else the first that covers no symbol or label.
+  const noSymbol = (b: Box) => !symbols.some((s) => overlaps(b, s));
+  const noLabel = (b: Box) => !taken.some((t) => overlaps(b, t));
+  const noBond = (b: Box) => !bonds.some((line) => crosses(b, line));
+  // The first spot inside the picture that covers nothing; failing that, no symbol or label;
+  // then no symbol; then any spot inside.
+  const tiers = [[noSymbol, noLabel, noBond], [noSymbol, noLabel], [noSymbol], []];
   const place = (spots: Point[]) => {
-    const spot =
-      spots.find((p) => inside(boxAt(p)) && clear(boxAt(p)) && !bonds.some((b) => crosses(boxAt(p), b))) ??
-      spots.find((p) => inside(boxAt(p)) && clear(boxAt(p))) ??
-      spots[0];
+    const fits = (rules: ((b: Box) => boolean)[]) => spots.find((p) => inside(boxAt(p)) && rules.every((rule) => rule(boxAt(p))));
+    const spot = tiers.reduce<Point | undefined>((found, rules) => found ?? fits(rules), undefined) ?? spots[0];
     taken.push(boxAt(spot));
     return spot;
   };
@@ -176,8 +179,11 @@ function placeLabels(svg: string, labels: Labels): PlacedLabel[] {
   const placed: PlacedLabel[] = [];
   for (const [atom, text] of Object.entries(labels.atoms)) {
     const at = atoms.get(Number(atom));
-    // Up and to the right first, then round.
-    if (at) placed.push({ text, ...place(around(at, [at.r + 3, at.r + 9], -Math.PI / 4, ROUND)), atom: Number(atom) });
+    if (!at) continue;
+    // Up and to the right first, then round; never nearer than a label's half diagonal, so
+    // it never covers its own atom, however small RDKit draws a big molecule.
+    const near = Math.max(at.r + 3, Math.hypot(LABEL.halfWidth, LABEL.halfHeight) + 1);
+    placed.push({ text, ...place(around(at, [near, near + 6, near + 12], -Math.PI / 4, ROUND)), atom: Number(atom) });
   }
   for (const [bond, text] of Object.entries(labels.bonds)) {
     const [a, b] = bond.split('-').map((i) => atoms.get(Number(i)));

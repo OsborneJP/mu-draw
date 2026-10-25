@@ -15,8 +15,9 @@ export type StereoState =
   | { kind: 'idle' }
   | { kind: 'working' }
   | { kind: 'message'; message: StereoMessage; detail?: string }
-  /** inHand: the number of the stereoisomer following the mouse, if any. */
-  | { kind: 'ready'; result: StereoResult; inHand: number | null };
+  /** inHand: the number of the stereoisomer following the mouse, if any; failedAdd: one that
+   * Ketcher could not take (the last Add failed). */
+  | { kind: 'ready'; result: StereoResult; inHand: number | null; failedAdd: number | null };
 
 /** Puts a Molfile in hand; `dropping` runs the click that places it (placeInHand.ts). */
 export type Place = (molfile: string, dropping: (drop: () => void) => void) => Promise<Placement>;
@@ -85,7 +86,7 @@ export function createStereo(read: () => Drawing, send: (request: StereoRequest)
       pending = null;
       if ('error' in message) return set({ kind: 'message', message: 'unavailable', detail: message.error });
       if (message.result === null) return set({ kind: 'message', message: 'unreadable' });
-      set({ kind: 'ready', result: message.result, inHand: null });
+      set({ kind: 'ready', result: message.result, inHand: null, failedAdd: null });
     },
     changed() {
       if (placing || state.kind === 'idle') return;
@@ -102,19 +103,26 @@ export function createStereo(read: () => Drawing, send: (request: StereoRequest)
       if (!molfile) return Promise.resolve(); // none, or one that can't be drawn flat
       putAway();
       const mine = adding;
-      set({ ...state, inHand: number });
-      return place(molfile, ownChange).then((placement) => {
-        if (mine !== adding) {
-          placement.cancel();
-          return;
-        }
-        held = placement;
-        void placement.done.then(() => {
-          if (held !== placement) return;
-          held = null;
-          if (state.kind === 'ready') set({ ...state, inHand: null });
-        });
-      });
+      set({ ...state, inHand: number, failedAdd: null });
+      return place(molfile, ownChange).then(
+        (placement) => {
+          if (mine !== adding) {
+            placement.cancel();
+            return;
+          }
+          held = placement;
+          void placement.done.then(() => {
+            if (held !== placement) return;
+            held = null;
+            if (state.kind === 'ready') set({ ...state, inHand: null });
+          });
+        },
+        // Ketcher couldn't take it (its paste tool, or Indigo reading the Molfile): say so,
+        // rather than leave the card saying it is in hand.
+        () => {
+          if (mine === adding && state.kind === 'ready') set({ ...state, inHand: null, failedAdd: number });
+        },
+      );
     },
   };
   return stereo;

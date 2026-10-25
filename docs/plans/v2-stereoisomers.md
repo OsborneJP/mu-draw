@@ -123,6 +123,35 @@ Three change the bar as written above, for Jeff to confirm:
   in stereoisomers_judged.json are provisional like the rest; cyclooctatetraene's was made
   after a probe, not blind.
 
+**Round 2** (capped, 4 reviewers with a skeptic each) confirmed 7 medium findings, now fixed
+with tests that fail without them:
+- A biaryl axis wedged as textbooks draw it (RDKit reads atropisomer stereo from the wedge)
+  was copied into every stereoisomer, so a diastereomer was shown as the enantiomer, and the
+  properties panel counted the axis as an undefined double bond. Settings are now written
+  into the drawing with all its stereo taken off, and only double bonds count; "matches"
+  compares only the elements varied, in the browser and the generator alike.
+- A crossed double bond sent every picture to a fresh layout. Now each picture tries the
+  drawing's layout first and is laid out afresh only where that shows a double bond the
+  other way; a test checks this per stereoisomer from the plain 2D geometry.
+- Labels could sit on their own atom in a crowded drawing; they now keep at least half a
+  label's diagonal away.
+- Three test gaps: the labels on each picture are now read back from its own Molfile, the
+  layout is checked per stereoisomer, and the undrawable ones are pinned by the fixture's
+  labels (cyclooctatetraene with one or three E).
+- Also fixed: the search for dependent double bonds (round 1) took about 1 s per properties
+  update on a sugar with an allyl group drawn with its H; it now runs only where both
+  branches at one end hold an open element. A failed Add now says so, the in-hand hint is
+  visible text, each Add button names its stereoisomer, and lowercase e/z get the note.
+- New test drawings: estradiol, limonene and (3E)-3-penten-2-ol from PubChem; generated:
+  the wedged axis, limonene and glucose with every H drawn, and pentenol with its centre
+  drawn beside a defined and a crossed double bond.
+
+Accepted limits from round 2 (low): the notes on a counted or too-many list are rendered
+but no test compound shows one there; where labels land on screen (the CSS) is not checked,
+only their computed positions; the generator's cross-check with EnumerateStereoisomers
+shares FindPotentialStereo, so only stereoisomers_judged.json checks which elements are
+varied; a dependent double bond with 10 or more open elements around it is not found.
+
 ## Priority
 
 The v1 checklist items that remain come before this for CHEM-311's start: the Mac checks, and "(R)- and (S)-2-butanol give different names and draw with the right wedges". This feature is built alongside them, not instead.

@@ -8,7 +8,7 @@ import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
 import { AXES, serialise, type RdkitJson } from './stereoElements';
-import { crosses, HIGHLIGHT, LABEL, obstacles, overlaps, PICTURE, picture } from './stereoPictures';
+import { crosses, HIGHLIGHT, LABEL, obstacles, overlaps, PICTURE, picture, placeLabels } from './stereoPictures';
 import { enumerateStereoisomers, LIMITS, listOutcome, sizeOutcome, type Enumeration, type Stereoisomer } from './stereoisomers';
 
 interface Expected {
@@ -155,6 +155,38 @@ function cipAtoms(molfile: string): Record<string, string> {
 
 const isWedge = (stereo: number) => stereo === 1 || stereo === 6;
 
+/** The R/S and E/Z RDKit reads from a Molfile (its wedges and layout), as the panel labels. */
+function cipOf(molfile: string) {
+  const mol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: false }))!;
+  const tags = JSON.parse(mol.get_stereo_tags()) as { CIP_atoms: [number, string][]; CIP_bonds: [number, number, string][] };
+  mol.delete();
+  const shown = (label: string) => label !== '(?)';
+  const plain = (label: string) => label.replace(/[()]/g, '');
+  return {
+    atoms: Object.fromEntries(tags.CIP_atoms.filter(([, l]) => shown(l)).map(([atom, l]) => [String(atom), plain(l)])),
+    bonds: Object.fromEntries(
+      tags.CIP_bonds.filter(([, , l]) => shown(l)).map(([a, b, l]) => [a < b ? `${a}-${b}` : `${b}-${a}`, plain(l)]),
+    ),
+  };
+}
+
+/** Whether a Molfile's layout draws double bond "a-b" with the first other neighbour of each
+ * end (lowest atom index) on the same side or opposite sides: plain geometry, no RDKit. */
+function sides(molfile: string, bond: string): 'same' | 'opposite' {
+  const { atoms, bonds } = parts(molfile);
+  const [a, b] = bond.split('-').map(Number);
+  const other = (end: number, not: number) =>
+    Math.min(...bonds.flatMap(([p, q]) => (p === end && q !== not ? [q] : q === end && p !== not ? [p] : [])));
+  const xy = (i: number) => atoms[i] as number[];
+  const side = (i: number) => {
+    const [ax, ay] = xy(a);
+    const [bx, by] = xy(b);
+    const [px, py] = xy(i);
+    return Math.sign((bx - ax) * (py - ay) - (by - ay) * (px - ax));
+  };
+  return side(other(a, b)) === side(other(b, a)) ? 'same' : 'opposite';
+}
+
 describe('each picture is the stereoisomer it shows', () => {
   it.each(listed.map((c) => [c.name, c] as const))('%s', (_, compound) => {
     for (const isomer of stereoisomersOf(compound)) {
@@ -175,12 +207,24 @@ describe('each picture is the stereoisomer it shows', () => {
       bare.delete();
       expect(key, `stereoisomer ${isomer.number}`).toBe(isomer.inchikey);
       if (Object.keys(isomer.labels.atoms).length > 0) expect(chiralFlag, `stereoisomer ${isomer.number}`).toBe('1');
+      // And its own wedges and layout give the labels placed on it: InChI can't tell the two
+      // settings of a meso form apart, but the labels on the picture can.
+      expect(cipOf(isomer.molfile), `stereoisomer ${isomer.number}`).toEqual(isomer.labels);
     }
   });
 
-  it('one that cannot be drawn flat is listed without a picture, not as an error', () => {
-    const undrawable = listed.flatMap((c) => stereoisomersOf(c).filter((s) => s.molfile === null).map(() => c.name));
-    expect(new Set(undrawable)).toEqual(new Set(['cyclooctatetraene']));
+  // Known limits (docs/plans/v2-stereoisomers.md): only cyclooctatetraene with one or three
+  // E has no flat drawing; read from the fixture's labels, not from the code under test.
+  it('only the stereoisomers that cannot be drawn flat are listed without a picture', () => {
+    const name = (c: Expected, number: number) => `${c.name} ${number}`;
+    const expected = listed.flatMap((c) =>
+      c.name !== 'cyclooctatetraene'
+        ? []
+        : c.stereoisomers!.filter((s) => Object.values(s.labels.bonds).filter((l) => l === 'E').length % 2 === 1).map((s) => name(c, s.number)),
+    );
+    const undrawable = listed.flatMap((c) => stereoisomersOf(c).filter((s) => s.molfile === null).map((s) => name(c, s.number)));
+    expect(expected.length).toBeGreaterThan(0);
+    expect(undrawable).toEqual(expected);
   });
 
   // Bar B.3: the drawing's layout, and at each centre the student wedged, the student's own
@@ -193,12 +237,15 @@ describe('each picture is the stereoisomer it shows', () => {
       isWedge(stereo) && /^[RS]$/.test(drawnLabels[first] ?? '') ? [{ index, first, second, stereo }] : [],
     );
     const centres = new Set(wedged.map((w) => w.first));
-    const doubleBonds = Object.keys(compound.stereoisomers![0].labels.bonds).length > 0;
     for (const isomer of stereoisomersOf(compound)) {
       if (isomer.molfile === null) continue;
       const shown = parts(isomer.molfile);
-      if (!doubleBonds) expect(shown.atoms, `stereoisomer ${isomer.number} keeps the layout`).toEqual(drawn.atoms);
-      if (JSON.stringify(shown.atoms) !== JSON.stringify(drawn.atoms)) continue;
+      // Laid out afresh only where the drawing's layout shows one of its double bonds the
+      // other way (decision 3); a crossed bond's layout still shows one way.
+      const kept = JSON.stringify(shown.atoms) === JSON.stringify(drawn.atoms);
+      const showable = Object.keys(isomer.labels.bonds).every((bond) => sides(isomer.molfile!, bond) === sides(drawing(compound), bond));
+      expect(kept, `stereoisomer ${isomer.number} keeps the layout`).toBe(showable);
+      if (!kept) continue;
       for (const w of wedged) {
         const label = isomer.labels.atoms[String(w.first)];
         if (!/^[RS]$/.test(label ?? '')) continue;
@@ -221,7 +268,8 @@ describe('each picture is the stereoisomer it shows', () => {
       const flag = mol.get_prop('_MolFileChiralFlag');
       mol.delete();
       const defined = [...tags.CIP_atoms, ...tags.CIP_bonds].filter((t) => t.at(-1) !== '(?)').length;
-      if (defined < compound.elements || (flag !== '1' && tags.CIP_atoms.length > 0)) continue;
+      // Exactly the elements varied: a wedged biaryl axis is defined too, and is not drawn.
+      if (defined !== compound.elements || (flag !== '1' && tags.CIP_atoms.length > 0)) continue;
       const own = stereoisomersOf(compound).filter((s) => s.matches);
       expect(own.length, compound.name).toBe(1);
       expect(parts(own[0].molfile!), compound.name).toEqual(parts(drawing(compound)));
@@ -293,6 +341,14 @@ describe('the pictures', () => {
         expect(drawnAsStereo, `${where}, bond ${index}`).toBe(true);
       });
     }
+  });
+
+  // A big molecule is drawn small, with a highlight smaller than a label: the label still
+  // keeps off its atom. (No test drawing is that crowded; an SVG with one atom stands in.)
+  it("keeps a label off its atom however small the atom's highlight", () => {
+    const svg = "<svg><ellipse cx='110.0' cy='85.0' rx='3.0' ry='3.0' class='atom-0'  style='fill:#9ECBFF' /></svg>";
+    const [label] = placeLabels(svg, { atoms: { '0': 'R' }, bonds: {} });
+    expect(Math.abs(label.x - 110) >= LABEL.halfWidth || Math.abs(label.y - 85) >= LABEL.halfHeight).toBe(true);
   });
 
   it('reads what a label must not cover from the SVG', () => {

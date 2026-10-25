@@ -62,6 +62,20 @@ OTHER_WEDGES = ("L-threonine, wedges on other bonds", "L-threonine")
 # A meso form drawn as the setting the smallest-signature rule would not pick, so the panel
 # must draw the stereoisomer the student drew as they drew it, not as its other setting.
 MESO = ("2,3-dibromobutane, the meso form", "2,3-dibromobutane")
+# A biaryl axis wedged as textbooks draw it, beside a centre: RDKit reads atropisomer stereo
+# from the wedge, which no stereoisomer may carry over.
+AXIS_WEDGED = ("joined: 1,1'-bi-2-naphthol + (R)-2-butanol, axis wedged", JOINED[1])
+# Every H drawn, as Ketcher's explicit-H button does: =CH2 then has two neighbours at its end,
+# and glucose makes a crowded picture for the labels.
+ALL_H = (
+    ("limonene, all H drawn", "limonene"),
+    ("aldehydo-D-glucose, all H drawn", "aldehydo-D-glucose"),
+)
+# A centre drawn beside a double bond drawn (E), and beside one drawn crossed, so pictures
+# keep the drawing's layout exactly where their double bond is as drawn.
+PENTENOL = "(3E)-3-penten-2-ol"
+CENTRE_AND_DOUBLE = (f"{PENTENOL}, centre drawn", PENTENOL)
+CENTRE_AND_CROSSED = ("3-penten-2-ol, centre drawn, double bond crossed", PENTENOL)
 # 3D embedding, only to record which listed stereoisomers of a bridged compound can exist.
 EMBED_SEED = 0xF00D
 EMBED_ATTEMPTS = 5
@@ -165,22 +179,33 @@ def signature(mol: Chem.Mol, elements: list) -> str:
     return "".join(parts)
 
 
-def matches_drawing(drawing: Chem.Mol, mol: Chem.Mol) -> bool:
-    """Every stereo element the drawing defines is set the same way in mol."""
-    for atom in drawing.GetAtoms():
-        tag = atom.GetChiralTag()
-        if tag in TETRAHEDRAL and mol.GetAtomWithIdx(atom.GetIdx()).GetChiralTag() != tag:
-            return False
-    _, drawn = cip(drawing)
+def defined_by(drawing: Chem.Mol, elements: list) -> tuple[dict[int, object], dict[str, str]]:
+    """What the drawing sets of the elements varied: each centre's chiral tag, and each double
+    bond's CIP label. Nothing else counts: a wedged biaryl axis (RDKit reads atropisomer
+    stereo from it) is not varied, and neither does the browser count it."""
+    tags = {
+        e.centeredOn: drawing.GetAtomWithIdx(e.centeredOn).GetChiralTag()
+        for e in elements
+        if e.type == Chem.StereoType.Atom_Tetrahedral
+        and drawing.GetAtomWithIdx(e.centeredOn).GetChiralTag() in TETRAHEDRAL
+    }
+    keys = set()
+    for e in elements:
+        if e.type == Chem.StereoType.Bond_Double:
+            bond = drawing.GetBondWithIdx(e.centeredOn)
+            first, second = sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()))
+            keys.add(f"{first}-{second}")
+    _, labels = cip(drawing)
+    return tags, {key: label for key, label in labels.items() if key in keys}
+
+
+def matches_drawing(defined: tuple[dict[int, object], dict[str, str]], mol: Chem.Mol) -> bool:
+    """Every element the drawing sets is set the same way in mol."""
+    tags, labels = defined
+    if any(mol.GetAtomWithIdx(atom).GetChiralTag() != tag for atom, tag in tags.items()):
+        return False
     _, these = cip(mol)
-    return all(these.get(bond) == label for bond, label in drawn.items())
-
-
-def defines_stereo(drawing: Chem.Mol) -> bool:
-    return any(a.GetChiralTag() in TETRAHEDRAL for a in drawing.GetAtoms()) or any(
-        b.GetStereo() not in (Chem.BondStereo.STEREONONE, Chem.BondStereo.STEREOANY)
-        for b in drawing.GetBonds()
-    )
+    return all(these.get(bond) == label for bond, label in labels.items())
 
 
 def is_racemic(drawing: Chem.Mol) -> bool:
@@ -286,9 +311,9 @@ def listing(drawing: Chem.Mol, elements: list, notes_: list[str]) -> dict[str, o
     classes, smiles_unique = enumerate_classes(drawing, elements)
     if len(classes) > LIMITS["drawn"]:
         return {"count": len(classes), "smiles_unique": smiles_unique}
-    defined, racemic = defines_stereo(drawing), is_racemic(drawing)
+    defined, racemic = defined_by(drawing, elements), is_racemic(drawing)
     agreeing = {
-        key: [m for m in members if matches_drawing(drawing, m)] if defined else []
+        key: [m for m in members if matches_drawing(defined, m)] if any(defined) else []
         for key, members in classes.items()
     }
     # A stereoisomer the drawing matches is shown as drawn, from the combination that agrees
@@ -396,7 +421,54 @@ def drawings(rows: list[dict[str, str]]) -> list[tuple[str, str]]:
 
     name, source = MESO
     out.append((name, molfile(meso_drawn_late(by_name[source]), name)))
+
+    name, (first, second) = AXIS_WEDGED
+    out.append((name, axis_wedged(join(by_name[first], by_name[second]), name)))
+
+    for name, source in ALL_H:
+        out.append((name, molfile(Chem.AddHs(by_name[source]), name)))
+
+    name, source = CENTRE_AND_DOUBLE
+    out.append((name, molfile(set_as(by_name[source], "R", "E"), name)))
+    name, source = CENTRE_AND_CROSSED
+    crossed = Chem.Mol(set_as(by_name[source], "R", "E"))
+    for bond in crossed.GetBonds():
+        if bond.GetBondType() == Chem.BondType.DOUBLE:
+            bond.SetStereo(Chem.BondStereo.STEREOANY)
+    out.append((name, molfile(crossed, name)))
     return out
+
+
+def set_as(mol: Chem.Mol, centres: str, double_bonds: str) -> Chem.Mol:
+    """The setting of mol's stereo elements with every centre labelled `centres` and every
+    double bond `double_bonds` (CIP)."""
+    for setting in settings(mol, potential(mol)):
+        atoms, bonds = cip(setting)
+        if set(atoms.values()) == {centres} and set(bonds.values()) == {double_bonds}:
+            return setting
+    raise ValueError(f"no setting with centres {centres} and double bonds {double_bonds}")
+
+
+def axis_wedged(mol: Chem.Mol, name: str) -> str:
+    """mol's Molfile with a wedge from one atom of its biaryl axis onto that atom's own ring
+    bond, which RDKit must read as atropisomer stereo."""
+    text = molfile(mol, name)
+    drawn = Chem.MolFromMolBlock(text, removeHs=False)
+    (match,) = drawn.GetSubstructMatches(Chem.MolFromSmarts("[!#1]!@a:a!@a:a!@[!#1]"))[:1]
+    axis, other = match[2], match[3]
+    ring = next(
+        b.GetIdx()
+        for b in drawn.GetAtomWithIdx(axis).GetBonds()
+        if b.GetOtherAtomIdx(axis) != other and b.IsInRing()
+    )
+    lines, start, _ = bond_lines(text)
+    bond = drawn.GetBondWithIdx(ring)
+    write_bond(lines, start + ring, axis, bond.GetOtherAtomIdx(axis), 1)
+    wedged = "\n".join(lines)
+    atrop = (Chem.BondStereo.STEREOATROPCW, Chem.BondStereo.STEREOATROPCCW)
+    if not any(b.GetStereo() in atrop for b in Chem.MolFromMolBlock(wedged).GetBonds()):
+        raise ValueError(f"{name}: RDKit read no atropisomer stereo from the wedge")
+    return wedged
 
 
 def meso_drawn_late(mol: Chem.Mol) -> Chem.Mol:

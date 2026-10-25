@@ -104,6 +104,12 @@ function notesShown(page: Page) {
 
 const listed = COMPOUNDS.filter((c) => c.outcome === 'listed');
 
+/** Known limits (docs/plans/v2-stereoisomers.md): only cyclooctatetraene with one or three E
+ * has no flat drawing, so no picture and no Add. Read from the fixture's labels. */
+function drawable(c: Expected, s: NonNullable<Expected['stereoisomers']>[number]): boolean {
+  return c.name !== 'cyclooctatetraene' || Object.values(s.labels.bonds).filter((l) => l === 'E').length % 2 === 0;
+}
+
 test('every test drawing: the stereoisomers RDKit lists, in order, labelled, paired and matched', async ({ app }) => {
   const { page } = app;
   await openEditor(app);
@@ -118,19 +124,18 @@ test('every test drawing: the stereoisomers RDKit lists, in order, labelled, pai
       relation,
       matches,
     }));
-    const shown = await cards(page);
-    // Every label as the fixture has it, on each card that has a picture.
-    expect(shown.map(({ drawn, labels, ...rest }) => ({ ...rest, labels: drawn ? labels : null })), c.name).toEqual(
-      expected.map((e, i) => ({ ...e, labels: shown[i]?.drawn ? e.labels : null })),
+    const drawn = c.stereoisomers!.map((s) => drawable(c, s));
+    // Every label as the fixture has it, on each card that has a picture (and none without).
+    expect(await cards(page), c.name).toEqual(
+      expected.map((e, i) => ({ ...e, labels: drawn[i] ? e.labels : { atoms: {}, bonds: {} }, drawn: drawn[i] })),
     );
-    expect(shown.filter((s) => !s.drawn).length === 0 || c.notes!.includes('axial-planar'), c.name).toBe(true);
     // What the student reads on each card.
     expect(await cardText(page), c.name).toEqual(
       expected.map((e, i) => ({
         match: e.matches ? 'Matches your drawing' : null,
         relation: e.relation.kind === 'enantiomer' ? `Enantiomer of ${e.relation.of}` : SAID[e.relation.kind],
-        add: shown[i].drawn ? 'Add' : null,
-        undrawable: shown[i].drawn ? null : 'RDKit can’t draw this one flat as itself.',
+        add: drawn[i] ? 'Add' : null,
+        undrawable: drawn[i] ? null : 'RDKit can’t draw this one flat as itself.',
       })),
     );
     await expect(page.getByTestId('stereo-summary')).toHaveText(
@@ -142,7 +147,7 @@ test('every test drawing: the stereoisomers RDKit lists, in order, labelled, pai
         e.relation.kind !== 'enantiomer' ? [[e.number]] : e.relation.of! > e.number ? [[e.number, e.relation.of!]] : [],
       ),
     );
-    const pseudo = expected.some((s) => Object.values(s.labels.atoms).some((l) => l === 'r' || l === 's'));
+    const pseudo = expected.some((s) => [...Object.values(s.labels.atoms), ...Object.values(s.labels.bonds)].some((l) => /^[rsez]$/.test(l)));
     expect(await notesShown(page), c.name).toEqual([...c.notes!, ...(pseudo ? ['pseudo-asymmetric'] : [])]);
     for (const note of await page.getByTestId('stereo-note').all()) await expect(note).toBeVisible();
     // Where RDKit can't judge chirality, nothing is called achiral or meso.
@@ -218,11 +223,15 @@ test('Add places a stereoisomer beside the drawing, keeping its stereo, and the 
   await show(page);
   const mirror = c.stereoisomers!.find((s) => !s.matches)!;
   const card = page.locator(`[data-testid="stereo-card"][data-number="${mirror.number}"]`);
-  await card.getByTestId('stereo-add').click();
+  await page.getByRole('button', { name: `Add: stereoisomer ${mirror.number}` }).click();
   await expect(card).toHaveAttribute('data-in-hand', 'true');
   await expect(card.getByTestId('stereo-add')).toHaveText('In hand');
+  await expect(page.getByTestId('stereo-hint')).toHaveText(
+    `Stereoisomer ${mirror.number} is in hand: click the canvas to place it, or press Esc.`,
+  );
   await clickOnCanvas(page, 0.15);
   await expect(card).toHaveAttribute('data-in-hand', 'false');
+  await expect(page.getByTestId('stereo-hint')).toHaveCount(0);
   expect(await fragmentCount(page)).toBe(2);
   // Ketcher (Indigo) reads the drawing and the placed stereoisomer as RDKit did.
   expect(await inchiKey(page)).toBe(mirror.with_drawing_inchikey);

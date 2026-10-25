@@ -27,7 +27,7 @@ const NOTES: Record<Note, string> = {
     'This structure may be chiral about an axis or a plane (an allene, a biaryl, or a double bond in a ring). RDKit cannot judge that kind of chirality, so it lists no mirror images for it and calls nothing here achiral or meso.',
 };
 
-const PSEUDO_NOTE = 'Lowercase r and s mark pseudo-asymmetric centres.';
+const PSEUDO_NOTE = 'Lowercase r, s, e and z are pseudo-asymmetric labels: they depend on the R and S of the groups around them.';
 const DIASTEREOMERS = 'Any two that are not enantiomers are diastereomers.';
 const UNDRAWABLE = 'RDKit can’t draw this one flat as itself.';
 
@@ -114,7 +114,7 @@ function Card({ isomer, inHand }: { isomer: Pictured; inHand: boolean }) {
           <button
             type="button"
             data-testid="stereo-add"
-            title={inHand ? 'Click the canvas to place it; Esc puts it away' : 'Put it in hand to place beside your drawing'}
+            aria-label={`${inHand ? 'In hand' : 'Add'}: stereoisomer ${isomer.number}`}
             onClick={() => addStereoisomer(isomer.number)}
           >
             {inHand ? 'In hand' : 'Add'}
@@ -138,14 +138,32 @@ function grouped(isomers: Pictured[]): Pictured[][] {
   return groups;
 }
 
-function Listed({ result, inHand }: { result: Extract<StereoResult, { outcome: 'listed' }>; inHand: number | null }) {
-  const pseudo = result.stereoisomers.some((s) => Object.values(s.labels.atoms).some((l) => l === 'r' || l === 's'));
+interface ListedProps {
+  result: Extract<StereoResult, { outcome: 'listed' }>;
+  inHand: number | null;
+  failedAdd: number | null;
+}
+
+function Listed({ result, inHand, failedAdd }: ListedProps) {
+  const pseudo = result.stereoisomers.some((s) =>
+    [...Object.values(s.labels.atoms), ...Object.values(s.labels.bonds)].some((l) => l === l.toLowerCase()),
+  );
   const n = result.stereoisomers.length;
   return (
     <>
       <p className="stereo-summary" data-testid="stereo-summary">
         {n === 1 ? '1 stereoisomer.' : `${n} stereoisomers. ${DIASTEREOMERS}`}
       </p>
+      {inHand !== null && (
+        <p className="stereo-hint" data-testid="stereo-hint" role="status">
+          Stereoisomer {inHand} is in hand: click the canvas to place it, or press Esc.
+        </p>
+      )}
+      {failedAdd !== null && (
+        <p className="stereo-hint" data-testid="stereo-add-failed" role="alert">
+          Stereoisomer {failedAdd} could not be put in hand. Try Add again.
+        </p>
+      )}
       <Notes notes={result.notes} pseudo={pseudo} />
       <ol className="stereo-cards">
         {grouped(result.stereoisomers).map((group) => (
@@ -168,10 +186,10 @@ function Message({ children }: { children: ReactNode }) {
   );
 }
 
-function Ready({ result, inHand }: { result: StereoResult; inHand: number | null }) {
+function Ready({ result, inHand, failedAdd }: { result: StereoResult; inHand: number | null; failedAdd: number | null }) {
   switch (result.outcome) {
     case 'listed':
-      return <Listed result={result} inHand={inHand} />;
+      return <Listed result={result} inHand={inHand} failedAdd={failedAdd} />;
     case 'counted':
       return (
         <>
@@ -210,7 +228,7 @@ function Body({ state }: { state: StereoState }) {
         </p>
       );
     case 'ready':
-      return <Ready result={state.result} inHand={state.inHand} />;
+      return <Ready result={state.result} inHand={state.inHand} failedAdd={state.failedAdd} />;
     default:
       return null;
   }

@@ -6,6 +6,7 @@ import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { computeProperties, configureRdkit, type Computed } from './compute';
 import { panelValues } from './properties';
+import { stereoElements } from './stereoElements';
 
 interface FixtureCompound {
   typed_name?: string;
@@ -149,6 +150,29 @@ describe('stereo elements', () => {
       expect(c.centres.length + c.doubleBonds.length).toBe(compound.elements);
     },
   );
+
+  // A double bond is tried against every setting of the elements around it only where both
+  // branches at one end hold one: =CH2 with its H drawn never is, so limonene with every H
+  // drawn is read once more than the drawing (the cis probe), not 2^n times. That search
+  // took about 1 s per properties update on sugars with an allyl group drawn with its H.
+  it('tries no double bond that cannot be stereogenic', () => {
+    const compound = stereoSet.find((c) => c.name === 'limonene, all H drawn')!;
+    const drawing = rdkit.get_mol(stereoDrawings[`../../../tests/fixtures/${compound.file}`], JSON.stringify({ removeHs: false }))!;
+    let reads = 0;
+    const counting = new Proxy(rdkit, {
+      get: (target, name) =>
+        name === 'get_mol'
+          ? (...args: Parameters<MainModule['get_mol']>) => {
+              reads += 1;
+              return target.get_mol(...args);
+            }
+          : Reflect.get(target, name),
+    });
+    const found = stereoElements(counting, drawing);
+    drawing.delete();
+    expect(found.centres.length + found.doubles.length).toBe(compound.elements);
+    expect(reads).toBe(1);
+  });
 
   it("needs RDKit's current stereo perception: the legacy one misses ring cis/trans centres", () => {
     const ring = expected.compounds.find((c) => c.typed_name === '1,4-dimethylcyclohexane')!;
