@@ -49,6 +49,7 @@ class Expect:
 
 FIXTURES = ROOT / "tests" / "fixtures"
 PATTERNS = "functional-groups.json"  # web/public/, as src/chem/rdkitFiles.ts PATTERNS_FILE
+IR_BANDS = "ir-bands.json"  # web/public/, as src/chem/irBands.ts IR_BANDS_FILE
 
 
 def patterns_check() -> Expect:
@@ -56,6 +57,12 @@ def patterns_check() -> Expect:
     and the file this commit ships (someone may edit it; a deploy must carry the edit)."""
     shipped = json.loads((ROOT / "web" / "public" / PATTERNS).read_text(encoding="utf-8"))
     return Expect(PATTERNS, cache="no-cache", content_type="application/json", body_json=shipped)
+
+
+def ir_bands_check() -> Expect:
+    """The IR hint table the page fetches: the same rules as the patterns."""
+    shipped = json.loads((ROOT / "web" / "public" / IR_BANDS).read_text(encoding="utf-8"))
+    return Expect(IR_BANDS, cache="no-cache", content_type="application/json", body_json=shipped)
 
 
 def name_check() -> Expect:
@@ -105,6 +112,7 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         Expect("rdkit/RDKit_minimal.wasm", cache="no-cache", content_type="application/wasm"),
         Expect("rdkit/worker.js", cache="no-cache", worker_csp=True),
         patterns_check(),
+        ir_bands_check(),
         Expect("nmr/carbon-shifts.bin", cache="no-cache", content_type="application/octet-stream"),
         Expect("nmr/LICENSE-nmrshiftdb2.txt", cache="no-cache", content_type="text/plain"),
         Expect("api/health", body_json={"ok": True}),

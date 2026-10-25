@@ -22,10 +22,11 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
    (it put the drawing in the URL; web/src/editor/debugHotkeys.ts + online smoke test).
    Accounts and analytics: review only.
-3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, or NMRShiftDB2
-   (¹³C shifts): never from an LLM and never hand-typed into code or tests.
-   Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's
-   header names its SD file's SHA-256), and scripts/checks/chem_literals.py (no
+3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, NMRShiftDB2 (¹³C
+   shifts), or the faculty-checked IR table web/public/ir-bands.json (every band cites its sources;
+   one marked "verify" is never shown): never from an LLM and never hand-typed into code or tests.
+   Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's header names
+   its SD file's SHA-256), web/src/chem/irBands.test.ts, and scripts/checks/chem_literals.py (no
    Molfile/CDXML/InChI text in source). SMILES and numeric literals in source: review only.
 4. Everything except the naming endpoints works offline.
    Enforced by: the precache guard (web/scripts/checks/precache.ts, run by
@@ -110,7 +111,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Don't touch the chem-tutor project or its env. Don't install system packages.
 
 ## Common AI failure modes (each one has bitten or nearly bitten this project)
-- Typing a SMILES, InChIKey, mass or count from memory, or copying the spec's checklist
+- Typing a SMILES, InChIKey, mass, count or IR band from memory, or copying the spec's checklist
   numbers ("glucose shows 4") into a test. Generate it with RDKit/PubChem; read the fixture.
 - PubChem: `IsomericSMILES`/`CanonicalSMILES` are legacy (it silently answers `SMILES`/
   `ConnectivitySMILES`, so old code gets KeyError); an unknown structure is 200, `CID 0`.
@@ -123,10 +124,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `^` or `~` on pinned packages, or forgetting ketcher-core.
 - Ketcher under Vite: needs `define: { global: 'globalThis' }`, the `events` package, and
   `ketcher-standalone/dist/binaryWasm`. No React StrictMode around the Editor.
-- Trusting Ketcher's `buttons.hidden` (its compact toolbar ignores it) or its config to
-  disable debug shortcuts. Trusting `setMolecule()` to reject bad input (it can silently
-  load a different molecule; it never rejects). Molfiles with chiral flag 0 open as AND
-  enantiomers.
+- Trusting Ketcher's `buttons.hidden` (its compact toolbar ignores it) or its config to disable
+  debug shortcuts. Trusting `setMolecule()` to reject bad input (it can silently load a
+  different molecule; it never rejects). Molfiles with chiral flag 0 open as AND enantiomers.
 - Assuming Ketcher calls `onInit` once (3.18 calls it twice, the second up to ~1 s later),
   or that saved KET equals the live drawing (Ketcher moves drawings without a change
   event; compare InChIKey and relative positions). Pressing Undo/Redo keys in a test

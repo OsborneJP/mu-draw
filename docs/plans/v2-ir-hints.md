@@ -144,7 +144,7 @@ The first "Common AI failure modes" bullet also gains "or an IR wavenumber".
 **B. In the browser (Playwright, web/e2e/irhints.spec.ts)**
 1. Unticked: no IR hints. Ticked, before the file arrives (its response held): "Loading IR hints…". Released: the hints.
 2. 4-hydroxybenzyl alcohol shows these entries, in this order: phenol, alcohol_primary, alcohol_oh, arene, alkane. Arene shows once, although phenol asks for it with `also_show`.
-3. Glycerol shows alcohol_oh once, after the 1° and 2° alcohols. Procaine shows amine_cn once, and amine_tertiary's note with no bands.
+3. Glycerol shows alcohol_oh once, right after the 1° alcohol, which names it first; then the 2° alcohol. Procaine shows amine_cn once, and amine_tertiary's note with no bands.
 4. Every band shown has `data-low`, `data-high`, `data-diagnostic` and `data-verify`. The test compares each with the file (read by the test, never typed). Diagnostic bands are bold.
 5. Paracetamol's amide shows no band marked `verify`, and shows the "still being checked" line. A served copy of the file with one band of a shown group marked `verify` hides exactly that band. This is the guard's negative test.
 6. The credit line shows the licence and URI, and the attribution of each source cited by a shown band. It contains no `<a>`, and the link guard passes.

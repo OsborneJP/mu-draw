@@ -73,6 +73,8 @@ def test_two_cache_control_headers_fail():
         ("rdkit/worker.js", "cache-control", [IMMUTABLE], "rdkit/worker.js: Cache-Control"),
         ("functional-groups.json", "cache-control", [IMMUTABLE], "functional-groups.json: Cache"),
         ("functional-groups.json", "content-type", ["text/html"], "functional-groups.json: Cont"),
+        ("ir-bands.json", "cache-control", [IMMUTABLE], "ir-bands.json: Cache"),
+        ("ir-bands.json", "content-type", ["text/html"], "ir-bands.json: Content"),
         # An HTML error page where the ¹³C table should be: the preview couldn't read it.
         ("nmr/carbon-shifts.bin", "content-type", ["text/html"], "nmr/carbon-shifts.bin: Content"),
         ("nmr/carbon-shifts.bin", "cache-control", [IMMUTABLE], "nmr/carbon-shifts.bin: Cache"),
@@ -131,3 +133,16 @@ def test_functional_group_patterns_must_be_this_commits():
     results = good_results()
     results[cl.PATTERNS].body = json.dumps(edited).encode()
     assert f"{cl.PATTERNS}: body" in cl.check(results, expected, POLICY, WORKERS)[0]
+
+
+def test_ir_hint_table_must_be_this_commits():
+    expected = cl.expectations(FILES)
+    (table,) = [e for e in expected if e.path == cl.IR_BANDS]
+    assert table.body_json["groups"]  # the repo's file, parsed
+    results = good_results()
+    results[cl.IR_BANDS] = cl.Fetched(404)
+    assert cl.check(results, expected, POLICY, WORKERS) == [f"{cl.IR_BANDS}: HTTP 404"]
+    edited = {**table.body_json, "version": table.body_json["version"] + "-edited"}
+    results = good_results()
+    results[cl.IR_BANDS].body = json.dumps(edited).encode()
+    assert f"{cl.IR_BANDS}: body" in cl.check(results, expected, POLICY, WORKERS)[0]
