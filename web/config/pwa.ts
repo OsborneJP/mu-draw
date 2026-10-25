@@ -4,7 +4,7 @@ import type { Plugin } from 'vite';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 import { basePath } from './app.ts';
 
-export const APP_TITLE = 'Structure Editor';
+export const APP_TITLE = 'MU Draw';
 
 /** The app's name for a base: staging says so, so an installed staging app can't be
  * mistaken for the production one. */
@@ -47,7 +47,7 @@ export function pwaOptions(base: string): Partial<VitePWAOptions> {
       scope: base,
       display: 'standalone',
       background_color: '#ffffff',
-      theme_color: '#1f4e79',
+      theme_color: '#000000',
       // Relative to the manifest, which is served from the base.
       icons: [
         { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },

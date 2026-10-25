@@ -8,8 +8,10 @@ import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
 
-// index.html's <title> is the app's name for this build (staging says so).
+// index.html's <title> is the app's name for this build (staging says so). Its first word,
+// "MU", is in gold.
 const TITLE = document.title;
+const [MARK, ...REST] = TITLE.split(' ');
 
 export default function Header() {
   const online = useOnline();
@@ -17,7 +19,7 @@ export default function Header() {
   return (
     <header className="app-header">
       <span className="app-title" data-testid="app-title">
-        {TITLE}
+        <span className="app-title-mark">{MARK}</span> {REST.join(' ')}
       </span>
       <div className="app-header-items">
         {/* Always in the page, so screen readers announce a badge when it appears. */}

@@ -107,11 +107,13 @@
 }
 
 .count-button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: #f2f2f2;
 }
 
+/* The canvas's defined-stereocentre highlight (DEFINED_COLOR, src/editor/stereoHighlight.ts):
+   the pressed button and the atoms it lights up are the same colour (src/brand.test.ts). */
 .count-button[aria-pressed='true'] {
-  border-color: #1f4e79;
+  border-color: var(--mu-black);
   background: #9ecbff;
 }
 

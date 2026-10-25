@@ -1,9 +1,10 @@
-"""Draw the placeholder app icons (a benzene-ring hexagon) into web/public/icons/.
+"""Draw MU Draw's app icons (a gold benzene ring on black) into web/public/icons/.
 
     python scripts/make_icons.py
 
-Placeholders until the app has a name and real artwork. 192 and 512 px are what Chrome
-needs to offer installation; the maskable icon keeps its drawing inside the 80% safe zone.
+Placeholders until there is real artwork. The colours are the app's --mu-black and
+--mu-gold (web/src/index.css). 192 and 512 px are what Chrome needs to offer installation;
+the maskable icon keeps its drawing inside the 80% safe zone.
 """
 
 from __future__ import annotations
@@ -14,8 +15,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 OUT = Path(__file__).resolve().parents[1] / "web" / "public" / "icons"
-BACKGROUND = (31, 78, 121, 255)
-FOREGROUND = (255, 255, 255, 255)
+BACKGROUND = (0, 0, 0, 255)  # --mu-black
+FOREGROUND = (240, 179, 35, 255)  # --mu-gold, #f0b323
 SUPERSAMPLE = 4
 
 

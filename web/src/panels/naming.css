@@ -8,7 +8,7 @@
   box-sizing: border-box;
   width: min(380px, calc(100% - 160px));
   padding: 10px 14px 12px;
-  border: 1px solid #c8d3df;
+  border: 1px solid #d0d7de;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 6px 24px rgb(0 0 0 / 18%);

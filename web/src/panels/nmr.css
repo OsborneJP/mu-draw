@@ -92,7 +92,7 @@
 }
 
 .nmr-stick line {
-  stroke: #1f4e79;
+  stroke: var(--mu-black);
   stroke-width: 2;
 }
 

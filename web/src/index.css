@@ -1,3 +1,9 @@
+/* MU Draw's colours: Manchester University's black and gold. Change them here. */
+:root {
+  --mu-black: #000;
+  --mu-gold: #f0b323;
+}
+
 html,
 body,
 #root {

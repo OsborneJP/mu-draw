@@ -45,12 +45,12 @@ This changes one point of docs/SPEC.md section 6: "Added fragments must not over
 
 **C. Name and colours**
 1. **Name.** The app is "MU Draw" ("MU Draw (staging)" on staging) everywhere it is named: manifest `name` and `short_name`, page title, header, About box. verify-dist already checks the manifest and the title for each target.
-2. **Colours.** They are tokens in one place (`--mu-black`, `--mu-gold` and tints in web/src/index.css).
+2. **Colours.** They are tokens in one place (`--mu-black` #000 and `--mu-gold` #f0b323 in web/src/index.css; a stand-in gold until there is an official brand value).
    - The header is black with a gold rule and gold "MU".
    - Buttons that were blue are black, with gold focus and hover states.
    - NMR sticks are black. `theme_color` is black.
    - Icons are a gold hexagon on black.
 3. **What stays the same.** The canvas highlight colours stay: light blue marks defined stereocentres and gold marks undefined ones, so changing the blue would make the two look the same. The stereocentre count button's pressed colour keeps matching the canvas highlight.
-4. **Guard.** A test fails if the old blue (#1f4e79) appears in web source again.
+4. **Guard.** A test (web/src/brand.test.ts) fails if the old blue or the old name appears in web source again, or if the pressed stereocentre button stops matching DEFINED_COLOR.
 
 **D. Every change:** check.sh passes before each commit, and `scripts/deploy.sh staging` passes the live checks at the end. Production is promoted only on Jeff's say-so.
