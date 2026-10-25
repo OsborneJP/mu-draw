@@ -18,3 +18,7 @@ web/blob-report/
 
 # OS / editors
 .DS_Store
+
+# Worktrees the Claude app makes for parallel sessions: whole copies of this repo,
+# which check.sh must not scan or fingerprint.
+.claude/worktrees/
