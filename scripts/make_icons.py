@@ -1,4 +1,4 @@
-"""Draw MU Draw's app icons (a gold benzene ring on black) into web/public/icons/.
+"""Draw MU Draw's app icons (a gold benzene ring, Kekulé style, on black) into web/public/icons/.
 
     python scripts/make_icons.py
 
@@ -40,12 +40,13 @@ def draw(size: int, maskable: bool) -> Image.Image:
     ]
     # Overlap one extra segment so the closing corner gets a proper joint too.
     pen.line(corners + corners[:2], fill=FOREGROUND, width=width, joint="curve")
-    inner = radius * 0.55
-    pen.ellipse(
-        (centre - inner, centre - inner, centre + inner, centre + inner),
-        outline=FOREGROUND,
-        width=width,
-    )
+    # Alternate edges are double bonds: a second, shorter line inside the ring, as chemists
+    # draw them (each end pulled a quarter of the way to the centre).
+    inward = 0.25
+    for i in (0, 2, 4):
+        ends = [corners[i], corners[(i + 1) % 6]]
+        line = [(x + (centre - x) * inward, y + (centre - y) * inward) for x, y in ends]
+        pen.line(line, fill=FOREGROUND, width=width)
     return image.resize((size, size), Image.Resampling.LANCZOS)
 
 
