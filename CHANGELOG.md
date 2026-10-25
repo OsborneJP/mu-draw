@@ -85,6 +85,16 @@ All notable changes to this project. The format follows
   drawing clears the prediction until it is predicted again.
 
 ### Changed
+- The app is called MU Draw ("MU Draw (staging)" on staging), in black and gold: a black
+  header with a gold rule and a gold "MU", gold hover and focus on its buttons, and
+  gold-on-black icons. An installed app picks up the new name and icon with the update.
+  The canvas highlights keep their colours (light blue for defined stereocentres, gold for
+  undefined ones).
+- Name to structure's Add no longer puts the compound beside the drawing, where it could be
+  off screen: the compound follows the mouse over the canvas until a click places it there.
+  Esc, another tool or closing the panel puts it away. One Undo still removes it.
+- In a short window, hand, select and eraser stay at the top of the left toolbar while the
+  tools below them scroll, with Ketcher's arrows or the mouse wheel.
 - Header buttons look greyed while they can't be used.
 - The source is public under the MIT licence (LICENSE); THIRD-PARTY-NOTICES.md lists the
   parts under their own. NMRShiftDB2's data requires prediction software built on it to be

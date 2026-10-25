@@ -854,3 +854,83 @@ that fails without the fix. Accepted as known limits:
   the 2 s timing over the network); 8 skip by design. `--production` ran the 75 tests on
   the production build, stopped for the restart, then passed the same 14 checks and 69
   tests against /draw/. Recorded after promoting, in one docs commit.
+
+## Click-to-place Add, pinned tools, MU Draw (2026-10-25)
+
+Acceptance bar: docs/plans/placement-toolbar-branding.md.
+- **Add follows the mouse.** It is Ketcher's own paste tool (`editor.tool('paste', struct)`
+  with the struct from `prepareStructToRender`, the parse `addFragment` uses, then
+  `rescale()`). Ketcher says nothing when that tool is done, so placeInHand.ts wraps the
+  armed instance:
+  - `mouseup` puts the compound down. The change event fires synchronously inside it
+    (`Editor.update` dispatches it when the action is not preview-only), so naming.ts
+    marks that one change as its own around the call.
+  - `cancel` runs both when another tool takes over and on mouse leave. `Editor.tool()`
+    cancels the old tool before it sets the new one, so a microtask later the compound is
+    put away only if the tool is no longer Ketcher's.
+  - The tool shows the compound at once where the mouse last was (`editor.lastEvent`, from
+    a document-wide mousemove). If the canvas's client area is not `:hover`, it is hidden
+    until the mouse comes over the canvas, so Export, Copy image and autosave never see an
+    unplaced compound while the student is in the header.
+  - Ketcher sends mouseup to the tool from `document`, so a release on the canvas reaches
+    it even when the press was before the compound arrived. A release counts only after a
+    press with the compound in hand. A click that finds the compound hidden (no move since
+    Ketcher hid it) shows it at the click first; the test hides it the way Ketcher does, with
+    a `mouseleave` on the client area.
+  - Esc is caught on the document (capture phase): Ketcher hears keys only on its root
+    element, and after clicking Add the focus is in the header.
+  - Ketcher's toolbar follows only its own redux actions. Its paste tool switches the editor
+    to select directly, so the toolbar went on showing the bond tool chosen before Add while
+    a click drew nothing (measured). placeInHand.ts sends Ketcher's root an Escape keydown,
+    Ketcher's own way back to the selection tool, toolbar included; if Ketcher ignores it
+    (a dialog open), the editor is switched to select directly.
+  - Ketcher redraws the compound in hand at most once a frame and drops moves in between,
+    so the browser tests wait for the next animation frame after each move.
+  - Overlap is now the student's choice (SPEC section 6 updated). Dropping onto existing
+    atoms fuses them, as Ketcher's paste always does; it is still one Undo.
+- **Pinned tools.** `left-toolbar-buttons` had `overflow: hidden`, so only Ketcher's arrows
+  scrolled it. It is `overflow-y: auto` now (scrollbar hidden), and its first child (hand,
+  select, eraser) is `position: sticky` over Ketcher's background rgb(252 252 252). Ketcher's
+  6px gap and the column's 5px right padding are covered by the sticky block's own padding,
+  so nothing shows through.
+  - Pinned only in a container query: Ketcher's app grid has `container-type: size`, and the
+    column is 122px shorter than it. Below 330px (a small window, or the NMR preview docked)
+    the 106px block would leave the other tools no room, so the whole column scrolls as
+    Ketcher has it.
+  - `scroll-padding-top: 106px` makes keyboard focus scroll a tool out from under the block.
+  - Playwright's Chrome runs with `--hide-scrollbars`, so the hidden scrollbar is checked by
+    its computed `scrollbar-width`.
+  - Ketcher shows its up arrow only while that first child is not wholly in view
+    (`useInView`, threshold 1). Sticky at `top: 0`, it never leaves view and the up arrow
+    never appears. At `top: -1px`, 1px of it is clipped once the column has scrolled, so
+    the arrow works. The pinned tools move up by that 1px.
+  - The browser test waits on `scrollend` for every scroll. It compares the gap's pixels
+    before and after: `elementFromPoint` alone passed with the background removed.
+- **Brand.** `--mu-black` (#000) and `--mu-gold` (#f0b323, a stand-in until there is an
+  official value) in web/src/index.css. The icons use the same two colours
+  (scripts/make_icons.py). brand.test.ts reads the web source as text for the old blue
+  and name; it reads stereoHighlight.ts as text too, because importing it loads Ketcher.
+- Each guard removed in turn, and the test that failed.
+  - Vitest: putting it away on cancel, cancelling when closed while the structure is read,
+    cancelling on close, the own-change flag, keeping the placement, and dropping a
+    placement closed at the moment it lands. That last one first SURVIVED; the test "closed
+    the moment it is placed" was added.
+  - Playwright, rebuilt each time:
+    - the toolbar sync after a placement, and after Esc or close;
+    - hiding the first preview, and showing it under a resting mouse;
+    - showing a hidden compound at the click;
+    - ignoring a release without a press;
+    - sticky, `top: -1px` (and `top: 0`), the background, the right-hand cover;
+    - the container query, `scrollbar-width`, `overflow-y: auto` and `scroll-padding-top`;
+    - the pressed button's colour under the mouse.
+  - The last two CSS rules (`overflow-y: auto` and `scroll-padding-top`) fail only by the
+    test's 3-minute deadline: a scroll that never happens never fires `scrollend`.
+- Review (one capped round, 3 reviewers plus a refuting verifier per finding; 8 confirmed,
+  5 rejected). One medium: a click with no move since the compound arrived placed nothing.
+  Fixed, with the six lows that had cheap fixes; the bar's Review section lists them.
+- Accepted limits:
+  - A Ketcher dialog open at put-away makes Ketcher ignore the Escape. The editor is set to
+    select directly, and the toolbar shows the old tool until one is picked.
+  - A drag under way when the compound arrives is cut off: Ketcher's select tool has no
+    `cancel`, so its moved fragment stays moved, outside the undo history.
+
