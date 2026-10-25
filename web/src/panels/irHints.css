@@ -1,0 +1,88 @@
+/* The IR hints (IrHints.tsx), in the 280 px properties panel: each band's range in a
+   column of its own, the rest beside it; the bands to look for first in bold. */
+
+.ir-hints h4 {
+  margin: 10px 0 4px;
+  font-size: 13px;
+}
+
+.ir-entries {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ir-entries > li {
+  padding: 4px 0;
+  border-top: 1px solid #e5e8eb;
+}
+
+/* While a newer drawing is worked out, the older hints stay, like the groups list. */
+.properties-panel[data-state='updating'] .ir-entries {
+  opacity: 0.6;
+}
+
+.ir-label {
+  margin: 0 0 2px;
+  font-weight: 600;
+}
+
+.ir-group-note {
+  margin: 2px 0;
+  color: #57606a;
+}
+
+.ir-bands {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ir-band {
+  display: grid;
+  grid-template-columns: 5.4em 1fr;
+  column-gap: 6px;
+  padding: 1px 0;
+}
+
+.ir-range {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ir-diagnostic .ir-range,
+.ir-diagnostic .ir-what {
+  font-weight: 700;
+}
+
+.ir-band-note {
+  grid-column: 2;
+  color: #57606a;
+  font-size: 12px;
+}
+
+.ir-regions {
+  margin: 6px 0;
+}
+
+.ir-regions summary {
+  cursor: pointer;
+}
+
+.ir-regions ul {
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ir-credit {
+  margin: 6px 0 0;
+  color: #57606a;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+[data-testid='ir-problems'] ul {
+  margin: 2px 0 0;
+  padding-left: 16px;
+}

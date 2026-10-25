@@ -83,6 +83,15 @@ All notable changes to this project. The format follows
   drawing; clicking a carbon highlights its peak. A banner says these are predictions, not
   an answer key, and every prediction carries NMRShiftDB2's licence notice. Changing the
   drawing clears the prediction until it is predicted again.
+- IR hints (version 2, in the properties panel's Functional groups section): "Show IR
+  hints" lists the IR bands to expect for the groups found in the drawing: the range in
+  cm⁻¹, the vibration, its intensity and shape. The bands to look for first are in bold,
+  with the table's notes. A band shared by several groups (the alcohol O–H, the amine C–N)
+  appears once, and the alkane C–H bands always appear as a reference. A closed "Where
+  bands appear" list gives the four regions of the spectrum. The values come from a
+  faculty-checked table, ir-bands.json (CC BY-SA 4.0), credited under the hints; bands
+  still to be checked against a reference text are not shown, and their group says so.
+  Works offline. An entry of the table the app can't use is named and skipped.
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name
