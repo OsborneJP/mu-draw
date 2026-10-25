@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%28Z%29-acetaldehyde%20oxime/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:24:03Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5324280,
+          "SMILES": "C/C=N\\O",
+          "Title": "(Z)-acetaldehyde oxime"
+        }
+      ]
+    }
+  }
+}

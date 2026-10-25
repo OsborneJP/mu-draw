@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/Troger%27s%20base/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:40Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 196981,
+          "SMILES": "CC1=CC2=C(C=C1)N3CC4=C(C=CC(=C4)C)N(C2)C3",
+          "Title": "Troger base"
+        }
+      ]
+    }
+  }
+}

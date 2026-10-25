@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/cocaine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:42Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 446220,
+          "SMILES": "CN1[C@H]2CC[C@@H]1[C@H]([C@H](C2)OC(=O)C3=CC=CC=C3)C(=O)OC",
+          "Title": "Cocaine"
+        }
+      ]
+    }
+  }
+}

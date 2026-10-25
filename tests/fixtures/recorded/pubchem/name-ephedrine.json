@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ephedrine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:32Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 9294,
+          "SMILES": "C[C@@H]([C@@H](C1=CC=CC=C1)O)NC",
+          "Title": "Ephedrine"
+        }
+      ]
+    }
+  }
+}

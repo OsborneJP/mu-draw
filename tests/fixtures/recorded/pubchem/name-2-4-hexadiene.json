@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C4-hexadiene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:37Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 11600,
+          "SMILES": "CC=CC=CC",
+          "Title": "2,4-Hexadiene"
+        }
+      ]
+    }
+  }
+}

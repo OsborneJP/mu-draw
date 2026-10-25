@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C3%2C4-pentanetriol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:34Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 139799,
+          "SMILES": "CC(C(C(C)O)O)O",
+          "Title": "Pentane-2,3,4-triol"
+        }
+      ]
+    }
+  }
+}

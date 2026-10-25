@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/menthol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:33Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1254,
+          "SMILES": "CC1CCC(C(C1)O)C(C)C",
+          "Title": "Menthol"
+        }
+      ]
+    }
+  }
+}

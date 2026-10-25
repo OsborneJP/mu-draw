@@ -1,0 +1,30 @@
+# Test compounds for the stereoisomer enumerator (docs/plans/v2-stereoisomers.md,
+# decision 8, approved by Jeff 2026-10-25). One PubChem name per line; their SMILES come
+# from PubChem through scripts/fetch_reference_smiles.py, never typed.
+(R)-2-butanol
+2,3-dibromobutane
+tartaric acid
+L-threonine
+ephedrine
+menthol
+2,3,4-pentanetriol
+1,2-dimethylcyclohexane
+1,3-dimethylcyclohexane
+1,4-dimethylcyclohexane
+trans-decalin
+myo-inositol
+trans-2-butene
+2,4-hexadiene
+(E)-cinnamic acid
+(Z)-acetaldehyde oxime
+methyl phenyl sulfoxide
+1,2-dimethylaziridine
+Troger's base
+aldehydo-D-glucose
+2,3-pentadiene
+trans-cyclooctene
+camphor
+cocaine
+cholesterol
+erythromycin
+1,1'-bi-2-naphthol

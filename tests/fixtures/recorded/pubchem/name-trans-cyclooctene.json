@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/trans-cyclooctene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:41Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5463599,
+          "SMILES": "C1CCC/C=C/CC1",
+          "Title": "Trans-Cyclooctene"
+        }
+      ]
+    }
+  }
+}

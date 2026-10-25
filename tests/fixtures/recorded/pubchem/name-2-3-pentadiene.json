@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/2%2C3-pentadiene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:40Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 136378,
+          "SMILES": "CC=C=CC",
+          "Title": "1,3-Dimethylallene"
+        }
+      ]
+    }
+  }
+}

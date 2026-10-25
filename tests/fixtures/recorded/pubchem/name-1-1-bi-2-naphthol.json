@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/1%2C1%27-bi-2-naphthol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:25:20Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 11762,
+          "SMILES": "C1=CC=C2C(=C1)C=CC(=C2C3=C(C=CC4=CC=CC=C43)O)O",
+          "Title": "Binol"
+        }
+      ]
+    }
+  }
+}

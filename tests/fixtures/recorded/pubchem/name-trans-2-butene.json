@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/trans-2-butene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T19:23:50Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 62695,
+          "SMILES": "C/C=C/C",
+          "Title": "trans-2-BUTENE"
+        }
+      ]
+    }
+  }
+}
