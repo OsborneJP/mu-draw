@@ -1,6 +1,6 @@
 // The browser's tautomer enumerator (RDKit.js, the code the worker runs; a port of RDKit's
 // TautomerEnumerator) against what server-side RDKit answered for the same drawings
-// (tests/fixtures/tautomers_expected.json) and for 303 molecules of RDKit's NCI set
+// (tests/fixtures/tautomers_expected.json) and for 304 molecules of RDKit's NCI set
 // (forms_nci_expected.json): docs/plans/v2-tautomers-resonance.md, bar A.4-A.5. The panel's
 // order is the drawing's own first, then RDKit's (decision 3).
 import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
@@ -161,7 +161,7 @@ describe('a bond RDKit reads as none of single, double or triple (review finding
 
 describe('RDKit’s NCI sample', () => {
   it('gives Python’s tautomers, in its order, and its status, for every molecule', () => {
-    expect(nci.molecules.length).toBe(303); // the first 300 single structures, and 3 witnesses of rarer rules
+    expect(nci.molecules.length).toBe(304); // the first 300 single structures, and 4 witnesses of rarer rules
     for (const m of nci.molecules) {
       const mol = rdkit.get_mol(m.smiles)!;
       const found = enumerate(rdkit, mol);

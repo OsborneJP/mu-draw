@@ -3,7 +3,7 @@
 // rules (MolOps::setConjugation, ConjugHybrid.cpp; countAtomElec, Aromaticity.cpp), run on
 // RDKit.js, which has neither. With decision 2's settings, ALLOW_CHARGE_SEPARATION and
 // KEKULE_ALL. resonance.test.ts requires Python RDKit's answers for every test drawing and for
-// 303 molecules of RDKit's NCI set: the same structures (bond orders and charges by atom), the
+// 304 molecules of RDKit's NCI set: the same structures (bond orders and charges by atom), the
 // same conjugated bonds, and RDKit's order, except among structures it ranks equal on every
 // measure (their order follows its internal hash values there). RDKit's list depends on the
 // atom order, so the panel runs it on the drawing in RDKit's canonical atom order (Jeff's

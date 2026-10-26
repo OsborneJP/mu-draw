@@ -19,13 +19,15 @@ from test_reference_fixtures import locked_version
 TABLES = json.loads(gen.TABLES_FILE.read_text(encoding="utf-8"))
 FIXTURES = gen.ROOT / "tests" / "fixtures"
 # Each transform, and a test molecule whose tautomers differ without it: a test drawing by
-# name, or an NCI molecule by its line in RDKit's set (forms_nci_expected.json). Found once
-# by trying every test drawing, each of their tautomers drawn, and every NCI molecule.
+# name, or an NCI molecule by its line in RDKit's set (forms_nci_expected.json). Each is the
+# first found, trying every test drawing and then every NCI molecule, whose whole answer the
+# panel lists (RDKit completes it, with at most 32 tautomers) and that a tautomer of it
+# matches the transform's pattern.
 WITNESSES: dict[str, str | int] = {
     "1,3 (thio)keto/enol f": "acetone",
     "1,3 (thio)keto/enol r": "phenol",
     "1,5 (thio)keto/enol f": "testosterone",
-    "1,5 (thio)keto/enol r": "curcumin",
+    "1,5 (thio)keto/enol r": 4,
     "aliphatic imine f": "histidine",
     "aliphatic imine r": "histidine",
     "special imine f": 49,
@@ -33,17 +35,19 @@ WITNESSES: dict[str, str | int] = {
     "special imine r2": 49,
     "1,3 heteroatom H shift": "tetrazole",
     "1,5 aromatic heteroatom H shift": 3,
-    "1,7 aromatic heteroatom H shift f": "curcumin",
-    "1,7 aromatic heteroatom H shift r": "curcumin",
-    "1,9 aromatic heteroatom H shift f": "curcumin",
+    "1,7 aromatic heteroatom H shift f": 20,
+    "1,7 aromatic heteroatom H shift r": 7,
+    "1,9 aromatic heteroatom H shift f": 46,
     "1,11 aromatic heteroatom H shift f": 158,
     "furanone f": 302,
+    "furanone r": 3319,
     "keten/ynol f": "ketene",
     "keten/ynol r": "ethynol",
     "ionic nitro/aci-nitro f": "nitromethane",
     "ionic nitro/aci-nitro r": 2,
     "oxim/nitroso f": "(Z)-acetaldehyde oxime",
     "oxim/nitroso r": "nitrosoethane",
+    "oxim/nitroso via phenol f": 4609,
     "oxim/nitroso via phenol r": 2,
     "cyano/iso-cyanic acid f": "cyanic acid",
     "cyano/iso-cyanic acid r": "isocyanic acid",
@@ -54,18 +58,18 @@ WITNESSES: dict[str, str | int] = {
     "phosphonic acid f": 3205,
     "phosphonic acid r": "dimethyl phosphite",
 }
-# Transforms no molecule tried needs, since RDKit's others make the same moves wherever they
-# match: the test drawings, each of their tautomers drawn, and all 4,854 single structures of
-# RDKit's NCI set. They are still RDKit's own (read from its source like the rest), but no
-# answer here would show one missing.
+# Transforms no listed answer needs, trying the test drawings and all 4,854 single structures
+# of RDKit's NCI set. They are still RDKit's own (read from its source like the rest), but no
+# answer the panel lists would show one missing.
 OVERLAPPED = "RDKit's other transforms make the same moves on every molecule tried"
+CAPPED = (
+    "needed only by NCI line 1570, where RDKit stops at 33 tautomers: more than the panel lists"
+)
 NEVER_NEEDED = {
-    "1,3 aromatic heteroatom H shift f": OVERLAPPED,
+    "1,3 aromatic heteroatom H shift f": CAPPED,
     "1,3 aromatic heteroatom H shift ": OVERLAPPED,
     "1,5 aromatic heteroatom H shift ": OVERLAPPED,
     "1,5 aromatic heteroatom H shift r": OVERLAPPED,
-    "furanone r": OVERLAPPED,
-    "oxim/nitroso via phenol f": OVERLAPPED,
 }
 # The first single structures of RDKit's bundled NCI set: varied, and read from SMILES.
 NCI = Path(RDConfig.RDDataDir) / "NCI" / "first_5K.smi"

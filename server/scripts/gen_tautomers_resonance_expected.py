@@ -59,7 +59,7 @@ NCI_SOURCE = Path(RDConfig.RDDataDir) / "NCI" / "first_5K.smi"
 NCI_SAMPLE = 300
 # Lines of the NCI set beyond the sample, each the first molecule there that needs one of
 # RDKit's rarer tautomer transforms (tests/test_rdkit_tables.py, WITNESSES).
-NCI_WITNESSES = (302, 2645, 3205)
+NCI_WITNESSES = (302, 3205, 3319, 4609)
 
 # docs/plans/v2-tautomers-resonance.md, decision 7.
 LIMITS = {"drawn": 32, "group_bonds": 60, "max_structs": 1000, "max_transforms": 1000}

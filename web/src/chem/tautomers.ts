@@ -4,7 +4,7 @@
 // RDKit's 37 transforms (rdkitTables.json, from its source): RDKit.js finds the matches on
 // the Kekulé form and reads each product back with the sanitization steps RDKit runs there.
 // tautomers.test.ts requires Python RDKit's Enumerate() answers for every test drawing and
-// for 303 molecules of RDKit's NCI set. Measured (plan): the answer can depend on atom order
+// for 304 molecules of RDKit's NCI set. Measured (plan): the answer can depend on atom order
 // (in Python too), so a drawing is read as drawn, never through SMILES.
 //
 // Kept as RDKit has it, so the two agree: its map of tautomers keyed by canonical SMILES and
