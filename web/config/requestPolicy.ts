@@ -24,3 +24,14 @@ export function linkProblem(url: string, appUrl: string): string | null {
   const problem = requestProblem(url, appUrl);
   return problem === null || PUBCHEM_COMPOUND.test(new URL(url).href) ? null : problem;
 }
+
+// Exactly what Ketcher writes for a placed image (glassware, or a student's own picture).
+const IMAGE_DATA = /^data:image\/(png|svg\+xml);base64,[A-Za-z0-9+/]*={0,2}$/;
+
+/** Why an SVG <image>'s source breaks the policy, or null if it is allowed. It is drawn, not
+ * followed, so it is judged as an image (the CSP's img-src), not as a link: a base64 PNG or
+ * SVG, which loads nothing, or one of the app's own files (docs/plans/v2-glassware.md,
+ * decision 7). */
+export function imageSourceProblem(url: string, appUrl: string): string | null {
+  return IMAGE_DATA.test(url) ? null : requestProblem(url, appUrl);
+}

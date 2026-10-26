@@ -72,3 +72,47 @@ test('the link guard lets exactly a PubChem compound page through', async ({ app
   await expect.poll(() => app.problems).toEqual([`link (other origin) A[href]: ${page}/`]);
   app.problems.length = 0;
 });
+
+/** Add an SVG <image> drawn from `source` (as href, or as xlink:href) to the page's body. */
+async function plantImage(app: App, source: string, xlink = false): Promise<void> {
+  await app.page.evaluate(
+    ([src, useXlink]) => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      if (useXlink) image.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', src as string);
+      else image.setAttribute('href', src as string);
+      svg.append(image);
+      document.body.append(svg);
+    },
+    [source, xlink] as const,
+  );
+}
+
+const PNG_DATA = 'data:image/png;base64,iVBORw0KGgo=';
+const SVG_DATA = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=';
+
+test('the image guard lets a base64 PNG or SVG through, and reports any other image source', async ({ app }) => {
+  await openEditor(app);
+  // Allowed ones first: reports arrive in the page's order, so a wrongly reported one would
+  // come before the controls'.
+  await plantImage(app, PNG_DATA);
+  await plantImage(app, SVG_DATA, true);
+  // Controls that load nothing (an image from another host would also trip the request and
+  // CSP guards): a data: URL of another type, and an SVG that isn't base64.
+  await plantImage(app, 'data:text/html;base64,PGgxPmhpPC9oMT4=');
+  await plantImage(app, 'data:image/svg+xml,%3Csvg%2F%3E', true);
+  await expect
+    .poll(() => app.problems)
+    .toEqual([
+      'image source (scheme data:) image[href]: data:text/html;base64,PGgxPmhpPC9oMT4=',
+      'image source (scheme data:) image[xlink:href]: data:image/svg+xml,%3Csvg%2F%3E',
+    ]);
+  app.problems.length = 0;
+});
+
+test('a link to an image data URL is still a link, and is reported', async ({ app }) => {
+  await openEditor(app);
+  await plant(app, 'a', 'href', PNG_DATA);
+  await expect.poll(() => app.problems).toEqual([`link (scheme data:) A[href]: ${PNG_DATA}`]);
+  app.problems.length = 0;
+});
