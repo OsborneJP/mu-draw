@@ -1,0 +1,25 @@
+# Safety's test compounds (docs/plans/v2-safety-snapshot.md, decision 11): Get name's test
+# compounds by name (tests/fixtures/reference_expected.json), so their recorded
+# structure-to-name lookups give the CIDs. server/scripts/record_ghs.py records PubChem's GHS
+# section for each. Nothing here is a chemistry value.
+# An EU harmonised classification:
+ethanol
+caffeine
+toluene
+boric acid
+nicotine
+(R)-2-butanol
+# Only ECHA's notified classifications:
+dimethyl sulfoxide
+aspirin
+paraquat
+sodium benzoate
+# "Not Classified":
+glucose
+L-alanine
+(E)-cinnamic acid
+# No GHS section:
+aldehydo-D-glucose
+tetramethylammonium
+# No PubChem record:
+invented: aspirin + (E)-cinnamic acid

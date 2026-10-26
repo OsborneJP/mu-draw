@@ -1,6 +1,14 @@
 import sqlite3
 
-from cache import COLUMNS, MAX_AGE_S, STRUCTURE_COLUMNS, Hit, NameCache, StructureHit
+from cache import (
+    COLUMNS,
+    HAZARD_COLUMNS,
+    MAX_AGE_S,
+    STRUCTURE_COLUMNS,
+    Hit,
+    NameCache,
+    StructureHit,
+)
 from pubchem import NameRecord, Record
 
 RECORD = Record(cid=1, iupac="one", title="One")
@@ -20,10 +28,12 @@ def test_the_cache_holds_chemistry_only(tmp_path):
     tables = [row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")]
     names = tuple(row[1] for row in db.execute("PRAGMA table_info(names)"))
     structures = tuple(row[1] for row in db.execute("PRAGMA table_info(structures)"))
-    assert tables == ["names", "structures"]
+    hazards = tuple(row[1] for row in db.execute("PRAGMA table_info(hazards)"))
+    assert tables == ["names", "structures", "hazards"]
     assert names == COLUMNS == ("smiles", "cid", "iupac", "title", "stored_at")
     assert structures == STRUCTURE_COLUMNS
     assert STRUCTURE_COLUMNS == ("name", "cid", "smiles", "title", "matches", "stored_at")
+    assert hazards == HAZARD_COLUMNS == ("cid", "classification", "others", "stored_at")
 
 
 def test_found_and_not_found_come_back(tmp_path):

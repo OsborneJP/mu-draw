@@ -36,10 +36,12 @@ class FakePubChem:
         self.time = time
         self.answers = list(answers)
         self.requests: list[tuple[float, dict[str, str]]] = []
+        self.urls: list[str] = []
         self.transport = httpx.MockTransport(self._handle)
 
     def _handle(self, request: httpx.Request) -> httpx.Response:
         self.requests.append((self.time.now, rec.form(request)))
+        self.urls.append(str(request.url))
         status, body = self.answers.pop(0) if len(self.answers) > 1 else self.answers[0]
         if isinstance(body, Exception):
             raise body

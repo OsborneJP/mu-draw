@@ -19,4 +19,14 @@ own licences:
   which is CC BY-NC-SA 4.0: values only, no text copied. The app shows this credit, in plain
   text, wherever it shows the hints.
 - tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
+  The `ghs-*.json` recordings are PubChem's GHS sections, which contain data from:
+  - the European Chemicals Agency (C&L Inventory), which may be reproduced for
+    non-commercial purposes provided that ECHA is acknowledged as the source: "Source:
+    European Chemicals Agency, http://echa.europa.eu/" (https://echa.europa.eu/web/guest/legal-notice);
+  - Regulation (EC) No 1272/2008, Annex VI, from EUR-Lex, © European Union, CC BY 4.0
+    (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html);
+  - NITE-CMC (Japan), which asks that the source be cited
+    (https://www.chem-info.nite.go.jp/en/chem/chrip/chrip_search/html/condUse.html);
+  - HCIS, Safe Work Australia, and HSDB (US National Library of Medicine).
+  The app shows each source's credit, in plain text, wherever it shows its data (Safety).
 - Packages installed by npm and conda are under their own licences.

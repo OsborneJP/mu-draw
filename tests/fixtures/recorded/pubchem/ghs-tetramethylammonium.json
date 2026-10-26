@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/6380/JSON?heading=GHS+Classification",
+    "form": {}
+  },
+  "recorded_at": "2026-10-26T11:50:27Z",
+  "status": 404,
+  "body": {
+    "Fault": {
+      "Code": "PUGVIEW.NotFound",
+      "Message": "No data found"
+    }
+  }
+}
