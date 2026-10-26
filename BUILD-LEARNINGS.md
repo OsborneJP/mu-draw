@@ -1237,3 +1237,51 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   the templates bar's "picking a template puts Add's compound away" is tested against Name
   to structure's Add only, not the stereoisomer panel's.
 
+
+## Safety snapshot (version 2, 2026-10-26)
+
+Acceptance bar: docs/plans/v2-safety-snapshot.md (measurements, decisions, known limits).
+- **PUG View, not PUG REST.** GHS data is only in PUG View:
+  `GET …/pug_view/data/compound/<CID>/JSON?heading=GHS+Classification`, with just the CID in
+  the URL. A compound with no GHS section answers 404 `PUGVIEW.NotFound` (an unknown
+  structure, by contrast, is PUG REST's 200 with `CID 0`). Answers run to 170 KB.
+- **One classification per `ReferenceNumber`.** Each source entry is a run of `Information`
+  items sharing a reference: pictograms (image URLs `…/images/ghs/GHS0n.svg`, the name in
+  `Extra`), signal word, H statements, P codes (no text), and for ECHA a `Note` and a
+  notifications summary. PubChem orders entries by `SortOrder`: the EU harmonised entry
+  (100000) first, then ECHA's by company reports (3000 + reports), NITE-CMC by year, HCIS,
+  HSDB. The server still chooses by source name, not by position.
+- **Sources disagree a lot**: ethanol's EU entry has H225 only; NITE-CMC adds H350, H360 and
+  H372. Hence one classification, never a merge, and the count of the others.
+- **Statement formats**: `H225:`, `H319 (37.7%):`, `H225 (> 99.9%):`, `H360FD:`, `H373 **:`,
+  `H361d ***:`, `H301+H311 (100%):`; ECHA repeats a code from different notifications.
+  server/ghs.py splits each and requires the parts, joined back, to equal PubChem's string;
+  all 139 entries across 30 probed records passed. ECHA lists only codes above 10%.
+- **Strict only where it matters.** Anything unexpected in the chosen entry, or a 200 with
+  no GHS section, is "unavailable", never a partial list or a false "none listed". Other
+  entries only need their reference (choosing needs every source name).
+- **Licences.** ECHA's C&L data may be reproduced only for non-commercial purposes and only
+  with "Source: European Chemicals Agency, http://echa.europa.eu/" in each copy, so the
+  credit is always visible (not behind a tick like the IR credit). The repo is public, so
+  THIRD-PARTY-NOTICES.md gives ECHA's terms for the `ghs-*.json` recordings. The nine
+  pictograms are Wikimedia Commons' public-domain copies of UNECE's files
+  (Special:FilePath redirects to upload.wikimedia.org); none contains a script or an
+  outside reference, and web/scripts/checks/svg.ts keeps it so.
+- **Per record.** Stereo records can have their own entries ((R)-2-butanol has the EU one),
+  but aldehydo-D-glucose and the tetramethylammonium cation have none.
+- **Two PubChem requests per lookup** (the structure, then PUG View), through the one rate
+  limit. The structure step shares Get name's cache entry, so Safety after Get name asks
+  PubChem only for the GHS section.
+- **The browser tests can't import src/api.ts** (`import.meta.env` is Vite's), so the answer
+  reader and the panel's wording live in src/panels/safetyAnswer.ts, and the PubChem link in
+  src/pubchemPage.ts (api.ts re-exports it): the tests compare the panel with the app's own
+  functions, and no hazard is typed in a test.
+- **One HTTP error per browser test.** The guards report a 4xx/5xx from the app's origin, and
+  from then on every `guarded()` wait fails; so 502, 503 and 400 each get their own test,
+  with `expectProblems` last.
+- **Don't edit the tree while check.sh runs** (about 11 minutes, 10 of them the smoke
+  tests): the "tree unchanged" stage fails. Commits here were checked in a second, check-only
+  worktree holding exactly the staged files, and committed only if the staged tree was
+  unchanged.
+- **Deploy**: the API service must be restarted for `/api/safety`; deploy.sh prints the
+  `sudo systemctl restart` line. Apache already proxies all of `<base>api/`.

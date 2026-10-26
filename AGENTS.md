@@ -5,12 +5,12 @@
 ## Purpose
 A free, installable structure editor (PWA) that replaces ChemSketch Freeware for Manchester
 chemistry students. Ketcher (drawing, Indigo wasm) and RDKit.js (properties) run in the
-browser; a small FastAPI service on osbornelab does the two naming lookups. Spec: docs/SPEC.md.
+browser; a small FastAPI service on osbornelab does the naming and safety lookups. Spec: docs/SPEC.md.
 
 ## Invariants (never break these; each line names what enforces it)
 "/draw/" means the configured base (`path` in app.config.json); staging is "/draw-staging/".
 1. The app requests nothing except /draw/api/* and its own static files. Only a link the
-   student clicks may leave it, and the only such link is Get name's PubChem compound page.
+   student clicks may leave it, and only to a compound's PubChem page (Get name, Safety).
    Enforced by: the CSP from web/csp.json (meta tag + Apache header; checker
    web/scripts/checks/csp.ts allows only listed sources; the RDKit worker alone adds
    'unsafe-eval', web/csp-workers.json, and nothing else); the request guard and the link
@@ -28,10 +28,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's header names
    its SD file's SHA-256), web/src/chem/irBands.test.ts, and scripts/checks/chem_literals.py (no
    Molfile/CDXML/InChI text in source). SMILES and numeric literals in source: review only.
-4. Everything except the naming endpoints works offline.
-   Enforced by: the precache guard (web/scripts/checks/precache.ts, run by
-   web/scripts/verify-dist.ts in every check.sh and deploy build, not by a bare
-   `npm run build`) and the two "offline:" smoke tests.
+4. Everything except the naming and safety lookups works offline. Enforced by: the precache
+   guard (web/scripts/checks/precache.ts, run by web/scripts/verify-dist.ts in every check.sh
+   and deploy build, not by a bare `npm run build`) and the "offline:" smoke tests.
 5. ketcher-react, ketcher-standalone, and @rdkit/rdkit are pinned to exact versions.
    Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
 6. Build only "Version 1 features", the NMR proof of concept, and the "After v1" features
@@ -59,7 +58,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
-  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names,
+  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names, record_ghs,
   record_name_lookups, build_practice_lists. ¹³C table: in web/, `node scripts/build-carbon-table.ts <sd>`.
 
 ## Layout (spec layout; "later" marks where future code goes)
@@ -71,19 +70,20 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts), Get name,
   Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
-  preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
-  nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
+  preview, stereoisomers and Safety (safety*.ts) dock below the canvas (Docked.tsx), one at a
+  time (belowCanvas.ts); nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
 - `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
+- `web/public/`: icons, functional-groups.json, ir-bands.json, nmr/ (¹³C), practice.json, ghs/ (pictograms).
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
   export.spec.ts reads PNG headers, pixels and the clipboard back; `holdableRdkitReplies()` and
   `holdableIndigoReplies()` (fixtures.ts) hold workers' replies; naming specs hold API answers.
-- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
-  test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
-  `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
+- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure`, `/api/safety`
+  (`create_app()` takes test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py`
+  (PubChem's GHS section), `cache.py` (SQLite in `$STATE_DIRECTORY`), `opsin.py` runs `opsin/`
+  (pinned jar + OpsinLines.java) on the env's Java.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
   replays), `functional_group*` and `nmr*` (test sets; judgement provisional), `chemdraw/`.

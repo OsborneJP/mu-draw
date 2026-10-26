@@ -1,7 +1,8 @@
 // Invariant 1: the browser requests nothing but the app's own files and its API, all
 // under the app's origin and base path. The smoke tests apply this to every request.
-// The only way out is a link the student clicks, and the only such link is Get name's
-// PubChem compound page; the smoke tests apply linkProblem() to every link in every page.
+// The only way out is a link the student clicks, and the only such links are a compound's
+// PubChem page (Get name, Safety); the smoke tests apply linkProblem() to every link in every
+// page.
 
 /** Why a request breaks the policy, or null if it is allowed. */
 export function requestProblem(url: string, appUrl: string): string | null {

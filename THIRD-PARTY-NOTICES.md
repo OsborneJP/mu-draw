@@ -18,6 +18,11 @@ own licences:
   12.1 (https://openstax.org/books/organic-chemistry/pages/12-7-interpreting-infrared-spectra),
   which is CC BY-NC-SA 4.0: values only, no text copied. The app shows this credit, in plain
   text, wherever it shows the hints.
+- web/public/ghs/GHS01.svg to GHS09.svg: the nine GHS hazard pictograms, unedited copies of
+  Wikimedia Commons' GHS-pictogram-explos, -flamme, -rondflam, -bottle, -acid, -skull,
+  -exclam, -silhouette and -pollu .svg (https://commons.wikimedia.org/wiki/File:GHS-pictogram-flamme.svg
+  and so on), which Commons marks public domain ("ineligible for copyright … contains no
+  original authorship"), converted from UNECE's EPS files. Read 2026-10-26.
 - tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
   The `ghs-*.json` recordings are PubChem's GHS sections, which contain data from:
   - the European Chemicals Agency (C&L Inventory), which may be reproduced for

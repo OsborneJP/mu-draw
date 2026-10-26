@@ -1,0 +1,118 @@
+/* Below the canvas (.canvas-area is a column, index.css), like the ¹³C NMR preview: the editor
+   gives up the height, so the panel never covers the drawing. */
+.safety-panel {
+  flex: none;
+  max-height: 45%;
+  overflow-y: auto;
+  padding: 8px 12px;
+  border-top: 1px solid #d0d7de;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #1f2328;
+}
+
+.safety-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.safety-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.safety-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.safety-compound {
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+.safety-reminder {
+  margin: 6px 0;
+  padding: 4px 8px;
+  border-left: 3px solid #9a6700;
+  background: #fff8c5;
+}
+
+.safety-signal {
+  margin: 6px 0 2px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.safety-signal[data-signal='Danger'] {
+  color: #b42318;
+}
+
+.safety-pictograms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.safety-pictograms li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.safety-statements {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.safety-statements li {
+  margin: 2px 0;
+}
+
+.safety-code {
+  font-weight: 600;
+}
+
+.safety-class {
+  display: block;
+  color: #57606a;
+  font-size: 11px;
+}
+
+.safety-note,
+.safety-not-classified,
+.safety-message {
+  margin: 6px 0;
+}
+
+.safety-not-classified {
+  font-weight: 600;
+}
+
+.safety-summary {
+  margin: 6px 0;
+  color: #57606a;
+}
+
+.safety-summary p {
+  margin: 4px 0;
+}
+
+.safety-credit,
+.safety-others {
+  margin: 6px 0;
+  color: #57606a;
+  font-size: 11px;
+}

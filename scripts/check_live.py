@@ -4,7 +4,9 @@
 
 Confirms what docs/server-setup.md promises: the API answers through Apache, names a
 reference compound (aspirin) as recorded, which needs PubChem or the server's cache, and
-draws a systematic name as recorded, which needs OPSIN (Java) on the server;
+draws a systematic name as recorded, which needs OPSIN (Java) on the server; Safety finds
+ethanol's classification from the recorded source (PubChem's GHS data, which changes, is not
+compared); the GHS pictograms are served as SVG;
 index.html, sw.js, the manifest, the RDKit files, the functional-group patterns and the ¹³C
 shift table (with its licence) revalidate (no-cache), and the patterns are this commit's;
 hashed assets are immutable;
@@ -45,6 +47,8 @@ class Expect:
     worker_csp: bool = False  # this worker's own policy (web/csp-workers.json)
     body_json: object = None
     post_json: object = None  # POST this as JSON instead of a GET
+    # Only these parts of a JSON body, by dotted path ("classification.source").
+    body_fields: dict[str, object] | None = None
 
 
 FIXTURES = ROOT / "tests" / "fixtures"
@@ -91,6 +95,32 @@ def structure_check() -> Expect:
     return Expect("api/structure", body_json=answer, post_json={"name": name})
 
 
+def safety_check() -> Expect:
+    """Safety through Apache and the API: ethanol's PubChem SMILES (from the reference
+    fixtures) must find the record and the source recorded for it
+    (tests/fixtures/safety_responses.json). The hazards aren't compared: PubChem's GHS data
+    changes, and ECHA's percentages most of all."""
+    expected = json.loads((FIXTURES / "reference_expected.json").read_text(encoding="utf-8"))
+    ethanol = next(c for c in expected["compounds"] if c["typed_name"] == "ethanol")
+    responses = json.loads((FIXTURES / "safety_responses.json").read_text(encoding="utf-8"))
+    answer = responses["responses"]["ethanol"]
+    return Expect(
+        "api/safety",
+        post_json={"smiles": ethanol["smiles"]},
+        body_fields={
+            "found": True,
+            "cid": answer["cid"],
+            "classification.source": answer["classification"]["source"],
+        },
+    )
+
+
+def field_at(body: object, path: str) -> object:
+    for key in path.split("."):
+        body = body.get(key) if isinstance(body, dict) else None
+    return body
+
+
 def expectations(dist_files: list[str]) -> list[Expect]:
     def one(pattern: str) -> str:
         found = [f for f in dist_files if re.fullmatch(pattern, f)]
@@ -115,9 +145,11 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         ir_bands_check(),
         Expect("nmr/carbon-shifts.bin", cache="no-cache", content_type="application/octet-stream"),
         Expect("nmr/LICENSE-nmrshiftdb2.txt", cache="no-cache", content_type="text/plain"),
+        Expect("ghs/GHS07.svg", content_type="image/svg+xml"),
         Expect("api/health", body_json={"ok": True}),
         name_check(),
         structure_check(),
+        safety_check(),
     ]
 
 
@@ -153,6 +185,14 @@ def check(
                 body = None
             if body != e.body_json:
                 problems.append(f"{where}: body {got.body[:80]!r}, want {e.body_json}")
+        if e.body_fields is not None:
+            try:
+                body = json.loads(got.body)
+            except ValueError:
+                body = None
+            for path, want in e.body_fields.items():
+                if field_at(body, path) != want:
+                    problems.append(f"{where}: {path} is {field_at(body, path)!r}, want {want!r}")
     return problems
 
 
@@ -183,7 +223,11 @@ def main(argv: list[str]) -> int:
     files = [p.relative_to(dist).as_posix() for p in sorted(dist.rglob("*")) if p.is_file()]
     expected = expectations(files)
     results = {
-        e.path: fetch(url + e.path, with_body=e.body_json is not None, post_json=e.post_json)
+        e.path: fetch(
+            url + e.path,
+            with_body=e.body_json is not None or e.body_fields is not None,
+            post_json=e.post_json,
+        )
         for e in expected
     }
     problems = check(results, expected, csp_policy(ROOT / "web" / "csp.json"), worker_policies())

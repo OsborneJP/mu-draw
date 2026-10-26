@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { GHS_PICTOGRAMS, pictogramFile } from '../../src/panels/ghsPictograms';
 import { checkPrecache, parseSwManifest, type DistFile } from './precache';
 
 // A real build's sw.js and file list (base path replaced with /app-x/).
@@ -80,6 +81,13 @@ describe('checkPrecache', () => {
     expect(files.length).toBe(FILES.length - 1);
     const urls = parseSwManifest(SW).filter((url) => url !== path);
     expect(checkPrecache(files, urls)).toEqual([`${what} missing: ${path}`]);
+  });
+
+  it.each(GHS_PICTOGRAMS.map(pictogramFile))('fails when the GHS pictogram %s is missing from the build', (path) => {
+    const files = FILES.filter((f) => f.path !== path);
+    expect(files.length).toBe(FILES.length - 1);
+    const urls = parseSwManifest(SW).filter((url) => url !== path);
+    expect(checkPrecache(files, urls)).toEqual([`GHS pictogram missing: ${path}`]);
   });
 
   it('fails when Indigo is missing (e.g. the base64 build was used)', () => {

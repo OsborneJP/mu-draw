@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-DiUFACdc.css",
-    "size": 193929
+    "path": "assets/index-CLtoJ9MM.js",
+    "size": 7973364
   },
   {
-    "path": "assets/index-RtopH5h2.js",
-    "size": 7964201
+    "path": "assets/index-nV1Zhqzo.css",
+    "size": 195165
   },
   {
-    "path": "assets/index.modern-55d8e3ef-M0dtVDOE.js",
+    "path": "assets/index.modern-55d8e3ef-DFwaKrzF.js",
     "size": 425354
   },
   {
@@ -34,6 +34,42 @@
   {
     "path": "functional-groups.json",
     "size": 3550
+  },
+  {
+    "path": "ghs/GHS01.svg",
+    "size": 17787
+  },
+  {
+    "path": "ghs/GHS02.svg",
+    "size": 792
+  },
+  {
+    "path": "ghs/GHS03.svg",
+    "size": 3202
+  },
+  {
+    "path": "ghs/GHS04.svg",
+    "size": 2412
+  },
+  {
+    "path": "ghs/GHS05.svg",
+    "size": 7812
+  },
+  {
+    "path": "ghs/GHS06.svg",
+    "size": 5927
+  },
+  {
+    "path": "ghs/GHS07.svg",
+    "size": 721
+  },
+  {
+    "path": "ghs/GHS08.svg",
+    "size": 9554
+  },
+  {
+    "path": "ghs/GHS09.svg",
+    "size": 1526
   },
   {
     "path": "icons/icon-192.png",
@@ -81,7 +117,7 @@
   },
   {
     "path": "sw.js",
-    "size": 2211
+    "size": 2805
   },
   {
     "path": "workbox-2fbc6a65.js",

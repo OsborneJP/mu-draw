@@ -10,6 +10,8 @@ import { checkBuiltHtml, checkCspPolicy, checkWorkerExtras } from './checks/csp.
 import { checkHtmlLinks, checkTitle } from './checks/html.ts';
 import { checkManifest, checkPromptMode } from './checks/manifest.ts';
 import { checkPrecache, parseSwManifest, type DistFile } from './checks/precache.ts';
+import { checkSvg } from './checks/svg.ts';
+import { GHS_PICTOGRAMS, pictogramFile } from '../src/panels/ghsPictograms.ts';
 
 const dist = process.env.DIST_DIR ?? 'dist';
 const base = resolveBase();
@@ -33,6 +35,9 @@ const errors = [
   ...checkBuiltHtml(read('index.html'), cspPolicy()).map((e) => `index.html: ${e}`),
   ...checkHtmlLinks(read('index.html'), base, files.map((f) => f.path)).map((e) => `index.html: ${e}`),
   ...checkTitle(read('index.html'), title).map((e) => `index.html: ${e}`),
+  ...GHS_PICTOGRAMS.map(pictogramFile)
+    .filter((path) => files.some((f) => f.path === path)) // a missing one is the precache guard's
+    .flatMap((path) => checkSvg(read(path)).map((e) => `${path}: ${e}`)),
 ];
 
 if (errors.length > 0) {
