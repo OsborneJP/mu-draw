@@ -79,6 +79,9 @@ def test_two_cache_control_headers_fail():
         ("nmr/carbon-shifts.bin", "content-type", ["text/html"], "nmr/carbon-shifts.bin: Content"),
         ("nmr/carbon-shifts.bin", "cache-control", [IMMUTABLE], "nmr/carbon-shifts.bin: Cache"),
         ("nmr/LICENSE-nmrshiftdb2.txt", "content-type", ["text/html"], "nmrshiftdb2.txt: Content"),
+        # The same for the ¹H table.
+        ("nmr/proton-shifts.bin", "content-type", ["text/html"], "nmr/proton-shifts.bin: Content"),
+        ("nmr/proton-shifts.bin", "cache-control", [IMMUTABLE], "nmr/proton-shifts.bin: Cache"),
     ],
 )
 def test_wrong_headers_fail(path, header, value, problem):

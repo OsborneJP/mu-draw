@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { checkPrecache, parseSwManifest, type DistFile } from './precache';
 
-// A real build's sw.js and file list (base path replaced with /app-x/).
+// A real build's sw.js and file list (base path replaced with /app-x/), recaptured with
+// scripts/capture-sw-fixture.ts from the merged build.
 const SW = readFileSync(new URL('./fixtures/sw.js', import.meta.url), 'utf8');
 const FILES: DistFile[] = JSON.parse(readFileSync(new URL('./fixtures/dist-files.json', import.meta.url), 'utf8'));
 const INDIGO = FILES.find((f) => f.path.endsWith('.wasm') && f.path.includes('indigo'))!.path;
@@ -73,6 +74,7 @@ describe('checkPrecache', () => {
   it.each([
     ['¹³C shift table', 'nmr/carbon-shifts.bin'],
     ["¹³C shift table's licence", 'nmr/LICENSE-nmrshiftdb2.txt'],
+    ['¹H shift table', 'nmr/proton-shifts.bin'],
     ['IR hint table', 'ir-bands.json'],
     ['practice list file', 'practice.json'],
   ])('fails when the %s is missing from the build', (what, path) => {

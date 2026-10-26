@@ -46,7 +46,7 @@ def test_one_recording_per_name():
     wanted = {fetch.recording_path(name).name for name in fetch.all_names()}
     assert {p.name for p in fetch.RECORDINGS.glob("name-*.json")} == wanted
     # Every set is recorded; names they share (aspirin) are recorded once.
-    assert len(fetch.SETS) == 7
+    assert len(fetch.SETS) == 9
     assert len(fetch.all_names()) < sum(len(fetch.read_names(n)) for n, _ in fetch.SETS)
 
 
@@ -78,12 +78,14 @@ def test_generated_files_match_committed(generated):
 def test_no_stale_generated_files(generated):
     on_disk = {
         p.relative_to(gen.FIXTURES).as_posix()
-        for folder in ("molfiles", gen.FG_DIR, gen.NMR_DIR)
+        for folder in ("molfiles", gen.FG_DIR, gen.NMR_DIR, gen.PROTON_DIR, gen.PROTON_RULE_DIR)
         for p in (gen.FIXTURES / folder).iterdir()
     }
-    # tests/fixtures/nmr/ also holds what web/scripts/build-carbon-table.ts writes from
-    # NMRShiftDB2, and the judgement files.
-    others = {f"{gen.NMR_DIR}/{name}" for name in NMR_NOT_FROM_RDKIT}
+    # tests/fixtures/nmr/ and proton_nmr/ also hold what web/scripts/build-carbon-table.ts
+    # and build-proton-table.ts write from NMRShiftDB2, and the judgement files.
+    others = {f"{d}/{name}" for d in (gen.NMR_DIR, gen.PROTON_DIR) for name in NMR_NOT_FROM_RDKIT}
+    # The ¹H rule's drawings come with a person's judgement of them.
+    others.add(f"{gen.PROTON_RULE_DIR}/judged.json")
     assert on_disk - others == {rel for rel in generated if rel != gen.EXPECTED_FILE}
 
 

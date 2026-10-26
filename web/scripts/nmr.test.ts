@@ -6,7 +6,7 @@ import type { MainModule } from '@rdkit/rdkit';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { decodeTable, type CarbonTable } from '../src/chem/carbonTable.ts';
+import { decodeTable, encodeTable, type CarbonTable } from '../src/chem/carbonTable.ts';
 import { predictCarbon, type Peak } from '../src/chem/nmr.ts';
 import { referenceSpectra, testCompounds, type ReferenceSpectrum } from './nmrReference.ts';
 
@@ -115,6 +115,13 @@ describe('the shipped table', () => {
     expect(table.info.licence).toContain('nmrshiftdb2 Database License');
     expect(table.info.excluded).toEqual(COMPOUNDS.map((c) => ({ name: c.typed_name, inchikey: c.inchikey.split('-')[0] })));
     expect(table.info.spheres).toBe(4);
+  });
+
+  it('reads back byte for byte: re-encoding its own entries gives the same file (the ¹H table shares the format)', () => {
+    const bytes = readFileSync(new URL('../public/nmr/carbon-shifts.bin', import.meta.url));
+    const entries = new Map([...table.hashes].map((_, i) => [String(i), table.shifts[i] / 10]));
+    const key = (code: string): [number, number] => [table.hashes[Number(code)], table.checks[Number(code)]];
+    expect(Buffer.from(encodeTable(table.info, entries, key)).equals(bytes)).toBe(true);
   });
 
   it('predicts a 30-heavy-atom molecule in well under 2 seconds', () => {

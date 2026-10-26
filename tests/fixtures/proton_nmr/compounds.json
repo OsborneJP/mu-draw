@@ -1,0 +1,1076 @@
+{
+  "generator": "server/scripts/gen_reference_expected.py",
+  "rdkit_version": "2026.09.1",
+  "settings": {
+    "legacy_stereo_perception": false,
+    "prefer_coordgen": false,
+    "compute2d_canon_orient": true,
+    "molfile_chiral_flag": "1 when any tetrahedral centre is specified, else 0"
+  },
+  "compounds": [
+    {
+      "typed_name": "ethanol",
+      "pubchem_cid": 702,
+      "pubchem_title": "Ethanol",
+      "canonical_smiles": "CCO",
+      "inchikey": "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+      "heavy_atoms": 3,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
+      "file": "proton_nmr/ethanol.mol"
+    },
+    {
+      "typed_name": "acetone",
+      "pubchem_cid": 180,
+      "pubchem_title": "Acetone",
+      "canonical_smiles": "CC(C)=O",
+      "inchikey": "CSCPPACGZOOCGX-UHFFFAOYSA-N",
+      "heavy_atoms": 4,
+      "carbon_classes": [
+        [
+          0,
+          3
+        ],
+        [
+          1
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          3
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
+      "file": "proton_nmr/acetone.mol"
+    },
+    {
+      "typed_name": "ethyl acetate",
+      "pubchem_cid": 8857,
+      "pubchem_title": "Ethyl Acetate",
+      "canonical_smiles": "CCOC(C)=O",
+      "inchikey": "XEKOWRVHYACXOJ-UHFFFAOYSA-N",
+      "heavy_atoms": 6,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_nmr/ethyl-acetate.mol"
+    },
+    {
+      "typed_name": "tert-butanol",
+      "pubchem_cid": 6386,
+      "pubchem_title": "tert-Butanol",
+      "canonical_smiles": "CC(C)(C)O",
+      "inchikey": "DKGAVHZHDRPRBM-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "carbon_classes": [
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          1
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [],
+      "file": "proton_nmr/tert-butanol.mol"
+    },
+    {
+      "typed_name": "2-chloro-2-methylpropane",
+      "pubchem_cid": 10486,
+      "pubchem_title": "tert-BUTYL CHLORIDE",
+      "canonical_smiles": "CC(C)(C)Cl",
+      "inchikey": "NBRKLOOSMBRFMH-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "carbon_classes": [
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          1
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          2,
+          3
+        ]
+      ],
+      "hydrogen_count": 9,
+      "diastereotopic": [],
+      "file": "proton_nmr/2-chloro-2-methylpropane.mol"
+    },
+    {
+      "typed_name": "2-butanol",
+      "pubchem_cid": 6568,
+      "pubchem_title": "(+-)-2-Butanol",
+      "canonical_smiles": "CCC(C)O",
+      "inchikey": "BTANRVKWQNVYAZ-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [
+        1
+      ],
+      "file": "proton_nmr/2-butanol.mol"
+    },
+    {
+      "typed_name": "propanoic acid",
+      "pubchem_cid": 1032,
+      "pubchem_title": "Propionic Acid",
+      "canonical_smiles": "CCC(=O)O",
+      "inchikey": "XBDQKXXYIPTUBI-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
+      "file": "proton_nmr/propanoic-acid.mol"
+    },
+    {
+      "typed_name": "diethylamine",
+      "pubchem_cid": 8021,
+      "pubchem_title": "Diethylamine",
+      "canonical_smiles": "CCNCC",
+      "inchikey": "HPNMFZURTQLUMO-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "carbon_classes": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "hydrogen_count": 11,
+      "diastereotopic": [],
+      "file": "proton_nmr/diethylamine.mol"
+    },
+    {
+      "typed_name": "triethylamine",
+      "pubchem_cid": 8471,
+      "pubchem_title": "Triethylamine",
+      "canonical_smiles": "CCN(CC)CC",
+      "inchikey": "ZMANZCXQSJIPKH-UHFFFAOYSA-N",
+      "heavy_atoms": 7,
+      "carbon_classes": [
+        [
+          0,
+          4,
+          6
+        ],
+        [
+          1,
+          3,
+          5
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          4,
+          6
+        ],
+        [
+          1,
+          3,
+          5
+        ]
+      ],
+      "hydrogen_count": 15,
+      "diastereotopic": [],
+      "file": "proton_nmr/triethylamine.mol"
+    },
+    {
+      "typed_name": "cyclohexanone",
+      "pubchem_cid": 7967,
+      "pubchem_title": "Cyclohexanone",
+      "canonical_smiles": "O=C1CCCCC1",
+      "inchikey": "JHIVVAPYMSGYDF-UHFFFAOYSA-N",
+      "heavy_atoms": 7,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [],
+      "file": "proton_nmr/cyclohexanone.mol"
+    },
+    {
+      "typed_name": "toluene",
+      "pubchem_cid": 1140,
+      "pubchem_title": "Toluene",
+      "canonical_smiles": "Cc1ccccc1",
+      "inchikey": "YXFVVABEGXRONW-UHFFFAOYSA-N",
+      "heavy_atoms": 7,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_nmr/toluene.mol"
+    },
+    {
+      "typed_name": "acetophenone",
+      "pubchem_cid": 7410,
+      "pubchem_title": "Acetophenone",
+      "canonical_smiles": "CC(=O)c1ccccc1",
+      "inchikey": "KWOLFJPFCHCOCG-UHFFFAOYSA-N",
+      "heavy_atoms": 9,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_nmr/acetophenone.mol"
+    },
+    {
+      "typed_name": "benzyl alcohol",
+      "pubchem_cid": 244,
+      "pubchem_title": "Benzyl Alcohol",
+      "canonical_smiles": "OCc1ccccc1",
+      "inchikey": "WVDDGKGOMKODPV-UHFFFAOYSA-N",
+      "heavy_atoms": 8,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_nmr/benzyl-alcohol.mol"
+    },
+    {
+      "typed_name": "aspirin",
+      "pubchem_cid": 2244,
+      "pubchem_title": "Aspirin",
+      "canonical_smiles": "CC(=O)Oc1ccccc1C(=O)O",
+      "inchikey": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
+      "heavy_atoms": 13,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          12
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_nmr/aspirin.mol"
+    },
+    {
+      "typed_name": "ibuprofen",
+      "pubchem_cid": 3672,
+      "pubchem_title": "Ibuprofen, (+-)-",
+      "canonical_smiles": "CC(C)Cc1ccc(C(C)C(=O)O)cc1",
+      "inchikey": "HEFNNWSXXWATRW-UHFFFAOYSA-N",
+      "heavy_atoms": 15,
+      "carbon_classes": [
+        [
+          0,
+          2
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          2
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          14
+        ]
+      ],
+      "hydrogen_count": 18,
+      "diastereotopic": [
+        3
+      ],
+      "file": "proton_nmr/ibuprofen.mol"
+    },
+    {
+      "typed_name": "caffeine",
+      "pubchem_cid": 2519,
+      "pubchem_title": "Caffeine",
+      "canonical_smiles": "Cn1c(=O)c2c(ncn2C)n(C)c1=O",
+      "inchikey": "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
+      "heavy_atoms": 14,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          9
+        ],
+        [
+          12
+        ],
+        [
+          13
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          12
+        ],
+        [
+          13
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [],
+      "file": "proton_nmr/caffeine.mol"
+    },
+    {
+      "typed_name": "nicotine",
+      "pubchem_cid": 89594,
+      "pubchem_title": "Nicotine",
+      "canonical_smiles": "CN1CCC[C@H]1c1cccnc1",
+      "inchikey": "SNICXCGAKADSCV-JTQLQIEISA-N",
+      "heavy_atoms": 12,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          7
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ]
+      ],
+      "hydrogen_count": 14,
+      "diastereotopic": [
+        2,
+        3,
+        4
+      ],
+      "file": "proton_nmr/nicotine.mol"
+    },
+    {
+      "typed_name": "(E)-cinnamic acid",
+      "pubchem_cid": 444539,
+      "pubchem_title": "Cinnamic Acid",
+      "canonical_smiles": "O=C(O)/C=C/c1ccccc1",
+      "inchikey": "WBYWAXJHAXSJNI-VOTSOKGWSA-N",
+      "heavy_atoms": 11,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          10
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_nmr/e-cinnamic-acid.mol"
+    },
+    {
+      "typed_name": "crotonic acid",
+      "pubchem_cid": 637090,
+      "pubchem_title": "Crotonic Acid",
+      "canonical_smiles": "C/C=C/C(=O)O",
+      "inchikey": "LDHQCZJRKDOVOX-NSCUHMNNSA-N",
+      "heavy_atoms": 6,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
+      "file": "proton_nmr/crotonic-acid.mol"
+    },
+    {
+      "typed_name": "carvone",
+      "pubchem_cid": 7439,
+      "pubchem_title": "Carvone, (+-)-",
+      "canonical_smiles": "C=C(C)C1CC=C(C)C(=O)C1",
+      "inchikey": "ULDHMXUKGWMISQ-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ]
+      ],
+      "hydrogen_count": 14,
+      "diastereotopic": [
+        3,
+        5,
+        9
+      ],
+      "file": "proton_nmr/carvone.mol"
+    },
+    {
+      "typed_name": "limonene",
+      "pubchem_cid": 22311,
+      "pubchem_title": "1-Methyl-4-Prop-1-En-2-Ylcyclohexene",
+      "canonical_smiles": "C=C(C)C1CC=C(C)CC1",
+      "inchikey": "XMGQYMWWDOXHJM-UHFFFAOYSA-N",
+      "heavy_atoms": 10,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ]
+      ],
+      "hydrogen_count": 16,
+      "diastereotopic": [
+        3,
+        5,
+        6,
+        8
+      ],
+      "file": "proton_nmr/limonene.mol"
+    },
+    {
+      "typed_name": "menthol",
+      "pubchem_cid": 1254,
+      "pubchem_title": "Menthol",
+      "canonical_smiles": "CC1CCC(C(C)C)C(O)C1",
+      "inchikey": "NOOLISFMXDJSKH-UHFFFAOYSA-N",
+      "heavy_atoms": 11,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          8
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "hydrogen_count": 20,
+      "diastereotopic": [
+        2,
+        3,
+        6
+      ],
+      "file": "proton_nmr/menthol.mol"
+    }
+  ]
+}

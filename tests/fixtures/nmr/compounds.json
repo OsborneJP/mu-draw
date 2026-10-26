@@ -34,6 +34,24 @@
           4
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/toluene.mol"
     },
     {
@@ -62,6 +80,24 @@
           5
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/anisole.mol"
     },
     {
@@ -90,6 +126,24 @@
           4
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          7
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/p-cresol.mol"
     },
     {
@@ -121,6 +175,24 @@
           6
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/acetophenone.mol"
     },
     {
@@ -149,6 +221,24 @@
           6
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
       "file": "nmr/benzaldehyde.mol"
     },
     {
@@ -180,6 +270,24 @@
           7
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/methyl-benzoate.mol"
     },
     {
@@ -203,6 +311,19 @@
           5
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/ethyl-acetate.mol"
     },
     {
@@ -228,6 +349,21 @@
           3
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [],
       "file": "nmr/cyclohexanone.mol"
     },
     {
@@ -248,6 +384,19 @@
           2
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
       "file": "nmr/propanoic-acid.mol"
     },
     {
@@ -270,6 +419,27 @@
         [
           3
         ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [
+        1
       ],
       "file": "nmr/2-butanol.mol"
     },
@@ -299,6 +469,27 @@
           6
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
       "file": "nmr/benzyl-alcohol.mol"
     },
     {
@@ -324,6 +515,24 @@
           3
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_count": 7,
+      "diastereotopic": [],
       "file": "nmr/aniline.mol"
     },
     {
@@ -345,6 +554,20 @@
           5
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0,
+          4,
+          6
+        ],
+        [
+          1,
+          3,
+          5
+        ]
+      ],
+      "hydrogen_count": 15,
+      "diastereotopic": [],
       "file": "nmr/triethylamine.mol"
     },
     {
@@ -369,6 +592,33 @@
         [
           3
         ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3
+        ],
+        [
+          6
+        ]
+      ],
+      "hydrogen_count": 13,
+      "diastereotopic": [
+        0,
+        1,
+        2,
+        4,
+        5
       ],
       "file": "nmr/cyclohexanamine.mol"
     },
@@ -413,6 +663,39 @@
         [
           12
         ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          2
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          14
+        ]
+      ],
+      "hydrogen_count": 18,
+      "diastereotopic": [
+        3
       ],
       "file": "nmr/ibuprofen.mol"
     },
@@ -483,6 +766,56 @@
           27
         ]
       ],
+      "hydrogen_classes": [
+        [
+          0,
+          23,
+          24,
+          29
+        ],
+        [
+          2,
+          21
+        ],
+        [
+          3,
+          20
+        ],
+        [
+          4,
+          19
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          8,
+          15
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          25,
+          28
+        ],
+        [
+          26,
+          27
+        ]
+      ],
+      "hydrogen_count": 50,
+      "diastereotopic": [],
       "file": "nmr/squalene.mol"
     }
   ]

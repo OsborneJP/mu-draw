@@ -1,15 +1,15 @@
 [
   {
-    "path": "assets/index-DzapO9ys.js",
-    "size": 7964759
+    "path": "assets/index-BEOreadS.css",
+    "size": 197096
   },
   {
-    "path": "assets/index-XtHTMFPR.css",
-    "size": 194005
+    "path": "assets/index-BY0V0qVA.js",
+    "size": 8012700
   },
   {
-    "path": "assets/index.modern-55d8e3ef-4M-CmNV4.js",
-    "size": 425354
+    "path": "assets/index.modern-55d8e3ef-DWnctM1H.js",
+    "size": 425349
   },
   {
     "path": "assets/index.modern-DKFtyn1s.js",
@@ -101,11 +101,11 @@
   },
   {
     "path": "glassware/schlenk-flask.svg",
-    "size": 3574
+    "size": 3365
   },
   {
     "path": "glassware/separating-funnel.svg",
-    "size": 3632
+    "size": 3365
   },
   {
     "path": "glassware/still-head.svg",
@@ -113,7 +113,7 @@
   },
   {
     "path": "glassware/stirrer-hotplate.svg",
-    "size": 6607
+    "size": 5158
   },
   {
     "path": "glassware/three-neck-flask.svg",
@@ -160,6 +160,10 @@
     "size": 1971438
   },
   {
+    "path": "nmr/proton-shifts.bin",
+    "size": 812093
+  },
+  {
     "path": "practice.json",
     "size": 16711
   },
@@ -169,11 +173,11 @@
   },
   {
     "path": "rdkit/worker.js",
-    "size": 84360
+    "size": 121532
   },
   {
     "path": "sw.js",
-    "size": 4083
+    "size": 4157
   },
   {
     "path": "workbox-2fbc6a65.js",

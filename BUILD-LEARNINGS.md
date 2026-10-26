@@ -1446,3 +1446,74 @@ Python RDKit 2026.09.1.
   `git write-tree` from a temporary GIT_INDEX_FILE, check that tree in a detached worktree
   (web/node_modules symlinked; `touch -d 2020-01-01 web/package-lock.json` so npm ci isn't
   rerun), and commit exactly that tree (`git commit-tree` + `git update-ref`) once it passes.
+
+## ¹H NMR preview (version 2, 2026-10-26)
+
+- Plan, measurements, bar and review: docs/plans/v2-proton-nmr.md (Jeff approved it as
+  proposed and corrected bar 5 the same day, below). Same SD file as the ¹³C table (SHA-256
+  0e866883…3a0afe, downloaded again from SourceForge with Jeff's OK; not in the repository).
+- The ¹H data: 18,222 spectra in 17,671 records. A peak is `shift;intensity+multiplicity;atom`,
+  the atom being the one carrying the H, or the H itself where a record draws its H (8,337
+  entries in 4,535 records): those go to the H's neighbour. No coupling constants; a
+  multiplicity letter on 8% of entries. 86% of the spectra name no solvent (mostly one block of
+  records), and training without them made predictions worse, so the table pools all.
+- NMRShiftDB2 keeps calculated spectra beside measured ones: NMRProgram names Spartan or Quantum
+  ESPRESSO for 177 ¹H spectra, which the ¹H table leaves out (its header counts them). The
+  Program field names predictors (its own HOSE code, ACD/Labs, CSEARCH) for about 8,200 ¹³C
+  spectra, which the ¹³C table includes; the ¹³C table check (its own session and branch, plan
+  docs/plans/nmr-measured-only.md there) is that follow-up.
+- Records are matched to a test compound on stereo as well as the InChIKey skeleton: the first
+  set's (Z)-but-2-enoic acid was silently compared with crotonic acid's (E) spectrum, the only
+  one NMRShiftDB2 has. A mirror image or undefined stereo still matches (sameStereo). The ¹³C
+  references still match on the skeleton alone.
+- The prototype's held-out figures (0.228 ppm, 77% within ±0.3) included the 38 test compounds,
+  which are small and easy. The builder holds out the random 2% alone: 0.257 and 73.4%, under the
+  plan's bar 5 (0.25, 75%), so the build stopped itself; Jeff corrected bar 5 to 0.27 and 72%.
+  Lesson: hold out exactly what the shipped build holds out when measuring for a bar. After the
+  review the table scores 0.239 and 75.6%.
+- `node x.ts` only strips types: a TypeScript parameter property (`constructor(readonly rdkit)`)
+  is a syntax error there, and the table builder runs under plain Node. stereoElements.ts's and
+  stereoisomers.ts's Readers now assign their fields, and `erasableSyntaxOnly` in both tsconfigs
+  makes tsc refuse such syntax anywhere.
+- The diastereotopic rule makes one H of each CH₂ class deuterium and asks RDKit.js for possible
+  stereocentres (get_stereo_tags). The first version counted any stereo element, double bonds
+  too, through stereoElements.ts: 6.8 s on cholesterol with =CH₂ for its OH and every H drawn
+  (its dependent-double-bond search), and wrong, since a reflection keeps E and Z (enantiotopic
+  H got two rows). Counting only stereocentres is right on NMRShiftDB2 (pairs flagged only by a
+  double bond differ 7% of the time; with a stereocentre 82%) and needs no search: 11 ms for
+  squalene. It still over-flags bridged ring systems (RDKit's possible stereo at bridgeheads); the
+  panel says so there.
+- A later SVG element paints over an earlier one, and a `fill="transparent"` rect catches clicks:
+  each stick's wide invisible target covered the stick before it. Targets now stop halfway to
+  each neighbour, and sticks closer than a line's width are drawn as one (their H together).
+- Heavy work shares one machine-wide lock (Jeff, 2026-10-26: six sessions testing at once ran the
+  server out of memory). check.sh does not take it: it, builds, Playwright and the table builds
+  (about 45 s and 1.4 GB each) were run by hand under `flock "$HOME/.cache/mu-draw-heavy.lock"`.
+  With the queue long, the code was written and unit-tested in a copy of the worktree and copied
+  in for each check.
+- The precache guard's fixture gained the ¹H table by hand (its size and md5 revision) rather than
+  a recapture, to keep the merge small; recapture it from the merged build. The precache: 21
+  entries, 31,388 KiB (the ¹H table is 812 kB).
+- Held-out results for the 22 (bar 4): 105 C–H signals, mean error 0.129 ppm, 94 (89.5%) within
+  ±0.3. The 11 outside, in tests/fixtures/proton_nmr/outliers.json (predicted / measured ppm):
+  ethanol CH₂ 4.02 / 3.70; aspirin's ring H 7.53 / 8.25, 7.10 / 7.53, 6.88 / 7.30 (its record
+  also puts COOH at 7.06); ibuprofen's ring H next to the CH 7.55 / 7.21; caffeine's ring H
+  8.80 / 7.53; nicotine's N–CH 4.00 / 3.08; carvone's =CH 6.43 / 6.76, CH 3.04 / 2.69 and the
+  lower H of its CH₂ next to C=O 2.08 / 2.49; menthol's CH–O 4.18 / 3.42.
+- Each guard removed in turn, and the test that failed. Vitest at once:
+  - the state (protonNmr.test.ts): a stale answer dropped, a change dropping the request, atoms
+    mapped to Ketcher ids, an RDKit failure remembered, the low-confidence threshold, the axis
+    (wider past 12 and below 0), stick merging, click targets stopping halfway, element symbols;
+  - one panel below the canvas (belowCanvas.test.ts);
+  - the prediction (chem/protonNmr.test.ts): exchangeable elements; the rule's "another
+    stereocentre" and "the CH₂ itself becomes one" (fixtures from Python and the judged rule
+    drawings), its =CH₂ cases (only after the rule's own drawings were added: styrene,
+    2-methylpropene), a double bond not counting; pairs as two signals, a pair centred on a
+    deeper plain match, the fallback to one signal; the back-off; bridged ring systems marked;
+  - the acceptance tests (scripts/protonNmr.test.ts): the speed of the rule, an entry on a drawn
+    H moved to its atom, calculated spectra left out, CDCl3 preferred, D2O last, higher and
+    lower measured for a pair, records matched on stereo, a missing figure stopping the build;
+  - the format (carbonTable.test.ts): the ¹H table's own magic and hundredths; the precache
+    guard requiring the ¹H table (precache.test.ts).
+  Playwright, rebuilt each time, at once: the ¹H store taking only ¹H replies, sticks as tall as
+  their H, the worker reading the ¹H format, click targets stopping halfway.

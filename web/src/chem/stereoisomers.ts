@@ -99,7 +99,11 @@ function labelsOf(tags: Tags): Labels {
 }
 
 class Reader {
-  constructor(readonly rdkit: MainModule) {}
+  readonly rdkit: MainModule;
+
+  constructor(rdkit: MainModule) {
+    this.rdkit = rdkit;
+  }
 
   /** Read text into RDKit, use it, and free it. */
   with<T>(text: string, work: (mol: Mol) => T): T {

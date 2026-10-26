@@ -1,7 +1,8 @@
-// The ¹³C shift table's format: what is written is read back, a code is found or not, a
-// damaged file is refused, and two codes on one key are both left out.
+// The shift tables' format: what is written is read back, a code is found or not, a
+// damaged file is refused, two codes on one key are both left out, and a ¹³C table is never
+// read as a ¹H one or the other way round.
 import { describe, expect, it } from 'vitest';
-import { decodeTable, encodeTable, keyOf, lookup, MAGIC, type TableInfo } from './carbonTable';
+import { CARBON, decodeTable, encodeTable, keyOf, lookup, MAGIC, PROTON, type TableInfo } from './carbonTable';
 
 const INFO: TableInfo = {
   version: 1,
@@ -62,5 +63,29 @@ describe('the shift table', () => {
     expect(() => decodeTable(buffer(new Uint8Array([...bytes, 0])))).toThrow('cut short');
     const wrongVersion = new TextEncoder().encode(MAGIC + '\0\0\0\0');
     expect(() => decodeTable(buffer(wrongVersion))).toThrow();
+  });
+});
+
+describe('the ¹H table', () => {
+  const PRECISE = new Map([
+    ['6H3(6)', 1.234],
+    ['8H1(6)', -0.567],
+    ['6H2(6,6)|hi', 12.345],
+  ]);
+
+  it('reads back what was written, to a hundredth of a ppm', () => {
+    const table = decodeTable(buffer(encodeTable(INFO, PRECISE, keyOf, PROTON)), PROTON);
+    expect(table.info).toEqual(INFO);
+    expect([...PRECISE.keys()].map((code) => lookup(table, code))).toEqual([1.23, -0.57, 12.35]);
+    // The ¹³C table keeps tenths.
+    const carbon = decodeTable(buffer(encodeTable(INFO, PRECISE)));
+    expect([...PRECISE.keys()].map((code) => lookup(carbon, code))).toEqual([1.2, -0.6, 12.3]);
+  });
+
+  it('is never read as the ¹³C table, nor the other way round', () => {
+    const proton = buffer(encodeTable(INFO, PRECISE, keyOf, PROTON));
+    const carbon = buffer(encodeTable(INFO, PRECISE, keyOf, CARBON));
+    expect(() => decodeTable(proton)).toThrow('not a ¹³C shift table');
+    expect(() => decodeTable(carbon, PROTON)).toThrow('not a ¹H shift table');
   });
 });

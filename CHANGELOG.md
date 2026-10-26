@@ -160,6 +160,18 @@ All notable changes to this project. The format follows
   is not single, double or triple (an aromatic bond outside a ring, as in a carboxylate drawn
   as its hybrid, a hydrogen bond or a query bond) is told so. A compound gets the same lists
   however its atoms were drawn (RDKit runs in its canonical atom order).
+- ¹H NMR preview (version 2, in the properties panel beside ¹³C, marked Preview): "Predict ¹H
+  NMR" shows a stick spectrum (12 to 0 ppm, wider when a signal lies beyond, with a TMS line
+  that can be switched off) whose sticks are as tall as their number of H (signals that close
+  share one stick), and a table of signals: shift (to 0.01 ppm), number of H, what they sit on
+  (CH₃, OH, NH₂…) and notes. Equivalent H share a signal; the two H of a diastereotopic CH₂ get
+  a signal each (with a note in bridged ring systems, where that can be wrong). OH, NH and SH
+  are marked exchangeable and drawn as broad sticks, with a note that their shifts vary and
+  that they exchange in D₂O. Shifts come from measured spectra in NMRShiftDB2, looked up on this device (offline
+  too); there are no multiplets yet. As for ¹³C: matches on an atom's nearest surroundings
+  only are "low confidence", a signal and the atoms carrying its H highlight each other, the
+  banner and NMRShiftDB2's notice show on every prediction, and a change to the drawing
+  clears it. It docks below the canvas with the other panels, one at a time.
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."

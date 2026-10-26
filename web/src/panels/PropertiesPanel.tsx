@@ -9,6 +9,7 @@ import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHigh
 import FormsButtons from './FormsButtons';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
+import ProtonNmrButton from './ProtonNmrButton';
 import { makeRoomFor } from './belowCanvas';
 import { showStereoisomers } from './stereoStore';
 import './properties.css';
@@ -306,6 +307,7 @@ export default function PropertiesPanel() {
           <FormsButtons fragments={state.values.fragments} />
           <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
           <NmrButton />
+          <ProtonNmrButton />
         </Values>
       )}
     </aside>
