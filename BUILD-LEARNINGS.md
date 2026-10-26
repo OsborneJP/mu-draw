@@ -1283,3 +1283,7 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   ETKDG honours the tag (the signed volume flips): such drawings get no model (accepted).
 - 3Dmol 2.5.5 renders only through an `OffscreenCanvas` with WebGL2 (unless in a grid); with
   WebGL1 only, its own try/catch swallows the error and `createViewer` throws later.
+- The review took three capped rounds; round 2's medium was caused by round 1's own fix
+  (random starts), which had been measured on the test compounds only. Measure a change to
+  the embedding on a wider set (round 2 used 53 large PubChem drugs). Round 3 found nothing
+  high or medium; its lows are in docs/plans/v2-3d-view.md.

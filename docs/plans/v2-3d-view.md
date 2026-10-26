@@ -269,11 +269,25 @@ built fail within the cap (ivermectin: 0.7 s from the default start, over 2 s fr
 one) and slowed others (tacrolimus, rifampicin). Round 1's "changes nothing that already
 built" was measured on the test compounds only. Fixed: the default start first, then one
 random start only if it fails, each capped; tested on the attempts' order and parameters
-(both tests failed on the round-1 commit). Accepted (low): a structure that fails both
-attempts holds the one embedding slot for up to about 4-5 s per request, and failures aren't
-cached, so repeated clicks on one can push other students in the queue past the browser's
-8 s deadline. If a further round finds a new problem caused by a fix, the next step is to
-step back and propose a simpler design to Jeff rather than patch again.
+(both tests failed on the round-1 commit). If a further round finds a new problem caused
+by a fix, the next step is to step back and propose a simpler design to Jeff rather than
+patch again.
+
+## Review round 3 (2026-10-26, the round-2 fix only): stop
+
+Nothing high or medium, so the review stops here. Its three lows are accepted limits:
+- A structure that fails both attempts holds the one embedding slot for longer than the cap
+  suggests, since RDKit checks its timeout only between steps: cyclosporin A 5.2 s, a
+  generated 98-carbon ladder 6.9 s (measured under load). After PubChem's round trip such a
+  request can reach the browser's 8 s deadline ("not responding"), and failures aren't
+  cached, so repeated clicks can push other students in the queue past it too.
+- The random start runs only when the embedding fails, not when the force field then turns
+  a double bond the wrong way: Lutein A (only when PubChem doesn't answer; it has a record)
+  and a few lycopene and β-carotene E/Z isomers get "could not build". No wrong model is
+  shown: the stereo check catches it.
+- Under load, a default start cut off by the cap is followed by the random start, which can
+  build a different (equally valid) model, and that one is cached. The fixtures are not
+  affected: they are built without the cap.
 
 ## Known limits
 

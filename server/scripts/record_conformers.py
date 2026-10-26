@@ -22,7 +22,9 @@ tests/fixtures/conformers_judged.json (judgement, never generated).
 
 RDKit's models are built here without the embedding's 2 s timeout. The timeout only cuts a
 slow run short; it never changes a model that finishes (the same coordinates with and
-without it, measured), so the fixtures don't depend on how busy the machine is.
+without it, measured), so the fixtures don't depend on how busy the machine is. (In the
+service, a default start cut short is followed by a random start, which can build a
+different, equally valid model; every RDKit test compound here finishes well within it.)
 """
 
 from __future__ import annotations
