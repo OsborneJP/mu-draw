@@ -266,11 +266,11 @@ Jeff approved the plan as written, with every proposed answer:
 
 ## Done (2026-10-26, on branch claude/v2-glassware)
 
-Commits, in order: the plan (aa02f22); the link guard for canvas images (ec08dc8); the 23 pieces and their generator (f0345d6); the Glassware tab (39447dc); the review's fixes (the commit after). Each passed check.sh. Nothing is merged, pushed or deployed.
+Commits, in order: the plan (aa02f22); the link guard for canvas images (ec08dc8); the 23 pieces and their generator (f0345d6); the Glassware tab (39447dc); the review's fixes (027f8b4); Jeff's look (the commit after). Each passed check.sh. Nothing is merged, pushed or deployed.
 - **Bar A:** tests/test_glassware.py (64 tests, among them a doctored original for each refusal) and the browser test of the crop boxes in web/e2e/glassware.spec.ts.
 - **Bars B and C:** web/e2e/glassware.spec.ts (12 browser tests) and web/src/panels/glassware.test.ts (forced orderings with a held loader).
 - **Bar D:** web/config/requestPolicy.test.ts, web/e2e/guards.spec.ts, and the precache guard's test.
-- **Bar F:** a contact sheet of every piece, and a distillation and a reflux built from them and exported with the app's Export, sent to Jeff with the build report.
+- **Bar F:** a contact sheet of every piece, and a distillation and a reflux built from them and exported with the app's Export, sent to Jeff with the build report. **Jeff passed all 23 pieces and both set-ups on 2026-10-26; none is dropped or redone.**
 
 Changed while building:
 - **A3 is measured in placed px** (1 px on screen at 100% zoom), not in source px: the source units differ about 100-fold between drawings. Every crop leaves 0.9 to 1.4 placed px around the ink.
