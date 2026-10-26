@@ -147,6 +147,19 @@ All notable changes to this project. The format follows
   subscript buttons are greyed while it is on. Turning it off leaves the text as it is, so
   an isotope (¹³C) is still made by hand. A text formatted this way reopens with Formula
   on. The note under the buttons adds "Formula formats all of the text as you type."
+- Tautomers and resonance structures (version 2): "Show tautomers" and "Show resonance
+  structures" in the properties panel list them below the canvas, each drawn in the
+  drawing's own layout with what differs from the drawing highlighted. The drawing's own
+  form is marked "Your drawing" (first among the tautomers); Add puts one in hand, and the
+  panel stays open to add another. Both come from RDKit's own rules, run on the device
+  (offline too): every tautomer RDKit's 37 transform rules reach, never called "most
+  stable"; resonance structures with charges separated (the amide's N⁺=C–O⁻) and every
+  Kekulé structure, in RDKit's order. Notes say what RDKit leaves out (no C⁺–O⁻ form for a
+  lone C=O, an enone or an ester; only Kekulé forms for aniline and phenol). Up to 32 are
+  drawn; a conjugated system of more than 60 bonds is not listed. A drawing with a bond that
+  is not single, double or triple (an aromatic bond outside a ring, as in a carboxylate drawn
+  as its hybrid, a hydrogen bond or a query bond) is told so. A compound gets the same lists
+  however its atoms were drawn (RDKit runs in its canonical atom order).
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."

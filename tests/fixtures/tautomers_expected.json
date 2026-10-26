@@ -1,0 +1,6898 @@
+{
+ "generator": "server/scripts/gen_tautomers_resonance_expected.py",
+ "rdkit_version": "2026.09.1",
+ "settings": {
+  "legacy_stereo_perception": false,
+  "resonance_flags": [
+   "ALLOW_CHARGE_SEPARATION",
+   "KEKULE_ALL"
+  ]
+ },
+ "limits": {
+  "drawn": 32,
+  "group_bonds": 60,
+  "max_structs": 1000,
+  "max_transforms": 1000
+ },
+ "compounds": [
+  {
+   "name": "acetone",
+   "file": "forms/acetone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(C)O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      3
+     ],
+     "kekule": [
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "CC(C)=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "2-butanone",
+   "file": "forms/2-butanone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(O)CC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      3,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    },
+    {
+     "smiles": "CC=C(C)O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      1,
+      0,
+      1,
+      3
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CCC(C)=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "cyclohexanone",
+   "file": "forms/cyclohexanone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1CCCCC1",
+     "drawing": true,
+     "hydrogens": [
+      2,
+      2,
+      2,
+      0,
+      0,
+      2,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "OC1=CCCCC1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      2,
+      1,
+      0,
+      1,
+      2,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "acetylacetone",
+   "file": "forms/acetylacetone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(O)C=C(C)O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      3
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      3,
+      5
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      3,
+      4
+     ]
+    },
+    {
+     "smiles": "C=C(O)CC(=C)O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      5,
+      6
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "C=C(O)CC(C)=O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "CC(=O)C=C(C)O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CC(=O)CC(C)=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      2,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "ethyl acetoacetate",
+   "file": "forms/ethyl-acetoacetate.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(O)C=C(O)OCC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      4,
+      5,
+      7,
+      8
+     ],
+     "changed_bonds": [
+      3,
+      4,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "C=C(O)CC(=O)OCC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      2,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      7,
+      8
+     ],
+     "changed_bonds": [
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)C=C(C)O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      7
+     ],
+     "changed_bonds": [
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)CC(C)=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "CCOC(O)=CC(C)=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      5
+     ],
+     "changed_bonds": [
+      3,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "name": "dimedone",
+   "file": "forms/dimedone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "CC1(C)C=C(O)C=C(O)C1",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      5,
+      7
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "CC1(C)C=C(O)CC(=O)C1",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      1,
+      2,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    },
+    {
+     "smiles": "CC1(C)C=C(O)CC(O)=C1",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      1,
+      2,
+      0,
+      1,
+      1,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      7,
+      8
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "CC1(C)CC(=O)C=C(O)C1",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      5
+     ],
+     "changed_bonds": [
+      3,
+      4
+     ]
+    },
+    {
+     "smiles": "CC1(C)CC(=O)CC(=O)C1",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "phenylpyruvic acid",
+   "file": "forms/phenylpyruvic-acid.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C(O)C(=O)Cc1ccccc1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "O=C(O)C(O)=Cc1ccccc1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      8
+     ],
+     "changed_bonds": [
+      6,
+      7
+     ]
+    }
+   ]
+  },
+  {
+   "name": "phenol",
+   "file": "forms/phenol.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1C=CC=CC1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      2,
+      0,
+      1,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      6
+     ],
+     "changed_bonds": [
+      2,
+      5
+     ]
+    },
+    {
+     "smiles": "Oc1ccccc1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "2-pyridone",
+   "file": "forms/2-pyridone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1CC=CC=N1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      2,
+      0,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      4
+     ],
+     "changed_bonds": [
+      0,
+      4,
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "O=c1cccc[nH]1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "Oc1ccccn1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      3,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "acetamide",
+   "file": "forms/acetamide.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(N)O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "CC(=N)O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      2,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CC(N)=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "thioacetamide",
+   "file": "forms/thioacetamide.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(N)S",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "CC(=N)S",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      2,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CC(N)=S",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "(Z)-acetaldehyde oxime",
+   "file": "forms/z-acetaldehyde-oxime.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": true,
+   "tautomers": [
+    {
+     "smiles": "CC=NO",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "CCN=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "nitrosobenzene",
+   "file": "forms/nitrosobenzene.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=Nc1ccccc1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "4-nitrosophenol",
+   "file": "forms/4-nitrosophenol.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1C=CC(=NO)C=C1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      7,
+      8
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "O=NC1=CCC(=O)C=C1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      3,
+      8
+     ],
+     "changed_bonds": [
+      2,
+      7
+     ]
+    },
+    {
+     "smiles": "O=NC1C=CC(=O)C=C1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      8
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      4,
+      7
+     ]
+    },
+    {
+     "smiles": "O=Nc1ccc(O)cc1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "N-methylethanimine",
+   "file": "forms/n-methylethanimine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "CC=NC",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      1,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "nitromethane",
+   "file": "forms/nitromethane.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=[N+]([O-])O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "C[N+](=O)[O-]",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "imidazole",
+   "file": "forms/imidazole.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "c1c[nH]cn1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "1,2,4-triazole",
+   "file": "forms/1-2-4-triazole.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "c1nc[nH]n1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "c1nnc[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      4
+     ],
+     "changed_bonds": [
+      0,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "name": "tetrazole",
+   "file": "forms/tetrazole.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "c1nn[nH]n1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "c1nnn[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "guanine",
+   "file": "forms/guanine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N=c1[nH]c(=O)c2[nH]cnc2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      9,
+      10
+     ],
+     "changed_bonds": [
+      8,
+      9
+     ]
+    },
+    {
+     "smiles": "N=c1[nH]c(=O)c2nc[nH]c2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      4,
+      9,
+      10
+     ],
+     "changed_bonds": [
+      0,
+      8,
+      9,
+      10
+     ]
+    },
+    {
+     "smiles": "N=c1[nH]c2ncnc-2c(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      6,
+      9,
+      10
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      8,
+      9,
+      10
+     ]
+    },
+    {
+     "smiles": "N=c1nc(O)c2[nH]cnc2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      7,
+      9,
+      10
+     ],
+     "changed_bonds": [
+      5,
+      6,
+      8,
+      9
+     ]
+    },
+    {
+     "smiles": "N=c1nc(O)c2nc[nH]c2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      4,
+      6,
+      7,
+      9,
+      10
+     ],
+     "changed_bonds": [
+      0,
+      5,
+      6,
+      8,
+      9,
+      10
+     ]
+    },
+    {
+     "smiles": "N=c1nc2[nH]cnc2c(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      4,
+      6,
+      10
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      4,
+      5,
+      8,
+      9,
+      10,
+      11
+     ]
+    },
+    {
+     "smiles": "N=c1nc2nc[nH]c2c(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      6,
+      10
+     ],
+     "changed_bonds": [
+      2,
+      4,
+      5,
+      8,
+      9,
+      11
+     ]
+    },
+    {
+     "smiles": "Nc1nc(=O)c2[nH]cnc2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      7,
+      9
+     ],
+     "changed_bonds": [
+      7,
+      8
+     ]
+    },
+    {
+     "smiles": "Nc1nc(=O)c2nc[nH]c2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      4,
+      7,
+      9
+     ],
+     "changed_bonds": [
+      0,
+      7,
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "Nc1nc(O)c2[nH]cnc2n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      7
+     ],
+     "changed_bonds": [
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "Nc1nc(O)c2nc[nH]c2n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      4,
+      6,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      5,
+      6,
+      10
+     ]
+    },
+    {
+     "smiles": "Nc1nc(O)c2ncnc-2[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      6,
+      7,
+      9
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      7,
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "Nc1nc2[nH]cnc2c(=O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      4
+     ],
+     "changed_bonds": [
+      0,
+      10
+     ]
+    },
+    {
+     "smiles": "Nc1nc2nc[nH]c2c(=O)[nH]1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "Nc1nc2ncnc-2c(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      6
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      10
+     ]
+    }
+   ]
+  },
+  {
+   "name": "cytosine",
+   "file": "forms/cytosine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N=c1cc[nH]c(=O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      5,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      5,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "N=c1cc[nH]c(O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      5,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "N=c1ccnc(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      4,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      3,
+      4,
+      5,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "Nc1cc[nH]c(=O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      2,
+      5
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      5,
+      7
+     ]
+    },
+    {
+     "smiles": "Nc1ccnc(=O)[nH]1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "Nc1ccnc(O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "uracil",
+   "file": "forms/uracil.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1CC=NC(=O)N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "O=C1CC=NC(O)=N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      4,
+      5
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      3,
+      4
+     ]
+    },
+    {
+     "smiles": "O=C1N=CCC(O)=N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      5,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "O=c1cc[nH]c(=O)[nH]1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "O=c1cc[nH]c(O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      5
+     ],
+     "changed_bonds": [
+      3,
+      4
+     ]
+    },
+    {
+     "smiles": "O=c1ccnc(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    },
+    {
+     "smiles": "O=c1nc(O)cc[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      7
+     ],
+     "changed_bonds": [
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "O=c1nccc(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      2,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "Oc1ccnc(O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      5,
+      7
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      5,
+      6
+     ]
+    }
+   ]
+  },
+  {
+   "name": "thymine",
+   "file": "forms/thymine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "CC1C=NC(=O)N=C1O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      3,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "CC1C=NC(=O)NC1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CC1C=NC(O)=NC1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      3,
+      5,
+      6
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "Cc1c[nH]c(=O)[nH]c1=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "Cc1c[nH]c(=O)nc1O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      8
+     ],
+     "changed_bonds": [
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "Cc1c[nH]c(O)nc1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      6
+     ],
+     "changed_bonds": [
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "Cc1cnc(=O)[nH]c1O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      3,
+      8
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      7,
+      8
+     ]
+    },
+    {
+     "smiles": "Cc1cnc(O)[nH]c1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      3,
+      5
+     ],
+     "changed_bonds": [
+      3,
+      4
+     ]
+    },
+    {
+     "smiles": "Cc1cnc(O)nc1O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      3,
+      5,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      3,
+      4,
+      6,
+      7
+     ]
+    }
+   ]
+  },
+  {
+   "name": "adenine",
+   "file": "forms/adenine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N=c1[nH]cnc2[nH]cnc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      5,
+      8,
+      9
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      8,
+      9,
+      10
+     ]
+    },
+    {
+     "smiles": "N=c1[nH]cnc2nc[nH]c12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      5,
+      9
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      4,
+      6,
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "N=c1nc[nH]c2[nH]cnc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      3,
+      8,
+      9
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      6,
+      8,
+      9,
+      10
+     ]
+    },
+    {
+     "smiles": "N=c1nc[nH]c2nc[nH]c12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      3,
+      9
+     ],
+     "changed_bonds": [
+      2,
+      6,
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "Nc1[nH]cnc2ncnc1-2",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      8
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      9
+     ]
+    },
+    {
+     "smiles": "Nc1nc[nH]c2ncnc1-2",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      3,
+      8
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      2,
+      9
+     ]
+    },
+    {
+     "smiles": "Nc1ncnc2[nH]cnc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      8
+     ],
+     "changed_bonds": [
+      0,
+      9
+     ]
+    },
+    {
+     "smiles": "Nc1ncnc2nc[nH]c12",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "barbituric acid",
+   "file": "forms/barbituric-acid.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1CC(=O)NC(=O)N1",
+     "drawing": true,
+     "hydrogens": [
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "O=C1CC(=O)NC(O)=N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      6
+     ],
+     "changed_bonds": [
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "O=C1CC(O)=NC(=O)N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      8
+     ],
+     "changed_bonds": [
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "O=C1CC(O)=NC(O)=N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3,
+      5,
+      6
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "O=C1N=C(O)CC(O)=N1",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "O=c1cc(O)[nH]c(=O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "O=c1cc(O)[nH]c(O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      5,
+      6
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "O=c1cc(O)nc(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      0,
+      5,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      4,
+      5,
+      7,
+      8
+     ]
+    },
+    {
+     "smiles": "O=c1nc(O)cc(O)[nH]1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "Oc1cc(O)nc(O)n1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      4,
+      5,
+      7,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "name": "creatinine",
+   "file": "forms/creatinine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "CN1CC(=O)N=C1N",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "CN1CC(=O)NC1=N",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      0,
+      0,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      7
+     ],
+     "changed_bonds": [
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "CN1CC(O)=NC1=N",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      0,
+      1,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      7
+     ],
+     "changed_bonds": [
+      3,
+      4,
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "Cn1cc(O)[nH]c1=N",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      5,
+      7
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "Cn1cc(O)nc1N",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      2
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "allopurinol",
+   "file": "forms/allopurinol.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=c1[nH]cnc2[nH]ncc12",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "O=c1[nH]cnc2n[nH]cc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      3,
+      9
+     ]
+    },
+    {
+     "smiles": "O=c1nc[nH]c2[nH]ncc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      7,
+      9
+     ],
+     "changed_bonds": [
+      7,
+      8
+     ]
+    },
+    {
+     "smiles": "O=c1nc[nH]c2n[nH]cc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      2,
+      7,
+      9
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      3,
+      7,
+      8,
+      9
+     ]
+    },
+    {
+     "smiles": "O=c1ncnc2[nH][nH]cc1-2",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      3,
+      7,
+      8,
+      9,
+      10
+     ]
+    },
+    {
+     "smiles": "Oc1[nH]cnc2nncc1-2",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      6
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "Oc1nc[nH]c2nncc1-2",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      6,
+      7,
+      9
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8
+     ]
+    },
+    {
+     "smiles": "Oc1ncnc2[nH]ncc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      7
+     ],
+     "changed_bonds": [
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "Oc1ncnc2n[nH]cc12",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      2,
+      6,
+      7
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "name": "warfarin",
+   "file": "forms/warfarin.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C(O)CC(c1ccccc1)C1C(=O)Oc2ccccc2C1=O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      11,
+      22
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      11,
+      21
+     ]
+    },
+    {
+     "smiles": "C=C(O)CC(c1ccccc1)c1c(O)c2ccccc2oc1=O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "C=C(O)CC(c1ccccc1)c1c(O)oc2ccccc2c1=O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      1,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2,
+      21,
+      22
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      11,
+      20,
+      21,
+      23
+     ]
+    },
+    {
+     "smiles": "CC(=O)CC(c1ccccc1)C1C(=O)Oc2ccccc2C1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      11,
+      22
+     ],
+     "changed_bonds": [
+      11,
+      21
+     ]
+    },
+    {
+     "smiles": "CC(=O)CC(c1ccccc1)c1c(O)c2ccccc2oc1=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "CC(=O)CC(c1ccccc1)c1c(O)oc2ccccc2c1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      21,
+      22
+     ],
+     "changed_bonds": [
+      11,
+      20,
+      21,
+      23
+     ]
+    },
+    {
+     "smiles": "CC(O)=CC(c1ccccc1)C1C(=O)Oc2ccccc2C1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3,
+      11,
+      22
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      11,
+      21
+     ]
+    },
+    {
+     "smiles": "CC(O)=CC(c1ccccc1)c1c(O)c2ccccc2oc1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CC(O)=CC(c1ccccc1)c1c(O)oc2ccccc2c1=O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3,
+      21,
+      22
+     ],
+     "changed_bonds": [
+      1,
+      2,
+      11,
+      20,
+      21,
+      23
+     ]
+    }
+   ]
+  },
+  {
+   "name": "histidine",
+   "file": "forms/histidine.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": true,
+   "tautomers": [
+    {
+     "smiles": "N=C(Cc1c[nH]cn1)C(O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      2,
+      0,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      6,
+      7,
+      8,
+      10
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      7,
+      9
+     ]
+    },
+    {
+     "smiles": "N=C(Cc1cnc[nH]1)C(O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      2,
+      0,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      7,
+      8,
+      10
+     ],
+     "changed_bonds": [
+      7,
+      9
+     ]
+    },
+    {
+     "smiles": "NC(=Cc1c[nH]cn1)C(O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      5,
+      6,
+      7,
+      8
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      5,
+      7
+     ]
+    },
+    {
+     "smiles": "NC(=Cc1cnc[nH]1)C(O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      6,
+      7,
+      8
+     ],
+     "changed_bonds": [
+      5,
+      7
+     ]
+    },
+    {
+     "smiles": "NC(Cc1c[nH]cn1)=C(O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      2,
+      0,
+      0,
+      1,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4,
+      6,
+      8
+     ],
+     "changed_bonds": [
+      2,
+      3,
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "NC(Cc1c[nH]cn1)C(=O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      2,
+      1,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      4
+     ],
+     "changed_bonds": [
+      2,
+      3
+     ]
+    },
+    {
+     "smiles": "NC(Cc1cnc[nH]1)=C(O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      2,
+      0,
+      0,
+      1,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      6,
+      8
+     ],
+     "changed_bonds": [
+      6,
+      7
+     ]
+    },
+    {
+     "smiles": "NC(Cc1cnc[nH]1)C(=O)O",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      2,
+      1,
+      0,
+      0,
+      1,
+      2
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "testosterone",
+   "file": "forms/testosterone.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C[C@]12CC[C@H]3[C@@H](CC=C4C=C(O)CC[C@@]43C)[C@@H]1CC[C@@H]2O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      2,
+      1,
+      0,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      12,
+      16
+     ],
+     "changed_bonds": [
+      12,
+      13,
+      14,
+      15
+     ]
+    },
+    {
+     "smiles": "C[C@]12CC[C@H]3[C@@H](CC=C4CC(=O)CC[C@@]43C)[C@@H]1CC[C@@H]2O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      2,
+      1,
+      0,
+      2,
+      0,
+      0,
+      2,
+      2,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      12,
+      14
+     ],
+     "changed_bonds": [
+      12,
+      13
+     ]
+    },
+    {
+     "smiles": "C[C@]12CC[C@H]3[C@@H](CC=C4CC(O)=CC[C@@]43C)[C@@H]1CC[C@@H]2O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      2,
+      1,
+      0,
+      2,
+      0,
+      1,
+      1,
+      2,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      12,
+      14,
+      16,
+      17
+     ],
+     "changed_bonds": [
+      12,
+      13,
+      15,
+      16
+     ]
+    },
+    {
+     "smiles": "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]43C)[C@@H]1CC[C@@H]2O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      2,
+      2,
+      0,
+      1,
+      0,
+      0,
+      2,
+      2,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "C[C@]12CC[C@H]3[C@@H](CCC4=CC(O)=CC[C@@]43C)[C@@H]1CC[C@@H]2O",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      2,
+      2,
+      0,
+      1,
+      0,
+      1,
+      1,
+      2,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      16,
+      17
+     ],
+     "changed_bonds": [
+      15,
+      16
+     ]
+    }
+   ]
+  },
+  {
+   "name": "aldehydo-D-glucose",
+   "file": "forms/aldehydo-d-glucose.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": true,
+   "tautomers": [
+    {
+     "smiles": "O=C(C(O)CO)C(O)C(O)CO",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      0,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      5,
+      6,
+      9
+     ],
+     "changed_bonds": [
+      5,
+      8
+     ]
+    },
+    {
+     "smiles": "O=C(CO)C(O)C(O)C(O)CO",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      1,
+      1,
+      0,
+      2,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      5,
+      6,
+      7
+     ],
+     "changed_bonds": [
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "O=CC(O)C(O)C(O)C(O)CO",
+     "drawing": true,
+     "hydrogens": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "OC=C(O)C(O)C(O)C(O)CO",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      6
+     ],
+     "changed_bonds": [
+      4,
+      5
+     ]
+    },
+    {
+     "smiles": "OCC(O)=C(O)C(O)C(O)CO",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      0,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      2,
+      5,
+      6
+     ],
+     "changed_bonds": [
+      1,
+      5
+     ]
+    },
+    {
+     "smiles": "OCC(O)C(O)=C(O)C(O)CO",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      1,
+      0,
+      0,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3,
+      5,
+      6
+     ],
+     "changed_bonds": [
+      2,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "curcumin",
+   "file": "forms/curcumin.mol",
+   "outcome": "too-many",
+   "status": "MaxTautomersReached"
+  },
+  {
+   "name": "ethanol",
+   "file": "forms/ethanol.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "CCO",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      2,
+      1
+     ],
+     "kekule": [
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "hydrogen cyanide",
+   "file": "forms/hydrogen-cyanide.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C#N",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0
+     ],
+     "kekule": [
+      3
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "[C-]#[NH+]",
+     "drawing": false,
+     "hydrogens": [
+      0,
+      1
+     ],
+     "kekule": [
+      3
+     ],
+     "changed_atoms": [
+      0,
+      1
+     ],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "cyanic acid",
+   "file": "forms/cyanic-acid.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N#CO",
+     "drawing": true,
+     "hydrogens": [
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      3,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "N=C=O",
+     "drawing": false,
+     "hydrogens": [
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ketene",
+   "file": "forms/ketene.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C#CO",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      3,
+      1
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "C=C=O",
+     "drawing": true,
+     "hydrogens": [
+      2,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      2
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "thiourea dioxide",
+   "file": "forms/thiourea-dioxide.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N=C(N)S(=O)O",
+     "drawing": true,
+     "hydrogens": [
+      0,
+      1,
+      2,
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "N=C(N)[SH](=O)=O",
+     "drawing": false,
+     "hydrogens": [
+      0,
+      1,
+      2,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      3,
+      5
+     ],
+     "changed_bonds": [
+      4
+     ]
+    },
+    {
+     "smiles": "NC(N)=S(=O)=O",
+     "drawing": false,
+     "hydrogens": [
+      0,
+      2,
+      2,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      1,
+      5
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "name": "dimethyl phosphite",
+   "file": "forms/dimethyl-phosphite.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "COP(O)OC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      0,
+      0,
+      1,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      3
+     ],
+     "changed_bonds": [
+      2
+     ]
+    },
+    {
+     "smiles": "CO[PH](=O)OC",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      0,
+      1,
+      0,
+      0,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "ethynol",
+   "file": "forms/ethynol.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C#CO",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      3,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "C=C=O",
+     "drawing": false,
+     "hydrogens": [
+      2,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      2
+     ],
+     "changed_atoms": [
+      0,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "isocyanic acid",
+   "file": "forms/isocyanic-acid.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N#CO",
+     "drawing": false,
+     "hydrogens": [
+      0,
+      0,
+      1
+     ],
+     "kekule": [
+      3,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      2
+     ],
+     "changed_bonds": [
+      0,
+      1
+     ]
+    },
+    {
+     "smiles": "N=C=O",
+     "drawing": true,
+     "hydrogens": [
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      2
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "hydrogen isocyanide",
+   "file": "forms/hydrogen-isocyanide.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C#N",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0
+     ],
+     "kekule": [
+      3
+     ],
+     "changed_atoms": [
+      0,
+      1
+     ],
+     "changed_bonds": []
+    },
+    {
+     "smiles": "[C-]#[NH+]",
+     "drawing": true,
+     "hydrogens": [
+      0,
+      1
+     ],
+     "kekule": [
+      3
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "nitrosoethane",
+   "file": "forms/nitrosoethane.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "CC=NO",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      1,
+      0,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      1,
+      3
+     ],
+     "changed_bonds": [
+      1,
+      2
+     ]
+    },
+    {
+     "smiles": "CCN=O",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "thiourea dioxide, drawn as RDKit's tautomer with C=S",
+   "file": "forms/thiourea-dioxide-drawn-as-rdkit-s-tautomer-with-c-s.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "N=C(N)S(=O)O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      2,
+      0,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      0,
+      4
+     ],
+     "changed_bonds": [
+      0,
+      2,
+      3
+     ]
+    },
+    {
+     "smiles": "N=C(N)[SH](=O)=O",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      0,
+      2,
+      1,
+      0,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      2,
+      2
+     ],
+     "changed_atoms": [
+      0,
+      3
+     ],
+     "changed_bonds": [
+      0,
+      2
+     ]
+    },
+    {
+     "smiles": "NC(N)=S(=O)=O",
+     "drawing": true,
+     "hydrogens": [
+      2,
+      0,
+      2,
+      0,
+      0,
+      0
+     ],
+     "kekule": [
+      1,
+      1,
+      2,
+      2,
+      2
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "Knorr's pyrrole, drawn in the atom order of RDKit's NCI set",
+   "file": "forms/knorr-s-pyrrole-drawn-in-the-atom-order-of-rdkit-s-nci-set.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "C=C1NC(C(=O)OCC)=C(C)C1C(=O)OCC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      1,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      8,
+      10
+     ],
+     "changed_bonds": [
+      8,
+      9
+     ]
+    },
+    {
+     "smiles": "C=C1NC(C(=O)OCC)C(C)=C1C(=O)OCC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      10
+     ],
+     "changed_bonds": [
+      5,
+      7,
+      8,
+      9
+     ]
+    },
+    {
+     "smiles": "C=c1[nH]c(=C(O)OCC)c(C)c1C(=O)OCC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      10
+     ],
+     "changed_bonds": [
+      3,
+      4,
+      5,
+      7,
+      8,
+      9
+     ]
+    },
+    {
+     "smiles": "C=c1[nH]c(C(=O)OCC)c(C)c1=C(O)OCC",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      1,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      10,
+      13
+     ],
+     "changed_bonds": [
+      8,
+      9,
+      11,
+      12
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)C1=C(C)C(=C(O)OCC)C(C)=N1",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      3,
+      0,
+      0,
+      1,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      11,
+      13
+     ],
+     "changed_bonds": [
+      8,
+      10,
+      11,
+      12
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)C1=C(C)C(=C(O)OCC)N=C1C",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      3,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      4,
+      11
+     ],
+     "changed_bonds": [
+      3,
+      4,
+      5,
+      7,
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)C1=C(C)C(C(=O)OCC)C(C)=N1",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      1,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      8,
+      11
+     ],
+     "changed_bonds": [
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)C1=C(C)C(C(=O)OCC)N=C1C",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      3,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [
+      5,
+      11
+     ],
+     "changed_bonds": [
+      5,
+      7,
+      8,
+      10
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)C1=NC(C)=C(C(=O)OCC)C1C",
+     "drawing": false,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      1,
+      3,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [
+      6,
+      11
+     ],
+     "changed_bonds": [
+      5,
+      16
+     ]
+    },
+    {
+     "smiles": "CCOC(=O)c1[nH]c(C)c(C(=O)OCC)c1C",
+     "drawing": true,
+     "hydrogens": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      3,
+      1,
+      0,
+      0,
+      0,
+      2,
+      3
+     ],
+     "kekule": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "phenol, drawn with aromatic bonds",
+   "file": "forms/phenol-drawn-with-aromatic-bonds.mol",
+   "outcome": "listed",
+   "status": "Completed",
+   "stereo_dropped": false,
+   "tautomers": [
+    {
+     "smiles": "O=C1C=CC=CC1",
+     "drawing": false,
+     "hydrogens": [
+      1,
+      1,
+      2,
+      0,
+      1,
+      1,
+      0
+     ],
+     "kekule": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "changed_atoms": [
+      2,
+      6
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+     ]
+    },
+    {
+     "smiles": "Oc1ccccc1",
+     "drawing": true,
+     "hydrogens": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+     ],
+     "kekule": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2
+     ],
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  }
+ ]
+}

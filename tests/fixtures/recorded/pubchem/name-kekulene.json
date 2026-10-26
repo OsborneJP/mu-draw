@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/kekulene/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:26Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 5460755,
+          "SMILES": "C1=CC2=CC3=C4C=C2C5=CC6=C(C=CC7=CC8=C(C=C76)C9=CC2=C(C=CC6=C2C=C2C(=C6)C=CC6=C2C=C4C(=C6)C=C3)C=C9C=C8)C=C51",
+          "Title": "15,23:16,22-Dimethenobenzo(1,2-a:5,4-a')dipentaphene"
+        }
+      ]
+    }
+  }
+}

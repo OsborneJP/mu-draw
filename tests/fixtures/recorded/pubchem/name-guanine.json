@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/guanine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:07Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 135398634,
+          "SMILES": "C1=NC2=C(N1)C(=O)NC(=N2)N",
+          "Title": "Guanine"
+        }
+      ]
+    }
+  }
+}

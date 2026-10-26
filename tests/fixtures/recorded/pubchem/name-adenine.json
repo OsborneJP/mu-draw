@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/adenine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:09Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 190,
+          "SMILES": "C1=NC2=NC=NC(=C2N1)N",
+          "Title": "Adenine"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,438 @@
+{
+ "status": "provisional",
+ "chosen_by": "Claude, 2026-10-26, for Jeff to check (docs/plans/v2-tautomers-resonance.md, bar A.3)",
+ "how": "Written by reading each structure against RDKit's rules with decision 2's settings (ALLOW_CHARGE_SEPARATION, KEKULE_ALL). Most were seen in the planning probes first, so it is a review, not a blind prediction. For each compound: what the panel lists, how many structures, whether the drawing as drawn is among them, and every place a charge goes (element and sign, one entry per atom). RDKit runs on each drawing in its canonical atom order (Jeff's decision, 2026-10-26), since its search depends on the atom order. 'exist' is a chemist's count where RDKit's still falls short: it misses some equivalent structures. A test compares the generated tests/fixtures/resonance_expected.json with this file.",
+ "compounds": [
+  {
+   "name": "acetate",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "O-",
+    "O-"
+   ],
+   "why": "the charge on either oxygen"
+  },
+  {
+   "name": "formate",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "O-",
+    "O-"
+   ],
+   "why": "as acetate"
+  },
+  {
+   "name": "benzoate",
+   "outcome": "listed",
+   "count": 4,
+   "drawing_listed": true,
+   "charge_sites": [
+    "O-",
+    "O-"
+   ],
+   "why": "the carboxylate's two, each with either Kekulé ring; the ring takes no charge"
+  },
+  {
+   "name": "acetylacetonate",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "O-",
+    "O-"
+   ],
+   "why": "the charge on either oxygen, and the central carbanion"
+  },
+  {
+   "name": "phenolate",
+   "outcome": "listed",
+   "count": 5,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "C-",
+    "C-",
+    "O-"
+   ],
+   "why": "O- with each Kekulé ring, and the two ortho and the para carbanions"
+  },
+  {
+   "name": "4-nitrophenolate",
+   "outcome": "listed",
+   "count": 5,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-",
+    "O-",
+    "O-"
+   ],
+   "why": "the nitro group's two with either Kekulé ring, and the quinoid nitronate; RDKit allows a carbanion only where its group holds no positive charge, so with the N+ the ring carbanions are left out"
+  },
+  {
+   "name": "carbonate",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [
+    "O-",
+    "O-",
+    "O-"
+   ],
+   "why": "the double bond to each oxygen"
+  },
+  {
+   "name": "nitrate",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-",
+    "O-",
+    "O-"
+   ],
+   "why": "the double bond to each oxygen"
+  },
+  {
+   "name": "azide",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "N-",
+    "N-"
+   ],
+   "why": "N-=N+=N- and the two N#N+-N(2-) forms (the minor ones)"
+  },
+  {
+   "name": "cyclopentadienide",
+   "outcome": "listed",
+   "count": 4,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "C-",
+    "C-",
+    "C-"
+   ],
+   "why": "the charge on each carbon, but RDKit misses one of the five, in its canonical order too",
+   "exist": 5
+  },
+  {
+   "name": "acetamide",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-"
+   ],
+   "why": "the amide and its N+=C-O- form (charge separation, decision 2)"
+  },
+  {
+   "name": "N-methylacetamide",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-"
+   ],
+   "why": "as acetamide"
+  },
+  {
+   "name": "hexaglycine",
+   "outcome": "listed",
+   "count": 32,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "N+",
+    "N+",
+    "N+",
+    "N+",
+    "O-",
+    "O-",
+    "O-",
+    "O-",
+    "O-"
+   ],
+   "why": "each of its five amides drawn either way: 2^5"
+  },
+  {
+   "name": "nitromethane",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-",
+    "O-"
+   ],
+   "why": "the double bond to either oxygen"
+  },
+  {
+   "name": "nitrobenzene",
+   "outcome": "listed",
+   "count": 4,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-",
+    "O-"
+   ],
+   "why": "the nitro group's two with either Kekulé ring; RDKit allows a ring carbocation only where its group's total charge is positive, so none here"
+  },
+  {
+   "name": "pyridine N-oxide",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "O-"
+   ],
+   "why": "the two Kekulé rings; the ring carbanion forms are left out (decision 6)"
+  },
+  {
+   "name": "ozone",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "O+",
+    "O-",
+    "O-"
+   ],
+   "why": "the double bond to either end"
+  },
+  {
+   "name": "diazomethane",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "N-"
+   ],
+   "why": "only CH2=N+=N-: the CH2- form needs UNCONSTRAINED_ANIONS (decision 2)"
+  },
+  {
+   "name": "guanidinium",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [
+    "N+",
+    "N+",
+    "N+"
+   ],
+   "why": "the double bond to each nitrogen"
+  },
+  {
+   "name": "tropylium",
+   "outcome": "listed",
+   "count": 6,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C+",
+    "C+",
+    "C+",
+    "C+",
+    "C+",
+    "C+"
+   ],
+   "why": "the charge on each carbon, but RDKit misses one of the seven, in its canonical order too",
+   "exist": 7
+  },
+  {
+   "name": "benzene",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "the two Kekulé structures (KEKULE_ALL)"
+  },
+  {
+   "name": "naphthalene",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "its three Kekulé structures"
+  },
+  {
+   "name": "anthracene",
+   "outcome": "listed",
+   "count": 4,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "its four Kekulé structures"
+  },
+  {
+   "name": "kekulene",
+   "outcome": "counted",
+   "count": 200,
+   "why": "200 Kekulé structures (planning probe): too many to draw"
+  },
+  {
+   "name": "aniline",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "the two Kekulé rings only (decision 6)"
+  },
+  {
+   "name": "methyl vinyl ketone",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "no C+-C=C-O- form with these settings (decision 6)"
+  },
+  {
+   "name": "acetic acid",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "no charge-separated form (decision 6)"
+  },
+  {
+   "name": "carbon dioxide",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "no charge-separated form"
+  },
+  {
+   "name": "sulfate",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": true,
+   "charge_sites": [
+    "O-",
+    "O-"
+   ],
+   "why": "hypervalent S is outside RDKit's conjugated groups"
+  },
+  {
+   "name": "buckminsterfullerene",
+   "outcome": "too-large",
+   "why": "one conjugated group of 90 bonds: more than 60 (decision 7)"
+  },
+  {
+   "name": "acetone enolate",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "O-"
+   ],
+   "why": "the carbanion and the enolate"
+  },
+  {
+   "name": "allyl anion",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "C-"
+   ],
+   "why": "the charge at either end"
+  },
+  {
+   "name": "allyl cation",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C+",
+    "C+"
+   ],
+   "why": "the charge at either end"
+  },
+  {
+   "name": "benzyl cation",
+   "outcome": "listed",
+   "count": 5,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C+",
+    "C+",
+    "C+",
+    "C+"
+   ],
+   "why": "CH2+ with either Kekulé ring, and the ortho and para ring cations"
+  },
+  {
+   "name": "benzenium (arenium ion)",
+   "outcome": "listed",
+   "count": 3,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C+",
+    "C+",
+    "C+"
+   ],
+   "why": "the charge ortho, ortho and para to the CH2"
+  },
+  {
+   "name": "methyl vinyl ketone, drawn charge-separated",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": false,
+   "charge_sites": [],
+   "why": "drawn as RDKit's own C+-C=C-O- form under wider settings; with decision 2's RDKit lists only the neutral enone, so the panel says the drawing is not among its structures"
+  },
+  {
+   "name": "pyrylium",
+   "outcome": "listed",
+   "count": 0,
+   "drawing_listed": false,
+   "charge_sites": [],
+   "why": "RDKit's rules rule out every structure: each with C+ has a carbon short of an octet, which they drop while a structure with full octets exists, and each with O+ has a cation right of N, which they drop while a structure without one exists; so the panel says none are listed",
+   "exist": 5
+  },
+  {
+   "name": "benzene, drawn with aromatic bonds",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "as benzene; a ring drawn aromatic is like either Kekulé structure, so both are the drawing"
+  },
+  {
+   "name": "phenolate, drawn with aromatic bonds",
+   "outcome": "listed",
+   "count": 5,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "C-",
+    "C-",
+    "O-"
+   ],
+   "why": "as phenolate"
+  },
+  {
+   "name": "pyridine bound to copper",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "pyridine's two Kekulé structures; the N-Cu bond, drawn single and read by RDKit as dative, takes no part"
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/histidine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:12Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 6274,
+          "SMILES": "C1=C(NC=N1)C[C@@H](C(=O)O)N",
+          "Title": "L-Histidine"
+        }
+      ]
+    }
+  }
+}

@@ -6,6 +6,7 @@ import type { PanelValues } from '../chem/properties';
 import { readDrawing } from '../editor/drawing';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
+import FormsButtons from './FormsButtons';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
 import { makeRoomFor } from './belowCanvas';
@@ -302,6 +303,7 @@ export default function PropertiesPanel() {
       {state.kind === 'ready' && (
         <Values values={state.values}>
           <Stereo stereo={state.values.stereo} fragments={state.values.fragments} current={current} highlighted={highlighted} onToggle={toggle} />
+          <FormsButtons fragments={state.values.fragments} />
           <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
           <NmrButton />
         </Values>

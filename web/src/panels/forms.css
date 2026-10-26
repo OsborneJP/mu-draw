@@ -1,0 +1,110 @@
+/* Below the canvas, like the stereoisomers (stereo.css): the editor gives up the height. */
+.forms-panel {
+  flex: none;
+  max-height: 55%;
+  overflow-y: auto;
+  padding: 8px 12px;
+  border-top: 1px solid #d0d7de;
+  background: #fff;
+  font-size: 13px;
+  color: #1f2328;
+}
+
+.forms-head {
+  display: flex;
+  align-items: center;
+}
+
+.forms-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.forms-close {
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.forms-summary,
+.forms-message {
+  margin: 6px 0;
+}
+
+.forms-status {
+  position: sticky;
+  top: -8px; /* the panel's top padding */
+  z-index: 1;
+  background: #fff;
+}
+
+.forms-hint {
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+.forms-note {
+  margin: 4px 0;
+  padding: 4px 8px;
+  border-left: 3px solid var(--mu-gold);
+  background: #fffaf0;
+}
+
+.forms-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.forms-card {
+  padding: 6px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+
+.forms-card[data-in-hand='true'] {
+  border-color: var(--mu-gold);
+  box-shadow: 0 0 0 2px var(--mu-gold);
+}
+
+.forms-card img {
+  display: block;
+}
+
+.forms-card-head,
+.forms-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 22px;
+}
+
+.forms-card-foot {
+  justify-content: flex-end;
+}
+
+.forms-number {
+  font-weight: 700;
+}
+
+/* As the stereoisomers' "Matches your drawing" (stereo.css). */
+.forms-drawing {
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--mu-black);
+  color: var(--mu-gold);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.forms-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

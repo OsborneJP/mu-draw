@@ -46,7 +46,7 @@ def test_one_recording_per_name():
     wanted = {fetch.recording_path(name).name for name in fetch.all_names()}
     assert {p.name for p in fetch.RECORDINGS.glob("name-*.json")} == wanted
     # Every set is recorded; names they share (aspirin) are recorded once.
-    assert len(fetch.SETS) == 5
+    assert len(fetch.SETS) == 7
     assert len(fetch.all_names()) < sum(len(fetch.read_names(n)) for n, _ in fetch.SETS)
 
 

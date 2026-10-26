@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/acetic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:28Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 176,
+          "SMILES": "CC(=O)O",
+          "Title": "Acetic Acid"
+        }
+      ]
+    }
+  }
+}

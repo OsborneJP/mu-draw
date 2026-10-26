@@ -1374,3 +1374,75 @@ Acceptance bar, the survey of sets and the measurements: docs/plans/v2-glassware
 - A pick that is still fetching its file is not "in hand" for placeInHand's Esc, so pick()
   watches Esc itself while it waits and drops the pick if Ketcher's tool changed meanwhile
   (another tool, or Add arming its paste tool: `editor.tool()` is a new object each time).
+
+## Tautomers and resonance structures (version 2, 2026-10-26)
+
+Acceptance bar: docs/plans/v2-tautomers-resonance.md. Measured with RDKit.js 2026.9.1 and
+Python RDKit 2026.09.1.
+- RDKit.js has neither TautomerEnumerator nor ResonanceMolSupplier (its d.ts is generated
+  from the bindings and complete; the wasm holds the tautomer code only inside tautomer
+  fingerprints and R-group decomposition). The app runs ports of RDKit's own C++ instead
+  (web/src/chem/tautomers.ts, resonance.ts), on what RDKit.js has: SMARTS matches, canonical
+  SMILES, and its JSON form edited and read back (rdkitForm.ts). Tests require Python's
+  answers on every test drawing and 304 NCI molecules; probes found the same on all 4,854
+  single structures of RDKit's NCI set (tautomers) and 1,103 molecules under four flag
+  settings (resonance).
+- Reading RDKit's JSON back exactly as RDKit's own code holds a molecule took four details:
+  `setAromaticBonds: false` keeps a Kekulé bond's order while flagging it aromatic (the form
+  RDKit's enumerator matches its SMARTS against); a `sanitize` object runs only the steps it
+  names as true (`{}` throws; `{SANITIZE_CLEANUP: false}` runs nothing); without the ring
+  step an acyclic molecule has no ring info and `R{0-2}` queries throw; and
+  `convert_to_kekule_form()` is RDKit's own `Kekulize` (canonical), where sanitizing
+  kekulizes in atom order.
+- RDKit's tautomer list depends on atom order, in Python too: a pyrrole diester gave 9 from
+  one SMILES and 10 from its canonical SMILES. So is its resonance list: phenolate gave 3, 4
+  or 5 under renumbering, cyclopentadienide 4 or 5, tropylium 6 or 7. Fixtures therefore
+  keep each drawing's own Molfile, and judged files record a chemist's count as "exist".
+  Jeff chose to run resonance on the drawing in RDKit's canonical atom order (its canonical
+  SMILES read back; `_smilesAtomOutputOrder`, which RDKit.js's `get_prop` reads after
+  `get_smiles()` exactly as Python does, maps each structure back), so the list no longer
+  depends on how the drawing was numbered; then tautomers too. A tautomer found in canonical
+  order is rebuilt onto the drawing (its Hs, charges, bond orders and aromaticity by the atom
+  and bond maps) and its stereo cleared and settled again, never permuted: a chiral tag is
+  relative to the order of the atom's bonds, so carrying it to another order can invert it.
+  Each rebuilt tautomer must give the canonical one's SMILES, or the panel fails. Order
+  dependence is rare for tautomers: of NCI's first 5,000 only Knorr's pyrrole (line 2033)
+  changes (9 or 10), and not when its atoms are merely reversed; a renumbering test needs a
+  witness found by trying the actual orders.
+- RDKit keeps the drawing's own tautomer under its SMILES, but may have stored it with an H
+  elsewhere that gives the same SMILES (histidine's acid H on its other O), so the drawing's
+  card is found by that SMILES and drawn as drawn, not by comparing atoms.
+- The first parser of RDKit's transform file read 36 of its 37 tuples (the last one ends
+  `)};`, not `),`), and Python agreed on 300 NCI molecules anyway: none needed that rule.
+  A test now finds, for each transform, a test molecule that needs it ("witnesses"); that
+  search caught it. A witness must be one whose whole answer the panel lists (complete, at
+  most 32): curcumin, past that limit, was first taken for three. Four transforms (aromatic
+  heteroatom H shifts) change no listed answer of any molecule tried, since RDKit's others
+  make the same moves; test_rdkit_tables.py lists them with the reason.
+- Python's ResonanceMolSupplier ran for minutes on buckminsterfullerene (one conjugated
+  group of 90 bonds), and so did the port, even with a cap on stored structures: the search,
+  not its output, grows. The panel doesn't run RDKit on a group of more than 60 bonds.
+- RDKit's highlight colour is written truncated to whole 255ths, so the panel's is chosen
+  to be exact (#FFCC66); tests read highlighted atoms (ellipses) and bonds (filled paths)
+  from each picture's SVG by that colour.
+- RDKit marks a changed double bond "either" in every tautomer; its own stereo cleanup turns
+  that back to none where the bond can't be stereogenic, so only a real E/Z unknown is drawn
+  crossed.
+- Prettier is not this project's formatter (there is no config; it rewrote files with double
+  quotes at 80 columns). ESLint is the check.
+- RDKit's JSON form has bond orders 1 to 4, 17 for dative, and 0 for every type it has no
+  number for: an aromatic bond outside a ring (Ketcher's aromatic bond on a carboxylate), a
+  hydrogen bond, a query bond. The panels refuse a 0 with a message; reading it on gave wrong
+  structures. Sanitizing turns a single bond from a metal to an over-valent atom (pyridine's
+  N, a porphyrin's imine N, ferrocene's C) into a dative one, which RDKit's resonance code
+  counts at its end atom only.
+- RDKit's ResonanceMolSupplier lists no structure at all for pyrylium or thiopyrylium: each
+  C+ form is short of an octet and each O+/S+ form has a cation right of N, and its default
+  rules drop both. The panel says so rather than "0 resonance structures".
+- RDKit's Kekulé form of a tautomer is not the drawing's: a phenol drawn with the other
+  Kekulé ring was highlighted as changed. Each tautomer is drawn in the Kekulé form, among
+  RDKit's own (KEKULE_ALL), closest to the drawing.
+- To keep working while check.sh waits for the shared lock: snapshot the tree with
+  `git write-tree` from a temporary GIT_INDEX_FILE, check that tree in a detached worktree
+  (web/node_modules symlinked; `touch -d 2020-01-01 web/package-lock.json` so npm ci isn't
+  rerun), and commit exactly that tree (`git commit-tree` + `git update-ref`) once it passes.

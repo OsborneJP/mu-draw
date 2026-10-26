@@ -1,0 +1,43 @@
+typed_name,pubchem_cid,pubchem_title,smiles
+acetone,180,Acetone,CC(=O)C
+2-butanone,6569,Methyl Ethyl Ketone,CCC(=O)C
+cyclohexanone,7967,Cyclohexanone,C1CCC(=O)CC1
+acetylacetone,31261,Acetylacetone,CC(=O)CC(=O)C
+ethyl acetoacetate,8868,Ethyl Acetoacetate,CCOC(=O)CC(=O)C
+dimedone,31358,Dimedone,CC1(CC(=O)CC(=O)C1)C
+phenylpyruvic acid,997,Phenylpyruvic acid,C1=CC=C(C=C1)CC(=O)C(=O)O
+phenol,996,Phenol,C1=CC=C(C=C1)O
+2-pyridone,8871,2-Pyridone,C1=CC(=O)NC=C1
+acetamide,178,Acetamide,CC(=O)N
+thioacetamide,2723949,Thioacetamide,CC(=S)N
+(Z)-acetaldehyde oxime,5324280,(Z)-acetaldehyde oxime,C/C=N\O
+nitrosobenzene,11473,Nitrosobenzene,C1=CC=C(C=C1)N=O
+4-nitrosophenol,7729,4-Nitrosophenol,C1=CC(=CC=C1N=O)O
+N-methylethanimine,144069,"Methanamine, N-ethylidene-, (Z)-",CC=NC
+nitromethane,6375,Nitromethane,C[N+](=O)[O-]
+imidazole,795,Imidazole,C1=CN=CN1
+"1,2,4-triazole",9257,"1H-1,2,4-Triazole",C1=NC=NN1
+tetrazole,67519,1H-Tetrazole,C1=NNN=N1
+guanine,135398634,Guanine,C1=NC2=C(N1)C(=O)NC(=N2)N
+cytosine,597,Cytosine,C1=C(NC(=O)N=C1)N
+uracil,1174,Uracil,C1=CNC(=O)NC1=O
+thymine,1135,Thymine,CC1=CNC(=O)NC1=O
+adenine,190,Adenine,C1=NC2=NC=NC(=C2N1)N
+barbituric acid,6211,Barbituric Acid,C1C(=O)NC(=O)NC1=O
+creatinine,588,creatinine,CN1CC(=O)N=C1N
+allopurinol,135401907,Allopurinol,C1=NNC2=C1C(=O)NC=N2
+warfarin,54678486,Warfarin,CC(=O)CC(C1=CC=CC=C1)C2=C(C3=CC=CC=C3OC2=O)O
+histidine,6274,L-Histidine,C1=C(NC=N1)C[C@@H](C(=O)O)N
+testosterone,6013,Testosterone,C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@]34C
+aldehydo-D-glucose,107526,"(2R,3S,4R,5R)-2,3,4,5,6-pentahydroxyhexanal",C([C@H]([C@H]([C@@H]([C@H](C=O)O)O)O)O)O
+curcumin,969516,Curcumin,COC1=C(C=CC(=C1)/C=C/C(=O)CC(=O)/C=C/C2=CC(=C(C=C2)O)OC)O
+ethanol,702,Ethanol,CCO
+hydrogen cyanide,768,Hydrogen Cyanide,C#N
+cyanic acid,540,Cyanic acid,C(#N)O
+ketene,10038,Ketene,C=C=O
+thiourea dioxide,61274,Thiourea dioxide,C(=N)(N)S(=O)O
+dimethyl phosphite,13361,"Phosphonic acid, dimethyl ester",COP(=O)OC
+ethynol,123441,Ethynol,C#CO
+isocyanic acid,6347,Isocyanic acid,C(=N)=O
+hydrogen isocyanide,6432654,Hydroisocyanic acid,[C-]#[NH+]
+nitrosoethane,79124,Nitrosoethane,CCN=O

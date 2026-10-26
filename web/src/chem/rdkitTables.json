@@ -1,0 +1,1080 @@
+{
+ "generator": "server/scripts/gen_rdkit_tables.py",
+ "rdkit_version": "2026.09.1",
+ "sources": {
+  "tautomerTransforms.in": {
+   "url": "https://raw.githubusercontent.com/rdkit/rdkit/Release_2026_09_1/Code/GraphMol/MolStandardize/TautomerCatalog/tautomerTransforms.in",
+   "sha256": "72cfe428c2c46c60e02b611e5b1e4dd8f17e817aa5c9109daedd4cae5d33ac07"
+  },
+  "Resonance.cpp": {
+   "url": "https://raw.githubusercontent.com/rdkit/rdkit/Release_2026_09_1/Code/GraphMol/Resonance.cpp",
+   "sha256": "f2641722322b6ca85bd5c659f0d828d9f3804871d2d99c68d075fdc9c9da9258"
+  },
+  "license.txt": {
+   "url": "https://raw.githubusercontent.com/rdkit/rdkit/Release_2026_09_1/license.txt",
+   "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+  }
+ },
+ "tautomer_transforms": [
+  {
+   "name": "1,3 (thio)keto/enol f",
+   "smarts": "[CX4!H0R{0-2}]-[C;z{1-2}]=[O,S,Se,Te;X1]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,3 (thio)keto/enol r",
+   "smarts": "[O,S,Se,Te;X2!H0]-[#6;z{1-2}]=[C,cz{0-1}R{0-1}]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,5 (thio)keto/enol f",
+   "smarts": "[CX4z0,NX3;!H0]-[C]=[C][Cz1H0]=[O,S,Se,Te;X1]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,5 (thio)keto/enol r",
+   "smarts": "[O,S,Se,Te;X2!H0]-[Cz1H0]=[C]-[C]=[Cz0,N]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "aliphatic imine f",
+   "smarts": "[CX4R{0-2}!H0]-[Cz1]=[NX2;N!H0,$(N-a)]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "aliphatic imine r",
+   "smarts": "[NX3;NH2,$([NH1]-a)]-[C;z{1-2}]=[CX3]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "special imine f",
+   "smarts": "[Nz0!H0]-[C]=[Cz0X3R0]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "special imine r",
+   "smarts": "[Cz0R0X4!H0]-[c]=[nz0]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "special imine r2",
+   "smarts": "[Cz0R0X4!H0]-[cr6](=[cr6])-[nr6H0z0]",
+   "bonds": "==-",
+   "charges": ""
+  },
+  {
+   "name": "1,3 aromatic heteroatom H shift f",
+   "smarts": "[#7+0!H0]-[#6R1]=[O,#7X2+0]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,3 aromatic heteroatom H shift ",
+   "smarts": "[O,#7+0;!H0]-[#6R1]=[#7+0X2]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,3 heteroatom H shift",
+   "smarts": "[#7+0,S,O,Se,Te;!H0]-[#7X2,#6,#15X3H0]=[#7+0,#16,#8,Se,Te]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,5 aromatic heteroatom H shift",
+   "smarts": "[#7+0,#16,#8;!H0]-[#6,#7]=[#6]-[#6,#7]=[#7+0,#16,#8;H0]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,5 aromatic heteroatom H shift ",
+   "smarts": "[#7+0,#16,#8,Se,Te;!H0]-[#6,nX2]=[#6,nX2]-[#6,#7X2]=[#7X2+0,S,O,Se,Te]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,5 aromatic heteroatom H shift r",
+   "smarts": "[#7+0,S,O,Se,Te;!H0]-[#6,#7X2]=[#6,nX2]-[#6,nX2]=[#7+0,#16,#8,Se,Te]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,7 aromatic heteroatom H shift f",
+   "smarts": "[#7+0,#8,#16,Se,Te;!H0]-[#6,#7X2]=[#6,#7X2]-[#6,#7X2]=[#6]-[#6,#7X2]=[#7X2+0,S,O,Se,Te,Cz0X3]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,7 aromatic heteroatom H shift r",
+   "smarts": "[#7+0,S,O,Se,Te,Cz0X4;!H0]-[#6,#7X2]=[#6]-[#6,#7X2]=[#6,#7X2]-[#6,#7X2]=[NX2,S,O,Se,Te]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,9 aromatic heteroatom H shift f",
+   "smarts": "[#7+0,O;!H0]-[#6,#7X2]=[#6,#7X2]-[#6,#7X2]=[#6,#7X2]-[#6,#7X2]=[#6,#7X2]-[#6,#7X2]=[#7+0,O]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "1,11 aromatic heteroatom H shift f",
+   "smarts": "[#7+0,O;!H0]-[#6,nX2]=[#6,nX2]-[#6,nX2]=[#6,nX2]-[#6,nX2]=[#6,nX2]-[#6,nX2]=[#6,nX2]-[#6,nX2]=[#7X2+0,O]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "furanone f",
+   "smarts": "[O,S,N;!H0]-[#6z2r5]=,:[#6X3r5;$([#6]([#6;r5])=,:[#6X3r5])]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "furanone r",
+   "smarts": "[#6r5!H0;$([#6]([#6r5])[#6r5])][#6z2r5]=[O,S,N]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "keten/ynol f",
+   "smarts": "[C!H0]=[C]=[O,S,Se,Te;X1]",
+   "bonds": "#-",
+   "charges": ""
+  },
+  {
+   "name": "keten/ynol r",
+   "smarts": "[O,S,Se,Te;!H0X2]-[C]#[C]",
+   "bonds": "==",
+   "charges": ""
+  },
+  {
+   "name": "ionic nitro/aci-nitro f",
+   "smarts": "[C!H0]-[N+;$([N][O-])]=[O]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "ionic nitro/aci-nitro r",
+   "smarts": "[O!H0]-[N+;$([N][O-])]=[C]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "oxim/nitroso f",
+   "smarts": "[O!H0]-[Nz1]=[C]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "oxim/nitroso r",
+   "smarts": "[C!H0]-[Nz1]=[O]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "oxim/nitroso via phenol f",
+   "smarts": "[O!H0]-[N]=[C]-[C]=[C]-[C]=[OH0]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "oxim/nitroso via phenol r",
+   "smarts": "[O!H0]-[c]=,:[c][c]=,:[c]-[N]=[OH0]",
+   "bonds": "",
+   "charges": ""
+  },
+  {
+   "name": "cyano/iso-cyanic acid f",
+   "smarts": "[O!H0]-[C]#[N]",
+   "bonds": "==",
+   "charges": ""
+  },
+  {
+   "name": "cyano/iso-cyanic acid r",
+   "smarts": "[N!H0]=[C]=[O]",
+   "bonds": "#-",
+   "charges": ""
+  },
+  {
+   "name": "formamidinesulfinic acid f",
+   "smarts": "[O,N;!H0]-[C]=[S,Se,Te;v6]=[O]",
+   "bonds": "=--",
+   "charges": ""
+  },
+  {
+   "name": "formamidinesulfinic acid r",
+   "smarts": "[O!H0]-[S,Se,Te;v4]-[C]=[O,N]",
+   "bonds": "==-",
+   "charges": ""
+  },
+  {
+   "name": "isocyanide f",
+   "smarts": "[C-0!H0]#[N+0]",
+   "bonds": "#",
+   "charges": "-+"
+  },
+  {
+   "name": "isocyanide r",
+   "smarts": "[N+!H0]#[C-]",
+   "bonds": "#",
+   "charges": "-+"
+  },
+  {
+   "name": "phosphonic acid f",
+   "smarts": "[OH]-[PX3H0]",
+   "bonds": "=",
+   "charges": ""
+  },
+  {
+   "name": "phosphonic acid r",
+   "smarts": "[PX4H]=[O]",
+   "bonds": "-",
+   "charges": ""
+  }
+ ],
+ "electronegativity": [
+  1000,
+  2300,
+  4160,
+  912,
+  1576,
+  2051,
+  2544,
+  3066,
+  3610,
+  4193,
+  4789,
+  869,
+  1293,
+  1613,
+  1916,
+  2253,
+  2589,
+  2869,
+  3242,
+  734,
+  1034,
+  1190,
+  1380,
+  1530,
+  1650,
+  1750,
+  1800,
+  1840,
+  1880,
+  1850,
+  1590,
+  1756,
+  1994,
+  2211,
+  2434,
+  2685,
+  2966,
+  706,
+  963,
+  1120,
+  1320,
+  1410,
+  1470,
+  1510,
+  1540,
+  1560,
+  1590,
+  1870,
+  1520,
+  1656,
+  1824,
+  1984,
+  2158,
+  2359,
+  2582,
+  659,
+  881,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1000,
+  1090,
+  1160,
+  1340,
+  1470,
+  1600,
+  1650,
+  1680,
+  1720,
+  1920,
+  1760,
+  1789,
+  1854,
+  2010,
+  2190,
+  2390,
+  2600,
+  670,
+  890
+ ],
+ "elements": [
+  {
+   "outer": 0,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    0
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1,
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    2
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    3
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    4
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    3
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    2
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    0
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1,
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    2,
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    3
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    4
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    3,
+    5
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    2,
+    4,
+    6
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    0
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1,
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    2,
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 9,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 10,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 11,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    3
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    4
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    3,
+    5
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    2,
+    4,
+    6
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    0
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1,
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    2,
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 9,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 10,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 11,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    3
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    2,
+    4
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    3,
+    5
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    2,
+    4,
+    6
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    1,
+    3,
+    5
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    0,
+    2,
+    4,
+    6
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    2,
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 9,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 10,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 11,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 12,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 13,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 14,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 15,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 9,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 10,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 11,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    2,
+    4
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    3,
+    5
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    2,
+    4,
+    6
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    1,
+    3,
+    5
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    0
+   ]
+  },
+  {
+   "outer": 1,
+   "valences": [
+    1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    2,
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 3,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 4,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 5,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 6,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 7,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 8,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 9,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 10,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 11,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 12,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 13,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 14,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 15,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  },
+  {
+   "outer": 2,
+   "valences": [
+    -1
+   ]
+  }
+ ],
+ "rdkit_license": "BSD 3-Clause License\n\nCopyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice, this\n   list of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\n   this list of conditions and the following disclaimer in the documentation\n   and/or other materials provided with the distribution.\n\n3. Neither the name of the copyright holder nor the names of its\n   contributors may be used to endorse or promote products derived from\n   this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+}

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/pyridine%20N-oxide/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:21Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 12753,
+          "SMILES": "C1=CC=[N+](C=C1)[O-]",
+          "Title": "Pyridine N-Oxide"
+        }
+      ]
+    }
+  }
+}

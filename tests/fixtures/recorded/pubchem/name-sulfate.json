@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/sulfate/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:29Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1117,
+          "SMILES": "[O-]S(=O)(=O)[O-]",
+          "Title": "Sulfate Ion"
+        }
+      ]
+    }
+  }
+}

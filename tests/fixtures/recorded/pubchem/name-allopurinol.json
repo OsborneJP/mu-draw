@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/allopurinol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:11Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 135401907,
+          "SMILES": "C1=NNC2=C1C(=O)NC=N2",
+          "Title": "Allopurinol"
+        }
+      ]
+    }
+  }
+}

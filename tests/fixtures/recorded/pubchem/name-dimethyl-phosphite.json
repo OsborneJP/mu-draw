@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/dimethyl%20phosphite/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T13:06:21Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 13361,
+          "SMILES": "COP(=O)OC",
+          "Title": "Phosphonic acid, dimethyl ester"
+        }
+      ]
+    }
+  }
+}

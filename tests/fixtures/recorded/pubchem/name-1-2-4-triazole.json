@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/1%2C2%2C4-triazole/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:06Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 9257,
+          "SMILES": "C1=NC=NN1",
+          "Title": "1H-1,2,4-Triazole"
+        }
+      ]
+    }
+  }
+}

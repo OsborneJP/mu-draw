@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/warfarin/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:11Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 54678486,
+          "SMILES": "CC(=O)CC(C1=CC=CC=C1)C2=C(C3=CC=CC=C3OC2=O)O",
+          "Title": "Warfarin"
+        }
+      ]
+    }
+  }
+}
