@@ -1,0 +1,18 @@
+typed_name,pubchem_cid,pubchem_title,smiles
+aspirin,2244,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O
+(R)-2-butanol,84682,(-)-2-Butanol,CC[C@@H](C)O
+(S)-2-butanol,444683,(+)-2-Butanol,CC[C@H](C)O
+trans-2-butene,62695,trans-2-BUTENE,C/C=C/C
+cis-2-butene,5287573,cis-2-BUTENE,C/C=C\C
+cyclohexane,8078,Cyclohexane,C1CCCCC1
+beta-D-glucose,64689,Beta-D-Glucose,C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)O
+cholesterol,5997,Cholesterol,C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C
+cocaine,446220,Cocaine,CN1[C@H]2CC[C@@H]1[C@H]([C@H](C2)OC(=O)C3=CC=CC=C3)C(=O)OC
+menthol,1254,Menthol,CC1CCC(C(C1)O)C(C)C
+camphor,2537,Camphor,CC1(C2CCC1(C(=O)C2)C)C
+adamantane,9238,Adamantane,C1C2CC3CC1CC(C2)C3
+"2,2'-dimethylbiphenyl",11797,"2,2'-Dimethylbiphenyl",CC1=CC=CC=C1C2=CC=CC=C2C
+erythromycin,12560,Erythromycin,CC[C@@H]1[C@@]([C@@H]([C@H](C(=O)[C@@H](C[C@@]([C@@H]([C@H]([C@@H]([C@H](C(=O)O1)C)O[C@H]2C[C@@]([C@H]([C@@H](O2)C)O)(C)OC)C)O[C@H]3[C@@H]([C@H](C[C@H](O3)C)N(C)C)O)(C)O)C)C)O)(C)O
+vancomycin,14969,Vancomycin,C[C@H]1[C@H]([C@@](C[C@@H](O1)O[C@@H]2[C@H]([C@@H]([C@H](O[C@H]2OC3=C4C=C5C=C3OC6=C(C=C(C=C6)[C@H]([C@H](C(=O)N[C@H](C(=O)N[C@H]5C(=O)N[C@@H]7C8=CC(=C(C=C8)O)C9=C(C=C(C=C9O)O)[C@H](NC(=O)[C@H]([C@@H](C1=CC(=C(O4)C=C1)Cl)O)NC7=O)C(=O)O)CC(=O)N)NC(=O)[C@@H](CC(C)C)NC)O)Cl)CO)O)O)(C)N)O
+sodium acetate,31372,Sodium acetate,CC(=O)[O-].[Na+]
+tristearin,11146,Tristearin,CCCCCCCCCCCCCCCCCC(=O)OCC(COC(=O)CCCCCCCCCCCCCCCCC)OC(=O)CCCCCCCCCCCCCCCCC

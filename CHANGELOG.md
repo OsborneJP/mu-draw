@@ -193,6 +193,13 @@ All notable changes to this project. The format follows
   risk assessment. It says when PubChem lists no classification, or has no record of the
   structure. The drawing is sent only on the click; it needs a connection (greyed offline).
   The pictograms ship with the app. The naming service needs a restart for the new lookup.
+- 3D view (version 2): Show in 3D, in the properties panel, docks a model of the drawing
+  below the canvas, which the student turns with the mouse or a finger, as ball and stick,
+  sticks or space-filling, with or without its hydrogens. The model is PubChem's 3D
+  conformer where PubChem has one; otherwise RDKit builds one on the server (capped, one at a
+  time). It says where the model came from, that a molecule takes many shapes, and when the
+  drawing leaves stereo undefined. Needs an internet connection. Shown with 3Dmol.js 2.5.5,
+  as ProteinFirst does. Needs the API service restarted (new endpoint `/api/conformer`).
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."

@@ -260,10 +260,12 @@ export interface App {
   newPage(): Promise<Page>;
 }
 
-export const test = base.extend<{ app: App; buildCopy: boolean }>({
+export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: string[] }>({
   /** Serve a copy of the build that the test may change (publishSecondBuild). */
   buildCopy: [false, { option: true }],
-  app: async ({ buildCopy }, use, testInfo) => {
+  /** Chromium's command-line switches, such as WebGL turned off (the 3D view). */
+  browserArgs: [[], { option: true }],
+  app: async ({ buildCopy, browserArgs }, use, testInfo) => {
     const server = await startServer(buildCopy ? testInfo.outputPath('dist') : undefined);
     const problems: string[] = [];
     let failNow: (error: Error) => void = () => {};
@@ -287,7 +289,11 @@ export const test = base.extend<{ app: App; buildCopy: boolean }>({
       // A fresh persistent profile: not incognito (Chrome reports 'in-incognito' as not
       // installable) and with no service worker left over from an earlier run. Full
       // Chromium, because the headless shell stubs the installability check.
-      const context = await chromium.launchPersistentContext(profile, { channel: 'chromium', headless: true });
+      const context = await chromium.launchPersistentContext(profile, {
+        channel: 'chromium',
+        headless: true,
+        args: browserArgs,
+      });
       await context.exposeFunction('__reportGuard', (kind: string, detail: string) => {
         addProblem(`${kind}: ${detail}`);
       });

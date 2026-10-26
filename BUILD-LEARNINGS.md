@@ -1635,3 +1635,53 @@ Acceptance bar: docs/plans/v2-safety-snapshot.md (measurements, decisions, known
   backtracks: the SVG check's first transform pattern took twice as long per function, and a
   test of it hung the suite. That test now runs the check in a child process with a deadline
   (`spawnSync(..., { timeout })`), which fails instead of hanging.
+
+## 3D view (version 2, 2026-10-26)
+
+- RDKit.js 2026.9.1 has no 3D embedding (no ETKDG, no force field in its API or wasm), so the
+  3D view's fallback runs on the server (server/threed.py, Python RDKit of the same release).
+  `EmbedMolecule` and `MMFFOptimizeMolecule` release Python's lock, so names are answered
+  meanwhile; one embedding runs at a time anyway, at most 4 wait.
+- PubChem's 3D record: POST `compound/smiles/SDF?record_type=3d`. Its "none" answers are
+  text/plain whatever the Accept header: 404 `PUGREST.NotFound` (no 3D record: over 50 heavy
+  atoms, salts, metals) and 501 `PUGREST.Unimplemented` (no record at all). A drawing with
+  undefined stereo gets one arrangement (flat 2-butanol: PubChem's model is (S)).
+- RDKit marks a Molfile 3D from its coordinates, not its header ("2D" with z ≠ 0 reads as
+  3D), so a flat record is made in the test by zeroing z.
+- ETKDG's `timeout` is wall-clock. It never changes a model that finishes (same coordinates
+  with and without it), so the fixture generator runs without it and can't depend on how
+  busy the machine is. Camphor's impossible stereoisomer fails by running out of iterations
+  (1.5 s), the same with or without the 2 s cap.
+- Checking a model's stereo: comparing full InChIKeys fails on cages (InChI reads
+  bridgehead parities from 3D coordinates that it doesn't give the 2D adamantane). RDKit's
+  chirality-aware substructure match, after `AssignStereochemistryFrom3D`, gets cages,
+  symmetric molecules and undefined elements right; the fixtures check it independently
+  with CIP labels keyed by canonical rank.
+- RDKit counts adamantane's four bridgeheads as undefined stereo (as the properties panel
+  and Get name do), so the 3D view's stereo note shows for it: an accepted limit.
+- 3Dmol.js 2.5.5 draws into one shared offscreen WebGL2 context and copies each frame to its
+  canvas with a `bitmaprenderer` context, so many viewers don't use up WebGL contexts, and
+  `getContext('webgl2')` on its canvas returns null. Without WebGL it only logs an error;
+  the app asks the browser first. Its one `eval` (string callbacks, for py3Dmol) is never
+  reached, and Rolldown warns about it at build time. Its `autoload` acts only on elements
+  with class `viewer_3Dmoljs`. Vite puts it in its own chunk, `assets/3Dmol-*.js` (574 kB).
+- A test that waited for a queue to fill hung, rather than failed, when the queue's limit
+  was taken out; it now races the extra request against "it joined the queue".
+- The shared heavy-command lock: a queued `flock … check.sh` was killed while waiting (exit
+  143) and never started, and .check.log still held the run before. Read the exit status.
+- Review round 1: a heavy-atom cap doesn't bound the embedding, which builds every H
+  (`[PtH40]`-style counts) and whose memory grows with the square of the atoms; cap
+  `GetNumAtoms(onlyExplicit=False)` too, and refuse dummy atoms (two bonded ones crash it).
+- ETKDG from its default eigenvector start fails every time on long chains (tristearin,
+  n-C80, any seed); `useRandomCoords` builds them, but is slower and misses the 2 s cap for
+  some the default builds (ivermectin: 0.7 s against 2.4 s), so the server tries the
+  default first and a random start only after it fails (round 2; round 1 had measured only
+  the test compounds).
+- RDKit reads no stereo from 3D at a three-coordinate P or N (PAMP, an aziridine N), though
+  ETKDG honours the tag (the signed volume flips): such drawings get no model (accepted).
+- 3Dmol 2.5.5 renders only through an `OffscreenCanvas` with WebGL2 (unless in a grid); with
+  WebGL1 only, its own try/catch swallows the error and `createViewer` throws later.
+- The review took three capped rounds; round 2's medium was caused by round 1's own fix
+  (random starts), which had been measured on the test compounds only. Measure a change to
+  the embedding on a wider set (round 2 used 53 large PubChem drugs). Round 3 found nothing
+  high or medium; its lows are in docs/plans/v2-3d-view.md.

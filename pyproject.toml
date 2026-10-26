@@ -39,4 +39,6 @@ known-first-party = [
   "test_name",
   "test_reference_fixtures",
   "render_server_config",
+  "threed",
+  "record_conformers",
 ]

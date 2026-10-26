@@ -4,7 +4,8 @@
 // engine inside ketcher-react; Formula text imports it too, and both must get the one copy
 // (one lockfile entry), or the app's transforms would not be the dialog's. indigo-ketcher
 // (the biochem worker's Indigo) must be the very release ketcher-standalone pins, so one
-// Indigo ships.
+// Indigo ships. 3dmol draws the 3D view, the same release as ProteinFirst's
+// (docs/plans/v2-3d-view.md).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -18,6 +19,7 @@ export const PINNED: Record<string, string> = {
   '@rdkit/rdkit': '2026.9.1',
   lexical: '0.40.0',
   'indigo-ketcher': '1.46.0',
+  '3dmol': '2.5.5',
 };
 // The Ketcher packages must move together.
 export const SAME_VERSION = ['ketcher-react', 'ketcher-standalone', 'ketcher-core'] as const;

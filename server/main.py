@@ -2,7 +2,8 @@
 
 POST /api/name names a structure from PubChem (Get name). POST /api/structure draws a name
 (Name to structure): OPSIN first (server/opsin.py, local), then PubChem's name lookup. POST
-/api/safety gives a structure's GHS hazard classification from PubChem (server/ghs.py). Rules
+/api/safety gives a structure's GHS hazard classification from PubChem (server/ghs.py), and
+/api/conformer gives the 3D view its model (server/threed.py). Rules
 for every endpoint here (see AGENTS.md): SMILES and names travel in POST bodies only, request
 bodies are never logged, and user input never goes into exception or log messages.
 
@@ -16,7 +17,7 @@ import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Annotated
 
@@ -24,9 +25,11 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, StringConstraints
+from rdkit import Chem
 
 import chem
 import ghs
+import threed
 from cache import NameCache
 from opsin import COMMAND as OPSIN_COMMAND
 from opsin import Opsin, OpsinUnavailable
@@ -135,9 +138,10 @@ def create_app(
     sleep=None,
     clock=None,
     opsin_command: tuple[str, ...] = OPSIN_COMMAND,
+    embed: threed.Embed = threed.embed,
 ) -> FastAPI:
-    """The app. Tests pass a replay transport, a temporary state folder, fake time and a
-    stand-in for OPSIN."""
+    """The app. Tests pass a replay transport, a temporary state folder, fake time and
+    stand-ins for OPSIN and the 3D embedding."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -158,6 +162,7 @@ def create_app(
             async with new_http(transport) as http:
                 pubchem = PubChem(http, limit or RateLimit(), **retry_sleep)
                 app.state.naming = Naming(cache, pubchem, opsin)
+                app.state.embedding = threed.EmbedQueue(embed)
                 yield
         finally:
             await opsin.close()
@@ -287,6 +292,30 @@ def create_app(
             log.warning("PubChem lookup failed: unreadable SMILES")
             return JSONResponse({"error": "unavailable"}, status_code=502)
         return drawn(mol, "PubChem", message, record)
+
+    @app.post("/api/conformer")
+    async def conformer(body: NameRequest, request: Request):
+        mol = chem.parse(body.smiles)
+        if mol is None or not threed.elements_only(mol):
+            return JSONResponse({"error": "invalid_structure"}, status_code=400)
+        if len(Chem.GetMolFrags(mol)) != 1:
+            return JSONResponse({"error": "one_structure"}, status_code=400)
+        smiles, naming = chem.canonical(mol), request.app.state.naming
+        model = naming.cache.get_conformer(smiles)
+        if model is None:
+            try:
+                model = await threed.model_for(
+                    mol, smiles, naming.pubchem, request.app.state.embedding
+                )
+            except threed.TooBusy:
+                return JSONResponse({"error": "busy"}, status_code=503)
+            if threed.cacheable(model):
+                naming.cache.put_conformer(smiles, model)
+        return {
+            **asdict(model),
+            "found": model.source is not None,
+            "undefined_stereo": chem.undefined_stereo(mol),
+        }
 
     return app
 

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF?record_type=3d",
+    "form": {
+      "smiles": "CC(CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C)CCn1c(=O)c2c(ncn2C)n(C)c1=O"
+    }
+  },
+  "recorded_at": "2026-10-26T12:35:44Z",
+  "status": 501,
+  "content_type": "text/plain",
+  "text": "Status: 501\nCode: PUGREST.Unimplemented\nMessage: Cannot (yet) generate 3D coordinates for structures without an existing CID\n"
+}

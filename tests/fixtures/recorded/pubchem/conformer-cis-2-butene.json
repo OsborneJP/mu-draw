@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF?record_type=3d",
+    "form": {
+      "smiles": "C/C=C\\C"
+    }
+  },
+  "recorded_at": "2026-10-26T12:35:35Z",
+  "status": 200,
+  "content_type": "chemical/x-mdl-sdfile",
+  "text": "5287573\n  -OEChem-10262608353D\n\n 12 11  0     0  0  0  0  0  0999 V2000\n   -0.6703    0.6200    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.6702    0.6200    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.5014   -0.6201    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.5015   -0.6200    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.1945    1.5716    0.0113 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1943    1.5718   -0.0113 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.3834   -0.4587   -0.6295 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.9908   -1.4974   -0.4042 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8500   -0.8414    1.0132 H   0  0  0  0  0  0  0  0  0  0  0  0\n    2.3833   -0.4586    0.6300 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.9908   -1.4974    0.4036 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.8506   -0.8408   -1.0131 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0  0  0  0\n  1  3  1  0  0  0  0\n  1  5  1  0  0  0  0\n  2  4  1  0  0  0  0\n  2  6  1  0  0  0  0\n  3  7  1  0  0  0  0\n  3  8  1  0  0  0  0\n  3  9  1  0  0  0  0\n  4 10  1  0  0  0  0\n  4 11  1  0  0  0  0\n  4 12  1  0  0  0  0\nM  END\n> <PUBCHEM_COMPOUND_CID>\n5287573\n\n> <PUBCHEM_CONFORMER_RMSD>\n0.4\n\n> <PUBCHEM_CONFORMER_DIVERSEORDER>\n1\n\n> <PUBCHEM_MMFF94_PARTIAL_CHARGES>\n6\n1 -0.29\n2 -0.29\n3 0.14\n4 0.14\n5 0.15\n6 0.15\n\n> <PUBCHEM_EFFECTIVE_ROTOR_COUNT>\n0\n\n> <PUBCHEM_PHARMACOPHORE_FEATURES>\n2\n1 3 hydrophobe\n1 4 hydrophobe\n\n> <PUBCHEM_HEAVY_ATOM_COUNT>\n4\n\n> <PUBCHEM_ATOM_DEF_STEREO_COUNT>\n0\n\n> <PUBCHEM_ATOM_UDEF_STEREO_COUNT>\n0\n\n> <PUBCHEM_BOND_DEF_STEREO_COUNT>\n1\n\n> <PUBCHEM_BOND_UDEF_STEREO_COUNT>\n0\n\n> <PUBCHEM_ISOTOPIC_ATOM_COUNT>\n0\n\n> <PUBCHEM_COMPONENT_COUNT>\n1\n\n> <PUBCHEM_CACTVS_TAUTO_COUNT>\n1\n\n> <PUBCHEM_CONFORMER_ID>\n0050AE9500000001\n\n> <PUBCHEM_MMFF94_ENERGY>\n0.6737\n\n> <PUBCHEM_FEATURE_SELFOVERLAP>\n10.15\n\n> <PUBCHEM_SHAPE_FINGERPRINT>\n20096714 4 9223235151983869950\n21015797 1 18338520720446007713\n5943 1 12071344063191033445\n\n> <PUBCHEM_SHAPE_MULTIPOLES>\n82.32\n1.97\n1\n0.62\n0\n0\n0\n0.56\n0\n0\n0\n0\n0\n0\n\n> <PUBCHEM_SHAPE_SELFOVERLAP>\n136.609\n\n> <PUBCHEM_SHAPE_VOLUME>\n57\n\n> <PUBCHEM_COORDINATE_TYPE>\n2\n5\n10\n\n$$$$\n"
+}

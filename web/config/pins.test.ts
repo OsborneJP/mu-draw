@@ -61,7 +61,7 @@ describe('pin check', () => {
 
   it('covers every pinned engine', () => {
     expect(Object.keys(PINNED)).toEqual(
-      expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit', 'lexical', 'indigo-ketcher']),
+      expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit', 'lexical', 'indigo-ketcher', '3dmol']),
     );
   });
 

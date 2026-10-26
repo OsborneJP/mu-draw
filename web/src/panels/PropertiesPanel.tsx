@@ -11,6 +11,7 @@ import FormsButtons from './FormsButtons';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
 import ProtonNmrButton from './ProtonNmrButton';
+import ThreeDButton from './ThreeDButton';
 import { makeRoomFor } from './belowCanvas';
 import { showStereoisomers } from './stereoStore';
 import './properties.css';
@@ -309,6 +310,7 @@ export default function PropertiesPanel() {
           <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
           <NmrButton />
           <ProtonNmrButton />
+          <ThreeDButton />
         </Values>
       )}
       <BiochemSection />

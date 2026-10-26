@@ -2,6 +2,7 @@ import sqlite3
 
 from cache import (
     COLUMNS,
+    CONFORMER_COLUMNS,
     HAZARD_COLUMNS,
     MAX_AGE_S,
     STRUCTURE_COLUMNS,
@@ -10,6 +11,7 @@ from cache import (
     StructureHit,
 )
 from pubchem import NameRecord, Record
+from threed import Model
 
 RECORD = Record(cid=1, iupac="one", title="One")
 
@@ -29,11 +31,37 @@ def test_the_cache_holds_chemistry_only(tmp_path):
     names = tuple(row[1] for row in db.execute("PRAGMA table_info(names)"))
     structures = tuple(row[1] for row in db.execute("PRAGMA table_info(structures)"))
     hazards = tuple(row[1] for row in db.execute("PRAGMA table_info(hazards)"))
-    assert tables == ["names", "structures", "hazards"]
+    conformers = tuple(row[1] for row in db.execute("PRAGMA table_info(conformers)"))
+    assert tables == ["names", "structures", "hazards", "conformers"]
     assert names == COLUMNS == ("smiles", "cid", "iupac", "title", "stored_at")
     assert structures == STRUCTURE_COLUMNS
     assert STRUCTURE_COLUMNS == ("name", "cid", "smiles", "title", "matches", "stored_at")
     assert hazards == HAZARD_COLUMNS == ("cid", "classification", "others", "stored_at")
+    assert conformers == CONFORMER_COLUMNS
+    assert CONFORMER_COLUMNS == (
+        "smiles",
+        "pubchem",
+        "source",
+        "cid",
+        "molblock",
+        "reason",
+        "stored_at",
+    )
+
+
+def test_3d_models_come_back_and_expire_after_thirty_days(tmp_path):
+    clock = Clock()
+    cache = NameCache(tmp_path / "c.sqlite", clock=clock)
+    shown = Model("found", "pubchem", 1, "a model", None)
+    none = Model("none", None, None, None, "no_model")
+    cache.put_conformer("a", shown)
+    cache.put_conformer("b", none)
+    assert (cache.get_conformer("a"), cache.get_conformer("b")) == (shown, none)
+    assert cache.get_conformer("c") is None
+    clock.now += MAX_AGE_S - 1
+    assert cache.get_conformer("a") == shown
+    clock.now += 1
+    assert cache.get_conformer("a") is None
 
 
 def test_found_and_not_found_come_back(tmp_path):

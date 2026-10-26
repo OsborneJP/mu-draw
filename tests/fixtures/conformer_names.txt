@@ -1,0 +1,22 @@
+# Test compounds for the 3D view (docs/plans/v2-3d-view.md, decision 12, approved by Jeff
+# 2026-10-26). One PubChem name per line; their SMILES come from PubChem through
+# scripts/fetch_reference_smiles.py, never typed. server/scripts/record_conformers.py adds
+# generated drawings: (R)-2-butanol and cocaine with their stereo taken off, camphor's
+# stereoisomer that can't exist, and one of Get name's invented structures.
+aspirin
+(R)-2-butanol
+(S)-2-butanol
+trans-2-butene
+cis-2-butene
+cyclohexane
+beta-D-glucose
+cholesterol
+cocaine
+menthol
+camphor
+adamantane
+2,2'-dimethylbiphenyl
+erythromycin
+vancomycin
+sodium acetate
+tristearin

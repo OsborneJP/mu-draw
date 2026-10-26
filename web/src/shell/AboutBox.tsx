@@ -22,7 +22,8 @@ export default function AboutBox({ title }: { title: string }) {
         <p>Your drawing is saved only in this browser, on this device.</p>
         <p data-testid="app-authors">Made by Jeff Osborne with Claude Code.</p>
         <p className="about-credits">
-          Built with Ketcher (EPAM Systems, Apache License 2.0) and RDKit (BSD 3-Clause License).
+          Built with Ketcher (EPAM Systems, Apache License 2.0), RDKit (BSD 3-Clause License) and
+          3Dmol.js (University of Pittsburgh and contributors, BSD 3-Clause License).
         </p>
         <p className="about-credits" data-testid="about-glassware-credit">
           Lab glassware: {GLASSWARE_CREDIT}

@@ -5,11 +5,11 @@
     python scripts/fetch_reference_smiles.py --offline  # rebuild CSVs from the recordings
 
 Each name in a names file (SETS: the reference compounds, the functional-group, ¹³C NMR,
-stereoisomer, tautomer, resonance and ¹H NMR test sets, the ¹H rule's drawings, and the
-structures in the drawing templates) is looked up with PUG REST and the raw response is saved
-under tests/fixtures/recorded/pubchem/ (one recording per name, shared by the sets). Each CSV
-is always built from those recordings by parse() and write_csv(), which is what the replay
-test checks, so the CSVs' SMILES provably came from PubChem.
+stereoisomer, tautomer, resonance, ¹H NMR and 3D view test sets, the ¹H rule's drawings, and
+the structures in the drawing templates) is looked up with PUG REST and the raw response is
+saved under tests/fixtures/recorded/pubchem/ (one recording per name, shared by the sets).
+Each CSV is always built from those recordings by parse() and write_csv(), which is what the
+replay test checks, so the CSVs' SMILES provably came from PubChem.
 """
 
 from __future__ import annotations
@@ -46,6 +46,8 @@ PROTON_NAMES_FILE = FIXTURES / "proton_nmr_names.txt"
 PROTON_CSV_FILE = FIXTURES / "proton_nmr_compounds.csv"
 PROTON_RULE_NAMES_FILE = FIXTURES / "proton_rule_names.txt"
 PROTON_RULE_CSV_FILE = FIXTURES / "proton_rule_compounds.csv"
+CONFORMER_NAMES_FILE = FIXTURES / "conformer_names.txt"
+CONFORMER_CSV_FILE = FIXTURES / "conformer_compounds.csv"
 # (names file, CSV built from its recordings)
 SETS = (
     (NAMES_FILE, CSV_FILE),
@@ -57,6 +59,7 @@ SETS = (
     (RESONANCE_NAMES_FILE, RESONANCE_CSV_FILE),
     (PROTON_NAMES_FILE, PROTON_CSV_FILE),
     (PROTON_RULE_NAMES_FILE, PROTON_RULE_CSV_FILE),
+    (CONFORMER_NAMES_FILE, CONFORMER_CSV_FILE),
 )
 PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 # Current PubChem names: SMILES includes stereo. Never IsomericSMILES/CanonicalSMILES.

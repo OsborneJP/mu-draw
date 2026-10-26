@@ -1,23 +1,27 @@
 [
   {
+    "path": "assets/3Dmol-Dbby3ERY.js",
+    "size": 574085
+  },
+  {
     "path": "assets/biochemWorker-0N0MBlUM.js",
     "size": 71118
   },
   {
-    "path": "assets/index-B7hNiaRb.css",
-    "size": 199287
+    "path": "assets/index-IlIQdueO.js",
+    "size": 8122385
   },
   {
-    "path": "assets/index-DoabUGYR.js",
-    "size": 8034129
+    "path": "assets/index-VqJed3cf.css",
+    "size": 200079
   },
   {
-    "path": "assets/index.modern-55d8e3ef-Bp-4YY8d.js",
+    "path": "assets/index.modern-55d8e3ef-kctqBJVr.js",
     "size": 425349
   },
   {
-    "path": "assets/index.modern-DKFtyn1s.js",
-    "size": 1220456
+    "path": "assets/index.modern-D8hrqyu3.js",
+    "size": 1220506
   },
   {
     "path": "assets/indigo-ketcher-1.46.0-f_xBxuuS.wasm",
@@ -28,8 +32,8 @@
     "size": 73996
   },
   {
-    "path": "assets/lodash-BvBZBh6l.js",
-    "size": 80318
+    "path": "assets/rolldown-runtime-BCiCTKAo.js",
+    "size": 1301
   },
   {
     "path": "assets/workbox-window.prod.es5-Bd17z0YL.js",
@@ -181,7 +185,7 @@
   },
   {
     "path": "index.html",
-    "size": 1191
+    "size": 1201
   },
   {
     "path": "ir-bands.json",
@@ -217,7 +221,7 @@
   },
   {
     "path": "sw.js",
-    "size": 4806
+    "size": 4863
   },
   {
     "path": "workbox-2fbc6a65.js",

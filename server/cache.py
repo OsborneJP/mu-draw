@@ -4,9 +4,11 @@ Chemistry only. `names` (Get name): a canonical SMILES and what PubChem said abo
 and names, or that it has no record). `structures` (Name to structure's fallback): a
 lowercased name and PubChem's first record for it (CID, SMILES, title, how many records), or
 that it has none. `hazards` (Safety): a CID and the safety snapshot read from PubChem's GHS
-section (server/ghs.py), or that it lists none. Each with the time PubChem said it; nothing
-about who asked. Busy and unavailable answers are never stored, so the next request asks
-PubChem again. OPSIN's answers aren't cached: OPSIN runs here and answers in milliseconds.
+section (server/ghs.py), or that it lists none. `conformers` (the 3D view): a canonical
+SMILES and the model shown for it (server/threed.py: PubChem's 3D record, RDKit's, or none,
+and what PubChem said). Each with the time PubChem said it; nothing about who asked. Busy and
+unavailable answers are never stored, so the next request asks PubChem again. OPSIN's
+answers aren't cached: OPSIN runs here and answers in milliseconds.
 """
 
 from __future__ import annotations
@@ -20,11 +22,13 @@ from pathlib import Path
 
 from ghs import Classification, Others, Pictogram, Snapshot, Statement
 from pubchem import NameRecord, Record
+from threed import Model
 
 MAX_AGE_S = 30 * 24 * 60 * 60
 COLUMNS = ("smiles", "cid", "iupac", "title", "stored_at")
 STRUCTURE_COLUMNS = ("name", "cid", "smiles", "title", "matches", "stored_at")
 HAZARD_COLUMNS = ("cid", "classification", "others", "stored_at")
+CONFORMER_COLUMNS = ("smiles", "pubchem", "source", "cid", "molblock", "reason", "stored_at")
 SCHEMA = (
     """CREATE TABLE IF NOT EXISTS names (
     smiles TEXT PRIMARY KEY,
@@ -45,6 +49,15 @@ SCHEMA = (
     cid INTEGER PRIMARY KEY,
     classification TEXT,
     others TEXT NOT NULL,
+    stored_at REAL NOT NULL
+)""",
+    """CREATE TABLE IF NOT EXISTS conformers (
+    smiles TEXT PRIMARY KEY,
+    pubchem TEXT NOT NULL,
+    source TEXT,
+    cid INTEGER,
+    molblock TEXT,
+    reason TEXT,
     stored_at REAL NOT NULL
 )""",
 )
@@ -134,6 +147,22 @@ class NameCache:
         )
         self._db.execute("DELETE FROM hazards WHERE stored_at <= ?", (now - MAX_AGE_S,))
         self._db.execute("INSERT OR REPLACE INTO hazards VALUES (?, ?, ?, ?)", (cid, *values, now))
+
+    def get_conformer(self, smiles: str) -> Model | None:
+        row = self._db.execute(
+            "SELECT pubchem, source, cid, molblock, reason FROM conformers"
+            " WHERE smiles = ? AND stored_at > ?",
+            (smiles, self._clock() - MAX_AGE_S),
+        ).fetchone()
+        return None if row is None else Model(*row)
+
+    def put_conformer(self, smiles: str, model: Model) -> None:
+        now = self._clock()
+        values = (model.pubchem, model.source, model.cid, model.molblock, model.reason)
+        self._db.execute("DELETE FROM conformers WHERE stored_at <= ?", (now - MAX_AGE_S,))
+        self._db.execute(
+            "INSERT OR REPLACE INTO conformers VALUES (?, ?, ?, ?, ?, ?, ?)", (smiles, *values, now)
+        )
 
     def close(self) -> None:
         self._db.close()

@@ -27,11 +27,11 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
    "verify" is never shown): never from an LLM, never hand-typed into code or tests. Enforced by:
    generated fixtures with drift tests (tests/fixtures/; the NMR and RDKit tables' headers name their
    sources' SHA-256), irBands.test.ts, chem_literals.py (no Molfile/CDXML/InChI); SMILES, numbers: review.
-4. Everything except the naming and safety lookups works offline.
+4. Everything except the naming and safety lookups and the 3D view works offline.
    Enforced by: the precache guard (web/scripts/checks/precache.ts, run by web/scripts/verify-dist.ts
    in every check.sh and deploy build, not by a bare `npm run build`) and the "offline:" smoke tests.
-5. ketcher-react, ketcher-standalone, @rdkit/rdkit and indigo-ketcher (Ketcher's own release) are
-   pinned exactly. Enforced by: the pin test (web/config/pins.ts), also covering ketcher-core, lexical.
+5. ketcher-react, ketcher-standalone, @rdkit/rdkit, indigo-ketcher (Ketcher's own release) and 3dmol
+   are pinned exactly. Enforced by: the pin test (web/config/pins.ts), also covering ketcher-core, lexical.
 6. Build only "Version 1 features", the NMR proof of concept, and the "After v1" features
    Jeff has started, each with his approved plan in docs/plans/v2-*.md. Nothing else.
    Enforced by: review. Ketcher's 3D viewer, macromolecules mode, create-monomer and
@@ -70,9 +70,9 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
   biochem.ts (sequences, charge, pI), indigoBiochem.ts (Indigo's values; biochemWorker.ts runs it).
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts; at its foot
   BiochemSection.tsx), Get name, Name to structure (naming.ts; NamePanel floats), Templates menu
-  (+ Glassware tab: glassware.ts); Practice, NMR previews (¹³C, ¹H), stereoisomers, tautomers,
-  resonance (FormsPanel.tsx) and Safety (safety*.ts) dock below the canvas (Docked.tsx), one at a
-  time (belowCanvas.ts); nmr/protonNmr/stereo/forms/biochem.ts state, *Store.ts, panelWorker.ts (RDKit).
+  (+ Glassware tab: glassware.ts); Practice, NMR previews (¹³C, ¹H), stereoisomers, tautomers, resonance
+  (FormsPanel.tsx), Safety (safety*.ts) and 3D view (threeD.ts; viewer3d.ts loads 3Dmol) dock below the
+  canvas (Docked.tsx), one at a time (belowCanvas.ts); *Store.ts wiring, panelWorker.ts (RDKit).
 - `web/src/`: api.ts (`<base>api/*`, 8 s); pwa/ (SW, update checks, Reload); shell/ (header, badge, About, banner).
 - `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H); practice.json; glassware/; ghs/.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
@@ -80,9 +80,9 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
   export.spec.ts reads PNG headers, pixels and the clipboard back; `holdable{Rdkit,Indigo,Biochem}Replies()`
   (fixtures.ts) hold workers' replies; naming specs hold API answers.
-- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure`, `/api/safety` (`create_app()`
-  takes test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py` (PubChem's GHS),
-  `cache.py` (SQLite in `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar) on the env's Java.
+- `server/main.py`: FastAPI `/api/health`, `name`, `structure`, `safety`, `conformer` (`create_app()` takes
+  fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py` (PubChem's GHS), `threed.py` (3D
+  models: RDKit.js can't embed), `cache.py` (SQLite in `$STATE_DIRECTORY`), `opsin.py` (pinned jar, Java).
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators (build_glassware.py
   cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json).
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
