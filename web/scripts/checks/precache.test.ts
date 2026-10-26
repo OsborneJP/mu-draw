@@ -82,6 +82,17 @@ describe('checkPrecache', () => {
     expect(checkPrecache(files, urls)).toEqual([`${what} missing: ${path}`]);
   });
 
+  it('fails when a glassware piece is missing from the build, and when it is left out of the precache', () => {
+    const path = 'glassware/round-bottom-flask.svg';
+    const files = FILES.filter((f) => f.path !== path);
+    expect(files.length).toBe(FILES.length - 1);
+    const urls = parseSwManifest(SW).filter((url) => url !== path);
+    expect(checkPrecache(files, urls)).toEqual([`glassware piece missing: ${path}`]);
+    expect(checkPrecache(FILES, urls)).toEqual([
+      `file not precached (it would be missing offline): ${path} (${FILES.find((f) => f.path === path)!.size} bytes)`,
+    ]);
+  });
+
   it('fails when Indigo is missing (e.g. the base64 build was used)', () => {
     const files = FILES.filter((f) => f.path !== INDIGO);
     const urls = parseSwManifest(SW).filter((url) => url !== INDIGO);

@@ -2,6 +2,7 @@
 // from the Templates menu and it is in their hand, as with Name to structure's Add: it follows
 // the mouse over the canvas until a click places it (src/editor/placeInHand.ts). The drawings
 // are made by server/scripts/gen_templates.py from PubChem and RDKit (templates.json).
+// The menu's lab glassware (glassware.ts) goes into the same hand through pick().
 import type { Ketcher } from 'ketcher-core';
 import type { Placement } from '../editor/placeInHand';
 import generated from '../editor/templates.json';
@@ -27,7 +28,29 @@ export type Placer = (
   dropping: (drop: () => void) => void,
 ) => Promise<Placement>;
 
-let held: { template: Template; placement: Placement } | null = null;
+/** Anything the Templates menu puts in the student's hand: a template or a piece of glassware. */
+export interface Pickable {
+  id: string;
+  name: string;
+}
+
+/** Calls `listener` when Esc is pressed anywhere in the page; returns what stops it. */
+export type EscWatch = (listener: () => void) => () => void;
+
+function watchEsc(listener: () => void): () => void {
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') listener();
+  };
+  document.addEventListener('keydown', onKeyDown, true);
+  return () => document.removeEventListener('keydown', onKeyDown, true);
+}
+
+/** Ketcher's tool now: a new object whenever the student (or Add) picks a tool. */
+function currentTool(ketcher: Ketcher): unknown {
+  return (ketcher.editor as unknown as { tool(): unknown }).tool();
+}
+
+let held: { item: Pickable; placement: Placement } | null = null;
 let latest = 0; // each pick's number: an earlier pick that arrives late is put away
 const listeners = new Set<() => void>();
 
@@ -35,9 +58,9 @@ function notify(): void {
   listeners.forEach((listener) => listener());
 }
 
-/** The template in the student's hand, if any. */
-export function heldTemplate(): Template | null {
-  return held?.template ?? null;
+/** What the student holds from the menu (a template or a piece of glassware), if anything. */
+export function heldTemplate(): Pickable | null {
+  return held?.item ?? null;
 }
 
 export function subscribeTemplates(listener: () => void): () => void {
@@ -45,7 +68,7 @@ export function subscribeTemplates(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
-/** Put the template in hand away, unplaced. */
+/** Put what is in hand away, unplaced. */
 export function putAwayTemplate(): void {
   const was = held;
   held = null;
@@ -55,21 +78,48 @@ export function putAwayTemplate(): void {
 
 /** Puts `template` in the student's hand. True once a click has placed it; false if it was
  * put away (Esc, another tool, Add, a later pick) or Ketcher could not take it. */
-export async function pickTemplate(ketcher: Ketcher, template: Template, place: Placer): Promise<boolean> {
-  const pick = ++latest;
+export function pickTemplate(ketcher: Ketcher, template: Template, place: Placer): Promise<boolean> {
+  return pick(ketcher, template, async () => JSON.stringify(template.ket), place);
+}
+
+/** Puts `item` in the student's hand once `structure` has made its KET. True once a click has
+ * placed it; false if it was put away (Esc, another tool, Add, a later pick), if the student
+ * moved on while its KET was being made, or if it could not be made or Ketcher could not
+ * take it. */
+export async function pick(
+  ketcher: Ketcher,
+  item: Pickable,
+  structure: () => Promise<string>,
+  place: Placer,
+  escapes: EscWatch = watchEsc,
+): Promise<boolean> {
+  const mine = ++latest;
   putAwayTemplate();
+  // While its KET is being made (a glassware file loading), the item isn't in hand yet, but the
+  // student may move on: a later pick, Esc, another tool, or Add (which arms Ketcher's paste
+  // tool). Arming the paste tool after that would take over from what they chose.
+  const tool = currentTool(ketcher);
+  let escaped = false;
+  const stopWatching = escapes(() => (escaped = true));
   let placement: Placement;
   try {
-    placement = await place(ketcher, JSON.stringify(template.ket), (drop) => drop());
+    let ket: string;
+    try {
+      ket = await structure();
+    } finally {
+      stopWatching();
+    }
+    if (mine !== latest || escaped || currentTool(ketcher) !== tool) return false;
+    placement = await place(ketcher, ket, (drop) => drop());
   } catch (error) {
-    console.error('Could not pick up the template:', error);
+    console.error(`Could not pick up ${item.name}:`, error);
     return false;
   }
-  if (pick !== latest) {
+  if (mine !== latest) {
     placement.cancel();
     return false;
   }
-  held = { template, placement };
+  held = { item, placement };
   notify();
   const placed = await placement.done;
   if (held?.placement === placement) {

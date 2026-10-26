@@ -2,7 +2,8 @@
 // guards that fail the test on page errors, editor or service-worker errors, CSP
 // violations, popups, websockets, same-origin HTTP errors, any request outside the
 // app's own origin and base path (invariant 1), any link that leads outside it except to a
-// PubChem compound page (the one way out, which only the student's click takes), and the
+// PubChem compound page (the one way out, which only the student's click takes), any SVG
+// image drawn from anything but a base64 PNG or SVG or the app's own files, and the
 // app reloading itself or letting a new build take over without the student clicking the
 // update banner.
 //
@@ -22,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { preview } from 'vite';
 import { resolveBase } from '../config/app.ts';
 import { cspHeaders } from '../config/csp.ts';
-import { linkProblem, requestProblem } from '../config/requestPolicy.ts';
+import { imageSourceProblem, linkProblem, requestProblem } from '../config/requestPolicy.ts';
 import { autosaveKey } from '../src/editor/autosave.ts';
 
 const WEB_DIR = fileURLToPath(new URL('..', import.meta.url));
@@ -139,10 +140,14 @@ function installPageGuards({ reloadButtonTestId, appUrl }: { reloadButtonTestId:
     (window as unknown as { __reportGuard?: Report }).__reportGuard?.(kind, detail);
   // Every link in the page (href, form action), resolved as the browser would follow it. A
   // link inside the app is fine; any other goes to the test, which applies the link policy
-  // (config/requestPolicy.ts). Namespaced xlink:href is read when its element is added
-  // (MutationObserver's attributeFilter can't name it); the others also when they change.
+  // (config/requestPolicy.ts). An SVG <image>'s href is drawn, not followed, so it goes to
+  // the image policy instead (Ketcher draws placed images from data: URLs). Namespaced
+  // xlink:href is read when its element is added (MutationObserver's attributeFilter can't
+  // name it); the others also when they change.
   const LINK_ATTRIBUTES = ['href', 'action', 'formaction'];
   const XLINK = 'http://www.w3.org/1999/xlink';
+  const SVG = 'http://www.w3.org/2000/svg';
+  type ReportUrl = (where: string, url: string) => void;
   const reportLink = (element: Element, attribute: string, value: string) => {
     let url = value;
     try {
@@ -151,10 +156,9 @@ function installPageGuards({ reloadButtonTestId, appUrl }: { reloadButtonTestId:
       // Reported as written; the test side can't parse it either.
     }
     if (url.startsWith(appUrl)) return;
-    (window as unknown as { __reportLink?: (where: string, url: string) => void }).__reportLink?.(
-      `${element.tagName}[${attribute}]`,
-      url,
-    );
+    const reporters = window as unknown as { __reportLink?: ReportUrl; __reportImageSource?: ReportUrl };
+    const image = element.namespaceURI === SVG && element.localName === 'image';
+    (image ? reporters.__reportImageSource : reporters.__reportLink)?.(`${element.tagName}[${attribute}]`, url);
   };
   const checkElement = (element: Element) => {
     for (const name of LINK_ATTRIBUTES) {
@@ -295,6 +299,16 @@ export const test = base.extend<{ app: App; buildCopy: boolean }>({
           problem = 'unparseable';
         }
         if (problem) addProblem(`link (${problem}) ${where}: ${url}`);
+      });
+      await context.exposeFunction('__reportImageSource', (where: string, url: string) => {
+        let problem: string | null;
+        try {
+          problem = imageSourceProblem(url, server.url);
+        } catch {
+          problem = 'unparseable';
+        }
+        // A data: URL can be megabytes; its start says what it is.
+        if (problem) addProblem(`image source (${problem}) ${where}: ${url.slice(0, 80)}`);
       });
       await context.addInitScript(installPageGuards, { reloadButtonTestId: RELOAD_BUTTON_TEST_ID, appUrl: server.url });
       context.on('request', (request) => {

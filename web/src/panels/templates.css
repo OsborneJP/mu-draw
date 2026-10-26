@@ -64,3 +64,51 @@
   width: 100%;
   height: 80px;
 }
+
+/* Structures | Glassware (role="tablist"). */
+.templates-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.templates-tabs [role='tab'] {
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.templates-tabs [role='tab'][aria-selected='true'] {
+  border-color: #d0d0d0;
+  background: #fff;
+  font-weight: 600;
+  margin-bottom: -1px;
+}
+
+.templates-tabs [role='tab']:focus-visible {
+  outline: 2px solid var(--mu-gold);
+  outline-offset: 1px;
+}
+
+/* A glassware piece's picture: its SVG file, kept whole inside the picture's box. */
+.glassware-picture img {
+  display: block;
+  width: 100%;
+  height: 80px;
+  object-fit: contain;
+}
+
+.glassware-note,
+.glassware-credit {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #555;
+}

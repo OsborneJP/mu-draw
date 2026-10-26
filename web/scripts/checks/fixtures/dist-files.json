@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-DiUFACdc.css",
-    "size": 193929
+    "path": "assets/index-DzapO9ys.js",
+    "size": 7964759
   },
   {
-    "path": "assets/index-RtopH5h2.js",
-    "size": 7964201
+    "path": "assets/index-XtHTMFPR.css",
+    "size": 194005
   },
   {
-    "path": "assets/index.modern-55d8e3ef-M0dtVDOE.js",
+    "path": "assets/index.modern-55d8e3ef-4M-CmNV4.js",
     "size": 425354
   },
   {
@@ -34,6 +34,98 @@
   {
     "path": "functional-groups.json",
     "size": 3550
+  },
+  {
+    "path": "glassware/allihn-condenser.svg",
+    "size": 6803
+  },
+  {
+    "path": "glassware/beaker.svg",
+    "size": 2725
+  },
+  {
+    "path": "glassware/buchner-flask.svg",
+    "size": 2054
+  },
+  {
+    "path": "glassware/buchner-funnel.svg",
+    "size": 2357
+  },
+  {
+    "path": "glassware/burette.svg",
+    "size": 28136
+  },
+  {
+    "path": "glassware/conical-flask.svg",
+    "size": 737
+  },
+  {
+    "path": "glassware/dropping-funnel.svg",
+    "size": 42894
+  },
+  {
+    "path": "glassware/filter-funnel.svg",
+    "size": 2587
+  },
+  {
+    "path": "glassware/ice-bath.svg",
+    "size": 1204
+  },
+  {
+    "path": "glassware/liebig-condenser-slanted.svg",
+    "size": 7810
+  },
+  {
+    "path": "glassware/liebig-condenser-upright.svg",
+    "size": 7840
+  },
+  {
+    "path": "glassware/measuring-cylinder.svg",
+    "size": 61566
+  },
+  {
+    "path": "glassware/oil-bath.svg",
+    "size": 1196
+  },
+  {
+    "path": "glassware/receiver-adapter.svg",
+    "size": 1562
+  },
+  {
+    "path": "glassware/round-bottom-flask-small.svg",
+    "size": 3359
+  },
+  {
+    "path": "glassware/round-bottom-flask.svg",
+    "size": 3586
+  },
+  {
+    "path": "glassware/schlenk-flask.svg",
+    "size": 3574
+  },
+  {
+    "path": "glassware/separating-funnel.svg",
+    "size": 3632
+  },
+  {
+    "path": "glassware/still-head.svg",
+    "size": 3048
+  },
+  {
+    "path": "glassware/stirrer-hotplate.svg",
+    "size": 6607
+  },
+  {
+    "path": "glassware/three-neck-flask.svg",
+    "size": 64719
+  },
+  {
+    "path": "glassware/tlc-tank.svg",
+    "size": 5078
+  },
+  {
+    "path": "glassware/two-neck-flask.svg",
+    "size": 43122
   },
   {
     "path": "icons/icon-192.png",
@@ -81,7 +173,7 @@
   },
   {
     "path": "sw.js",
-    "size": 2211
+    "size": 4083
   },
   {
     "path": "workbox-2fbc6a65.js",

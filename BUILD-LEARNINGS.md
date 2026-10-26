@@ -1335,3 +1335,42 @@ Acceptance bar, sources and measurements: docs/plans/v2-formula-text.md.
 - ketcher-react binds the struct service's methods once (createApi), so wrapping
   `generateImageAsBase64` in the provider's createStructService, as imageQueue does, reaches
   every picture: Export, Copy image, Ketcher's Save preview, Save and Copy Image, Practice.
+
+## Lab glassware library (version 2, 2026-10-26)
+
+Acceptance bar, the survey of sets and the measurements: docs/plans/v2-glassware.md.
+- Ketcher 3.18 keeps an image as a KET node with its file as base64 (`boundingBox` in bond
+  lengths) and draws it as an SVG `<image>` from a `data:` URL, in a layer under everything
+  else. placeInHand's paste tool carries images unchanged (`rescale()` leaves them alone).
+- Ketcher can move and resize an image but not rotate or flip it (`fromRotate`/`fromFlip`
+  skip images), and resizing is free: it draws images with `preserveAspectRatio="none"`. So
+  pieces ship in each orientation a set-up needs (the Liebig condenser slanted and upright).
+- Molfile, SDF, SMILES and InChI drop images without a word, and Ketcher's Save dialog warns
+  of nothing. CDXML embeds a PNG image as it is, but turns an SVG image into Indigo's
+  1024 × 1024 "image not available" icon, which is what comes back on Open.
+- Indigo's `generateImage` rasterises each SVG image at the SVG's own width and height and
+  then scales it, so a picture placed larger than that blurs; it also drops SVG `<text>`.
+  The pieces ship 4× their placed size (an apparatus exports in about 0.7 s) and with their
+  text removed. Its first call costs about 450 ms once.
+- The smoke tests' link guard reported Ketcher's canvas `<image href="data:…">` as a link
+  out of the app, so no test had ever placed an image (a student could, with Ketcher's own
+  image tool). SVG `<image>` sources now go to their own policy (base64 PNG/SVG or the
+  app's files). An image from another host also trips the request and CSP guards, so the
+  guard's test uses `data:` controls, which load nothing.
+- No openly licensed set covers an organic lab: Quantockgoblin's public-domain drawings on
+  Commons are the only ones whose joints meet (one scale per drawing), and they are scenes.
+  scripts/build_glassware.py cuts pieces out by element id, or, for drawings whose paths
+  have no ids (Jü's), by region: every shape whose middle (path ends and control points,
+  under its transforms) lies in a box. Crop boxes come from rendered ink, not from geometry.
+- Commons answers HTTP 429 (Retry-After 600) after about a dozen quick downloads; send a
+  User-Agent and wait about 20 s between files.
+- On a first visit the page isn't controlled by the service worker, so `page.route` can hold
+  a glassware fetch. The Glassware tab's pictures load the same files as images: hold only
+  `resourceType() === 'fetch'`.
+- The review found the generator's denylist let SMIL animation (`<set attributeName="href">`),
+  CSS escapes (`\75 rl(`), `@\69mport`, `image-set("…")` and XHTML wrappers through; an
+  allowlist of drawing elements closes the class. The shipped-piece test checks the files
+  with its own rules, not the script's, so one blind spot can't hide in both.
+- A pick that is still fetching its file is not "in hand" for placeInHand's Esc, so pick()
+  watches Esc itself while it waits and drops the pick if Ketcher's tool changed meanwhile
+  (another tool, or Add arming its paste tool: `editor.tool()` is a new object each time).

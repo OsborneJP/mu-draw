@@ -3,7 +3,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { Placement } from '../editor/placeInHand';
 import { GROUPS, heldTemplate, pickTemplate, putAwayTemplate, subscribeTemplates, TEMPLATES, type Placer } from './templates';
 
-const KETCHER = {} as Ketcher; // the menu touches Ketcher only through the placer
+// The menu touches Ketcher only through the placer, and reads which tool it has.
+const KETCHER = { editor: { tool: () => null } } as unknown as Ketcher;
+// Unit tests run in Node: a stand-in for the page, where pick() listens for Esc.
+(globalThis as { document?: EventTarget }).document ??= new EventTarget();
 const [FIRST, SECOND] = TEMPLATES;
 
 /** One pick as the placer sees it: its parse is held until the test says so. */

@@ -114,6 +114,17 @@ All notable changes to this project. The format follows
   α- and β-D-glucopyranose. No drawing of a Haworth projection carries stereo the app can
   read, so they have plain bonds (no thick front edge) and the app shows their
   stereocenters as undefined rather than as a wrong stereoisomer.
+- Lab glassware (version 2, the Templates menu's new Glassware tab; the templates are under
+  Structures): 23 pieces for apparatus diagrams in lab reports: flasks (round-bottom, two-
+  and three-neck, Schlenk, conical, Büchner, a beaker), condensers (Liebig slanted and
+  upright, Allihn), a still head with thermometer, a receiver adapter, Büchner, filter,
+  dropping and separating funnels, a burette, a measuring cylinder, a stirrer hotplate, oil
+  and ice baths, and a TLC tank. A click puts a piece in hand, as with templates; on the
+  canvas it is a picture that the selection tool moves and resizes (it can't be turned),
+  drawn behind structures and text. Autosave, Ket Format files, Copy image and Export keep
+  it; Molfile, SMILES and the other chemistry formats leave it out, and CDXML shows a
+  placeholder, as the tab says. Works offline. The drawings are public domain or CC0, from
+  Wikimedia Commons and Openclipart, credited in the tab and in About.
 - Practice mode (version 2): the Practice button shows a name, the student draws it, and
   Check compares the drawing's InChIKey with the answer's, on the device, offline too.
   Stereochemistry counts only where the name states it (either enantiomer for cis/trans

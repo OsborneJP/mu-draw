@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { GLASSWARE_CREDIT } from '../panels/glassware';
 
 // Our own About box; Ketcher's stays hidden because it links to outside sites. Plain text
 // only: nothing here may link or load anything.
@@ -22,6 +23,9 @@ export default function AboutBox({ title }: { title: string }) {
         <p data-testid="app-authors">Made by Jeff Osborne with Claude Code.</p>
         <p className="about-credits">
           Built with Ketcher (EPAM Systems, Apache License 2.0) and RDKit (BSD 3-Clause License).
+        </p>
+        <p className="about-credits" data-testid="about-glassware-credit">
+          Lab glassware: {GLASSWARE_CREDIT}
         </p>
         <button type="button" onClick={() => dialog.current?.close()}>
           Close

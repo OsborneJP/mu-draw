@@ -1,0 +1,589 @@
+<?xml version="1.0"?>
+<svg
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    id="svg2"
+    style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality"
+    fill-rule="evenodd"
+    xml:space="preserve"
+    viewBox="0 0 8000 11314"
+    version="1.0"
+  >
+ <defs
+      id="defs4"
+    >
+  <style
+        id="style6"
+        type="text/css"
+      >
+    .str1 {stroke:#838281;stroke-width:3}
+    .str0 {stroke:#1F1A17;stroke-width:3}
+    .str2 {stroke:#C0A062;stroke-width:215;stroke-linejoin:round}
+    .fil8 {fill:none}
+    .fil3 {fill:#1F1A17}
+    .fil7 {fill:#4D4948}
+    .fil0 {fill:#FFFFFF}
+    .fil4 {fill:#FFFFFF}
+    .fil10 {fill:#D7C6A3}
+    .fil13 {fill:#D7C7A4}
+    .fil15 {fill:#D8C7A5}
+    .fil17 {fill:#D8C8A6}
+    .fil19 {fill:#D8C8A7}
+    .fil21 {fill:#DAC9A8}
+    .fil23 {fill:#DACAA9}
+    .fil25 {fill:#DBCAAA}
+    .fil27 {fill:#DBCCAB}
+    .fil29 {fill:#DBCCAC}
+    .fil31 {fill:#DDCDAD}
+    .fil33 {fill:#DDCDAE}
+    .fil35 {fill:#DECFAF}
+    .fil37 {fill:#DED0B2}
+    .fil40 {fill:#E0D2B4}
+    .fil43 {fill:#E1D4B6}
+    .fil45 {fill:#E1D4B7}
+    .fil47 {fill:#E1D5B8}
+    .fil48 {fill:#E3D6BA}
+    .fil50 {fill:#E3D6BB}
+    .fil52 {fill:#E4D8BC}
+    .fil54 {fill:#E4D8BD}
+    .fil53 {fill:#E5D9BE}
+    .fil51 {fill:#E6DABF}
+    .fil49 {fill:#E6DBC1}
+    .fil46 {fill:#E8DDC3}
+    .fil44 {fill:#E8DEC5}
+    .fil42 {fill:#E9DEC6}
+    .fil41 {fill:#EADFC8}
+    .fil39 {fill:#EBE1C9}
+    .fil38 {fill:#EBE2CC}
+    .fil36 {fill:#EDE4CE}
+    .fil34 {fill:#EFE6D1}
+    .fil80 {fill:#EFF0ED}
+    .fil32 {fill:#F0E7D4}
+    .fil30 {fill:#F2E9D8}
+    .fil28 {fill:#F2ECDC}
+    .fil26 {fill:#F3EEDF}
+    .fil24 {fill:#F5EFE2}
+    .fil22 {fill:#F6F1E6}
+    .fil20 {fill:#F8F3E9}
+    .fil18 {fill:#F8F5ED}
+    .fil16 {fill:#F9F7F0}
+    .fil14 {fill:#FBF9F4}
+    .fil12 {fill:#FCFBF7}
+    .fil11 {fill:#FEFCFB}
+    .fil9 {fill:#FFFFFF}
+    .fil2 {fill:url(#id2)}
+    .fil6 {fill:url(#id3)}
+    .fil1 {fill:url(#id4)}
+    .fil5 {fill:url(#id5)}
+    .fil73 {fill:url(#id6)}
+    .fil59 {fill:url(#id7)}
+    .fil60 {fill:url(#id8)}
+    .fil67 {fill:url(#id9)}
+    .fil61 {fill:url(#id10)}
+    .fil71 {fill:url(#id11)}
+    .fil64 {fill:url(#id12)}
+    .fil56 {fill:url(#id13)}
+    .fil57 {fill:url(#id14)}
+    .fil63 {fill:url(#id15)}
+    .fil55 {fill:url(#id16)}
+    .fil79 {fill:url(#id17)}
+    .fil68 {fill:url(#id18)}
+    .fil76 {fill:url(#id19)}
+    .fil78 {fill:url(#id20)}
+    .fil62 {fill:url(#id21)}
+    .fil58 {fill:url(#id22)}
+    .fil65 {fill:url(#id23)}
+    .fil72 {fill:url(#id24)}
+    .fil66 {fill:url(#id25)}
+    .fil74 {fill:url(#id26)}
+    .fil77 {fill:url(#id27)}
+    .fil75 {fill:url(#id28)}
+    .fil70 {fill:url(#id29)}
+    .fil69 {fill:url(#id30)}
+  </style
+    >
+  <linearGradient
+        id="id2"
+        y2="7913"
+        gradientUnits="userSpaceOnUse"
+        y1="6339"
+        x2="3060"
+        x1="3060"
+      >
+   <stop
+          id="stop9"
+          stop-color="#75C5F0"
+          offset="0"
+      />
+   <stop
+          id="stop13"
+          stop-color="#789cbd"
+          stop-opacity=".1134"
+          offset="1"
+      />
+  </linearGradient
+    >
+  <linearGradient
+        id="id3"
+        y2="7913"
+        gradientUnits="userSpaceOnUse"
+        y1="6339"
+        x2="3060"
+        x1="3060"
+      >
+   <stop
+          id="stop16"
+          stop-color="#B3DEF8"
+          offset="0"
+      />
+   <stop
+          id="stop18"
+          stop-color="#fff"
+          offset=".90196"
+      />
+   <stop
+          id="stop20"
+          stop-color="#fff"
+          offset="1"
+      />
+  </linearGradient
+    >
+  <linearGradient
+        id="id4"
+        y2="6087"
+        gradientUnits="userSpaceOnUse"
+        y1="6087"
+        x2="4435"
+        x1="1684"
+      >
+   <stop
+          id="stop23"
+          stop-color="#a0a0a0"
+          offset="0"
+      />
+   <stop
+          id="stop25"
+          stop-color="#fff"
+          offset=".58824"
+      />
+   <stop
+          id="stop27"
+          stop-color="#fff"
+          offset=".65882"
+      />
+   <stop
+          id="stop29"
+          stop-color="#bebebe"
+          offset="1"
+      />
+  </linearGradient
+    >
+  <linearGradient
+        id="id5"
+        y2="6087"
+        gradientUnits="userSpaceOnUse"
+        y1="6087"
+        x2="4435"
+        x1="1684"
+      >
+   <stop
+          id="stop32"
+          stop-color="#fff"
+          offset="0"
+      />
+   <stop
+          id="stop34"
+          stop-color="#fff"
+          offset=".58824"
+      />
+   <stop
+          id="stop36"
+          stop-color="#fff"
+          offset=".65882"
+      />
+   <stop
+          id="stop38"
+          stop-color="#fff"
+          offset="1"
+      />
+  </linearGradient
+    >
+  <radialGradient
+        id="id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7053"
+        cx="2183"
+        r="52"
+      >
+   <stop
+          id="stop41"
+          stop-color="#fff"
+          offset="0"
+      />
+   <stop
+          id="stop43"
+          stop-color="#A8CEDE"
+          offset="1"
+      />
+  </radialGradient
+    >
+  <radialGradient
+        id="id7"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7298"
+        cx="2203"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id8"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7501"
+        cx="2236"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id9"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6972"
+        cx="2263"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id10"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7703"
+        cx="2268"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id11"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6597"
+        cx="2272"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id12"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7241"
+        cx="2287"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id13"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7619"
+        cx="2296"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id14"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7396"
+        cx="2341"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id15"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7478"
+        cx="2360"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id16"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7777"
+        cx="2366"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id17"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7090"
+        cx="2372"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id18"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6826"
+        cx="2375"
+        r="49"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id19"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6697"
+        cx="2412"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id20"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6483"
+        cx="2420"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id21"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7652"
+        cx="2437"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id22"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7565"
+        cx="2439"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id23"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7219"
+        cx="2465"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id24"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7377"
+        cx="2471"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id25"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6953"
+        cx="2485"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id26"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6781"
+        cx="2545"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id27"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6578"
+        cx="2627"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id28"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="7060"
+        cx="2636"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id29"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6385"
+        cx="2641"
+        r="52"
+      >
+  </radialGradient
+    >
+  <radialGradient
+        id="id30"
+        href="#id6"
+        gradientUnits="userSpaceOnUse"
+        cy="6512"
+        cx="2776"
+        r="52"
+      >
+  </radialGradient
+    >
+ <style
+        id="style1472"
+        type="text/css"
+      >
+    .fil0 {fill:#000000}
+  </style
+    >
+ </defs
+  >
+ <path
+      id="path75"
+      d="m8325.1 663.94l70.9-48.74 283.6 403.2-70.9 48.8-283.6-403.26z"
+      fill="#fff"
+      class="fil0"
+  />
+<path
+      id="path3908"
+      stroke="#000"
+      stroke-width="31.314"
+      fill="none"
+      d="m450.68 6567.1s-1028.5 3319.5-1123.7 3604.3c-110.33 330.05 135.25 602.54 392.49 599.27 863.53-10.964 2611.9-26.129 2910.5-26.129 298.66 0 522.01-306.93 376.39-636.46-112.07-253.59-1077.6-3541-1077.6-3541s-7.4595-393.19 0-966.79c108.71 0 97.999-146.98 0-146.98h-1478.1c-124.12 0-115.91 146.98 0 146.98v966.79z"
+  /><path
+      id="path3908-9"
+      stroke="#000"
+      stroke-width="26.831"
+      fill="none"
+      d="m6424.8 7330.9s-1118.6 2844.3-1200.1 3088.3c-94.531 282.8 115.89 516.28 336.3 513.48 739.9-9.395 2238-22.389 2493.9-22.389s447.28-262.99 322.5-545.34c-96.025-217.29-1164.8-3035.1-1164.8-3035.1s-2.1472-335.85 4.2442-827.34c93.148 0 83.969-125.94 0-125.94h-792c-106.35 0-99.315 125.94 0 125.94v828.39z"
+  /><path
+      id="path3908-9-1"
+      stroke="#000"
+      stroke-width="33.409"
+      fill="none"
+      d="m6349.8 1520.8s-1392.8 3541.5-1494.3 3845.4c-117.7 352.13 144.3 642.84 418.74 639.35 921.28-11.698 2786.6-27.877 3105.2-27.877 318.63 0 556.92-327.46 401.56-679.02-119.56-270.55-1450.3-3779.1-1450.3-3779.1s-2.6734-418.18 5.2846-1030.1c115.98 0 104.55-156.81 0-156.81h-986.15c-132.42 0-123.66 156.81 0 156.81v1031.5z"
+  /><path
+      id="path3908-3"
+      stroke="#000"
+      stroke-width="31.314"
+      fill="none"
+      d="m1219 1425.4s-1028.5 2471-1123.7 2755.8c-110.33 330.05 135.25 602.54 392.49 599.27 863.53-10.964 1933-26.129 2231.7-26.129 298.66 0 522.01-306.93 376.39-636.46-112.1-253.7-1077.6-2692.5-1077.6-2692.5s-7.4595-166.91 0-740.51c108.71 0 97.999-146.98 0-146.98h-799.27c-124.12 0-115.91 146.98 0 146.98v740.51z"
+  /><path
+      id="path3908-3-9"
+      stroke="#000"
+      stroke-width="27.907"
+      fill="none"
+      d="m6639.1 3211.1s-816.01 1680.6-891.55 1965.7c-87.533 330.38 100.22 574.76 304.31 571.49 685.13-10.975 1505.3-4.8763 1742.3-4.8763 236.96 0 449.63-300.14 334.09-629.99-88.916-253.84-854.98-1902.4-854.98-1902.4s-5.9184-167.08 0-741.25c86.252 0 77.753-147.12 0-147.12h-634.15c-98.474 0-91.962 147.12 0 147.12v741.25z"
+  /><path
+      id="path3908-0"
+      stroke="#000"
+      stroke-width="29.467"
+      fill="none"
+      d="m607.64 7724.5s-749.35 2019.3-833.61 2304.3c-97.643 330.21 119.71 602.86 347.37 599.59 764.26-10.969 1911.1-26.142 2175.4-26.142 264.32 0 462-307.11 333.12-636.79-99.186-253.71-846.45-2240.9-846.45-2240.9s-6.6019-110.47 0-684.34c96.214 0 86.733-147.05 0-147.05h-1175.8c-109.85 0-102.58 147.05 0 147.05v684.34z"
+  /><metadata
+    ><rdf:RDF
+      ><cc:Work
+        ><dc:format
+          >image/svg+xml</dc:format
+        ><dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        /><cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        /><dc:publisher
+          ><cc:Agent
+              rdf:about="http://openclipart.org/"
+            ><dc:title
+              >Openclipart</dc:title
+            ></cc:Agent
+          ></dc:publisher
+        ><dc:title
+          >Erlenmeyerkolben</dc:title
+        ><dc:date
+          >2013-04-13T05:29:09</dc:date
+        ><dc:description
+          >Sammlung von mehreren Erlenmeyerkolben mit schaler und breiter &#xC3;&#x2013;ffnung</dc:description
+        ><dc:source
+          >https://openclipart.org/detail/176995/erlenmeyerkolben-by-b.lachner-176995</dc:source
+        ><dc:creator
+          ><cc:Agent
+            ><dc:title
+              >B.Lachner</dc:title
+            ></cc:Agent
+          ></dc:creator
+        ><dc:subject
+          ><rdf:Bag
+            ><rdf:li
+              >chemie</rdf:li
+            ><rdf:li
+              >chemistry</rdf:li
+            ><rdf:li
+              >erlenmeyerkolben</rdf:li
+            ><rdf:li
+              >glass</rdf:li
+            ><rdf:li
+              >glassware</rdf:li
+            ><rdf:li
+              >labor</rdf:li
+            ><rdf:li
+              >laboratory</rdf:li
+            ></rdf:Bag
+          ></dc:subject
+        ></cc:Work
+      ><cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        ><cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        /><cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        /><cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        /></cc:License
+      ></rdf:RDF
+    ></metadata
+  ></svg
+>

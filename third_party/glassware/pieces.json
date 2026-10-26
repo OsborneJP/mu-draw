@@ -1,0 +1,576 @@
+{
+  "about": "The lab glassware pieces (docs/plans/v2-glassware.md): each is cut out of a public-domain or CC0 original in originals/ by scripts/build_glassware.py. crop and region are in the original's own units (after rotate); scale is model units (Ketcher bond lengths) per original unit.",
+  "groups": [
+    "Flasks",
+    "Condensers and adapters",
+    "Funnels",
+    "Measuring",
+    "Heating and cooling",
+    "Chromatography"
+  ],
+  "sources": {
+    "qg-distillation": {
+      "file": "Simple_distillation_apparatus.svg",
+      "title": "Simple distillation apparatus",
+      "url": "https://commons.wikimedia.org/wiki/File:Simple_distillation_apparatus.svg",
+      "author": "Quantockgoblin (original PNG) and Slashme (SVG)",
+      "site": "Wikimedia Commons",
+      "licence": "Public domain",
+      "credit_names": [
+        "Quantockgoblin",
+        "Slashme"
+      ],
+      "sha256": "0a73283a06aea6fe614e2231cfc87151a6705663591a4c8935da943d0d615582"
+    },
+    "qg-schlenk": {
+      "file": "Schlenk_flasks.svg",
+      "title": "Schlenk flasks",
+      "url": "https://commons.wikimedia.org/wiki/File:Schlenk_flasks.svg",
+      "author": "Quantockgoblin (original PNG) and Slashme (SVG)",
+      "site": "Wikimedia Commons",
+      "licence": "Public domain",
+      "credit_names": [
+        "Quantockgoblin",
+        "Slashme"
+      ],
+      "sha256": "f0f15d3fdb0214d63165523c588c269b94268fa37d5024f257e0be4779acd35a"
+    },
+    "qg-allihn": {
+      "file": "Allihn_condenser.svg",
+      "title": "Allihn condenser",
+      "url": "https://commons.wikimedia.org/wiki/File:Allihn_condenser.svg",
+      "author": "Quantockgoblin (original) and Jxjl (vector)",
+      "site": "Wikimedia Commons",
+      "licence": "Public domain",
+      "credit_names": [
+        "Quantockgoblin",
+        "Jxjl"
+      ],
+      "sha256": "18cd158e988cff11ec1f779858f6aea457d396463e7a5c746c9105b0612d8241"
+    },
+    "qg-burette": {
+      "file": "Burette.svg",
+      "title": "Burette",
+      "url": "https://commons.wikimedia.org/wiki/File:Burette.svg",
+      "author": "Mysid, after Quantockgoblin",
+      "site": "Wikimedia Commons",
+      "licence": "Public domain",
+      "credit_names": [
+        "Quantockgoblin",
+        "Mysid"
+      ],
+      "sha256": "1948e53328ff889505f6b4e3a088f249dffc8e93cf34cd240eb775738c495c3c"
+    },
+    "qg-tlc": {
+      "file": "Tlc_sequence.svg",
+      "title": "Tlc sequence",
+      "url": "https://commons.wikimedia.org/wiki/File:Tlc_sequence.svg",
+      "author": "Quantockgoblin (original PNG) and Shakiestone (SVG)",
+      "site": "Wikimedia Commons",
+      "licence": "Public domain",
+      "credit_names": [
+        "Quantockgoblin",
+        "Shakiestone"
+      ],
+      "sha256": "d96bebf9f7bdd1e752686e1f142fa0b6095910f499bed89ddcf31402c0af01ed"
+    },
+    "jue-multineck": {
+      "file": "Mehrhalskolben.V.1.V.1.svg",
+      "title": "Mehrhalskolben V.1",
+      "url": "https://commons.wikimedia.org/wiki/File:Mehrhalskolben.V.1.V.1.svg",
+      "author": "Jü",
+      "site": "Wikimedia Commons",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "Jü"
+      ],
+      "sha256": "c9f0b9175c251f8cbbfb257f628ccf5b5b03dc3c3ef31a1b3bf0cbc593669c65"
+    },
+    "jue-funnels": {
+      "file": "Funnel_Types_V.1.svg",
+      "title": "Funnel Types V.1",
+      "url": "https://commons.wikimedia.org/wiki/File:Funnel_Types_V.1.svg",
+      "author": "Jü",
+      "site": "Wikimedia Commons",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "Jü"
+      ],
+      "sha256": "8c76ee7e889ea52bf0888e616353e271379945332b567fa431b98fe2976508bc"
+    },
+    "jue-dropping": {
+      "file": "Dropping_Funnel_V.1.svg",
+      "title": "Dropping Funnel V.1",
+      "url": "https://commons.wikimedia.org/wiki/File:Dropping_Funnel_V.1.svg",
+      "author": "Jü",
+      "site": "Wikimedia Commons",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "Jü"
+      ],
+      "sha256": "35043ff99a1aec92c6a658a56ae45911e9252e43f3bb7fbf90bb215a12edae72"
+    },
+    "xavax-cylinder": {
+      "file": "Graduated_Cylinder_tall_form_250ml.svg",
+      "title": "Graduated Cylinder tall form 250ml",
+      "url": "https://commons.wikimedia.org/wiki/File:Graduated_Cylinder_tall_form_250ml.svg",
+      "author": "Xavax",
+      "site": "Wikimedia Commons",
+      "licence": "Public domain",
+      "credit_names": [
+        "Xavax"
+      ],
+      "sha256": "c8ba5988c42020b536d9460516a412be475b34abbe5cd1865ae282694bd30e4e"
+    },
+    "bl-erlenmeyer": {
+      "file": "176995_Erlenmeyerkolben.svg",
+      "title": "Erlenmeyerkolben",
+      "url": "https://openclipart.org/detail/176995/erlenmeyerkolben",
+      "author": "B_Lachner",
+      "site": "Openclipart",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "B_Lachner"
+      ],
+      "sha256": "ea5c449e6cfe7ea91b346a0029bdd794cb3bf5750e53674c3bee0262e64a5e7c"
+    },
+    "bl-beakers": {
+      "file": "175615_Becherglaeser.svg",
+      "title": "Beakers",
+      "url": "https://openclipart.org/detail/175615/beakers",
+      "author": "B_Lachner",
+      "site": "Openclipart",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "B_Lachner"
+      ],
+      "sha256": "ad444a3f488638125db5e278831c285248c6520c64a0f6f1858a1a3fa62659e6"
+    },
+    "sf-separatory": {
+      "file": "175342_1361989489.svg",
+      "title": "Separatory funnel",
+      "url": "https://openclipart.org/detail/175342/separatory-funnel",
+      "author": "stefg1971",
+      "site": "Openclipart",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "stefg1971"
+      ],
+      "sha256": "ddd4b2d618286f8de1bc3cb5d862dc5149986571bc3f677be62c90be446e4e79"
+    },
+    "mev-buchner": {
+      "file": "28348_MeV-Buchner-Funnel-and-Flask.svg",
+      "title": "Buchner funnel and flask",
+      "url": "https://openclipart.org/detail/28348/buchner-funnel-and-flask",
+      "author": "MeV",
+      "site": "Openclipart",
+      "licence": "CC0 1.0",
+      "credit_names": [
+        "MeV"
+      ],
+      "sha256": "8261051837361744ce44662eb21eef9ab2a5ca5813b9e1581985369906086354"
+    }
+  },
+  "pieces": [
+    {
+      "id": "round-bottom-flask",
+      "name": "Round-bottom flask",
+      "group": "Flasks",
+      "source": "qg-distillation",
+      "keep": [
+        "g2023"
+      ],
+      "crop": [
+        29.72,
+        330.413,
+        76.1867,
+        111.893
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "round-bottom-flask-small",
+      "name": "Round-bottom flask, small",
+      "group": "Flasks",
+      "source": "qg-distillation",
+      "keep": [
+        "g2084"
+      ],
+      "crop": [
+        321.613,
+        370.627,
+        50.5333,
+        88.32
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "two-neck-flask",
+      "name": "Two-neck flask",
+      "group": "Flasks",
+      "source": "jue-multineck",
+      "region": [
+        0,
+        0,
+        377.5,
+        413
+      ],
+      "crop": [
+        0.406538,
+        36.0099,
+        308.234,
+        375.68
+      ],
+      "scale": 0.00802106
+    },
+    {
+      "id": "three-neck-flask",
+      "name": "Three-neck flask",
+      "group": "Flasks",
+      "source": "jue-multineck",
+      "region": [
+        377.5,
+        0,
+        377.5,
+        413
+      ],
+      "crop": [
+        413.14,
+        0.776538,
+        341.454,
+        411.417
+      ],
+      "scale": 0.00802106
+    },
+    {
+      "id": "schlenk-flask",
+      "name": "Schlenk flask",
+      "group": "Flasks",
+      "source": "qg-schlenk",
+      "keep": [
+        "g10305"
+      ],
+      "crop": [
+        8.12196,
+        14.9058,
+        90.5343,
+        133.728
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "conical-flask",
+      "name": "Conical flask",
+      "group": "Flasks",
+      "source": "bl-erlenmeyer",
+      "keep": [
+        "path3908-3"
+      ],
+      "crop": [
+        11.533,
+        481.565,
+        3192.88,
+        4354.45
+      ],
+      "scale": 0.00064302
+    },
+    {
+      "id": "beaker",
+      "name": "Beaker",
+      "group": "Flasks",
+      "source": "bl-beakers",
+      "keep": [
+        "path17066",
+        "g17003",
+        "path17064"
+      ],
+      "crop": [
+        -1.50974,
+        0.593656,
+        125.078,
+        138.896
+      ],
+      "scale": 0.0165591
+    },
+    {
+      "id": "buchner-flask",
+      "name": "Büchner flask",
+      "group": "Flasks",
+      "source": "mev-buchner",
+      "keep": [
+        "g3881"
+      ],
+      "crop": [
+        -1.2993,
+        161.176,
+        117.498,
+        152.02
+      ],
+      "scale": 0.0200631
+    },
+    {
+      "id": "liebig-condenser-slanted",
+      "name": "Liebig condenser, slanted",
+      "group": "Condensers and adapters",
+      "source": "qg-distillation",
+      "keep": [
+        "g2109"
+      ],
+      "crop": [
+        90.3867,
+        196.6,
+        235.653,
+        146.56
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "liebig-condenser-upright",
+      "name": "Liebig condenser, upright",
+      "group": "Condensers and adapters",
+      "source": "qg-distillation",
+      "keep": [
+        "g2109"
+      ],
+      "rotate": 69.657,
+      "crop": [
+        -219.067,
+        175.668,
+        95.1603,
+        243.635
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "allihn-condenser",
+      "name": "Allihn condenser",
+      "group": "Condensers and adapters",
+      "source": "qg-allihn",
+      "region": [
+        0.0,
+        0.0,
+        116.0,
+        478.0
+      ],
+      "crop": [
+        4.35448,
+        11.0492,
+        102.5,
+        444.748
+      ],
+      "scale": 0.0147274
+    },
+    {
+      "id": "still-head",
+      "name": "Still head with thermometer",
+      "group": "Condensers and adapters",
+      "source": "qg-distillation",
+      "keep": [
+        "path6311",
+        "g2026"
+      ],
+      "crop": [
+        58.4933,
+        4.89333,
+        41.52,
+        328.56
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "receiver-adapter",
+      "name": "Receiver adapter",
+      "group": "Condensers and adapters",
+      "source": "qg-distillation",
+      "keep": [
+        "path2030"
+      ],
+      "crop": [
+        317.453,
+        325.213,
+        65.7867,
+        87.6267
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "buchner-funnel",
+      "name": "Büchner funnel",
+      "group": "Funnels",
+      "source": "mev-buchner",
+      "keep": [
+        "g4121"
+      ],
+      "crop": [
+        0.364431,
+        -1.24607,
+        114.17,
+        151.396
+      ],
+      "scale": 0.0200631
+    },
+    {
+      "id": "filter-funnel",
+      "name": "Filter funnel",
+      "group": "Funnels",
+      "source": "jue-funnels",
+      "region": [
+        0,
+        0,
+        276.5,
+        380
+      ],
+      "crop": [
+        0.360472,
+        6.12247,
+        207.207,
+        373.844
+      ],
+      "scale": 0.00615229
+    },
+    {
+      "id": "dropping-funnel",
+      "name": "Dropping funnel",
+      "group": "Funnels",
+      "source": "jue-dropping",
+      "region": [
+        112.5,
+        0,
+        112.5,
+        355
+      ],
+      "crop": [
+        161.043,
+        1.13994,
+        62.3301,
+        352.483
+      ],
+      "scale": 0.0129084
+    },
+    {
+      "id": "separating-funnel",
+      "name": "Separating funnel",
+      "group": "Funnels",
+      "source": "sf-separatory",
+      "keep": [
+        "g12025"
+      ],
+      "crop": [
+        263.667,
+        102.837,
+        226.975,
+        726.665
+      ],
+      "scale": 0.00694956
+    },
+    {
+      "id": "burette",
+      "name": "Burette with clamp",
+      "group": "Measuring",
+      "source": "qg-burette",
+      "region": [
+        0.0,
+        0.0,
+        100.0,
+        680.0
+      ],
+      "crop": [
+        8.56461,
+        12.7779,
+        84.6041,
+        658.977
+      ],
+      "scale": 0.0114571
+    },
+    {
+      "id": "measuring-cylinder",
+      "name": "Measuring cylinder",
+      "group": "Measuring",
+      "source": "xavax-cylinder",
+      "region": [
+        -35.087,
+        -952.356,
+        315.874,
+        1198.413
+      ],
+      "crop": [
+        -4.94107,
+        -881.717,
+        242.215,
+        1062.73
+      ],
+      "scale": 0.00475192
+    },
+    {
+      "id": "stirrer-hotplate",
+      "name": "Stirrer hotplate",
+      "group": "Heating and cooling",
+      "source": "qg-distillation",
+      "keep": [
+        "rect3921",
+        "rect3923",
+        "rect4812",
+        "g4857",
+        "g4866"
+      ],
+      "crop": [
+        11.0,
+        450.013,
+        113.28,
+        61.9733
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "oil-bath",
+      "name": "Oil bath",
+      "group": "Heating and cooling",
+      "source": "qg-distillation",
+      "keep": [
+        "g3915"
+      ],
+      "crop": [
+        20.7067,
+        404.253,
+        94.2133,
+        48.1067
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "ice-bath",
+      "name": "Ice bath",
+      "group": "Heating and cooling",
+      "source": "qg-distillation",
+      "keep": [
+        "g3911"
+      ],
+      "crop": [
+        306.707,
+        387.613,
+        77.5733,
+        82.7733
+      ],
+      "scale": 0.025
+    },
+    {
+      "id": "tlc-tank",
+      "name": "TLC tank with plate",
+      "group": "Chromatography",
+      "source": "qg-tlc",
+      "region": [
+        300,
+        0,
+        115,
+        128
+      ],
+      "crop": [
+        309.265,
+        8.90462,
+        100.503,
+        113.565
+      ],
+      "scale": 0.0224541
+    }
+  ]
+}

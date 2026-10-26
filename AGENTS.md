@@ -65,17 +65,17 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug keys, image queue, instance.ts (ready
-  Ketcher), drawing, stereoHighlight, placeInHand, templates.json, groups*, formula* + pictureScripts.
+  Ketcher), drawing, stereoHighlight, placeInHand, templates/glassware.json, groups*, formula*, pictureScripts.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts), Get name,
-  Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
+  Name to structure (naming.ts; NamePanel floats), Templates menu (+ Glassware tab: glassware.ts); Practice, NMR
   preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
   nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
 - `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, update checks, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
+- `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C table); practice.json; glassware/.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
@@ -84,7 +84,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
   test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
   `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
-- `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
+- `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators (build_glassware.py
+  cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json).
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
   replays), `functional_group*` and `nmr*` (test sets; judgement provisional), `chemdraw/`.
 - `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit), plans/ (acceptance bars).
@@ -100,8 +101,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   final value fixed in advance (exact value or format marker); `expect.poll` only on an
   exact value. Never sleep, never retry, never wait "long enough". Force orderings.
 - Every bug fix gets a test that fails without it; every guard has a negative test.
-- No test touches the network (pytest-socket; a Vitest fetch stub). Naming tests replay
-  recorded responses from tests/fixtures/recorded/.
+- No test touches the network (pytest-socket; a Vitest fetch stub); naming tests replay tests/fixtures/recorded/.
 - Playwright: full Chromium (`channel: 'chromium'`), a fresh profile per test, `retries: 0`.
 - Server: SMILES and names arrive in POST bodies only; never log bodies or put user input
   in exceptions. When RDKit or httpx is first used, call `RDLogger.DisableLog('rdApp.*')`
@@ -115,8 +115,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   numbers ("glucose shows 4") into a test. Generate it with RDKit/PubChem; read the fixture.
 - PubChem: `IsomericSMILES`/`CanonicalSMILES` are legacy (it silently answers `SMILES`/
   `ConnectivitySMILES`, so old code gets KeyError); an unknown structure is 200, `CID 0`.
-- Using the base conda env's Python (older rdkit with a chi2v/chi2n bug) or the system
-  Node 18. check.sh puts the env first on PATH and asserts both versions.
+- Using the base conda env's Python (old rdkit, chi2v/chi2n bug) or system Node 18 (check.sh asserts both).
 - Adding a CDN, web font, analytics or any external URL, or loosening web/csp.json.
 - Workbox drops files that `globPatterns` doesn't match, silently; the precache guard
   fails the build instead. Keep `wasm` in globPatterns and the 30 MB size limit.
@@ -135,7 +134,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Asking Indigo for two images, or two conversions (`getSmiles`, `getMolfile()` without
   'v2000'), at once: with different drawings one never settles (src/editor/imageQueue.ts
   queues both; keep the provider). `exportImage('svg')` copies the canvas offset by
-  Ketcher's toolbar, so the app's header clips it; use `generateImage`.
+  Ketcher's toolbar, so the app's header clips it; use `generateImage` (it rasterises an SVG
+  image at its own width and height and drops its text). Ketcher can't rotate or flip images.
 - RDKit.js needs `'unsafe-eval'` (embind's `new Function`): it runs only in rdkit/worker.js,
   never on the page. It defaults to legacy stereo perception (`configureRdkit` turns it off).
 - `tsc --noEmit` checks zero files here (use `tsc -b`). Vitest 5's disk cache froze globs (off).
