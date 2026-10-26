@@ -341,6 +341,7 @@ Version 2 adds the teaching features; none of them change the v1 architecture.
 - **Resonance structure generator:** enolates, carboxylates, amides and similar (RDKit).
 - **Conformation and projection templates:** chair cyclohexane with axial and equatorial positions, Newman, Fischer and Haworth. Templates first; generating a Newman projection from a chosen bond comes later.
 - **Lab glassware library:** an openly licensed SVG set placed with Ketcher's image tool, for lab reports.
+- **Formula text** (Jeff, 2026-10-26): a Formula button in Ketcher's Text Editor makes numbers subscripts and charges superscripts as the student types, like ChemDraw's Formula style. Plan: docs/plans/v2-formula-text.md.
 - **Course template libraries** for CHEM-312 and CHEM-405.
 
 ### Later version
