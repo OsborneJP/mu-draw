@@ -8,7 +8,7 @@ import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
-import { closeNmr } from './nmrStore';
+import { makeRoomFor } from './belowCanvas';
 import { showStereoisomers } from './stereoStore';
 import './properties.css';
 
@@ -141,7 +141,7 @@ function Stereo({ stereo, fragments, current, highlighted, onToggle }: StereoPro
           data-testid="stereo-show"
           disabled={!current}
           onClick={() => {
-            closeNmr(); // one panel below the canvas at a time
+            makeRoomFor('stereoisomers'); // one panel below the canvas at a time
             showStereoisomers();
           }}
         >

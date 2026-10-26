@@ -143,3 +143,21 @@ Accepted limits:
 - Nobody has tried it by hand in a browser yet, and it isn't on staging. Once the main
   session deploys, Jeff should try a few names on staging. He replaces the provisional list
   with CHEM-311's own: edit practice/chem-311.txt, then run build_practice_lists.py.
+
+## Merged with the stereoisomer panel (2026-10-26)
+
+Practice was built beside the ¹³C NMR preview only; on main the stereoisomer panel also docks
+below the canvas, and those two already close each other. Open together, the three would
+squeeze the canvas to nothing. Acceptance bar:
+1. **One panel below the canvas at a time**, for Practice, the ¹³C NMR preview and the
+   stereoisomers: opening any one closes the other two. The rule lives in one function that
+   every opener calls (the Practice button, Predict ¹³C NMR, Show stereoisomers), not in
+   pairs of calls.
+2. **Practice keeps its place**: closed to make room, it comes back to the same name.
+3. **Tests**: in Playwright, each opener closes each of the other two panels, and Practice
+   reopens on the same name. Each fails with that opener's call to the rule removed.
+
+Done: web/src/panels/belowCanvas.ts holds the rule; the Practice button, Predict ¹³C NMR and
+Show stereoisomers call it. A Playwright test opens each panel over the others and checks
+that Practice comes back to its name; with any one opener's call removed it fails.
+

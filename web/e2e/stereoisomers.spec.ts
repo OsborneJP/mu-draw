@@ -327,6 +327,35 @@ test('one panel below the canvas at a time: stereoisomers or the ¹³C NMR previ
   await expect(page.getByTestId('nmr-panel')).toHaveCount(0);
 });
 
+// Practice docks below the canvas too (docs/plans/v2-practice-mode.md, "Merged with the
+// stereoisomer panel"): whichever opens closes the others, and Practice keeps its place.
+test('one panel below the canvas at a time: Practice too, and it keeps its place', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await load(page, 'L-threonine');
+  await show(page);
+  const practice = page.getByTestId('practice-panel');
+  await page.getByTestId('app-practice-button').click();
+  await expect(practice).toBeVisible();
+  await expect(page.getByTestId('stereo-panel')).toHaveCount(0);
+  await page.getByTestId('practice-next').click();
+  await expect(page.getByTestId('practice-position')).toHaveText(/^2 of \d+$/);
+  const name = await page.getByTestId('practice-name').textContent();
+
+  // Next cleared the canvas for the new name; draw again.
+  await load(page, 'L-threonine');
+  await page.getByTestId('nmr-predict').click();
+  await expect(page.getByTestId('nmr-panel')).toHaveAttribute('data-state', 'ready');
+  await expect(practice).toHaveCount(0);
+  await page.getByTestId('app-practice-button').click();
+  await expect(practice).toBeVisible();
+  await expect(page.getByTestId('nmr-panel')).toHaveCount(0);
+  await expect(page.getByTestId('practice-name')).toHaveText(name!);
+
+  await show(page);
+  await expect(practice).toHaveCount(0);
+});
+
 test('offline: after one visit the stereoisomers are listed with no network and no server', async ({ app }) => {
   const { context, page, server } = app;
   await openEditor(app);

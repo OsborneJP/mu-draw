@@ -124,6 +124,8 @@ All notable changes to this project. The format follows
   sent. The first list is a provisional CHEM-311 one.
 
 ### Changed
+- Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening
+  one now closes the others; Practice comes back to the same name when reopened.
 - Save and Open no longer show the raw text of the file. Save asks only for the file name
   and format (Ketcher's warnings still show when a format would lose something). Open goes
   from choosing a file straight to "Open as New Project" or "Add to Canvas"; the "Paste
