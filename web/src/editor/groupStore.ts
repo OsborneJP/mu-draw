@@ -39,11 +39,11 @@ interface Editor {
   struct(): Struct;
   selection(selection?: Selection | null): Selection | null;
   findItem(event: MouseEvent, maps: string[]): { map: string; id: number } | null;
-  render: { clientArea: { contains(node: Node): boolean } };
+  render: { clientArea: { contains(node: Node): boolean; clientWidth: number; clientHeight: number } };
   rotateController?: { rerender(): void };
   event: {
     selectionChange: { add(handler: (value: unknown) => unknown): void };
-    updateFloatingTools: { add(handler: (payload: { visible?: boolean }) => void): void };
+    updateFloatingTools: { add(handler: (payload: { visible?: boolean; rotateHandlePosition?: Point }) => void): void };
   };
 }
 
@@ -83,11 +83,13 @@ function whereIn(struct: Struct): (kind: 'atoms' | ObjectKind, id: number) => Po
 export interface GroupState {
   /** What the button offers for the selection now, if anything. */
   offer: 'group' | 'ungroup' | null;
-  /** Ketcher's floating tools show (the button sits beside them). */
+  /** Ketcher's floating tools show on the canvas (the button sits beside them). */
   anchored: boolean;
 }
 
 let state: GroupState = { offer: null, anchored: false };
+let toolsShown = false; // Ketcher's floating tools are drawn (over a selection)
+let handle: Point | null = null; // where Ketcher's rotate handle is, on the canvas
 const listeners = new Set<() => void>();
 let groups: Group[] = [];
 let editor: Editor | null = null;
@@ -136,6 +138,16 @@ function drawingChanged(): void {
   }
   persist(groups, struct);
   set({ offer: offer(groups, editor.selection() ?? {}, canvasOf(struct)) });
+}
+
+/** Ketcher's floating tools are 108 × 36 px, centred 40 px above its rotate handle (measured);
+ * the button takes up to 96 px beside them. Ketcher draws them above the selection, so off
+ * the canvas when the selection reaches its top or an edge: then the button stays in its own
+ * place on the canvas, where it can be clicked. */
+function toolsOnCanvas(): boolean {
+  if (!editor || !handle) return false;
+  const { clientWidth, clientHeight } = editor.render.clientArea;
+  return handle.x - 54 >= 0 && handle.x + 54 + 96 <= clientWidth && handle.y - 58 >= 0 && handle.y - 22 <= clientHeight;
 }
 
 /** A double-click on an atom or bond of a group: select only it first (see the top). */
@@ -191,7 +203,9 @@ export function startGroups(ketcher: Ketcher, storage: () => Storage, key: strin
     return value;
   });
   editor.event.updateFloatingTools.add((payload) => {
-    if (payload.visible !== undefined) set({ anchored: payload.visible });
+    if (payload.visible !== undefined) toolsShown = payload.visible;
+    if (payload.rotateHandlePosition) handle = { x: payload.rotateHandlePosition.x, y: payload.rotateHandlePosition.y };
+    set({ anchored: toolsShown && toolsOnCanvas() });
   });
   ketcher.changeEvent.add(drawingChanged);
   events.addEventListener('dblclick', editOne, true);

@@ -1685,3 +1685,53 @@ Acceptance bar: docs/plans/v2-safety-snapshot.md (measurements, decisions, known
   (random starts), which had been measured on the test compounds only. Measure a change to
   the embedding on a wider set (round 2 used 53 large PubChem drugs). Round 3 found nothing
   high or medium; its lows are in docs/plans/v2-3d-view.md.
+
+## ACS drawing style by default (2026-10-26)
+
+Plan and measurements: docs/plans/acs-style-default.md.
+- **Ketcher keeps its settings in one localStorage entry, `ketcher-opts`, per site**, and
+  reads it twice. ketcher-react reads it when its code loads (the Redux options state), and
+  ketcher-core's `SettingsService` (a singleton) reads it when the editor is built, then
+  writes all its settings back. So every browser that ever opened the app has it. The
+  `Editor` component takes no settings; `KetcherBuilder.withSettings` exists, but
+  `buildKetcherAsync` never calls it. `resetToDefaults()` ignores any `defaults` given.
+- **Write it before ketcher-react's code loads.** src/editor/acsStart.ts is main.tsx's first
+  import, and the build keeps it ahead of ketcher-react (same chunk, import order). Written
+  later (after ketcher-react loaded, before the editor is built), the two readers disagree:
+  core's `SYNC_SETTINGS_FROM_CORE` changes the Redux options, `StructEditor` calls
+  `editor.options()`, which builds a new Render and reloads the structure through
+  `editor.struct()`. That reload goes into the undo history as "Load canvas", so a fresh,
+  empty canvas has an Undo step. e2e/acs.spec.ts checks the undo count; moved after `App`,
+  the import failed it.
+- **`imageResolution` has two types.** Core keeps a number (72, 600); the Redux schema
+  wants text ('600'). A stored 600 is dropped by Redux, so it reads 72 until core syncs it:
+  the same redraw. A stored '600' fails core's validation, and core then falls back to its
+  defaults for every setting. The app leaves resolution at Ketcher's 72 (with 600 written,
+  e2e/acs.spec.ts failed on the undo count).
+- **Partial settings can be thrown away whole.** `{ fontsz: 10, fontszUnit: 'pt' }` on its
+  own came back as 13 px: core rejected the stored object and used its defaults. Ketcher's
+  whole ACS preset passes. acsStyle.test.ts checks the app writes exactly that preset
+  (minus resolution), and e2e/acs.spec.ts that pressing Ketcher's own ACS button afterwards
+  changes nothing but resolution.
+- **Points on screen:** the canvas converts with `toFixed()`: 14.4 pt is 19 px, 0.6 pt is
+  1 px, 2 pt is 3 px, 10 pt labels are 13 px (the same as Ketcher's default labels).
+- **Clicking a bond is harder at ACS size.** Ketcher's bond hit test is a box in screen
+  pixels around the drawn line (`ReBond.getSelectionPoints`, which also reads the raw
+  `bondThickness` and `stereoBondWidth` numbers as pixels whatever their unit), and its
+  distance fallback never fires (it compares drawing units with `0.4 × microModeScale`
+  pixels). Atoms win within 0.4 bond lengths, and a bond wins only while the click is
+  nearer its middle than the atom. On a 19 px bond to an "OH" label the bond's middle is at
+  the label's edge, so Practice's wedge test, which clicked the middle, drew a new wedge
+  fragment ("query"). It now clicks a third of the way along the drawn line from the label
+  (`halfBonds.get(id).p`, the label-clipped end, in canvas pixels).
+- **Points in Indigo's pictures** are drawn at `image-resolution` dots per inch; pixels
+  ignore it. At ACS's 600, caffeine's SVG was 705 × 521 px (7.3 in wide in Word); at 96
+  it is 116 × 87 px, ACS print size. `generateImage` spreads its options over the editor's
+  `serverSettings`, so Export, Copy image and Show answer pass `AT_CSS_PIXELS`.
+- Indigo's SVG draws each bond line as a stroked path `M x y L x y` in drawing units (a
+  bond is 1 unit), with `transform="matrix(s, 0, 0, s, …)"`, so the longest line times `s`
+  is the bond length in pixels (`bondLengthInSvg` in e2e/fixtures.ts).
+- Ketcher draws its floating tools centred 40 px above its rotate handle, and the handle above
+  the selection, wherever that falls: off the canvas when the selection reaches its top. Its
+  updateFloatingTools event gives the handle's position relative to render.clientArea. At ACS
+  size, setMolecule then addFragment (no position) leaves part of the drawing above the canvas.

@@ -118,21 +118,34 @@ async function drawing(page: Page, { text = true } = {}) {
     async ([a, b]) => {
       await window.ketcher!.setMolecule(a);
       await window.ketcher!.addFragment(b);
+      // At half size, in the middle of the canvas, so the whole drawing and Ketcher's floating
+      // tools above it are on the canvas (addFragment leaves caffeine partly above it).
+      const editor = window.ketcher!.editor as unknown as { zoom(value: number): number; centerStruct(): void };
+      editor.zoom(0.5);
+      editor.centerStruct();
     },
     [molfile('aspirin'), molfile('caffeine')],
   );
+  // The text and the arrow go just below the molecules.
+  const atoms = await Promise.all((await everything(page)).atoms.map((id) => atomOnPage(page, id)));
+  const [left, right, bottom] = [Math.min(...atoms.map((a) => a.x)), Math.max(...atoms.map((a) => a.x)), Math.max(...atoms.map((a) => a.y))];
+  const box = (await page.locator(CANVAS).boundingBox())!;
+  expect(Math.min(...atoms.map((a) => a.y))).toBeGreaterThan(box.y + 150);
+  expect(bottom + 60).toBeLessThan(box.y + box.height);
   // A text, with the Text tool.
   if (text) {
     await page.getByTestId('text').filter({ visible: true }).click();
-    const textAt = await canvasPoint(page, 0.15, 0.85);
-    await page.mouse.click(textAt.x, textAt.y);
+    await page.mouse.click(left, bottom + 40);
     await page.getByTestId('text-editor').click();
     await page.keyboard.type('note');
     await page.getByRole('button', { name: 'Apply' }).click();
   }
   // An arrow, with the arrow tool.
   await page.getByTestId('reaction-arrow-open-angle').filter({ visible: true }).click();
-  const [from, to] = [await canvasPoint(page, 0.4, 0.88), await canvasPoint(page, 0.6, 0.88)];
+  const [from, to] = [
+    { x: (left + right) / 2, y: bottom + 40 },
+    { x: (left + right) / 2 + 80, y: bottom + 40 },
+  ];
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(to.x, to.y, { steps: 5 });
@@ -430,4 +443,35 @@ test('a double-click with the bond tool on a grouped bond leaves nothing selecte
   await page.mouse.dblclick((p.x + q.x) / 2, (p.y + q.y) / 2);
   // The next tool picked would act on anything left selected.
   await expect.poll(() => selection(page)).toEqual({ atoms: [], bonds: [], texts: [], rxnArrows: [] });
+});
+
+test('the button stays on the canvas, and works, when Ketcher draws its floating tools off it', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  // Placed by Ketcher alone: at ACS size addFragment leaves caffeine partly above the canvas.
+  await page.evaluate(
+    async ([a, b]) => {
+      await window.ketcher!.setMolecule(a);
+      await window.ketcher!.addFragment(b);
+    },
+    [molfile('aspirin'), molfile('caffeine')],
+  );
+  await selectTool(page);
+  const bottom = await page.evaluate(() => document.documentElement.clientHeight);
+  const lowest = await Promise.all((await everything(page)).atoms.map((id) => atomOnPage(page, id)));
+  const atom = (await everything(page)).atoms[lowest.findIndex((p) => p.y === Math.max(...lowest.map((q) => q.y)))];
+  await groupEverything(page);
+  await deselect(page);
+  await clickAtom(page, atom);
+  // Ketcher's tools are above the canvas; the button is not beside them but on the canvas.
+  const box = (await page.locator(CANVAS).boundingBox())!;
+  const tools = (await page.getByTestId('floating-tools').boundingBox())!;
+  expect(tools.y + tools.height).toBeLessThan(box.y);
+  const button = page.getByTestId('group-button');
+  await expect(button).toHaveAttribute('data-anchored', 'false');
+  const at = (await button.boundingBox())!;
+  expect(at.y).toBeGreaterThanOrEqual(box.y);
+  expect(at.y + at.height).toBeLessThan(Math.min(box.y + box.height, bottom));
+  await button.click();
+  await expect(button).toHaveAttribute('data-offer', 'group');
 });

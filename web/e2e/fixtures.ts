@@ -653,4 +653,68 @@ export function holdableBiochemReplies() {
   };
 }
 
+interface Ket {
+  root: { nodes: { $ref?: string }[] };
+  [name: string]: unknown;
+}
+
+/** Each atom's label and position relative to the drawing's lower-left corner, sorted.
+ * Ketcher moves the whole drawing without a change event (it centres a loaded drawing,
+ * and shifts everything when a drawing nears the canvas edge), so a saved copy can sit
+ * elsewhere on the canvas than the live drawing; Redo also renumbers atoms. Rounded,
+ * since loading rescales bonds to (almost exactly) the same length. */
+export function shape(text: string): string[] {
+  const parsed = JSON.parse(text) as Ket;
+  const atoms = parsed.root.nodes
+    .filter((node) => node.$ref)
+    .flatMap((node) => (parsed[node.$ref!] as { atoms: { label: string; location: number[] }[] }).atoms);
+  const x0 = Math.min(...atoms.map((a) => a.location[0]));
+  const y0 = Math.min(...atoms.map((a) => a.location[1]));
+  const round = (v: number) => (Math.abs(v) < 5e-5 ? 0 : v).toFixed(4);
+  return atoms.map((a) => `${a.label} ${round(a.location[0] - x0)} ${round(a.location[1] - y0)}`).sort();
+}
+
+/** The live drawing is the expected one: same structure (stereo included), and the same
+ * atoms in the same places relative to each other. */
+export async function expectDrawing(page: Page, expected: { inchikey: string; ket: string }) {
+  expect(await inchiKey(page)).toBe(expected.inchikey);
+  expect(shape(await ket(page))).toEqual(shape(expected.ket));
+}
+
+/** Steps Ketcher can undo and redo (not in its published types, but stable in 3.18). */
+export async function history(page: Page): Promise<{ undo: number; redo: number }> {
+  return page.evaluate(() =>
+    (window.ketcher!.editor as unknown as { historySize(): { undo: number; redo: number } }).historySize(),
+  );
+}
+
+/** Ketcher's display settings, as its settings service holds them. */
+export function ketcherSettings(page: Page): Promise<Record<string, unknown>> {
+  return page.evaluate(() => ({ ...window.ketcher!.settingsService!.getSettings() }));
+}
+
+/** A length set in Ketcher's settings, in CSS pixels at print size (1 in is 96 CSS px, 72 pt). */
+export function cssPixels(value: number, unit: string): number {
+  const perUnit: Record<string, number> = { px: 1, pt: 96 / 72, inch: 96, cm: 96 / 2.54 };
+  if (!(unit in perUnit)) throw new Error(`unknown unit ${unit}`);
+  return value * perUnit[unit];
+}
+
+/** The longest bond line in an Indigo SVG, in the SVG's pixels. Indigo draws each bond line
+ * as a stroked path "M x y L x y" in drawing units, scaled by its transform; a bond between
+ * two unlabelled carbons is drawn full length, so the longest line is the bond length. */
+export function bondLengthInSvg(svg: string): number {
+  let longest = 0;
+  for (const [path] of svg.matchAll(/<path fill="none"[^>]*>/g)) {
+    const line = / d="M ([-\d.]+) ([-\d.]+) L ([-\d.]+) ([-\d.]+) "/.exec(path);
+    const scale = / transform="matrix\(([-\d.]+), 0, 0, ([-\d.]+),/.exec(path);
+    if (!line || !scale) continue;
+    expect(scale[1]).toBe(scale[2]);
+    const [x1, y1, x2, y2] = line.slice(1).map(Number);
+    longest = Math.max(longest, Math.hypot(x2 - x1, y2 - y1) * Number(scale[1]));
+  }
+  expect(longest, 'the SVG has bond lines').toBeGreaterThan(0);
+  return longest;
+}
+
 export { expect };

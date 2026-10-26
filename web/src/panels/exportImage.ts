@@ -1,7 +1,8 @@
 // Export and copy (spec section 4), entirely on the device: nothing here makes a request.
 //
 // Every image starts as Indigo's SVG rendering of the whole drawing (ketcher.generateImage,
-// which applies the student's Ketcher display settings). The SVG file is that text. A PNG is
+// which applies the student's Ketcher display settings), at CSS pixels (AT_CSS_PIXELS), so
+// ACS's sizes in points come out at print size. The SVG file is that text. A PNG is
 // that SVG drawn on a canvas at 1x, 2x or 4x, so every scale is the same picture at exactly
 // scale × the SVG's size. Each PNG says it is 96 × scale dpi, so Word places all three at
 // the same size: a higher scale is sharper, not bigger.
@@ -19,6 +20,15 @@ export type Scale = 1 | 2 | 4;
 export const SCALES: readonly Scale[] = [1, 2, 4];
 /** Copy image always uses this scale and a white background (see copyDrawing). */
 export const COPY_SCALE: Scale = 2;
+
+/** CSS pixels per inch: Indigo draws 1x in CSS pixels. */
+const CSS_DPI = 96;
+
+/** Every picture the app makes asks Indigo for CSS pixels, over the student's display
+ * settings. Sizes set in points, as ACS's are, then come out at print size (ACS's 14.4 pt
+ * bond is 0.2 in), and sizes set in pixels are unchanged. At Ketcher's own image resolution
+ * (600 dpi in its ACS preset) an ACS drawing would come out 6.25 times too big. */
+export const AT_CSS_PIXELS = { 'image-resolution': CSS_DPI } as const;
 
 /** 'empty': the drawing is empty, so nothing was saved or copied. */
 export type Outcome = 'done' | 'empty';
@@ -62,7 +72,7 @@ function isEmpty(ketcher: Ketcher): boolean {
 
 async function drawingSvg(ketcher: Ketcher): Promise<string> {
   const ket = await ketcher.getKet();
-  return (await ketcher.generateImage(ket, { outputFormat: 'svg' })).text();
+  return (await ketcher.generateImage(ket, { outputFormat: 'svg', ...AT_CSS_PIXELS })).text();
 }
 
 async function drawingPng(ketcher: Ketcher, scale: Scale, transparent: boolean): Promise<Blob> {
@@ -100,8 +110,6 @@ function download(blob: Blob, fileName: string): void {
   URL.revokeObjectURL(link.href);
 }
 
-/** CSS pixels per inch: Indigo draws 1x in CSS pixels. */
-const CSS_DPI = 96;
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
 
 /** The PNG with a pHYs chunk saying 96 × scale dpi, placed right after IHDR (any pHYs it

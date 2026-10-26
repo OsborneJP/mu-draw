@@ -10,6 +10,7 @@
 // reply, change the drawing, release it and see that nothing is shown.
 import type { Ketcher } from 'ketcher-core';
 import { readDrawing } from '../editor/drawing';
+import { AT_CSS_PIXELS } from './exportImage';
 import { PRACTICE_FILE, type PracticeList, type PracticeName } from './practiceFile';
 
 export type { PracticeList, PracticeName };
@@ -245,12 +246,17 @@ export async function showAnswer(ketcher: Ketcher): Promise<void> {
   update({ answer: { kind: 'drawing' } });
   let answer: Answer;
   try {
-    // What ketcher.generateImage asks Indigo for (the student's display settings), kept as
-    // base64: a data: image, which img-src allows (web/csp.json; blob: images are not). With
-    // no Blob to read, the answer is handled as soon as Indigo's reply arrives, so a test
-    // knows it was dropped once a later request through the queue has settled.
+    // What ketcher.generateImage asks Indigo for (the student's display settings), at CSS
+    // pixels like Export, so it is the size of the canvas's drawing at 100%. Kept as base64:
+    // a data: image, which img-src allows (web/csp.json; blob: images are not). With no Blob
+    // to read, the answer is handled as soon as Indigo's reply arrives, so a test knows it
+    // was dropped once a later request through the queue has settled.
     const settings = (ketcher.editor as unknown as { serverSettings: Record<string, unknown> }).serverSettings;
-    const svg = await ketcher.structService.generateImageAsBase64(item.molfile, { ...settings, outputFormat: 'svg' });
+    const svg = await ketcher.structService.generateImageAsBase64(item.molfile, {
+      ...settings,
+      ...AT_CSS_PIXELS,
+      outputFormat: 'svg',
+    });
     answer = { kind: 'shown', src: `data:image/svg+xml;base64,${svg}` };
   } catch (error) {
     console.error('Show answer could not draw the answer:', error);

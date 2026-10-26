@@ -62,12 +62,12 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug keys, image queue, instance.ts (ready
-  Ketcher), drawing, stereoHighlight, placeInHand, templates/glassware.json, groups*, formula*, pictureScripts.
-- `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
-  properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
-  overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), protonNmr.ts (¹H), stereoElements/-isomers/
-  -Pictures.ts; tautomers.ts, resonance.ts (RDKit's C++ ported onto rdkitForm.ts), formPictures.ts;
-  biochem.ts (sequences, charge, pI), indigoBiochem.ts (Indigo's values; biochemWorker.ts runs it).
+  Ketcher), drawing, stereoHighlight, placeInHand, templates/glassware.json, groups*, formula*, pictureScripts,
+  the ACS default (acsStyle.ts; acsStart.ts: main.tsx's first import).
+- `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values), properties.ts
+  (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS, overlap rule), hose.ts, carbonTable.ts,
+  nmr.ts (¹³C), protonNmr.ts (¹H), stereoElements/-isomers/-Pictures.ts; tautomers.ts, resonance.ts (RDKit's C++
+  ported onto rdkitForm.ts), formPictures.ts; biochem.ts (sequences, charge, pI), indigoBiochem.ts (biochemWorker.ts).
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts; at its foot
   BiochemSection.tsx), Get name, Name to structure (naming.ts; NamePanel floats), Templates menu
   (+ Glassware tab: glassware.ts); Practice, NMR previews (¹³C, ¹H), stereoisomers, tautomers, resonance

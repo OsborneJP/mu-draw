@@ -208,6 +208,13 @@ All notable changes to this project. The format follows
   update banner then, not only at the next launch. Nothing reloads until Reload is clicked.
 - The Text tool's editor now says, under its formatting buttons: "Highlight the text first:
   formatting applies to what is highlighted."
+- Drawings start in the ACS Document 1996 style, the one Ketcher's "Set ACS Settings" gives
+  and ChemDraw users know from journals: bonds 0.2 in long, thin lines, 10 pt Arial labels,
+  and every atom black. On screen, molecules are about half their old size at 100% zoom;
+  Ketcher's zoom makes them bigger. A browser that used the app before switches once, and a
+  student's own changes in Settings stay after that. Export and Copy image come out at ACS
+  print size (caffeine is about 1.2 in wide in Word); 2x and 4x are sharper, not bigger.
+  Practice's Show answer is drawn the same way.
 - The IR hints' source and licence now sit behind a tick, "Source and licence (CC BY-SA
   4.0)", instead of taking several lines under every list of hints.
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening
@@ -238,6 +245,8 @@ All notable changes to this project. The format follows
   at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
+- The Group / Ungroup button no longer goes off the canvas with Ketcher's floating tools when
+  a selection reaches the top or an edge of the canvas; it stays where it can be clicked.
 - The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds
   stereogenic only through the stereocentres beside them, so its stereogenic double bonds
   and "Stereoisomers, at most" were too low.

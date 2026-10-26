@@ -9,11 +9,14 @@ import { resolveBase } from '../config/app.ts';
 import { autosaveKey } from '../src/editor/autosave.ts';
 import { PRACTICE_FILE, type PracticeList } from '../src/panels/practiceFile.ts';
 import {
+  bondLengthInSvg,
+  cssPixels,
   expect,
   fixture,
   goOffline,
   holdableIndigoReplies,
   inchiKey,
+  ketcherSettings,
   openEditor,
   referenceCompound,
   test,
@@ -86,21 +89,31 @@ const hold = (page: Page) => page.evaluate(() => (window as unknown as { __holdI
 const release = (page: Page) => page.evaluate(() => (window as unknown as { __releaseIndigo(): void }).__releaseIndigo());
 const heldReplies = (page: Page) => page.evaluate(() => (window as unknown as { __heldIndigo(): number }).__heldIndigo());
 
-/** Where the student clicks for the drawing's one bond to O: its middle, on the page. */
+/** Where the student clicks for the drawing's one bond to O, on the page: on the line
+ * Ketcher draws for it, a third of the way from the O label's edge to the stereocentre.
+ * Ketcher takes a click for a bond only on its drawn line (a box in screen pixels, which
+ * stops at the label), and only while nearer the bond's middle than the carbon. With ACS's
+ * 19 px bonds and 13 px labels, the bond's own middle is at the label's edge (measured). */
 function bondToOxygenOnPage(page: Page): Promise<{ x: number; y: number }> {
   return page.evaluate(() => {
+    type Point = { x: number; y: number };
     const editor = window.ketcher!.editor as unknown as {
-      render: { page2obj(e: { clientX: number; clientY: number }): { x: number; y: number } };
+      render: { page2obj(e: { clientX: number; clientY: number }): Point; options: { microModeScale: number } };
       struct(): {
-        atoms: Map<number, { label: string; pp: { x: number; y: number } }>;
-        bonds: Map<number, { begin: number; end: number }>;
+        atoms: Map<number, { label: string }>;
+        bonds: Map<number, { begin: number; end: number; hb1: number; hb2: number }>;
+        // Where each half of a bond's drawn line starts, in canvas pixels (clear of labels).
+        halfBonds: Map<number, { p: Point }>;
       };
     };
     const struct = editor.struct();
     const toO = [...struct.bonds.values()].filter((b) => [b.begin, b.end].some((a) => struct.atoms.get(a)!.label === 'O'));
     if (toO.length !== 1) throw new Error(`expected one bond to O, found ${toO.length}`);
-    const [a, b] = [struct.atoms.get(toO[0].begin)!.pp, struct.atoms.get(toO[0].end)!.pp];
-    const target = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const bond = toO[0];
+    const fromO = struct.atoms.get(bond.begin)!.label === 'O';
+    const [atO, atC] = (fromO ? [bond.hb1, bond.hb2] : [bond.hb2, bond.hb1]).map((id) => struct.halfBonds.get(id)!.p);
+    const scale = editor.render.options.microModeScale;
+    const target = { x: (atO.x + (atC.x - atO.x) / 3) / scale, y: (atO.y + (atC.y - atO.y) / 3) / scale };
     // Ketcher maps page to drawing linearly; invert it from three points.
     const at = (clientX: number, clientY: number) => editor.render.page2obj({ clientX, clientY });
     const o = at(0, 0);
@@ -341,8 +354,14 @@ test('Show answer: a picture of the answer after a wrong Check; the canvas is un
   await page.getByTestId('practice-show-answer').click();
   const picture = page.getByTestId('practice-answer').locator('img');
   await expect(picture).toBeVisible();
-  expect(await picture.getAttribute('src')).toMatch(/^data:image\/svg\+xml;base64,/);
+  const src = (await picture.getAttribute('src'))!;
+  expect(src).toMatch(/^data:image\/svg\+xml;base64,/);
   expect(await picture.evaluate((img: HTMLImageElement) => img.decode().then(() => img.naturalWidth))).toBeGreaterThan(0);
+  // Drawn like Export: a bond at print size, so the answer is the size of the canvas's drawing at 100%.
+  const { bondLength, bondLengthUnit } = await ketcherSettings(page);
+  expect(bondLengthUnit).toBe('pt');
+  const answerSvg = Buffer.from(src.slice(src.indexOf(',') + 1), 'base64').toString('utf8');
+  expect(bondLengthInSvg(answerSvg)).toBeCloseTo(cssPixels(bondLength as number, bondLengthUnit as string), 0);
   // The canvas view has made up for the height the panel takes, the picture included
   // (Docked, as for the NMR preview), so the drawing isn't pushed behind the panel.
   const panel = page.getByTestId('practice-panel');

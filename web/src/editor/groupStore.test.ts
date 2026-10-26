@@ -47,13 +47,17 @@ function drawing(order: 'as drawn' | 'second molecule first' | 'scaled and moved
 
 type Drawing = ReturnType<typeof drawing>;
 
+/** Ketcher's floating-tools event: whether they show, and where its rotate handle is on the
+ * canvas (they sit centred 40 px above it). */
+type FloatingTools = { visible?: boolean; rotateHandlePosition?: { x: number; y: number } };
+
 /** A fake Ketcher: setting the selection fires selectionChange (Ketcher's pipeline event), as
  * Ketcher's does. `beforeSelectionEvent` runs as each selection is set, before the event.
  * `doubleClick` sends a double-click on `under` (the item Ketcher's findItem gives) to the
  * events target, before Ketcher's own handler would read the selection. */
 function fakeKetcher(start: Drawing) {
   const onSelection: ((value: unknown) => unknown)[] = [];
-  const onFloatingTools: ((payload: { visible?: boolean }) => void)[] = [];
+  const onFloatingTools: ((payload: FloatingTools) => void)[] = [];
   const onChange: (() => void)[] = [];
   let current: Selection | null = null;
   const events = new EventTarget();
@@ -70,7 +74,7 @@ function fakeKetcher(start: Drawing) {
     },
     beforeSelectionEvent: (() => {}) as (selection: Selection | null) => void,
     change: () => onChange.forEach((handler) => handler()),
-    floatingTools: (payload: { visible?: boolean }) => onFloatingTools.forEach((handler) => handler(payload)),
+    floatingTools: (payload: FloatingTools) => onFloatingTools.forEach((handler) => handler(payload)),
     selection: (next?: Selection | null) => {
       if (next === undefined) return current;
       current = next;
@@ -84,11 +88,11 @@ function fakeKetcher(start: Drawing) {
       struct: () => fake.drawing,
       selection: fake.selection,
       findItem: () => fake.under,
-      render: { clientArea: { contains: () => fake.onCanvas } },
+      render: { clientArea: { contains: () => fake.onCanvas, clientWidth: 800, clientHeight: 600 } },
       rotateController: { rerender: () => fake.rotateFrames++ },
       event: {
         selectionChange: { add: (handler: (value: unknown) => unknown) => onSelection.push(handler) },
-        updateFloatingTools: { add: (handler: (payload: { visible?: boolean }) => void) => onFloatingTools.push(handler) },
+        updateFloatingTools: { add: (handler: (payload: FloatingTools) => void) => onFloatingTools.push(handler) },
       },
     },
     changeEvent: { add: (handler: () => void) => onChange.push(handler) },
@@ -330,19 +334,27 @@ describe('the store on a Ketcher', () => {
     expect(tidy(fake.selection())).toEqual(WHOLE);
   });
 
-  it('tells the button whether Ketcher’s floating tools show, and its listeners of each change', () => {
+  it('puts the button beside Ketcher’s floating tools while they show on the canvas, and tells its listeners', () => {
     const { fake, ketcher } = fakeKetcher(drawing());
     store.startGroups(ketcher, () => memoryStorage(), KEY, fake.events);
     const heard = vi.fn();
     store.subscribeGroups(heard);
-    fake.floatingTools({ visible: true });
+    fake.floatingTools({ visible: true, rotateHandlePosition: { x: 300, y: 200 } });
     expect(store.getGroupState().anchored).toBe(true);
-    fake.floatingTools({}); // a move of the rotate handle only
+    fake.floatingTools({ rotateHandlePosition: { x: 320, y: 220 } }); // the handle moved
     expect(store.getGroupState().anchored).toBe(true);
-    fake.floatingTools({ visible: false });
+    // Ketcher draws its tools above the selection: off the canvas when the selection reaches its
+    // top (or edges), and the button would go with them out of reach.
+    for (const off of [{ x: 300, y: 30 }, { x: 20, y: 200 }, { x: 760, y: 200 }, { x: 300, y: 640 }]) {
+      fake.floatingTools({ rotateHandlePosition: off });
+      expect(store.getGroupState().anchored, JSON.stringify(off)).toBe(false);
+    }
+    fake.floatingTools({ rotateHandlePosition: { x: 300, y: 200 } });
+    expect(store.getGroupState().anchored).toBe(true);
+    fake.floatingTools({ visible: false, rotateHandlePosition: { x: 0, y: 0 } });
     expect(store.getGroupState().anchored).toBe(false);
     fake.selection({ atoms: [0, 2] });
     expect(store.getGroupState().offer).toBe('group');
-    expect(heard).toHaveBeenCalledTimes(3);
+    expect(heard).toHaveBeenCalledTimes(5);
   });
 });

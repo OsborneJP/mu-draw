@@ -90,6 +90,13 @@ and deletes as one.
   selected the group; so a double-click on an atom or bond of a group first selects that one
   alone (round 1: changing one carbon to N changed the whole group).
 
+- Merging the ACS default (smaller drawings) showed that Ketcher draws its floating tools and
+  rotate handle above the selection even when that is off the canvas, and the button anchored
+  to them went too, out of reach. It now sits beside them only while they are on the canvas
+  (from the rotate handle's position Ketcher reports), and otherwise in its own place; a store
+  test and a browser test (a drawing that runs off the canvas top) fail without that. The
+  browser tests now draw at half zoom in the middle of the canvas.
+
 ## Review (round 1, 2026-10-26)
 
 Three reviewers against this bar, each high or medium finding put to a skeptic. Confirmed
