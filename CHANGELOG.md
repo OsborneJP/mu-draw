@@ -131,6 +131,7 @@ All notable changes to this project. The format follows
   Undo brings them back.
 
 ### Changed
+- About now says who made the app: "Made by Jeff Osborne with Claude Code."
 - An open app now finds a new version when the student comes back to it (from another tab
   or window, or after closing the lid) or when the device comes back online, and shows the
   update banner then, not only at the next launch. Nothing reloads until Reload is clicked.

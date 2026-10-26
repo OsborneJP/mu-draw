@@ -18,7 +18,7 @@ test('the header names the app, and its offline badge follows the connection', a
   await expect(badge).toHaveCount(0);
 });
 
-test('About shows the version from package.json and links nowhere', async ({ app }) => {
+test('About shows the version from package.json and who made it, and links nowhere', async ({ app }) => {
   const { page } = app;
   await openEditor(app);
   const about = page.getByRole('dialog', { name: appTitle(resolveBase()) });
@@ -26,6 +26,7 @@ test('About shows the version from package.json and links nowhere', async ({ app
 
   await page.getByTestId('app-about-button').click();
   await expect(about.getByTestId('app-version')).toHaveText(`Version ${pkg.version}`);
+  await expect(about.getByTestId('app-authors')).toHaveText('Made by Jeff Osborne with Claude Code.');
   // Plain text only: nothing in it can take the student, or a request, anywhere.
   await expect(about.locator('a, [href], [src], form, iframe')).toHaveCount(0);
   await page.keyboard.press('Escape');

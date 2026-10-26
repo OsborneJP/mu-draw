@@ -19,6 +19,7 @@ export default function AboutBox({ title }: { title: string }) {
         <p data-testid="app-version">Version {__APP_VERSION__}</p>
         <p>Draw chemical structures and reactions. Works offline.</p>
         <p>Your drawing is saved only in this browser, on this device.</p>
+        <p data-testid="app-authors">Made by Jeff Osborne with Claude Code.</p>
         <p className="about-credits">
           Built with Ketcher (EPAM Systems, Apache License 2.0) and RDKit (BSD 3-Clause License).
         </p>
