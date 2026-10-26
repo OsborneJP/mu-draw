@@ -121,6 +121,13 @@ All notable changes to this project. The format follows
   isomer, or a different formula. Then Show answer draws a picture of the answer. Next and
   Previous clear the canvas, and one Undo brings the drawing back. Nothing is stored or
   sent. The first list is a provisional CHEM-311 one.
+- Formula text (version 2): the Text Editor has a Formula button. While it is on, numbers
+  come out as subscripts and charges as superscripts as the student types, like ChemDraw's
+  Formula style: H₂SO₄, (NH₄)₂SO₄, CuSO₄·5H₂O, Cu²⁺, SO₄²⁻, [Fe(CN)₆]³⁻. A leading number
+  (5H₂O) stays on the line. It covers the whole text box, and Ketcher's superscript and
+  subscript buttons are greyed while it is on. Turning it off leaves the text as it is, so
+  an isotope (¹³C) is still made by hand. A text formatted this way reopens with Formula
+  on. The note under the buttons adds "Formula formats all of the text as you type."
 
 ### Changed
 - The Text tool's editor now says, under its formatting buttons: "Highlight the text first:

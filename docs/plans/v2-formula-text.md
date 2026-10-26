@@ -7,7 +7,7 @@ Status: **approved by Jeff on 2026-10-26, every proposed answer (in bold) as wri
 
 ## What a student sees
 
-1. The Text tool opens Ketcher's Text Editor as today. Its formatting toolbar gains one button, "Formula", after the font size. It starts off (decision 5).
+1. The Text tool opens Ketcher's Text Editor as today. Its formatting toolbar gains one button, "Formula", on a row of its own under the formatting buttons (see "Built"). It starts off (decision 5).
 2. With Formula on, the text comes out as a chemical formula while the student types it: H2SO4 shows as H₂SO₄, (NH4)2SO4 as (NH₄)₂SO₄, CuSO4·5H2O as CuSO₄·5H₂O, and Cu2+ as Cu²⁺. While the student types Cu2+, the 2 is a subscript until the + arrives, then it rises: Cu2 could still be Cu₂.
 3. Formula covers the whole text box, as a ChemDraw caption set to Formula does (decision 3). Turning it on formats what is already there.
 4. While Formula is on, Ketcher's superscript and subscript buttons are greyed out, because Formula decides those. Bold, italic, symbols and font size work as before.
@@ -148,6 +148,13 @@ Each line is read word by word (words are split at spaces). Characters are never
 - The canvas draws subscripts and superscripts at half size (Ketcher), smaller than pictures (decision 6).
 - Formula's on or off is not saved. It is read back from the formatting when a text is reopened.
 - In a Formula box, a capitalised word ending in a hyphen (N- and O-alkylation) gets a raised minus.
+- A charge followed by a closing bracket, a slash or a quote is not raised, and its digit becomes a count: [Cu2+] gives [Cu₂+], Cu2+/Cu gives Cu₂+/Cu, and Ksp = [Ca2+][F-]2 gives [Ca₂+][F-]₂ (found in review; for Jeff, see "Built").
+- Turning Formula on has no Undo step of its own: hand formatting that it replaces (a superscript isotope) can't be brought back with Undo.
+- Pictures use whole pixels, so 75% is exact only at some sizes: 13 px gives 10 px (77%), 6 px gives 5 px (83%).
+- While Formula is on, the greyed subscript and superscript buttons show no tooltip or "not allowed" cursor (a click passes through them to the toolbar, which keeps the focus in the text).
+- The Formula row makes the Text Editor 36 px taller; in a window under about 490 px tall, Ketcher's dialog body scrolls.
+- Typing through an input method (composition) is not tested in a browser; the composed run is formatted once it is committed.
+- Each change reformats its whole line, so a long pasted paragraph full of formulas is slow: about 0.7 s per change at 3,000 characters (measured headless). Captions are short.
 
 ## Decided (Jeff, 2026-10-26)
 
@@ -162,3 +169,9 @@ Jeff approved the plan as written, with every proposed answer:
 8. No shortcut.
 9. The note under the toolbar gains "Formula formats all of the text as you type."
 10. lexical 0.40.0 is pinned exactly and covered by the pin test.
+
+## Built (2026-10-26, on branch claude/v2-formula-text)
+
+- Changed while building: the Formula button sits on a row of its own inside Ketcher's toolbar, under the formatting buttons. Beside them there was no room in the 340 px dialog: it squeezed Ketcher's buttons from 28 px to about 16 px and clipped the bold icon (review finding).
+- Found in review and fixed, each with a browser test that failed without the fix: a click on a greyed subscript or superscript button took the focus out of the text, so the next keys went nowhere and Enter applied the dialog.
+- For Jeff to decide (not built, not in the approved rules): whether a charge before a closing bracket, slash or quote should be raised, for concentrations and redox couples ([Cu2+], Cu2+/Cu). Proposed: yes, by treating `)`, `]`, `/` and quotes after a charge like the trailing punctuation of rule 3.

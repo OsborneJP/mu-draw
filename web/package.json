@@ -20,6 +20,7 @@
     "ketcher-core": "3.18.0",
     "ketcher-react": "3.18.0",
     "ketcher-standalone": "3.18.0",
+    "lexical": "0.40.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

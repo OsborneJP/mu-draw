@@ -65,7 +65,7 @@ test('the Text Editor says formatting applies to the highlighted text', async ({
   });
   expect(label).toEqual({
     text: 'Text:',
-    note: '"Highlight the text first: formatting applies to what is highlighted."',
+    note: '"Highlight the text first: formatting applies to what is highlighted. Formula formats all of the text as you type."',
     display: 'block',
   });
 });

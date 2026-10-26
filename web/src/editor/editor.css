@@ -43,11 +43,50 @@
    buttons apply to the highlighted text, which students miss (Jeff, 2026-10-26). A note on
    its own line under the formatting toolbar, before the "Text:" label (its next sibling). */
 [role='toolbar'][aria-label='Text formatting toolbar'] + span::before {
-  content: 'Highlight the text first: formatting applies to what is highlighted.';
+  content: 'Highlight the text first: formatting applies to what is highlighted. Formula formats all of the text as you type.';
   display: block;
   margin: 0 0 8px;
   color: #57606a;
   font-size: 12px;
+}
+
+/* The Formula button (src/editor/formulaText.ts), on a row of its own under Ketcher's
+   formatting buttons, which fill the 340px dialog (beside them it squeezed them): shaped like
+   Ketcher's text buttons, filled like its active ones while Formula is on. */
+[role='toolbar'][aria-label='Text formatting toolbar'] {
+  flex-wrap: wrap;
+  height: auto;
+  row-gap: 8px;
+}
+
+[data-testid='formula-row'] {
+  flex-basis: 100%;
+}
+
+/* While Formula is on, the app disables Ketcher's superscript and subscript buttons, and
+   Ketcher's own [disabled] style greys them. A click on one then lands on the toolbar, whose
+   click puts the focus back in the text: a disabled button gets no events, so the press would
+   otherwise move the focus to the toolbar and the next keys would go nowhere (Enter would
+   apply the dialog). */
+[role='toolbar'][aria-label='Text formatting toolbar'] button:disabled {
+  pointer-events: none;
+}
+
+[data-testid='formula-button'] {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #b4b9d6;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  font: inherit;
+  cursor: pointer;
+}
+
+[data-testid='formula-button'][aria-pressed='true'] {
+  border-color: #167782;
+  background: #167782;
+  color: #fff;
 }
 
 /* Without the preview, Save's fixed 310px would be blank space; Open's one tile is centred. */

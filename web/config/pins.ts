@@ -1,6 +1,8 @@
 // Invariant: the chemistry engines are pinned to exact versions. ketcher-core is included
 // because ketcher-react and ketcher-standalone depend on it as "*". @rdkit/rdkit must also
-// match the server's rdkit release (tests/test_versions.py).
+// match the server's rdkit release (tests/test_versions.py). lexical is the Text Editor's
+// engine inside ketcher-react; Formula text imports it too, and both must get the one copy
+// (one lockfile entry), or the app's transforms would not be the dialog's.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +14,7 @@ export const PINNED: Record<string, string> = {
   'ketcher-standalone': '3.18.0',
   'ketcher-core': '3.18.0',
   '@rdkit/rdkit': '2026.9.1',
+  lexical: '0.40.0',
 };
 // The Ketcher packages must move together.
 export const SAME_VERSION = ['ketcher-react', 'ketcher-standalone', 'ketcher-core'] as const;
