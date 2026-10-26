@@ -244,14 +244,16 @@ def test_without_an_eu_entry_echas_first_wins_and_without_either_the_first_liste
     ]
 
 
-def test_not_classified_followed_by_a_hazard_statement_is_unavailable():
+def test_not_classified_followed_by_a_hazard_code_in_any_form_is_unavailable():
     echa = first_of(GLUCOSE, ghs.ECHA)
-    statement = parts(item(ETHANOL, first_of(ETHANOL, ghs.EU), ghs.STATEMENTS))[0]
-    body = copy.deepcopy(GLUCOSE)
-    parts(item(body, echa, ghs.STATEMENTS)).append(copy.deepcopy(statement))
+    statement = parts(item(ETHANOL, first_of(ETHANOL, ghs.EU), ghs.STATEMENTS))[0]["String"]
+    code, words = statement.split(": ", 1)
     ghs.snapshot(GLUCOSE)  # the recording itself reads
-    with pytest.raises(Unavailable):
-        ghs.snapshot(body)
+    for line in (statement, code, f"{code} - {words}", f"{code}:{words}"):
+        body = copy.deepcopy(GLUCOSE)
+        parts(item(body, echa, ghs.STATEMENTS)).append({"String": line})
+        with pytest.raises(Unavailable):
+            ghs.snapshot(body)
 
 
 def test_an_entry_with_an_item_twice_is_unavailable_when_chosen():

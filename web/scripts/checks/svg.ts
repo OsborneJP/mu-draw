@@ -10,7 +10,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const ELEMENTS = new Set(['svg', 'g', 'path', 'circle', 'ellipse', 'rect', 'line', 'polyline', 'polygon']);
 const NUMBERS = /^[-+\d.eE,\s%]*$/;
 const COLOUR = /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]+)$/;
-const TRANSFORM = /^(\s*(matrix|translate|scale|rotate|skewX|skewY)\(\s*[-+\d.eE,\s]*\)\s*,?)*\s*$/;
+// Each separator is matched by one part only, so a value that fails is rejected in linear time.
+const TRANSFORM = /^\s*(?:(?:matrix|translate|scale|rotate|skewX|skewY)\([-+\d.eE,\s]*\)(?:\s*,\s*|\s+)?)*$/;
 const PATH_DATA = /^[MmLlHhVvCcSsQqTtAaZz\d\s.,eE+-]*$/;
 const STYLE_PROPERTIES = new Set(['fill', 'stroke', 'stroke-width', 'opacity', 'fill-opacity', 'stroke-opacity', 'fill-rule']);
 
@@ -84,7 +85,7 @@ export function checkSvg(source: string): string[] {
     for (let attribute = ATTRIBUTE.exec(rest); attribute; attribute = ATTRIBUTE.exec(rest)) {
       const [whole, key, double, single] = attribute;
       const value = double ?? single;
-      const allowed = ATTRIBUTES[key];
+      const allowed = Object.hasOwn(ATTRIBUTES, key) ? ATTRIBUTES[key] : undefined; // not "constructor"
       if (!allowed) errors.add(`has an attribute outside the allowlist: ${key}`);
       else if (!allowed(value)) errors.add(`has an attribute value not allowed: ${key}="${value}"`);
       rest = rest.slice(whole.length);

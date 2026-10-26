@@ -163,7 +163,9 @@ def test_the_pictograms_must_be_served_as_svg_under_the_pages_csp():
     results = good_results()
     results["ghs/GHS07.svg"].headers["content-type"] = ["text/plain"]
     del results["ghs/GHS07.svg"].headers["content-security-policy"]
+    results["ghs/GHS07.svg"].headers["cache-control"] = [IMMUTABLE]
     assert cl.check(results, cl.expectations(FILES), POLICY, WORKERS) == [
+        f"ghs/GHS07.svg: Cache-Control [{IMMUTABLE!r}], want ['no-cache']",
         "ghs/GHS07.svg: Content-Type ['text/plain'], want image/svg+xml",
         "ghs/GHS07.svg: Content-Security-Policy differs from web/csp.json",
     ]

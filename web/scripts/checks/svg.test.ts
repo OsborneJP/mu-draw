@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -62,6 +63,24 @@ describe('checkSvg', () => {
   ])('fails on %s', (_, extra) => {
     expect(checkSvg(planted(extra))).toContainEqual(expect.stringMatching(/^has markup other than elements and comments/));
   });
+
+  it.each(['constructor', 'toString', 'hasOwnProperty', '__proto__'])('treats %s as just another attribute name', (name) => {
+    expect(checkSvg(planted(`<path ${name}="x" d="M0 0"/>`))).toEqual([`has an attribute outside the allowlist: ${name}`]);
+  });
+
+  it('reads a long transform list in one pass, allowed or not', () => {
+    // A pattern that backtracks takes twice as long for each function, so 1000 would never
+    // end, and a regular expression blocks its thread: the check runs in a child process
+    // with a deadline, which fails the test instead of hanging the suite.
+    const many = 'scale(1) '.repeat(1000);
+    const script = `import { checkSvg } from ${JSON.stringify(new URL('./svg.ts', import.meta.url).href)};
+      const svg = (t) => '<svg xmlns="http://www.w3.org/2000/svg"><g transform="' + t + '"/></svg>';
+      const many = ${JSON.stringify(many)};
+      console.log(JSON.stringify([checkSvg(svg(many + 'scale(1)')), checkSvg(svg(many + 'scale(1px)'))]));`;
+    const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', timeout: 15_000 });
+    expect(run.signal, 'still running at the deadline').toBeNull();
+    expect(JSON.parse(run.stdout)).toEqual([[], [`has an attribute value not allowed: transform="${many}scale(1px)"`]]);
+  }, 30_000);
 
   it('fails on a file that is not an SVG', () => {
     expect(checkSvg('<html><body/></html>')).toContain('not an SVG document');

@@ -1302,3 +1302,7 @@ Acceptance bar: docs/plans/v2-safety-snapshot.md (measurements, decisions, known
   tested; the EU credit gives the licence's URI (CC BY 4.0 §3(a)(1)(C)) and the index number
   without PubChem's "[2]"; a cached row another version wrote is a miss, not a 500; the SVG
   check is an allowlist (a denylist missed prefixed elements, CDATA, CSS escapes and SMIL).
+- **A regular expression blocks its thread**, so Vitest's timeout can't stop one that
+  backtracks: the SVG check's first transform pattern took twice as long per function, and a
+  test of it hung the suite. That test now runs the check in a child process with a deadline
+  (`spawnSync(..., { timeout })`), which fails instead of hanging.

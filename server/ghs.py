@@ -41,7 +41,7 @@ STATEMENT = re.compile(
     r": (?P<words>[^\[\]\s](?:[^\[\]]*[^\[\]\s])?)"
     r"(?: \[(?P<hazard_class>[^\[\]]+)\])?"
 )
-# An Annex VI index number; PubChem may add "[2]" to tell two entries apart.
+# An Annex VI index number. PubChem's source ID may carry a "[n]" suffix, which isn't part of it.
 INDEX_NO = re.compile(r"(\d{3}-\d{3}-\d{2}-\d)(?:\[\d+\])?")
 
 
@@ -241,7 +241,7 @@ def read(entry: _Entry) -> Classification:
     if not_classified:
         if signals or pictograms:
             raise _unexpected("not classified, with a signal word or pictogram")
-        if any(STATEMENT.fullmatch(t) for t in texts[1:]):
+        if any(re.match(_CODE, t) for t in texts[1:]):  # a hazard code, in any form
             raise _unexpected("not classified, with a hazard statement")
         statements, notes = (), tuple(_texts(entry, NOTE) + texts[1:])
     else:

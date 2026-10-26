@@ -101,7 +101,7 @@ def test_the_chosen_classification_and_the_others(c):
     assert chosen["source_name"] == reference["SourceName"]
     assert chosen["entry"] == reference.get("Name")
     assert chosen["source_url"] == reference.get("URL")
-    # The Annex VI index number, without the "[2]" PubChem adds to tell entries apart.
+    # The Annex VI index number, without the "[n]" suffix PubChem's source ID may carry.
     index_no = reference["SourceID"].split("[")[0] if kind == "eu" else None
     assert chosen["index_no"] == index_no
     others = [ref["SourceName"] for i, (ref, _) in enumerate(entries) if i != pick]

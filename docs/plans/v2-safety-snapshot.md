@@ -323,8 +323,8 @@ the SMILES reaches PubChem only in a POST body, in the same request as Get name'
 - Differences from the bar and the decisions, for Jeff to confirm:
   - Decision 5, the EU credit: it also gives the licence's URI, "CC BY 4.0
     (https://creativecommons.org/licenses/by/4.0/)", because CC BY 4.0 §3(a)(1)(C) asks for it.
-    The entry is the Annex VI index number without the "[2]" PubChem adds to tell two entries
-    apart.
+    The entry is the Annex VI index number without the "[n]" suffix PubChem's source ID may
+    carry ("005-007-00-2[2]").
   - The "N more classifications" line separates the sources with semicolons: one source's name
     has a comma in it ("Hazardous Chemical Information System (HCIS), Safe Work Australia").
   - C.3, the live check: it also requires the page's CSP and no-cache on `ghs/GHS07.svg`.
@@ -352,6 +352,14 @@ fix (shown by undoing the fix):
   for the abort; the pictograms are pinned to their Commons files by SHA-256; the notice gives
   HCIS's and HSDB's terms; the SVG check is now an allowlist (a denylist missed prefixed elements,
   CDATA, CSS escapes and SMIL); a guard that could never fail (the statement round trip) is gone.
+
+**Last round** (capped, of the fixes only): two mediums, both in the fixes, now fixed with tests
+that fail without them: the SVG check's transform pattern backtracked exponentially (a crafted
+value would hang verify-dist; the test runs the check in a child process with a deadline,
+because a regular expression blocks its thread), and the new no-cache requirement on the live
+pictogram had no failing test. Its lows are fixed too: inherited names such as `constructor`
+passed the attribute allowlist, a hazard code in any form after "Not Classified" now reads as
+"unavailable", and the comment on the "[n]" suffix is corrected. The review stops here.
 
 Accepted limits (low):
 - AGENTS.md's Layout doesn't name src/pubchemPage.ts or panels/ghsPictograms.ts (149 of 149
