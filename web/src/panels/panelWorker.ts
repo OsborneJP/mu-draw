@@ -1,17 +1,18 @@
-// The RDKit worker copy the panels below the canvas share ('rdkit-nmr'): the ¹³C NMR preview
-// and the stereoisomers, only one of which is open at a time. It starts on the first request,
+// The RDKit worker copy the panels below the canvas share ('rdkit-nmr'): the ¹³C and ¹H NMR
+// previews and the stereoisomers, only one of which is open at a time. It starts on the first request,
 // so the properties panel's own copy never waits for either. Every reply goes to every
 // listener; each takes its own kind, and all of them a {failed} (RDKit couldn't start).
 import type { NmrReply, NmrRequest } from '../chem/nmr';
+import type { ProtonReply, ProtonRequest } from '../chem/protonNmr';
 import { startRdkitWorker } from '../chem/rdkitWorkers';
 import type { StereoReply, StereoRequest } from '../chem/stereoPictures';
 
-export type PanelReply = NmrReply | StereoReply | { failed: string };
+export type PanelReply = NmrReply | ProtonReply | StereoReply | { failed: string };
 
 const listeners = new Set<(reply: PanelReply) => void>();
 let worker: Worker | null = null;
 
-export function postToPanelWorker(request: NmrRequest | StereoRequest): void {
+export function postToPanelWorker(request: NmrRequest | ProtonRequest | StereoRequest): void {
   if (!worker) {
     worker = startRdkitWorker('rdkit-nmr');
     worker.onmessage = (event: MessageEvent<PanelReply>) => listeners.forEach((listener) => listener(event.data));

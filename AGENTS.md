@@ -22,10 +22,10 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
    (it put the drawing in the URL; web/src/editor/debugHotkeys.ts + online smoke test).
    Accounts and analytics: review only.
-3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, NMRShiftDB2 (¹³C
+3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, NMRShiftDB2 (¹³C, ¹H
    shifts), or the faculty-checked IR table web/public/ir-bands.json (every band cites its sources;
    one marked "verify" is never shown): never from an LLM and never hand-typed into code or tests.
-   Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's header names
+   Enforced by: generated fixtures with drift tests (tests/fixtures/; each NMR table's header names
    its SD file's SHA-256), web/src/chem/irBands.test.ts, and scripts/checks/chem_literals.py (no
    Molfile/CDXML/InChI text in source). SMILES and numeric literals in source: review only.
 4. Everything except the naming endpoints works offline.
@@ -60,7 +60,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
   then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names,
-  record_name_lookups, build_practice_lists. ¹³C table: in web/, `node scripts/build-carbon-table.ts <sd>`.
+  record_name_lookups, build_practice_lists. NMR tables: in web/, `node scripts/build-{carbon,proton}-table.ts <sd>`.
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
@@ -68,14 +68,14 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   ready Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts, templates.json.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
-  overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
+  overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), protonNmr.ts (¹H), stereoElements/-isomers/-Pictures.ts.
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts), Get name,
   Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
-  preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
-  nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
+  previews and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
+  nmr.ts/protonNmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
 - `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
+- `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C, ¹H tables); practice.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
@@ -86,7 +86,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
-  replays), `functional_group*` and `nmr*` (test sets; judgement provisional), `chemdraw/`.
+  replays), `functional_group*`, `nmr*`, `proton_nmr*`, `proton_rule*` (test sets; judgement provisional), `chemdraw/`.
 - `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit), plans/ (acceptance bars).
 
 ## Conventions

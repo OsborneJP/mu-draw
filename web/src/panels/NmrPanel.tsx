@@ -1,8 +1,8 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { CARBON_TABLE_LICENCE_FILE } from '../chem/rdkitFiles';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import Docked from './Docked';
 import { BANNER, carbonType, type NmrMessage, type NmrState, type ShownPeak } from './nmr';
+import NmrNotice from './NmrNotice';
 import { closeNmr, getNmrState, predictNmr, selectPeak, startNmr, subscribeNmrState } from './nmrStore';
 import './nmr.css';
 
@@ -12,8 +12,6 @@ import './nmr.css';
 // the peak table. Clicking a stick or a row selects that peak and colours its carbons;
 // selecting a carbon on the canvas selects its peak. data-state and the rows' data-*
 // attributes let tests read it exactly.
-
-const LICENCE_URI = 'https://nmrshiftdb.nmr.uni-koeln.de/nmrshiftdbhtml/nmrshiftdb2datalicense.txt';
 
 const MESSAGES: Record<NmrMessage, string> = {
   empty: 'Draw a structure to predict its ¹³C NMR spectrum.',
@@ -179,13 +177,7 @@ export default function NmrPanel() {
         {BANNER}
       </p>
       <Body state={state} tms={tms} />
-      <p className="nmr-notice" data-testid="nmr-notice">
-        Contains information from nmrshiftdb2 (www.nmrshiftdb.org), which is made available here under the{' '}
-        <a href={CARBON_TABLE_LICENCE_FILE} target="_blank" rel="noopener">
-          nmrshiftdb2 Database License
-        </a>{' '}
-        ({LICENCE_URI}).
-      </p>
+      <NmrNotice testId="nmr-notice" />
     </Docked>
   );
 }

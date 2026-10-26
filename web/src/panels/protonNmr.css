@@ -1,0 +1,12 @@
+/* The ¹H panel shares the ¹³C panel's styles (nmr.css); these are its own. */
+/* OH, NH, SH: a broad, pale stick (their signals are often broad), apart from the dashed
+   low-confidence one (nmr.css). */
+.nmr-stick.proton-exchangeable line {
+  stroke-width: 6;
+  stroke-opacity: 0.45;
+}
+
+.proton-note {
+  margin: 4px 0;
+  color: #57606a;
+}

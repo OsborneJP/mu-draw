@@ -8,25 +8,27 @@
 //
 // Messages: the properties panel sends {id, molfile}; the worker answers {id, computed}
 // (null when RDKit can't read the drawing). The panels' copy (rdkitWorkers.ts) is sent
-// {kind: 'nmr', id, molfile} and answers with the predicted peaks (src/chem/nmr.ts), or
-// {kind: 'stereoisomers', id, molfile} and answers with them and their pictures
-// (src/chem/stereoisomers.ts, stereoPictures.ts). Either copy sends {failed} once if RDKit
-// can't start. Nothing leaves the device: the worker's
-// only requests are for RDKit's own wasm, the functional-group patterns (on the first
-// properties request) and the ¹³C table (on the first prediction), all from the precache.
+// {kind: 'nmr', id, molfile} and answers with the predicted peaks (src/chem/nmr.ts),
+// {kind: 'proton', id, molfile} and answers with the predicted ¹H signals
+// (src/chem/protonNmr.ts), or {kind: 'stereoisomers', id, molfile} and answers with them and
+// their pictures (src/chem/stereoisomers.ts, stereoPictures.ts). Either copy sends {failed}
+// once if RDKit can't start. Nothing leaves the device: the worker's only requests are for
+// RDKit's own wasm, the functional-group patterns (on the first properties request) and the
+// ¹³C and ¹H tables (on the first prediction of each), all from the precache.
 import initRDKitModule from '@rdkit/rdkit';
-import { decodeTable, type CarbonTable } from './carbonTable';
+import { decodeTable, lookup, PROTON, type CarbonTable, type ShiftTable } from './carbonTable';
 import { computeProperties, configureRdkit, type PatternsOrReason } from './compute';
 import { readPatterns } from './functionalGroups';
 import { predictCarbon, type NmrReply, type NmrRequest } from './nmr';
-import { CARBON_TABLE_FILE, PATTERNS_FILE, RDKIT_WASM_FILE } from './rdkitFiles';
+import { predictProton, type ProtonReply, type ProtonRequest, type ProtonTableInfo } from './protonNmr';
+import { CARBON_TABLE_FILE, PATTERNS_FILE, PROTON_TABLE_FILE, RDKIT_WASM_FILE } from './rdkitFiles';
 import { enumerateStereoisomers } from './stereoisomers';
 import { withPictures, type StereoReply, type StereoRequest } from './stereoPictures';
 import type { WorkerReply, WorkerRequest } from './tracker';
 
 const scope = self as unknown as {
-  postMessage(message: WorkerReply | NmrReply | StereoReply): void;
-  onmessage: ((event: MessageEvent<WorkerRequest | NmrRequest | StereoRequest>) => void) | null;
+  postMessage(message: WorkerReply | NmrReply | ProtonReply | StereoReply): void;
+  onmessage: ((event: MessageEvent<WorkerRequest | NmrRequest | ProtonRequest | StereoRequest>) => void) | null;
 };
 
 const ready = initRDKitModule({ locateFile: () => `${import.meta.env.BASE_URL}${RDKIT_WASM_FILE}` }).then(
@@ -56,6 +58,7 @@ function load<T>(file: string, read: (response: Response) => Promise<T>): Promis
 // says why; an entry of the patterns RDKit can't use is skipped and named.
 let patterns: Promise<PatternsOrReason> | null = null;
 let table: Promise<CarbonTable | { unavailable: string }> | null = null;
+let protonTable: Promise<ShiftTable<ProtonTableInfo> | { unavailable: string }> | null = null;
 
 function loadPatterns(): Promise<PatternsOrReason> {
   const file = load(PATTERNS_FILE, (r) => r.json() as Promise<unknown>);
@@ -70,6 +73,31 @@ function loadPatterns(): Promise<PatternsOrReason> {
 function loadTable(): Promise<CarbonTable | { unavailable: string }> {
   return load(CARBON_TABLE_FILE, (r) => r.arrayBuffer().then(decodeTable)).then((loaded) =>
     'file' in loaded ? loaded.file : loaded,
+  );
+}
+
+function loadProtonTable(): Promise<ShiftTable<ProtonTableInfo> | { unavailable: string }> {
+  return load(PROTON_TABLE_FILE, (r) => r.arrayBuffer().then((bytes) => decodeTable<ProtonTableInfo>(bytes, PROTON))).then((loaded) =>
+    'file' in loaded ? loaded.file : loaded,
+  );
+}
+
+function predictHydrogens({ id, molfile }: ProtonRequest): void {
+  Promise.all([ready, (protonTable ??= loadProtonTable())]).then(
+    ([rdkit, shifts]) => {
+      if ('unavailable' in shifts) {
+        scope.postMessage({ kind: 'proton', id, unavailable: shifts.unavailable });
+        return;
+      }
+      let signals = null;
+      try {
+        signals = predictProton(rdkit, molfile, { spheres: shifts.info.spheres, find: (code) => lookup(shifts, code) });
+      } catch (error) {
+        console.error('RDKit could not predict the ¹H NMR:', error);
+      }
+      scope.postMessage({ kind: 'proton', id, signals });
+    },
+    () => {}, // already reported as {failed}
   );
 }
 
@@ -110,6 +138,7 @@ function stereoisomers({ id, molfile }: StereoRequest): void {
 scope.onmessage = (event) => {
   if ('kind' in event.data) {
     if (event.data.kind === 'nmr') predict(event.data);
+    else if (event.data.kind === 'proton') predictHydrogens(event.data);
     else stereoisomers(event.data);
     return;
   }
