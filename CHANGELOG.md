@@ -123,6 +123,8 @@ All notable changes to this project. The format follows
   sent. The first list is a provisional CHEM-311 one.
 
 ### Changed
+- The Text tool's editor now says, under its formatting buttons: "Highlight the text first:
+  formatting applies to what is highlighted."
 - The IR hints' source and licence now sit behind a tick, "Source and licence (CC BY-SA
   4.0)", instead of taking several lines under every list of hints.
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening

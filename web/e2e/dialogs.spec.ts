@@ -1,6 +1,7 @@
 // Ketcher's Save and Open dialogs without the raw text of the file (src/editor/editor.css):
 // Save keeps the file name, the format, its buttons and Ketcher's warnings; Open goes from
-// the file straight to "Open as New Project" or "Add to Canvas".
+// the file straight to "Open as New Project" or "Add to Canvas". The Text Editor notes that
+// formatting applies to the highlighted text.
 import type { Page } from '@playwright/test';
 import { expect, fixture, fixturePath, inchiKey, openEditor, referenceCompound, test, type App } from './fixtures.ts';
 
@@ -48,6 +49,26 @@ async function openFile(app: App, name: string) {
   await chooser.setFiles(molfilePath(name));
   return modal;
 }
+
+test('the Text Editor says formatting applies to the highlighted text', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await page.getByTestId('text').filter({ visible: true }).click();
+  await clickOnCanvas(page);
+  const toolbar = page.getByRole('toolbar', { name: 'Text formatting toolbar' });
+  await expect(toolbar).toBeVisible();
+  // The note is the "Text:" label's ::before, on its own line under the toolbar.
+  const label = await toolbar.evaluate((bar) => {
+    const next = bar.nextElementSibling as HTMLElement;
+    const before = getComputedStyle(next, '::before');
+    return { text: next.textContent, note: before.content, display: before.display };
+  });
+  expect(label).toEqual({
+    text: 'Text:',
+    note: '"Highlight the text first: formatting applies to what is highlighted."',
+    display: 'block',
+  });
+});
 
 test('Save shows the file name, the format and its buttons, but not the file', async ({ app }) => {
   const { page } = app;

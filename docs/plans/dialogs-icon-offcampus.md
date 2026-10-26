@@ -40,3 +40,15 @@ Requested by Jeff on 2026-10-25, for CHEM-311 to start using the app as soon as 
 - A to C shipped in 3df4f00 and 1ada5e8; D in 25eb814.
 - Jeff applied the vhost change (backup osbornelab.conf.bak.20261025_173547). Production was promoted at 2dfc6a8: the full check passed on the production build, then 14 live checks and 85 browser tests passed against /draw/.
 - Jeff opened /draw/ on his phone off campus.
+
+## Text Editor note (Jeff, 2026-10-26)
+
+Ketcher's Text Editor (the Text tool) has bold, italic, subscript, superscript and font size
+buttons that apply to the highlighted text, which students miss. Acceptance bar:
+1. A note on its own line directly under the formatting toolbar, above "Text:": "Highlight
+   the text first: formatting applies to what is highlighted."
+2. Ketcher's dialog is otherwise unchanged; the rule lives in `web/src/editor/editor.css`
+   with the other Ketcher dialog changes.
+3. Test (Playwright): opening the Text tool's dialog shows the note after the toolbar; it
+   fails without the rule.
+

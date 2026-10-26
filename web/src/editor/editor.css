@@ -39,6 +39,17 @@
   display: none !important;
 }
 
+/* Ketcher's Text Editor (the Text tool): its bold, italic, subscript, superscript and size
+   buttons apply to the highlighted text, which students miss (Jeff, 2026-10-26). A note on
+   its own line under the formatting toolbar, before the "Text:" label (its next sibling). */
+[role='toolbar'][aria-label='Text formatting toolbar'] + span::before {
+  content: 'Highlight the text first: formatting applies to what is highlighted.';
+  display: block;
+  margin: 0 0 8px;
+  color: #57606a;
+  font-size: 12px;
+}
+
 /* Without the preview, Save's fixed 310px would be blank space; Open's one tile is centred. */
 [data-testid='save-dialog'] [class*='Save-module_formContainer'] {
   height: auto;
