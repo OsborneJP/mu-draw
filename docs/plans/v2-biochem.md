@@ -176,9 +176,12 @@ The aim: a student types a peptide, DNA or RNA sequence in the side panel and se
 - **Tm** is Khandelwal's DNA model:
   - perfect duplexes in Na⁺ only, with no Mg²⁺ and no mismatches;
   - fitted for 15 bp and longer, at 0.015–0.6 M Na⁺;
-  - concentrations outside that range are accepted without a warning.
+  - concentrations outside that range are accepted without a warning;
+  - Indigo applies it to the whole length, so long DNA gets impossible values (measured while
+    building, at the default concentrations): 100 bases 99 °C, 1000 bases 140 °C. The paper
+    averages genomic DNA over 70-bp windows; Indigo doesn't. An open question for Jeff.
 - **Hydrophobicity** is the Black & Mould scale only, residue by residue, with no window averaging.
-- **A second Indigo instance** runs while the section is open, alongside Ketcher's own. Its memory is to be measured (bar B.8) and recorded.
+- **A second Indigo instance** runs once the section has been opened, alongside Ketcher's own. Measured while building: about 60 MB once loaded, about 120 MB after a 1000-residue peptide and 1000 DNA bases (BUILD-LEARNINGS).
 
 ## Priority
 

@@ -121,6 +121,17 @@ All notable changes to this project. The format follows
   isomer, or a different formula. Then Show answer draws a picture of the answer. Next and
   Previous clear the canvas, and one Undo brings the drawing back. Nothing is stored or
   sent. The first list is a provisional CHEM-311 one.
+- Biochem tools (version 2, at the foot of the properties panel): "Peptide or nucleic acid"
+  takes a typed sequence (a peptide in one- or three-letter codes, DNA or RNA; up to 1000)
+  and shows the values Ketcher's macromolecules mode would, computed in the browser by the
+  same Indigo; that mode stays hidden. A peptide gets its formula and average mass, its net
+  charge at a pH the student sets and its isoelectric point (Bjellqvist's pKa values, as
+  ExPASy uses), ε280 with every Cys reduced and with every two Cys paired, and a
+  hydrophobicity bar for each residue (Black and Mould). DNA of 15 bases or more gets the
+  Tm of the strand paired with its complement, at a [Na⁺] and strand concentration the
+  student can change; RNA and shorter DNA say why there is none. Works offline. Ketcher's
+  own "isoelectric point" (a median of pKa values) is not shown: it is far from the
+  standard answer.
 
 ### Changed
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening

@@ -54,13 +54,13 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Deploy: `scripts/deploy.sh staging`, `scripts/deploy.sh --production`,
   `scripts/deploy.sh --smoke-only <staging|production>`. Production promotes only the
   commit that passed the live staging checks; live checks run from that commit.
-- After changing scripts/deploy.sh or scripts/lib/deploy.sh: `python scripts/mutation_sweep.py`
-  (~5 min) must report every line covered.
+- After changing scripts/deploy.sh or lib/deploy.sh, `python scripts/mutation_sweep.py` (~5 min) must cover every line.
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
-  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names,
-  record_name_lookups, build_practice_lists. ¹³C table: in web/, `node scripts/build-carbon-table.ts <sd>`.
+  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names, record_name_lookups,
+  build_practice_lists, gen_biochem_expected. In web/: `node scripts/build-carbon-table.ts <sd>` (¹³C),
+  `node scripts/gen-biochem-indigo.ts` (Indigo's biochem values).
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
@@ -68,19 +68,19 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   ready Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts, templates.json.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
-  overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
-- `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts), Get name,
-  Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
-  preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
-  nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
-- `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
-- `web/src/shell/`: header, offline badge, About box, update banner.
+  overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts;
+  biochem.ts (sequences, charge, pI), indigoBiochem.ts (Indigo's values; biochemWorker.ts runs it).
+- `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts; at its foot
+  BiochemSection.tsx), Get name, Name to structure (naming.ts; NamePanel floats), Templates menu;
+  Practice (practice.ts), NMR preview and stereoisomers dock below the canvas (Docked.tsx), one at a
+  time (belowCanvas.ts); nmr.ts/stereo.ts/biochem.ts state, *Store.ts wiring, panelWorker.ts RDKit.
+- `web/src/`: api.ts (`<base>api/*`, 8 s deadline); pwa/ (SW, Reload); shell/ (header, badges, About, banner).
 - `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
-  export.spec.ts reads PNG headers, pixels and the clipboard back; `holdableRdkitReplies()` and
-  `holdableIndigoReplies()` (fixtures.ts) hold workers' replies; naming specs hold API answers.
+  export.spec.ts reads PNG headers, pixels and the clipboard back; `holdable{Rdkit,Indigo,Biochem}Replies()`
+  (fixtures.ts) hold workers' replies; naming specs hold API answers.
 - `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
   test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
   `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
@@ -121,7 +121,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Workbox drops files that `globPatterns` doesn't match, silently; the precache guard
   fails the build instead. Keep `wasm` in globPatterns and the 30 MB size limit.
 - Letting base, manifest `scope`, `start_url` and `id` drift; all come from `pwaOptions(base)`.
-- `^` or `~` on pinned packages, or forgetting ketcher-core.
+- `^` or `~` on pinned packages, or forgetting ketcher-core or indigo-ketcher.
 - Ketcher under Vite: needs `define: { global: 'globalThis' }`, the `events` package, and
   `ketcher-standalone/dist/binaryWasm`. No React StrictMode around the Editor.
 - Trusting Ketcher's `buttons.hidden` (its compact toolbar ignores it) or its config to disable
@@ -131,7 +131,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   or that saved KET equals the live drawing (Ketcher moves drawings without a change
   event; compare InChIKey and relative positions). Pressing Undo/Redo keys in a test
   without waiting for the button state (Ketcher refreshes it 100 ms after a change).
-- RDKit's CDXML (`BondLength=""`) doesn't load in Indigo 1.46.
+- Indigo 1.46: RDKit's CDXML (`BondLength=""`) doesn't load; a sequence needs Ketcher's monomer library.
 - Asking Indigo for two images, or two conversions (`getSmiles`, `getMolfile()` without
   'v2000'), at once: with different drawings one never settles (src/editor/imageQueue.ts
   queues both; keep the provider). `exportImage('svg')` copies the canvas offset by

@@ -1237,3 +1237,46 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   the templates bar's "picking a template puts Add's compound away" is tested against Name
   to structure's Add only, not the stereoisomer panel's.
 
+## Biochem tools (version 2, 2026-10-26)
+
+Plan and bar: docs/plans/v2-biochem.md. A typed peptide, DNA or RNA sequence in the side
+panel; Indigo's values from the app's own worker, net charge and pI from Bjellqvist's pKa values.
+- Ketcher's macromolecule properties are Indigo's `calculateMacroProperties` (wasm, in Ketcher's
+  standalone worker; no server). It needs monomers, so a sequence must first go through
+  Indigo's `convert` with Ketcher's monomer library. Ketcher's standalone service passes that
+  library only from the macromolecules editor (`provideEditorInstance()`), so with the editor
+  disabled its `convert` fails ("Monomer template … not found in monomer library"). The app
+  runs its own indigo-ketcher in a worker and posts it ketcher-core's library
+  (`dist/application/editor/data/monomers.modern.js`, already in the main bundle) first.
+- Ketcher 3.18's "Isoelectric Point" is the median of the free groups' pKa values, not where
+  the charge is zero: YGGFL 9.74 where Bjellqvist (Biopython, ExPASy) gives 5.52, tyrosine
+  alone 9.11 against 5.52. The app shows the charge-zero pH from Bjellqvist's values instead.
+- Indigo's ε280 adds 125 for every Cys, but Pace's 125 is per cystine; with Indigo's W, Y and C
+  values the app builds ExPASy's two figures, equal to Biopython's for every test peptide.
+- Indigo's hydrophobicity is Black and Mould's scale exactly (Biopython's `BlackMould`).
+- Tm exists only for two strands joined base to base by hydrogen-bond connections; HELM
+  `pair` connections make them (base k of n is monomer 3k + 2). Indigo doesn't check that the
+  bases pair, and reads U as T. The formula (Khandelwal and Bhyravabhotla 2010) was fitted
+  from 15-mers up, and Indigo applies it to the whole length: a 4-mer gets 36 °C, 100 bases
+  99 °C, 1000 bases 140 °C.
+- indigo-ketcher's separate-wasm build (the one Ketcher's worker uses) has an empty Node
+  branch: in Node (Vitest, the generator) pass the file's bytes as `wasmBinary`.
+- Indigo parses the 4 MB library on every `convert` (about 0.1 s). In Node a 1000-residue
+  peptide takes 0.4 s; 1000 DNA bases 0.9 s for the strand and 2 s more for the duplex. In
+  Playwright's Chromium, with four other sessions running their checks: the first values
+  0.9 s after opening the section (the worker loads its own Indigo), a 1000-residue peptide
+  0.4 s (bar B.8). Memory: the second Indigo adds about 60 MB once loaded, growing to about
+  120 MB after a 1000-residue peptide and 1000 DNA bases (process RSS in Node; wasm memory
+  never shrinks), for as long as the page is open once the section has been opened.
+- A `<details>` element's `toggle` event comes in a task after `open` is set, so a test that
+  waits for the attribute must also wait for what the toggle does (the worker's start).
+- In a Playwright test, `getByLabel` stops finding a textarea once it has been filled: React
+  copies a controlled textarea's value into its text, which becomes part of the label's
+  text. The biochem tests find controls by role and accessible name instead.
+- Biopython's pI search is bracketed to pH 4.05-12, so it clips very acidic or basic
+  peptides (DDD: 4.05 where the charge is zero at 3.67); the app bisects over 0-14.
+- `conda env update` has no dry run: it was tried first on a clone of the env (`conda create
+  --clone`), which showed only biopython added, before touching the shared env.
+- check.sh once failed in the existing Name to structure smoke test ("not-responding")
+  while five sessions ran Playwright at once (load average ~15): the app's real 8 s naming
+  deadline keeps running while the test holds the API's answer. It passed alone.

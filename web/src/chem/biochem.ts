@@ -3,7 +3,7 @@
 // HELM for a DNA strand paired with its complement (Indigo's Tm needs a double strand).
 // Every table comes from biochemData.json, generated from Biopython
 // (server/scripts/gen_biochem_expected.py); Indigo's values come from indigoBiochem.ts.
-import data from './biochemData.json';
+import data from './biochemData.json' with { type: 'json' };
 
 /** What the student says the sequence is. */
 export type SequenceType = 'peptide' | 'peptide3' | 'dna' | 'rna';

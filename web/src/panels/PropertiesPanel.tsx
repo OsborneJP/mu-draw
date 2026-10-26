@@ -6,6 +6,7 @@ import type { PanelValues } from '../chem/properties';
 import { readDrawing } from '../editor/drawing';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
+import BiochemSection from './BiochemSection';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
 import { makeRoomFor } from './belowCanvas';
@@ -306,6 +307,7 @@ export default function PropertiesPanel() {
           <NmrButton />
         </Values>
       )}
+      <BiochemSection />
     </aside>
   );
 }
