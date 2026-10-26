@@ -1,3 +1,4 @@
+import GroupButton from './editor/GroupButton';
 import KetcherEditor from './editor/KetcherEditor';
 import NamePanel from './panels/NamePanel';
 import NmrPanel from './panels/NmrPanel';
@@ -17,6 +18,7 @@ export default function App() {
             Practice, the NMR preview or the stereoisomers. */}
         <div className="canvas-area">
           <KetcherEditor />
+          <GroupButton />
           <NamePanel />
           <PracticePanel />
           <NmrPanel />

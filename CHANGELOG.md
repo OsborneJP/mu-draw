@@ -121,6 +121,12 @@ All notable changes to this project. The format follows
   isomer, or a different formula. Then Show answer draws a picture of the answer. Next and
   Previous clear the canvas, and one Undo brings the drawing back. Nothing is stored or
   sent. The first list is a provisional CHEM-311 one.
+- Grouping: select two or more items (molecules, text, arrows, + signs, shapes, images) and
+  click Group, beside the selection. A click on any member then picks up the whole group,
+  so it moves, rotates and deletes as one; with a group selected the button says Ungroup.
+  An atom drawn onto a grouped molecule joins the group. Groups are kept with the drawing
+  in this browser and come back after a relaunch, but files, copies and exports don't
+  carry them; opening another drawing or Clear Canvas ends them.
 
 ### Changed
 - The Text tool's editor now says, under its formatting buttons: "Highlight the text first:

@@ -1237,3 +1237,21 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   the templates bar's "picking a template puts Add's compound away" is tested against Name
   to structure's Add only, not the stereoisomer panel's.
 
+- Grouping (docs/plans/v2-grouping.md). Ketcher 3.18 has no grouping of its own (its Ctrl+G
+  is S-Group), and its KET writer drops properties it doesn't know, on a node or at the top
+  level, so the app keeps groups beside the autosaved drawing, by item positions.
+  `editor.event.selectionChange` is a pipeline: each handler gets the one before's return
+  value, so a handler must return what it was given. Setting `editor.selection()` inside it
+  fires it again at once; widening the selection there, on the press, makes Ketcher's drag
+  move the whole group. A drawing loaded afresh (setMolecule, Open) is a new struct object
+  with ids from 0 again, so the store compares struct identity, not ids. setMolecule also
+  rescales the drawing (average bond 1, about the origin; images keep their place) and
+  centres it in the window, so the first version, which looked for saved positions as they
+  were, lost the arrow on a relaunch; groups.ts now applies the same change first. An
+  image's `center` is a method, not a point. Undo of a delete brings items back under their
+  old ids (a Pool never reuses an id). Ketcher's render has `page2obj` but no inverse; the
+  e2e test inverts it from three points. In the test browser, turning any selection that
+  holds a Text-tool text with the rotate handle throws in Ketcher's ReText.getRelBox
+  (getBBox() gives undefined) and stops after moving the text, with or without groups
+  (Ctrl+A, no groups: same); without a text it turns. Its handle is
+  `data-testid="rotation-handle"`, 40 px below the floating tools.

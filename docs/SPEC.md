@@ -342,6 +342,7 @@ Version 2 adds the teaching features; none of them change the v1 architecture.
 - **Conformation and projection templates:** chair cyclohexane with axial and equatorial positions, Newman, Fischer and Haworth. Templates first; generating a Newman projection from a chosen bond comes later.
 - **Lab glassware library:** an openly licensed SVG set placed with Ketcher's image tool, for lab reports.
 - **Course template libraries** for CHEM-312 and CHEM-405.
+- **Grouping** (Jeff's request, Oct 26, 2026): group items on the canvas so they move, rotate and delete as one, as in ChemDraw. Plan: docs/plans/v2-grouping.md.
 
 ### Later version
 

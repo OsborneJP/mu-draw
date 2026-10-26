@@ -5,6 +5,7 @@ import 'ketcher-react/dist/index.css';
 // blob: worker), instead of the default entry's base64-embedded copy.
 import { StandaloneStructServiceProvider } from 'ketcher-standalone/dist/binaryWasm';
 import { autosaveKey, setSaveStatus, startAutosave, type AutosaveEditor } from './autosave';
+import { groupsKey, startGroups } from './groupStore';
 import './editor.css';
 import { imageQueue } from './imageQueue';
 import { setKetcher } from './instance';
@@ -61,6 +62,8 @@ function onInit(ketcher: Ketcher) {
   // Ready once the last drawing is back on the canvas and changes are being saved.
   const key = autosaveKey(import.meta.env.BASE_URL);
   void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus).then(() => {
+    // The groups beside the restored drawing (docs/plans/v2-grouping.md).
+    startGroups(ketcher, () => window.localStorage, groupsKey(import.meta.env.BASE_URL));
     setKetcher(ketcher);
     window.dispatchEvent(new Event('editor-ready'));
   });
