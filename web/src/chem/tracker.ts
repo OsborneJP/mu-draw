@@ -32,7 +32,7 @@ export interface StereoAtoms {
 export type GroupsView =
   | {
       kind: 'found';
-      groups: { name: string; color: string; instances: { atoms: number[]; bonds: [number, number][] }[] }[];
+      groups: { name: string; id?: string; color: string; instances: { atoms: number[]; bonds: [number, number][] }[] }[];
       problems: string[];
     }
   | { kind: 'unavailable'; reason: string };

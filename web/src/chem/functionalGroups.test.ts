@@ -228,6 +228,31 @@ describe('a pattern file with mistakes', () => {
     expect(counts(molfile('ethyl acetate'), p)).toEqual({ Ester: 1 });
   });
 
+  it('takes an optional id, its key in the IR table: lowercase letters, digits and _, one per group', () => {
+    const amide = good('Amide');
+    const p = patterns({
+      groups: [
+        good('Ester'),
+        { ...good('Ether'), id: 'Ether' },
+        { ...good('Arene'), id: 3 },
+        { ...good('Ketone'), id: good('Ester').id },
+        { name: amide.name, smarts: amide.smarts, color: amide.color, priority: amide.priority },
+      ],
+    });
+    expect(p.problems).toEqual([
+      '"Ether": its id is not lowercase letters, digits and _',
+      '"Arene": its id is not lowercase letters, digits and _',
+      '"Ketone": another group has the same id',
+    ]);
+    expect(p.groups.map((g) => [g.name, g.id])).toEqual([
+      ['Ester', good('Ester').id],
+      ['Amide', undefined],
+    ]);
+    // The groups found carry it to the panel.
+    expect(found(molfile('ethyl acetate'), p).map((g) => g.id)).toEqual([good('Ester').id]);
+    expect(found(molfile('N,N-dimethylformamide'), p).map((g) => [g.name, g.id])).toEqual([['Amide', undefined]]);
+  });
+
   it('says so when there is no list of groups', () => {
     for (const file of [null, {}, { groups: 'Ester' }, []]) {
       expect(patterns(file)).toEqual({ groups: [], problems: ['it has no "groups" list'] });

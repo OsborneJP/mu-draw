@@ -1,10 +1,12 @@
 import type { GroupsView } from '../chem/tracker';
 import { PATTERNS_FILE } from '../chem/rdkitFiles';
+import IrHints from './IrHints';
+import { useIrShown } from './irStore';
 
 // The properties panel's functional-group section (spec section 3): a "Show functional
 // groups" checkbox and, while it is ticked, the groups found with their colours and counts.
 // PropertiesPanel colours them on the canvas. data-name and data-count let tests read the
-// list exactly.
+// list exactly. A second checkbox shows the IR hints for the same groups (IrHints.tsx).
 
 interface Props {
   groups: GroupsView;
@@ -13,12 +15,17 @@ interface Props {
 }
 
 export default function FunctionalGroups({ groups, shown, onShow }: Props) {
+  const [irShown, showIr] = useIrShown();
   return (
     <section className="groups" aria-label="Functional groups">
       <h3>Functional groups</h3>
       <label className="groups-toggle">
         <input type="checkbox" data-testid="groups-toggle" checked={shown} onChange={(e) => onShow(e.target.checked)} />
         Show functional groups
+      </label>
+      <label className="groups-toggle">
+        <input type="checkbox" data-testid="ir-toggle" checked={irShown} onChange={(e) => showIr(e.target.checked)} />
+        Show IR hints
       </label>
       {shown && groups.kind === 'unavailable' && (
         <p className="properties-note" data-testid="groups-message">
@@ -54,6 +61,7 @@ export default function FunctionalGroups({ groups, shown, onShow }: Props) {
           )}
         </>
       )}
+      {irShown && <IrHints groups={groups} />}
     </section>
   );
 }

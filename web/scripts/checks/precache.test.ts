@@ -73,6 +73,7 @@ describe('checkPrecache', () => {
   it.each([
     ['¹³C shift table', 'nmr/carbon-shifts.bin'],
     ["¹³C shift table's licence", 'nmr/LICENSE-nmrshiftdb2.txt'],
+    ['IR hint table', 'ir-bands.json'],
   ])('fails when the %s is missing from the build', (what, path) => {
     const files = FILES.filter((f) => f.path !== path);
     expect(files.length).toBe(FILES.length - 1);

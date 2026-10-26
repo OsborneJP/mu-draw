@@ -1072,3 +1072,36 @@ what changed). Measured with RDKit.js 2026.9.1 and Python RDKit 2026.09.1.
 - RDKit's JSON carries an atom's isotope as `isotope`; an atom label passed to the drawer
   replaces everything RDKit would have drawn there, the isotope included.
 
+## IR hints (version 2, 2026-10-25)
+
+Acceptance bar: docs/plans/v2-ir-hints.md.
+- **Keys.** The highlighter knew its groups only by display name ("Alcohol (1°)"). Jeff's
+  IR library is keyed in snake_case, so functional-groups.json gained an optional `id` per
+  group, carried to the panel with the groups found. Joining on names would break on the
+  first rewording.
+- **Licences.** The table stays CC BY-SA 4.0 in an MIT app: it is a separate file that the
+  app shows but doesn't adapt. Its credit must appear wherever it is shown. The URIs are
+  plain text because the link guard (invariant 1) allows no outside link; the NMR notice
+  does the same. OpenStax Organic Chemistry is CC BY-NC-SA 4.0 (its page, read
+  2026-10-25), so only its values may be used, never its wording; Jeff confirmed that
+  none is copied.
+- **Hidden bands.** 9 of the 60 bands are marked `verify`. Hiding them leaves amide,
+  thiol, epoxide and 2° amine N–H with no band shown ("still being checked") until Jeff
+  checks them against Pavia or Silverstein.
+- **The page fetches the table**, not the RDKit worker: it is plain data. On a first visit
+  the page has no service worker in charge (prompt mode, no `clientsClaim`), so a test can
+  hold the page's request with `context.route` and let the service worker's precache
+  request through. After a reload offline, the page's request is answered from the
+  precache (`Response.fromServiceWorker()`).
+- **Where the state lives.** The section unmounts while the panel shows a message (an
+  empty canvas), so "Show IR hints" lives in src/panels/irStore.ts. A component file may
+  not also export a hook (react-refresh's `only-export-components`, an ESLint warning with
+  `--max-warnings 0`), which is the other reason for the separate module.
+- **Display.** Jeff's `bond` often repeats in `vibration` ("O–H" and "O–H stretch, …"), so
+  the bond is shown only when the vibration doesn't name it.
+- **AGENTS.md** was at 149 of 149 lines. The invariant 3 wording fits in 6 lines of up to 99
+  characters, and a failure-mode bullet was reflowed to make room. The Layout section names
+  no IR file: there was no room, and invariant 3 gives both paths.
+- **Guards checked by breaking them.** Removing the verify filter failed both browser verify
+  tests and the unit tests. Removing the de-duplication, the also_show rule, the shared
+  entry, the regions' span check or the credit's filter each failed a unit test.

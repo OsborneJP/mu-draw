@@ -1,0 +1,237 @@
+{
+  "version": "0.1-draft",
+  "title": "IR hint table",
+  "compiled_by": "MU Draw contributors",
+  "about": "The IR hint table (docs/plans/v2-ir-hints.md). Edit freely: no code change is needed, and the tests check this file (web/src/chem/irBands.test.ts). Group keys are the ids in functional-groups.json. A band marked verify is never shown; set verify to false once it is checked against a reference text, and cite that text. This file is under CC BY-SA 4.0, and changes to it stay under that licence.",
+  "status": "Draft for faculty review. Entries marked \"verify\": true come from standard textbook values rather than the two cited open sources; check them against Pavia or Silverstein before release.",
+  "units": "cm-1",
+  "license": "CC BY-SA 4.0",
+  "attribution": [
+    {
+      "key": "wikipedia",
+      "text": "Values adapted in part from \"Infrared spectroscopy correlation table\", Wikipedia, CC BY-SA 4.0",
+      "url": "https://en.wikipedia.org/wiki/Infrared_spectroscopy_correlation_table"
+    },
+    {
+      "key": "openstax",
+      "text": "Values cross-checked against OpenStax Organic Chemistry, section 12.7, Table 12.1 (values only; no text copied)",
+      "url": "https://openstax.org/books/organic-chemistry/pages/12-7-interpreting-infrared-spectra"
+    },
+    {
+      "key": "textbook",
+      "text": "Standard textbook value not found in the two open sources above; to be confirmed against a reference text",
+      "url": null
+    }
+  ],
+  "schema": {
+    "range": "[low, high] in cm-1; low equals high when a source gives a single typical value (then \"approx\": true)",
+    "intensity": "strong | medium | weak | variable",
+    "shape": "sharp | broad | null when not characteristic",
+    "diagnostic": "true for the band(s) a student should look for first; the UI shows these in bold",
+    "sources": "keys from the attribution list",
+    "verify": "true when the value still needs checking against a reference text"
+  },
+  "regions": [
+    { "range": [2500, 4000], "label": "Single bonds to hydrogen (O–H, N–H, C–H, S–H)", "sources": ["openstax"] },
+    { "range": [2000, 2500], "label": "Triple bonds (C≡C, C≡N)", "sources": ["openstax"] },
+    { "range": [1500, 2000], "label": "Double bonds (C=O, C=C, C=N)", "sources": ["openstax"] },
+    { "range": [400, 1500], "label": "Fingerprint region: many overlapping bands; use for comparison, not first-pass identification", "sources": ["openstax"] }
+  ],
+  "groups": {
+    "alkane": {
+      "label": "Alkane C–H (present in most organic compounds)",
+      "always_show": true,
+      "bands": [
+        { "bond": "C–H", "vibration": "sp³ C–H stretch", "range": [2850, 2960], "intensity": "medium", "shape": null, "diagnostic": true, "note": "Almost every organic molecule shows these. Useful mainly as a reference point: bands just above 3000 mean sp² or sp C–H.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C–H", "vibration": "CH₂ bend", "range": [1470, 1470], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "C–H", "vibration": "CH₃ bend", "range": [1380, 1380], "approx": true, "intensity": "weak", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "alkene": {
+      "label": "Alkene",
+      "bands": [
+        { "bond": "=C–H", "vibration": "sp² C–H stretch", "range": [3020, 3100], "intensity": "medium", "shape": null, "diagnostic": true, "note": "Just above 3000, which separates it from alkane C–H.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C=C", "vibration": "C=C stretch", "range": [1640, 1680], "intensity": "medium", "shape": null, "diagnostic": true, "note": "Weak or missing when the alkene is nearly symmetric (tri- and tetrasubstituted). Conjugation lowers it toward 1600–1650.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "=C–H", "vibration": "out-of-plane bend, monosubstituted", "range": [900, 990], "intensity": "strong", "shape": null, "diagnostic": false, "note": "Two bands, near 990 and 900.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "=C–H", "vibration": "out-of-plane bend, trans-disubstituted", "range": [965, 965], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": "Helps tell trans from cis.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "=C–H", "vibration": "out-of-plane bend, cis-disubstituted", "range": [670, 700], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "=C–H", "vibration": "out-of-plane bend, trisubstituted", "range": [800, 840], "intensity": "medium", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "alkyne": {
+      "label": "Alkyne",
+      "bands": [
+        { "bond": "≡C–H", "vibration": "sp C–H stretch (terminal alkynes only)", "range": [3300, 3300], "approx": true, "intensity": "strong", "shape": "sharp", "diagnostic": true, "note": "Sharp, unlike the broad O–H and N–H bands nearby.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C≡C", "vibration": "C≡C stretch, terminal", "range": [2100, 2140], "intensity": "weak", "shape": null, "diagnostic": true, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "C≡C", "vibration": "C≡C stretch, internal", "range": [2190, 2260], "intensity": "weak", "shape": null, "diagnostic": false, "note": "Very weak, and absent entirely for a symmetric alkyne, because the bond's dipole does not change.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "arene": {
+      "label": "Aromatic ring",
+      "bands": [
+        { "bond": "Ar–H", "vibration": "aromatic C–H stretch", "range": [3030, 3070], "intensity": "weak", "shape": null, "diagnostic": true, "note": "Just above 3000.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C=C", "vibration": "ring stretches", "range": [1450, 1600], "intensity": "medium", "shape": null, "diagnostic": true, "note": "Usually several bands, often near 1600, 1580, 1500 and 1450.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "—", "vibration": "overtone and combination bands", "range": [1660, 2000], "intensity": "weak", "shape": null, "diagnostic": false, "note": "A small pattern whose shape reflects the substitution pattern.", "sources": ["openstax"], "verify": false },
+        { "bond": "Ar–H", "vibration": "out-of-plane bend, monosubstituted", "range": [690, 750], "intensity": "strong", "shape": null, "diagnostic": false, "note": "Two bands in this range.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "Ar–H", "vibration": "out-of-plane bend, ortho-disubstituted", "range": [750, 750], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "Ar–H", "vibration": "out-of-plane bend, meta-disubstituted", "range": [750, 900], "intensity": "strong", "shape": null, "diagnostic": false, "note": "Two bands, near 750–800 and 860–900.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "Ar–H", "vibration": "out-of-plane bend, para-disubstituted", "range": [800, 860], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "alcohol_primary": {
+      "label": "Alcohol, 1°",
+      "shared": "alcohol_oh",
+      "bands": [
+        { "bond": "C–O", "vibration": "C–O stretch", "range": [1040, 1060], "intensity": "strong", "shape": null, "diagnostic": false, "note": "The C–O position shifts upward from 1° to 2° to 3° alcohols.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "alcohol_secondary": {
+      "label": "Alcohol, 2°",
+      "shared": "alcohol_oh",
+      "bands": [
+        { "bond": "C–O", "vibration": "C–O stretch", "range": [1100, 1100], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "alcohol_tertiary": {
+      "label": "Alcohol, 3°",
+      "shared": "alcohol_oh",
+      "bands": [
+        { "bond": "C–O", "vibration": "C–O stretch", "range": [1150, 1200], "intensity": "medium", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "alcohol_oh": {
+      "label": "Alcohol O–H (shared by 1°, 2° and 3° alcohols)",
+      "bands": [
+        { "bond": "O–H", "vibration": "O–H stretch, hydrogen-bonded", "range": [3200, 3400], "intensity": "strong", "shape": "broad", "diagnostic": true, "note": "The usual appearance in a neat sample or KBr: a broad, rounded band. OpenStax gives 3400–3650 for the general alcohol O–H range.", "sources": ["wikipedia", "openstax"], "verify": false },
+        { "bond": "O–H", "vibration": "O–H stretch, free (dilute solution)", "range": [3610, 3670], "intensity": "medium", "shape": "sharp", "diagnostic": false, "note": "Seen only in dilute solution, where molecules are not hydrogen-bonded.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "phenol": {
+      "label": "Phenol",
+      "also_show": ["arene"],
+      "bands": [
+        { "bond": "O–H", "vibration": "O–H stretch, hydrogen-bonded", "range": [3200, 3400], "intensity": "strong", "shape": "broad", "diagnostic": true, "note": "Looks like an alcohol O–H; the aromatic ring bands tell them apart.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "C–O", "vibration": "C–O stretch", "range": [1200, 1200], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": "Higher than an alcohol C–O.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "ether": {
+      "label": "Ether",
+      "bands": [
+        { "bond": "C–O", "vibration": "C–O–C stretch, aliphatic", "range": [1120, 1120], "approx": true, "intensity": "strong", "shape": null, "diagnostic": true, "note": "Ethers are best identified by what is missing: a strong C–O band with no O–H and no C=O.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "C–O", "vibration": "C–O–C stretch, aryl ether", "range": [1220, 1260], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "aldehyde": {
+      "label": "Aldehyde",
+      "bands": [
+        { "bond": "C=O", "vibration": "C=O stretch, saturated", "range": [1725, 1730], "intensity": "strong", "shape": null, "diagnostic": true, "note": "Conjugation with C=C or an aromatic ring lowers it by roughly 20–30.", "sources": ["wikipedia", "openstax"], "verify": false },
+        { "bond": "C–H", "vibration": "aldehyde C–H stretch (two bands)", "range": [2720, 2820], "intensity": "medium", "shape": null, "diagnostic": true, "note": "A pair near 2720 and 2820. The 2720 band, sitting to the right of the alkane C–H bands, is the giveaway that separates an aldehyde from a ketone.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "ketone": {
+      "label": "Ketone",
+      "bands": [
+        { "bond": "C=O", "vibration": "C=O stretch, saturated acyclic or six-membered ring", "range": [1715, 1720], "intensity": "strong", "shape": null, "diagnostic": true, "note": "The reference carbonyl: compare other carbonyls to 1715.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C=O", "vibration": "C=O stretch, conjugated (α,β-unsaturated or aryl)", "range": [1685, 1685], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": "Conjugation lowers the C=O frequency.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "C=O", "vibration": "C=O stretch, five-membered ring", "range": [1750, 1750], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": "Ring strain raises the frequency.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "C=O", "vibration": "C=O stretch, four-membered ring", "range": [1775, 1775], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "carboxylic_acid": {
+      "label": "Carboxylic acid",
+      "bands": [
+        { "bond": "O–H", "vibration": "O–H stretch, hydrogen-bonded dimer", "range": [2500, 3100], "intensity": "strong", "shape": "broad", "diagnostic": true, "note": "Very broad and often runs underneath the C–H bands. Much wider than an alcohol O–H.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C=O", "vibration": "C=O stretch, saturated", "range": [1710, 1710], "approx": true, "intensity": "strong", "shape": null, "diagnostic": true, "note": "Broad O–H plus a C=O near 1710 together point to a carboxylic acid.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C=O", "vibration": "C=O stretch, conjugated or aromatic", "range": [1680, 1690], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "C–O", "vibration": "C–O stretch", "range": [1250, 1300], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "CO₂⁻", "vibration": "carboxylate stretch (salt or zwitterion)", "range": [1550, 1610], "intensity": "strong", "shape": null, "diagnostic": false, "note": "Deprotonated acids and amino acid zwitterions lose the 1710 band and show this instead.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "ester": {
+      "label": "Ester",
+      "bands": [
+        { "bond": "C=O", "vibration": "C=O stretch, saturated", "range": [1735, 1735], "approx": true, "intensity": "strong", "shape": null, "diagnostic": true, "note": "Higher than a ketone. Conjugation lowers it.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C–O", "vibration": "C–O stretches", "range": [1100, 1300], "intensity": "strong", "shape": null, "diagnostic": true, "note": "Two strong bands. C=O near 1735 plus strong C–O with no O–H suggests an ester.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "amide": {
+      "label": "Amide",
+      "bands": [
+        { "bond": "C=O", "vibration": "C=O stretch (amide I)", "range": [1650, 1690], "intensity": "strong", "shape": null, "diagnostic": true, "note": "The lowest common carbonyl: resonance with nitrogen weakens the C=O bond. Wikipedia gives about 1650 for hydrogen-bonded amides; OpenStax gives 1690.", "sources": ["wikipedia", "openstax"], "verify": true },
+        { "bond": "N–H", "vibration": "N–H stretch, 1° amide (two bands)", "range": [3180, 3350], "intensity": "medium", "shape": null, "diagnostic": true, "note": "Two bands for RCONH₂, one for RCONHR′, none for a 3° amide.", "sources": ["textbook"], "verify": true },
+        { "bond": "N–H", "vibration": "N–H bend (amide II), 1° and 2° amides", "range": [1550, 1640], "intensity": "medium", "shape": null, "diagnostic": false, "note": null, "sources": ["textbook"], "verify": true }
+      ]
+    },
+    "acid_chloride": {
+      "label": "Acid chloride",
+      "bands": [
+        { "bond": "C=O", "vibration": "C=O stretch", "range": [1800, 1800], "approx": true, "intensity": "strong", "shape": null, "diagnostic": true, "note": "The highest common single carbonyl band, because chlorine withdraws electrons and donates little by resonance.", "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "anhydride": {
+      "label": "Anhydride",
+      "bands": [
+        { "bond": "C=O", "vibration": "C=O stretches, symmetric and asymmetric", "range": [1760, 1820], "intensity": "strong", "shape": null, "diagnostic": true, "note": "Two carbonyl bands, near 1820 and 1760. Two bands about 60 apart is the anhydride signature.", "sources": ["wikipedia"], "verify": false },
+        { "bond": "C–O", "vibration": "C–O stretch", "range": [1000, 1300], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["textbook"], "verify": true }
+      ]
+    },
+    "nitrile": {
+      "label": "Nitrile",
+      "bands": [
+        { "bond": "C≡N", "vibration": "C≡N stretch", "range": [2210, 2260], "intensity": "medium", "shape": "sharp", "diagnostic": true, "note": "Sharp and more intense than an alkyne C≡C. Near 2250 unconjugated, near 2230 when conjugated.", "sources": ["openstax", "wikipedia"], "verify": false }
+      ]
+    },
+    "amine_primary": {
+      "label": "Amine, 1°",
+      "shared": "amine_cn",
+      "bands": [
+        { "bond": "N–H", "vibration": "N–H stretch (two bands)", "range": [3300, 3500], "intensity": "medium", "shape": null, "diagnostic": true, "note": "Two bands (symmetric and asymmetric NH₂ stretch), sharper and weaker than an alcohol O–H.", "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "N–H", "vibration": "N–H bend (scissoring)", "range": [1560, 1640], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false }
+      ]
+    },
+    "amine_secondary": {
+      "label": "Amine, 2°",
+      "shared": "amine_cn",
+      "bands": [
+        { "bond": "N–H", "vibration": "N–H stretch (one band)", "range": [3300, 3500], "intensity": "weak", "shape": null, "diagnostic": true, "note": "One band, often weak. Counting N–H bands (two, one, none) distinguishes 1°, 2° and 3° amines.", "sources": ["openstax", "wikipedia"], "verify": true }
+      ]
+    },
+    "amine_tertiary": {
+      "label": "Amine, 3°",
+      "shared": "amine_cn",
+      "bands": [],
+      "note": "No N–H stretch. Tertiary amines are hard to confirm by IR alone; look for the C–N band and the absence of N–H and O–H."
+    },
+    "amine_cn": {
+      "label": "Amine C–N (shared by 1°, 2° and 3° amines)",
+      "bands": [
+        { "bond": "C–N", "vibration": "C–N stretch, aliphatic", "range": [1020, 1230], "intensity": "medium", "shape": null, "diagnostic": false, "note": "Often overlapped by other fingerprint bands.", "sources": ["wikipedia", "openstax"], "verify": false }
+      ]
+    },
+    "thiol": {
+      "label": "Thiol",
+      "bands": [
+        { "bond": "S–H", "vibration": "S–H stretch", "range": [2550, 2600], "intensity": "weak", "shape": "sharp", "diagnostic": true, "note": "Weak but in an otherwise empty region, so it is easy to spot.", "sources": ["textbook"], "verify": true }
+      ]
+    },
+    "alkyl_halide": {
+      "label": "Alkyl halide",
+      "bands": [
+        { "bond": "C–F", "vibration": "C–F stretch", "range": [1000, 1100], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["wikipedia"], "verify": false },
+        { "bond": "C–Cl", "vibration": "C–Cl stretch", "range": [540, 800], "intensity": "strong", "shape": null, "diagnostic": false, "note": "Wikipedia gives 540–760, OpenStax 600–800.", "sources": ["wikipedia", "openstax"], "verify": false },
+        { "bond": "C–Br", "vibration": "C–Br stretch", "range": [500, 600], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["openstax", "wikipedia"], "verify": false },
+        { "bond": "C–I", "vibration": "C–I stretch", "range": [500, 500], "approx": true, "intensity": "strong", "shape": null, "diagnostic": false, "note": "At or below the low end of many instruments' range.", "sources": ["wikipedia"], "verify": false }
+      ],
+      "note": "C–X bands sit deep in the fingerprint region, so IR rarely confirms a halide on its own. Mass spectrometry (M+2 isotope peaks for Cl and Br) is more useful."
+    },
+    "epoxide": {
+      "label": "Epoxide",
+      "bands": [
+        { "bond": "C–O", "vibration": "ring stretch (ring breathing)", "range": [1250, 1250], "approx": true, "intensity": "medium", "shape": null, "diagnostic": false, "note": null, "sources": ["textbook"], "verify": true },
+        { "bond": "C–O", "vibration": "asymmetric ring stretch", "range": [810, 950], "intensity": "strong", "shape": null, "diagnostic": true, "note": null, "sources": ["textbook"], "verify": true },
+        { "bond": "C–O", "vibration": "symmetric ring deformation", "range": [750, 840], "intensity": "strong", "shape": null, "diagnostic": false, "note": null, "sources": ["textbook"], "verify": true }
+      ],
+      "note": "Epoxide bands are all in the fingerprint region; IR supports an epoxide assignment but rarely proves it."
+    }
+  }
+}
