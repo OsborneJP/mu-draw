@@ -144,6 +144,10 @@ function editOne(event: Event): void {
   if (!editor || !target || !editor.render.clientArea.contains(target)) return;
   const item = editor.findItem(event as MouseEvent, ['atoms', 'bonds']);
   if (!item || (item.map !== 'atoms' && item.map !== 'bonds')) return;
+  // Only a selection the select tool's press made holds the item; a drawing tool's press
+  // clears the selection, and a selection left behind would take that tool's next pick.
+  const current = editor.selection() as Partial<Record<string, number[]>> | null;
+  if (!current?.[item.map]?.includes(item.id)) return;
   const one = { [item.map]: [item.id] };
   if (!widened(groups, one, canvasOf(editor.struct()))) return; // not in a group
   quiet = true;
@@ -152,6 +156,9 @@ function editOne(event: Event): void {
   } finally {
     quiet = false;
   }
+  // Ketcher drew its rotate frame and floating tools round the group at the press; redrawn
+  // for the one item, they go, so no handle is left to turn that item on its own.
+  editor.rotateController?.rerender();
 }
 
 /** Restore the saved groups onto the restored drawing, then keep them: call once the

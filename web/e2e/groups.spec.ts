@@ -403,4 +403,31 @@ test('a double-click on a grouped atom edits that atom only', async ({ app }) =>
   await label.fill('N');
   await page.getByTestId('OK').click();
   await expect.poll(labels).toEqual(before.map(([id, l]) => [id, id === 0 ? 'N' : l]));
+  // Only that atom is selected, so Ketcher's rotate frame and floating tools (drawn round the
+  // group by the press before) are gone: no handle left to turn one atom on its own.
+  await expect.poll(() => selection(page)).toEqual({ atoms: [0], bonds: [], texts: [], rxnArrows: [] });
+  await expect(page.getByTestId('floating-tools')).toHaveCount(0);
+  await expect(page.getByTestId('rotation-handle')).toHaveCount(0);
+});
+
+// A guard: on 6e1cbea, before the store narrowed only a select tool's selection, this already
+// passed (Ketcher's own handling left nothing selected); groupStore.test.ts holds the rule.
+test('a double-click with the bond tool on a grouped bond leaves nothing selected', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await drawing(page);
+  await groupEverything(page);
+  await deselect(page);
+  // A bond of atom 0, clicked twice with the single-bond tool (Ketcher steps its order).
+  const [begin, end] = await page.evaluate(() => {
+    const s = window.ketcher!.editor.struct() as unknown as { bonds: Map<number, { begin: number; end: number }> };
+    const bond = [...s.bonds.values()].find((b) => b.begin === 0 || b.end === 0)!;
+    return [bond.begin, bond.end];
+  });
+  const [p, q] = [await atomOnPage(page, begin), await atomOnPage(page, end)];
+  await page.getByTestId('bonds').filter({ visible: true }).click();
+  await page.mouse.dblclick((p.x + q.x) / 2, (p.y + q.y) / 2);
+  await expect(page.getByTestId('bonds').filter({ visible: true })).toHaveCount(1);
+  // The next tool picked would act on anything left selected.
+  await expect.poll(() => selection(page)).toEqual({ atoms: [], bonds: [], texts: [], rxnArrows: [] });
 });

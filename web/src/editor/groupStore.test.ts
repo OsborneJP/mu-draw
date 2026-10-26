@@ -240,12 +240,15 @@ describe('the store on a Ketcher', () => {
     expect(tidy(fake.selection())).toEqual({ atoms: [0, 1], bonds: [0], texts: [0] });
   });
 
-  it('a double-click on a grouped atom or bond edits that one only', () => {
+  it('a double-click on a grouped atom or bond edits that one only, and its rotate frame goes', () => {
     const { fake } = grouped();
-    fake.selection({ atoms: [1] }); // the press before it: the whole group
+    fake.selection({ atoms: [1] }); // the select tool's press before it: the whole group
     expect(tidy(fake.selection())).toEqual(WHOLE);
+    const frames = fake.rotateFrames;
     fake.doubleClick({ map: 'atoms', id: 1 });
     expect(tidy(fake.selection())).toEqual({ atoms: [1] });
+    // Ketcher drew the frame round the group; it is redrawn for the one atom (none shows).
+    expect(fake.rotateFrames).toBe(frames + 1);
     fake.selection({ bonds: [1] });
     fake.doubleClick({ map: 'bonds', id: 1 });
     expect(tidy(fake.selection())).toEqual({ bonds: [1] });
@@ -259,11 +262,24 @@ describe('the store on a Ketcher', () => {
   });
 
   it('leaves a double-click outside every group to Ketcher (it edits every selected atom)', () => {
+    const { fake, ketcher } = fakeKetcher(drawing());
+    store.startGroups(ketcher, () => memoryStorage(), KEY, fake.events);
+    // The first molecule and the text grouped; the second molecule selected, not grouped.
+    fake.selection({ atoms: [0], texts: [0] });
+    store.groupSelection();
+    fake.selection({ atoms: [2, 3] });
+    fake.doubleClick({ map: 'atoms', id: 3 });
+    expect(tidy(fake.selection())).toEqual({ atoms: [2, 3] });
+  });
+
+  it('leaves a double-click with a drawing tool alone: that tool cleared the selection', () => {
     const { fake } = grouped();
-    store.ungroupSelection();
-    fake.selection({ atoms: [0, 1] });
+    fake.selection(null); // a drawing tool's press
+    const frames = fake.rotateFrames;
     fake.doubleClick({ map: 'atoms', id: 1 });
-    expect(tidy(fake.selection())).toEqual({ atoms: [0, 1] });
+    fake.doubleClick({ map: 'bonds', id: 1 });
+    expect(tidy(fake.selection())).toEqual({});
+    expect(fake.rotateFrames).toBe(frames);
   });
 
   it('redraws Ketcher’s rotate frame for the group it selects', () => {

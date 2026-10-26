@@ -104,6 +104,19 @@ rotate frame; two restore tests could not fail. Lows accepted (below, and): the 
 wait in the move test is always already met; the browser tests press on atom 0 (the unit
 tests cover the other kinds of member).
 
+## Review (round 2, 2026-10-26)
+
+Two reviewers on the round 1 fixes (6e1cbea), skeptics on each medium. Both confirmed
+mediums came from round 1's double-click narrowing; Jeff chose the small fix over removing
+it. Fixed: after a double-click narrowed the selection to one atom, Ketcher's rotate frame
+and floating tools still framed the group, so the handle turned that atom alone (the store
+now redraws the frame; the browser test fails on 6e1cbea); and the narrowing ran under any
+tool (it now narrows only a selection that holds the item, which only the select tool's
+press makes; the store test fails on 6e1cbea, though in the browser no drawing tool left a
+selection behind even then). A low fixed: the "outside every group" test now has a group on
+the canvas. Lows accepted: reopening the identical drawing, and the Name panel over the
+button's fallback place (below).
+
 ## Known limits
 
 - Groups live only in this browser with the drawing; files, copies and exports don't carry
@@ -120,6 +133,10 @@ tests cover the other kinds of member).
   bond in it, as for any selection in Ketcher.
 - With the ¹³C NMR preview open, a click on a carbon of a grouped molecule selects the whole
   group, so it no longer picks out that carbon's peak.
+- Opening the identical drawing again, unmoved, keeps its groups: to the app it looks like
+  Aromatize or Settings, which hand Ketcher an unchanged copy.
+- In a narrow window the Name panel can cover the Group button when it is not beside Ketcher's
+  floating tools (images or shapes alone, or a browser without CSS anchor positioning).
 - In the test browser, Ketcher 3.18 can't turn a selection that holds a text with its rotate
   handle (it stops after moving the text), group or no group. The rotate test uses a group
   without text; worth checking in a real browser.
