@@ -174,6 +174,59 @@ describe('RDKit’s NCI sample', () => {
   });
 });
 
+/** A version 2 Molfile with its atoms listed in reverse: the same structure, drawn in another
+ * order. Bonds and charge lines follow their atoms. */
+function reversed(molfile: string): string {
+  const lines = molfile.split('\n');
+  const atoms = Number(lines[3].slice(0, 3));
+  const bonds = Number(lines[3].slice(3, 6));
+  const renumber = (n: number) => atoms + 1 - n;
+  const atomLines = lines.slice(4, 4 + atoms).reverse();
+  const bondLines = lines.slice(4 + atoms, 4 + atoms + bonds).map((line) => {
+    const [a, b] = [Number(line.slice(0, 3)), Number(line.slice(3, 6))];
+    return `${String(renumber(a)).padStart(3)}${String(renumber(b)).padStart(3)}${line.slice(6)}`;
+  });
+  const rest = lines.slice(4 + atoms + bonds).map((line) => {
+    if (!line.startsWith('M  CHG')) return line;
+    const fields = line.slice(6).trim().split(/\s+/).map(Number);
+    const pairs = fields.slice(1).flatMap((v, i) => (i % 2 === 0 ? [renumber(v)] : [v]));
+    return `M  CHG${String(fields[0]).padStart(3)}${pairs.map((v) => String(v).padStart(4)).join('')}`;
+  });
+  return [...lines.slice(0, 4), ...atomLines, ...bondLines, ...rest].join('\n');
+}
+
+describe('the atom order (Jeff’s decision: RDKit’s canonical order)', () => {
+  it('lists the same structures, in the same order, however the atoms were numbered', () => {
+    for (const c of fixture.compounds) {
+      const result = results.get(c.name)!;
+      // Only version 2 Molfiles: the helper reads their columns.
+      if (result.outcome !== 'listed' || /^M {2}V30 /m.test(drawing(c))) continue;
+      const other = listResonance(rdkit, reversed(drawing(c)));
+      expect(other?.outcome, c.name).toBe('listed');
+      if (other?.outcome !== 'listed') continue;
+      expect(other.structures.map((s) => s.rank), c.name).toEqual(result.structures.map((s) => s.rank));
+      // Charges by element, read through the renumbering: the same atoms carry them.
+      const n = result.structures[0]?.charges.length ?? 0;
+      const back = other.structures.map((s) => s.charges.map((_, a) => s.charges[n - 1 - a]));
+      expect(back.map((q) => q.filter((x) => x).sort().join()), c.name).toEqual(
+        result.structures.map((s) => s.charges.filter((x) => x).sort().join()),
+      );
+    }
+  });
+
+  it('reverses a drawing’s atoms and nothing else (the helper above)', () => {
+    const phenolate = drawing(fixture.compounds.find((c) => c.name === 'phenolate')!);
+    const read = (text: string) => {
+      const mol = rdkit.get_mol(text)!;
+      const smiles = mol.get_smiles();
+      mol.delete();
+      return smiles;
+    };
+    expect(read(reversed(phenolate))).toBe(read(phenolate));
+    expect(reversed(reversed(phenolate))).toBe(phenolate);
+  });
+});
+
 describe('the limits (decision 7)', () => {
   it('are the fixture’s', () => {
     expect(RESONANCE_LIMITS).toEqual({

@@ -1,7 +1,7 @@
 {
  "status": "provisional",
  "chosen_by": "Claude, 2026-10-26, for Jeff to check (docs/plans/v2-tautomers-resonance.md, bar A.3)",
- "how": "Written by reading each structure against RDKit's rules with decision 2's settings (ALLOW_CHARGE_SEPARATION, KEKULE_ALL). Most were seen in the planning probes first, so it is a review, not a blind prediction. For each compound: what the panel lists, how many structures, whether the drawing as drawn is among them, and every place a charge goes (element and sign, one entry per atom). 'exist' is a chemist's count where RDKit's falls short: RDKit's search depends on the atom order, and misses some equivalent structures. A test compares the generated tests/fixtures/resonance_expected.json with this file.",
+ "how": "Written by reading each structure against RDKit's rules with decision 2's settings (ALLOW_CHARGE_SEPARATION, KEKULE_ALL). Most were seen in the planning probes first, so it is a review, not a blind prediction. For each compound: what the panel lists, how many structures, whether the drawing as drawn is among them, and every place a charge goes (element and sign, one entry per atom). RDKit runs on each drawing in its canonical atom order (Jeff's decision, 2026-10-26), since its search depends on the atom order. 'exist' is a chemist's count where RDKit's still falls short: it misses some equivalent structures. A test compares the generated tests/fixtures/resonance_expected.json with this file.",
  "compounds": [
   {
    "name": "acetate",
@@ -39,27 +39,27 @@
   {
    "name": "acetylacetonate",
    "outcome": "listed",
-   "count": 2,
+   "count": 3,
    "drawing_listed": true,
    "charge_sites": [
+    "C-",
     "O-",
     "O-"
    ],
-   "why": "the charge on either oxygen; RDKit misses the central carbanion in this atom order (3 in its canonical order)",
-   "exist": 3
+   "why": "the charge on either oxygen, and the central carbanion"
   },
   {
    "name": "phenolate",
    "outcome": "listed",
-   "count": 4,
+   "count": 5,
    "drawing_listed": true,
    "charge_sites": [
     "C-",
     "C-",
+    "C-",
     "O-"
    ],
-   "why": "O- with each Kekulé ring and the ortho and para carbanions, but RDKit misses one ortho form in this atom order (5 in its canonical order)",
-   "exist": 5
+   "why": "O- with each Kekulé ring, and the two ortho and the para carbanions"
   },
   {
    "name": "4-nitrophenolate",
@@ -122,7 +122,7 @@
     "C-",
     "C-"
    ],
-   "why": "the charge on each carbon, but RDKit misses one of the five, in any order tried but a few",
+   "why": "the charge on each carbon, but RDKit misses one of the five, in its canonical order too",
    "exist": 5
   },
   {
@@ -249,7 +249,7 @@
     "C+",
     "C+"
    ],
-   "why": "the charge on each carbon, but RDKit misses one of the seven",
+   "why": "the charge on each carbon, but RDKit misses one of the seven, in its canonical order too",
    "exist": 7
   },
   {
@@ -416,15 +416,15 @@
   {
    "name": "phenolate, drawn with aromatic bonds",
    "outcome": "listed",
-   "count": 4,
+   "count": 5,
    "drawing_listed": true,
    "charge_sites": [
     "C-",
     "C-",
+    "C-",
     "O-"
    ],
-   "why": "as phenolate, in the same atom order",
-   "exist": 5
+   "why": "as phenolate"
   },
   {
    "name": "pyridine bound to copper",

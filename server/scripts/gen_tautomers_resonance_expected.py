@@ -396,13 +396,39 @@ def as_drawn(text: str) -> Chem.Mol:
     return Chem.RemoveHs(Chem.MolFromMolBlock(text, sanitize=False, removeHs=False), sanitize=False)
 
 
+def canonical(mol: Chem.Mol) -> tuple[Chem.Mol, list[int]]:
+    """The molecule in RDKit's canonical atom order, as its canonical SMILES lists the atoms,
+    and the molecule's own atom for each of them. RDKit's resonance list depends on the atom
+    order, so the panel runs it in this one (Jeff's decision, 2026-10-26)."""
+    smiles = Chem.MolToSmiles(mol)
+    return Chem.MolFromSmiles(smiles), json.loads(mol.GetProp("_smilesAtomOutputOrder"))
+
+
+def in_own_order(
+    mol: Chem.Mol, canon: Chem.Mol, order: list[int], bonds: list[int], charges: list[int]
+):
+    """A structure of the canonical molecule, as bond orders and charges by the molecule's own
+    bond and atom indices."""
+    at = {atom: k for k, atom in enumerate(order)}
+    bond = [
+        canon.GetBondBetweenAtoms(at[b.GetBeginAtomIdx()], at[b.GetEndAtomIdx()]).GetIdx()
+        for b in mol.GetBonds()
+    ]
+    return [bonds[j] for j in bond], [charges[at[a]] for a in range(mol.GetNumAtoms())]
+
+
 def resonance(mol: Chem.Mol, text: str) -> dict:
-    """What the resonance panel lists for a drawing (RDKit's reading of it, and the Molfile)."""
+    """What the resonance panel lists for a drawing (RDKit's reading of it, and the Molfile):
+    RDKit's structures for it in canonical atom order, by the drawing's own indices."""
     if len(Chem.GetMolFrags(mol)) > 1:
         return {"outcome": "several"}
-    found = resonance_structures(mol)
+    canon, order = canonical(mol)
+    found = {**resonance_structures(canon), "conjugated": conjugated_groups(mol)[0]}
     if found["outcome"] != "listed":
         return found
+    found["structures"] = [
+        (*in_own_order(mol, canon, order, b, c), r) for b, c, r in found["structures"]
+    ]
     drawn = as_drawn(text)
     if [a.GetAtomicNum() for a in drawn.GetAtoms()] != [a.GetAtomicNum() for a in mol.GetAtoms()]:
         raise ValueError(f"{Chem.MolToSmiles(mol)}: the drawing as drawn has other atoms")
