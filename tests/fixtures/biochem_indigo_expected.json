@@ -1447,6 +1447,446 @@
       "hydrophobicity": [
         0.88
       ]
+    },
+    {
+      "name": "Ala first",
+      "sequence": "AG",
+      "formula": "C5 H10 N2 O3",
+      "mass": 146.145997,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.616,
+        0.501
+      ]
+    },
+    {
+      "name": "Cys first",
+      "sequence": "CG",
+      "formula": "C5 H10 N2 O3 S",
+      "mass": 178.205998,
+      "extinction": 125,
+      "hydrophobicity": [
+        0.68,
+        0.501
+      ]
+    },
+    {
+      "name": "Asp first",
+      "sequence": "DG",
+      "formula": "C6 H10 N2 O5",
+      "mass": 190.154996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.028,
+        0.501
+      ]
+    },
+    {
+      "name": "Glu first",
+      "sequence": "EG",
+      "formula": "C7 H12 N2 O5",
+      "mass": 204.181995,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.043,
+        0.501
+      ]
+    },
+    {
+      "name": "Phe first",
+      "sequence": "FG",
+      "formula": "C11 H14 N2 O3",
+      "mass": 222.243995,
+      "extinction": 0,
+      "hydrophobicity": [
+        1,
+        0.501
+      ]
+    },
+    {
+      "name": "Gly first",
+      "sequence": "GG",
+      "formula": "C4 H8 N2 O3",
+      "mass": 132.118997,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.501
+      ]
+    },
+    {
+      "name": "His first",
+      "sequence": "HG",
+      "formula": "C8 H12 N4 O3",
+      "mass": 212.208996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.165,
+        0.501
+      ]
+    },
+    {
+      "name": "Ile first",
+      "sequence": "IG",
+      "formula": "C8 H16 N2 O3",
+      "mass": 188.226996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.943,
+        0.501
+      ]
+    },
+    {
+      "name": "Lys first",
+      "sequence": "KG",
+      "formula": "C8 H17 N3 O3",
+      "mass": 203.241996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.283,
+        0.501
+      ]
+    },
+    {
+      "name": "Leu first",
+      "sequence": "LG",
+      "formula": "C8 H16 N2 O3",
+      "mass": 188.226996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.943,
+        0.501
+      ]
+    },
+    {
+      "name": "Met first",
+      "sequence": "MG",
+      "formula": "C7 H14 N2 O3 S",
+      "mass": 206.259998,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.738,
+        0.501
+      ]
+    },
+    {
+      "name": "Asn first",
+      "sequence": "NG",
+      "formula": "C6 H11 N3 O4",
+      "mass": 189.170996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.236,
+        0.501
+      ]
+    },
+    {
+      "name": "Pro first",
+      "sequence": "PG",
+      "formula": "C7 H12 N2 O3",
+      "mass": 172.183996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.711,
+        0.501
+      ]
+    },
+    {
+      "name": "Gln first",
+      "sequence": "QG",
+      "formula": "C7 H13 N3 O4",
+      "mass": 203.197996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.251,
+        0.501
+      ]
+    },
+    {
+      "name": "Arg first",
+      "sequence": "RG",
+      "formula": "C8 H17 N5 O3",
+      "mass": 231.255996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0,
+        0.501
+      ]
+    },
+    {
+      "name": "Ser first",
+      "sequence": "SG",
+      "formula": "C5 H10 N2 O4",
+      "mass": 162.144996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.359,
+        0.501
+      ]
+    },
+    {
+      "name": "Thr first",
+      "sequence": "TG",
+      "formula": "C6 H12 N2 O4",
+      "mass": 176.171996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.45,
+        0.501
+      ]
+    },
+    {
+      "name": "Val first",
+      "sequence": "VG",
+      "formula": "C7 H14 N2 O3",
+      "mass": 174.199996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.825,
+        0.501
+      ]
+    },
+    {
+      "name": "Trp first",
+      "sequence": "WG",
+      "formula": "C13 H15 N3 O3",
+      "mass": 261.280994,
+      "extinction": 5500,
+      "hydrophobicity": [
+        0.878,
+        0.501
+      ]
+    },
+    {
+      "name": "Tyr first",
+      "sequence": "YG",
+      "formula": "C11 H14 N2 O4",
+      "mass": 238.242995,
+      "extinction": 1490,
+      "hydrophobicity": [
+        0.88,
+        0.501
+      ]
+    },
+    {
+      "name": "Ala last",
+      "sequence": "GA",
+      "formula": "C5 H10 N2 O3",
+      "mass": 146.145997,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.616
+      ]
+    },
+    {
+      "name": "Cys last",
+      "sequence": "GC",
+      "formula": "C5 H10 N2 O3 S",
+      "mass": 178.205998,
+      "extinction": 125,
+      "hydrophobicity": [
+        0.501,
+        0.68
+      ]
+    },
+    {
+      "name": "Asp last",
+      "sequence": "GD",
+      "formula": "C6 H10 N2 O5",
+      "mass": 190.154996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.028
+      ]
+    },
+    {
+      "name": "Glu last",
+      "sequence": "GE",
+      "formula": "C7 H12 N2 O5",
+      "mass": 204.181995,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.043
+      ]
+    },
+    {
+      "name": "Phe last",
+      "sequence": "GF",
+      "formula": "C11 H14 N2 O3",
+      "mass": 222.243995,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        1
+      ]
+    },
+    {
+      "name": "Gly last",
+      "sequence": "GG",
+      "formula": "C4 H8 N2 O3",
+      "mass": 132.118997,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.501
+      ]
+    },
+    {
+      "name": "His last",
+      "sequence": "GH",
+      "formula": "C8 H12 N4 O3",
+      "mass": 212.208996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.165
+      ]
+    },
+    {
+      "name": "Ile last",
+      "sequence": "GI",
+      "formula": "C8 H16 N2 O3",
+      "mass": 188.226996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.943
+      ]
+    },
+    {
+      "name": "Lys last",
+      "sequence": "GK",
+      "formula": "C8 H17 N3 O3",
+      "mass": 203.241996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.283
+      ]
+    },
+    {
+      "name": "Leu last",
+      "sequence": "GL",
+      "formula": "C8 H16 N2 O3",
+      "mass": 188.226996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.943
+      ]
+    },
+    {
+      "name": "Met last",
+      "sequence": "GM",
+      "formula": "C7 H14 N2 O3 S",
+      "mass": 206.259998,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.738
+      ]
+    },
+    {
+      "name": "Asn last",
+      "sequence": "GN",
+      "formula": "C6 H11 N3 O4",
+      "mass": 189.170996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.236
+      ]
+    },
+    {
+      "name": "Pro last",
+      "sequence": "GP",
+      "formula": "C7 H12 N2 O3",
+      "mass": 172.183996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.711
+      ]
+    },
+    {
+      "name": "Gln last",
+      "sequence": "GQ",
+      "formula": "C7 H13 N3 O4",
+      "mass": 203.197996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.251
+      ]
+    },
+    {
+      "name": "Arg last",
+      "sequence": "GR",
+      "formula": "C8 H17 N5 O3",
+      "mass": 231.255996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0
+      ]
+    },
+    {
+      "name": "Ser last",
+      "sequence": "GS",
+      "formula": "C5 H10 N2 O4",
+      "mass": 162.144996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.359
+      ]
+    },
+    {
+      "name": "Thr last",
+      "sequence": "GT",
+      "formula": "C6 H12 N2 O4",
+      "mass": 176.171996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.45
+      ]
+    },
+    {
+      "name": "Val last",
+      "sequence": "GV",
+      "formula": "C7 H14 N2 O3",
+      "mass": 174.199996,
+      "extinction": 0,
+      "hydrophobicity": [
+        0.501,
+        0.825
+      ]
+    },
+    {
+      "name": "Trp last",
+      "sequence": "GW",
+      "formula": "C13 H15 N3 O3",
+      "mass": 261.280994,
+      "extinction": 5500,
+      "hydrophobicity": [
+        0.501,
+        0.878
+      ]
+    },
+    {
+      "name": "Tyr last",
+      "sequence": "GY",
+      "formula": "C11 H14 N2 O4",
+      "mass": 238.242995,
+      "extinction": 1490,
+      "hydrophobicity": [
+        0.501,
+        0.88
+      ]
     }
   ],
   "nucleic": [

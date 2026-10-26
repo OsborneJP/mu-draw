@@ -1,7 +1,8 @@
 // What Indigo answers for the biochem test sequences (docs/plans/v2-biochem.md, bar A.2):
 //   node scripts/gen-biochem-indigo.ts                                  (from web/)
 // Reads ../tests/fixtures/biochem_sequences.json (sequences only) and writes
-// ../tests/fixtures/biochem_indigo_expected.json: for each peptide (and every residue alone)
+// ../tests/fixtures/biochem_indigo_expected.json: for each peptide (and every residue alone, first
+// in XG and last in GX, as the Biopython generator has them)
 // Indigo's formula, mass, ε and hydrophobicity; for each nucleic acid, as DNA and as RNA, the
 // single strand's formula and mass, and the DNA duplex's Tm at each test concentration.
 //
@@ -151,6 +152,8 @@ export async function generate(): Promise<string> {
   const peptides = [
     ...inputs.peptides.map((e) => ({ name: e.name, sequence: expand(e) })),
     ...Object.keys(three).map((r) => ({ name: `${three[r]} alone`, sequence: r })),
+    ...Object.keys(three).map((r) => ({ name: `${three[r]} first`, sequence: `${r}G` })),
+    ...Object.keys(three).map((r) => ({ name: `${three[r]} last`, sequence: `G${r}` })),
   ].map(({ name, sequence }) => {
     const p = props(ket(sequence, 'chemical/x-peptide-sequence'));
     return { name, sequence, formula: p.grossFormula, mass: p.mass, extinction: p.extinctionCoefficient, hydrophobicity: p.hydrophobicity };

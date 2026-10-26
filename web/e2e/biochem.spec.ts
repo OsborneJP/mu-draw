@@ -9,7 +9,16 @@ import { fileURLToPath } from 'node:url';
 import { isoelectricPoint, netCharge, parseSequence, problemMessage, RESIDUES, type Parsed } from '../src/chem/biochem.ts';
 import { shown } from '../src/chem/properties.ts';
 import { NOTES } from '../src/panels/biochem.ts';
-import { expect, fixture, goOffline, holdableBiochemReplies, openEditor, referenceCompound, test } from './fixtures.ts';
+import {
+  expect,
+  fixture,
+  goOffline,
+  holdableBiochemReplies,
+  holdableRdkitReplies,
+  openEditor,
+  referenceCompound,
+  test,
+} from './fixtures.ts';
 
 interface IndigoExpected {
   concentrations: { sodium_mM: number; strand_uM: number }[];
@@ -48,6 +57,14 @@ const held = (page: Page) => page.evaluate(() => (window as unknown as { __heldB
 const workers = (page: Page) => page.evaluate(() => (window as unknown as { __biochemWorkers(): number }).__biochemWorkers());
 const requests = (page: Page) => page.evaluate(() => (window as unknown as { __biochemRequests(): number }).__biochemRequests());
 
+/** Draw a reference compound (tests/fixtures/molfiles). */
+async function draw(page: Page, name: string): Promise<void> {
+  const molfile = fixture(referenceCompound(name).files.find((f) => f.endsWith('.mol'))!);
+  await page.evaluate((mol) => window.ketcher!.setMolecule(mol), molfile);
+}
+
+const formulaOf = (name: string) => (referenceCompound(name) as ReturnType<typeof referenceCompound> & { formula: string }).formula;
+
 async function openSection(page: Page): Promise<void> {
   await page.getByTestId('biochem').locator('summary').click();
   await expect(page.getByTestId('biochem')).toHaveAttribute('open', '');
@@ -75,8 +92,8 @@ async function expectPeptide(page: Page, expected: IndigoExpected['peptides'][nu
   await expect(page.getByTestId('biochem-no-absorbance')).toHaveCount(reduced === 0 && cystines === 0 ? 1 : 0);
   const bars = page.getByTestId('biochem-hydrophobicity').locator('rect');
   expect(await bars.evaluateAll((rects) => rects.map((r) => Number(r.getAttribute('data-value'))))).toEqual(expected.hydrophobicity);
-  const first = `${RESIDUES[sequence[0]]} 1: ${expected.hydrophobicity[0]}`;
-  await expect(bars.first().locator('title')).toHaveText(first);
+  const titles = expected.hydrophobicity.map((value, i) => `${RESIDUES[sequence[i]]} ${i + 1}: ${value}`);
+  expect(await bars.locator('title').evaluateAll((all) => all.map((t) => t.textContent))).toEqual(titles);
 }
 
 test('the section sits closed at the foot of the side panel; its worker starts when it opens; drawing leaves it alone', async ({
@@ -98,27 +115,48 @@ test('the section sits closed at the foot of the side panel; its worker starts w
   const before = await values.innerHTML();
   // A drawing, then a change to it: the section keeps its values.
   for (const name of ['ethanol', 'toluene']) {
-    const compound = referenceCompound(name) as ReturnType<typeof referenceCompound> & { formula: string };
-    const molfile = fixture(compound.files.find((f) => f.endsWith('.mol'))!);
-    await page.evaluate((mol) => window.ketcher!.setMolecule(mol), molfile);
-    await expect(page.getByTestId('prop-formula')).toHaveAttribute('data-formula', compound.formula);
+    await draw(page, name);
+    await expect(page.getByTestId('prop-formula')).toHaveAttribute('data-formula', formulaOf(name));
   }
   expect(await values.innerHTML()).toBe(before);
   await expect(section).toHaveAttribute('open', '');
+  expect(await page.getByTestId('properties-panel').evaluate((p) => p.lastElementChild?.getAttribute('data-testid'))).toBe('biochem');
   expect(await requests(page)).toBe(1);
+});
+
+test("while the drawing's values are worked out the panel greys them, never the section's", async ({ app }) => {
+  const { page, context } = app;
+  await context.addInitScript(holdableRdkitReplies);
+  await openEditor(app);
+  await openSection(page);
+  const all = peptide('all twenty');
+  await show(page, all.sequence, all.formula);
+  await draw(page, 'ethanol');
+  await expect(page.getByTestId('prop-formula')).toHaveAttribute('data-formula', formulaOf('ethanol'));
+  await page.evaluate(() => (window as unknown as { __holdRdkit(name: string): void }).__holdRdkit('rdkit'));
+  await draw(page, 'toluene');
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'updating');
+  const opacity = (element: Element) => getComputedStyle(element).opacity;
+  expect(await page.getByTestId('prop-formula').locator('..').evaluate(opacity)).toBe('0.6');
+  const lists = await page.getByTestId('biochem').locator('dl').evaluateAll((all) => all.map((e) => getComputedStyle(e).opacity));
+  expect(lists.length).toBeGreaterThan(0);
+  expect(lists.every((o) => o === '1')).toBe(true);
+  await page.evaluate(() => (window as unknown as { __releaseRdkit(name: string): void }).__releaseRdkit('rdkit'));
+  await expect(page.getByTestId('prop-formula')).toHaveAttribute('data-formula', formulaOf('toluene'));
 });
 
 test("every test peptide shows the generators' values", async ({ app }) => {
   const { page } = app;
   await openEditor(app);
   await openSection(page);
-  for (const expected of indigo.peptides) {
+  // The 40 dipeptides (each residue first and last) are checked in Vitest (indigoBiochem.test.ts).
+  for (const expected of indigo.peptides.filter((p) => !/ (first|last)$/.test(p.name))) {
     await show(page, expected.sequence, expected.formula);
     await expectPeptide(page, expected);
   }
-  await expect(page.getByTestId('biochem-values')).toContainText(NOTES.charge);
-  await expect(page.getByTestId('biochem-values')).toContainText(NOTES.extinction);
-  await expect(page.getByTestId('biochem-values')).toContainText(NOTES.hydrophobicity);
+  // The notes name each method's source (bar B.2).
+  const values = page.getByTestId('biochem-values');
+  for (const source of [/Bjellqvist/, /Pace et al\. 1995/, /Black and Mould \(1991\)/]) await expect(values).toContainText(source);
 });
 
 test('three-letter codes give the same values as one-letter', async ({ app }) => {
@@ -157,6 +195,7 @@ test('DNA: the Tm the generator recorded, at the defaults and after changing bot
       await strand.fill(String(defaults.strand_uM));
       await expect(page.getByTestId('biochem-tm')).toHaveText(shown(expected.dna.tm[0], 1));
       await expect(page.getByTestId('biochem-tm-note')).toHaveCount(0);
+      await expect(page.getByTestId('biochem-values')).toContainText(/Khandelwal and Bhyravabhotla \(2010\)/);
     } else {
       await expect(page.getByTestId('biochem-tm-note')).toHaveText(NOTES.short);
       await expect(page.getByTestId('biochem-tm')).toHaveCount(0);
@@ -314,4 +353,7 @@ test('the build ships one Indigo wasm and one copy of the monomer library', asyn
   const withLibrary = scripts.filter((f) => readFileSync(join(dist, f), 'utf8').includes('A___Alanine'));
   expect(withLibrary).toHaveLength(1);
   expect(scripts.filter((f) => f.startsWith('biochemWorker'))).toHaveLength(1);
+  // indigo-ketcher's default entry carries the wasm inside the script, as base64: a second
+  // Indigo that no .wasm count would see. "AGFzbQ" is the base64 of a wasm file's first bytes.
+  expect(scripts.filter((f) => readFileSync(join(dist, f), 'utf8').includes('AGFzbQ'))).toEqual([]);
 });

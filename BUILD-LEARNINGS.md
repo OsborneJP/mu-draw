@@ -1280,3 +1280,7 @@ panel; Indigo's values from the app's own worker, net charge and pI from Bjellqv
 - check.sh once failed in the existing Name to structure smoke test ("not-responding")
   while five sessions ran Playwright at once (load average ~15): the app's real 8 s naming
   deadline keeps running while the test holds the API's answer. It passed alone.
+- Review (capped; plan "After the review"): Indigo's fixture had missed decision 11's
+  dipeptides; a late answer for an undone edit could hide the current one; reusing the
+  properties panel's `.properties-list` class inherited its "updating" grey. indigo-ketcher's
+  default entry embeds the wasm as base64 (`AGFzbQ`), which a `.wasm` count can't see.

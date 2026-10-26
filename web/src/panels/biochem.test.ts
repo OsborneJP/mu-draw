@@ -87,6 +87,18 @@ describe('the biochem section', () => {
     expect(h.last()).toMatchObject({ sequence: 'G', indigo: { kind: 'ready' } });
   });
 
+  it("a late answer for an edit since undone doesn't hide the answer for the inputs now", () => {
+    const h = harness();
+    h.type({ text: 'G' });
+    h.biochem.reply(h.answer(h.sent[0]));
+    h.type({ text: 'GK' });
+    h.type({ text: 'G' });
+    expect(h.last()).toMatchObject({ sequence: 'G', indigo: { kind: 'ready' } });
+    h.biochem.reply(h.answer(h.sent[1]));
+    expect(h.last()).toMatchObject({ sequence: 'G', indigo: { kind: 'ready' } });
+    expect(h.sent.map((r) => r.sequence)).toEqual(['G', 'GK']);
+  });
+
   it('a reply that is not for the request in flight is ignored', () => {
     const h = harness();
     h.type({ text: 'G' });

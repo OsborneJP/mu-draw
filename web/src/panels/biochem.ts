@@ -154,7 +154,8 @@ export function createBiochem(send: (request: BiochemRequest) => void, show: (st
       } else {
         if (!inFlight || reply.id !== inFlight.id) return;
         const part: IndigoPart = 'values' in reply ? { kind: 'ready', values: reply.values } : { kind: 'error', message: reply.error };
-        answered = { key: inFlight.key, part };
+        // A late answer for an edit since undone must not replace the answer for the inputs now.
+        if (!wanted || answered?.key !== wanted.key) answered = { key: inFlight.key, part };
         inFlight = null;
       }
       update();

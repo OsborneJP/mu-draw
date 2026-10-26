@@ -97,7 +97,7 @@ function Values({ state }: { state: BiochemState }) {
     case 'peptide':
       return (
         <>
-          <dl className="properties-list">
+          <dl className="biochem-list">
             <dt>Residues</dt>
             <dd data-testid="biochem-length">{state.sequence.length}</dd>
             <dt>Net charge at pH {state.charge === null ? '…' : state.inputs.pH}</dt>
@@ -112,7 +112,7 @@ function Values({ state }: { state: BiochemState }) {
     case 'nucleic':
       return (
         <>
-          <dl className="properties-list">
+          <dl className="biochem-list">
             <dt>Bases</dt>
             <dd data-testid="biochem-length">{state.sequence.length}</dd>
           </dl>
@@ -153,7 +153,7 @@ function PeptideValues({ values, sequence }: { values: BiochemValues; sequence: 
   const { reduced, cystines } = values.extinction;
   return (
     <>
-      <dl className="properties-list">
+      <dl className="biochem-list">
         <dt>Formula</dt>
         <IndigoFormula formula={values.formula} />
         <dt>Average mass (g/mol)</dt>
@@ -181,7 +181,7 @@ function NucleicValues({ values }: { values: BiochemValues }) {
   if (values.kind !== 'nucleic') return null;
   return (
     <>
-      <dl className="properties-list">
+      <dl className="biochem-list">
         <dt>Formula (one strand)</dt>
         <IndigoFormula formula={values.formula} />
         <dt>Average mass (g/mol)</dt>

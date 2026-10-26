@@ -40,6 +40,26 @@
   align-items: center;
 }
 
+/* The properties panel's own list style, under a class of its own: the panel greys its
+   .properties-list while the drawing's values are worked out, and the drawing never touches
+   this section. */
+.biochem-list {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 10px;
+  margin: 0;
+}
+
+.biochem-list dt {
+  color: #57606a;
+}
+
+.biochem-list dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .biochem-problem {
   margin: 6px 0;
   color: #a40e26;

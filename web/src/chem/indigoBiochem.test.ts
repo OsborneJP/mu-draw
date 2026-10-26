@@ -48,6 +48,11 @@ function compute(request: Omit<BiochemRequest, 'id'>): BiochemValues {
 }
 
 describe('peptides', () => {
+  it("Indigo's fixture covers every test peptide Biopython's does (decision 11: alone, first, last)", () => {
+    const fromIndigo = new Set(indigoFixture.peptides.map((p) => p.sequence));
+    expect(biopython.peptides.map((p) => p.sequence).filter((s) => !fromIndigo.has(s))).toEqual([]);
+  });
+
   it.each(indigoFixture.peptides.map((p) => [p.name, p] as const))('%s: Indigo\'s values, and ε as ExPASy gives it', (_, expected) => {
     const values = compute({ type: 'peptide', sequence: expected.sequence, tm: null });
     if (values.kind !== 'peptide') throw new Error(values.kind);

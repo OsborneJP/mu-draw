@@ -183,6 +183,43 @@ The aim: a student types a peptide, DNA or RNA sequence in the side panel and se
 - **Hydrophobicity** is the Black & Mould scale only, residue by residue, with no window averaging.
 - **A second Indigo instance** runs once the section has been opened, alongside Ketcher's own. Measured while building: about 60 MB once loaded, about 120 MB after a 1000-residue peptide and 1000 DNA bases (BUILD-LEARNINGS).
 
+## After the review (2026-10-26)
+
+A capped review (three reviewers, then a skeptic verifying each finding) found nothing high
+and one medium, now fixed with a test that fails without the fix:
+- **Bar A.2-A.3:** Indigo's fixture lacked the 40 dipeptides of decision 11 (each residue
+  first, XG, and last, GX); the Biopython one had them. The Indigo generator now makes them
+  too, and a test requires both fixtures to hold the same peptides.
+
+Four lows were cheap to fix, each with a test that fails without it:
+- A late answer for an edit since undone (type G, then GK, back to G before GK's answer)
+  replaced the answer for G, so the values went back to "Working…" and G was asked for again.
+- The properties panel's "updating" style greyed the section's values while the drawing's
+  were worked out; the section now has its own list class.
+- The build test now also fails if any script carries a wasm module inside it, as
+  indigo-ketcher's default entry does: a second Indigo that no .wasm count would see.
+- The smoke tests now name the notes' sources (Bjellqvist, Pace, Black and Mould,
+  Khandelwal), read every hydrophobicity bar's tooltip, and check the section is still at
+  the panel's foot after drawing.
+
+Accepted limits (low):
+- The worker, and its Indigo, stay for the rest of the session once the section has been
+  opened; closing the section doesn't stop it. (The known limit above was reworded to say so
+  after approval.)
+- The `role=status` region holds the method notes as well as the values, so a screen reader
+  re-reads them on each change.
+- A poly-Arg of more than 101 residues has its model pI above 14; the panel shows 14.00.
+- A one-letter box accepts three-letter text run together when it uses only one-letter
+  letters (AlaGlyCys…; any Glu, Leu or Pro is rejected); an invisible pasted character
+  (zero-width space) is named in a message that looks empty.
+- Clearing a concentration box to retype it asks Indigo again for the formula and mass.
+- The DNA smoke test changes both concentration boxes for the 1000-base duplex too, so each Tm
+  check there waits for two duplex runs (about 6 s against the 30 s limit).
+- The smoke tests' CSP guard listens in documents only, so a violation inside a worker that
+  the code survives goes unreported (true of every worker).
+- Indigo's Tm doesn't check that the bases pair, so equal Tm values from the app and the
+  generator don't prove the pairing; the HELM test does.
+
 ## Priority
 
 After the v1 checklist items that remain for CHEM-311, like the other version 2 features.
