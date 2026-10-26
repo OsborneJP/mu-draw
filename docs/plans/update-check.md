@@ -60,3 +60,9 @@ Jeff chose **events only** on 2026-10-26, over events plus an hourly timer:
 2. CHANGELOG.md: a "Changed" entry. BUILD-LEARNINGS.md: the workbox-window finding above. AGENTS.md stays at 149 lines or fewer.
 3. Small commits on this branch: this plan; the check and its Vitest; the browser tests; the docs. `scripts/check.sh` passes before each, run as its own command with its exit status read.
 4. Nothing merged, pushed or deployed.
+
+## Built (2026-10-26)
+
+- dff5324: the check and its Vitest tests. eabca89: the browser tests. Then the docs.
+- Every new Vitest test fails with its part of the check removed. The failed-installs browser test fails with the banner left to `onNeedRefresh`, and the offline one fails without the check's catch.
+- Not merged, pushed or deployed.

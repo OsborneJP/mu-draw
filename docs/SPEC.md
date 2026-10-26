@@ -228,6 +228,7 @@ mu-draw/
 ### Updates and versioning
 
 - Use the PWA plugin's "prompt" update mode: a new build installs in the background and the student sees the reload banner (see Offline and error behavior).
+- An open app checks for a new build when the student comes back to it and when the device comes back online, so the banner can appear during a session, not only at the next launch. No timer (docs/plans/update-check.md).
 - Serve `sw.js` and `index.html` with `Cache-Control: no-cache`; hashed asset files can be cached long term.
 - Show the version number in an About box so students can tell you which build they have.
 
@@ -249,7 +250,7 @@ Status, 2026-10-25: Jeff has checked the Windows 11 side by hand (marked "Window
 - [ ] Installs from Chrome on macOS; Dock icon appears
 - [ ] With Wi-Fi off, the installed app launches and draws
 - [ ] Offline: properties, functional groups and export all work; naming buttons show the offline message
-- [ ] Publishing a new build shows the update banner on next launch
+- [ ] Publishing a new build shows the update banner on next launch, and in an open app when the student returns to it or it comes back online
 
 **Chemistry**
 

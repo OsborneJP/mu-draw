@@ -1237,3 +1237,27 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   the templates bar's "picking a template puts Add's compound away" is tested against Name
   to structure's Add only, not the stereoisomer panel's.
 
+## Update check while the app is open (2026-10-26)
+
+- Browsers check sw.js by themselves only on a navigation, and the app never navigates while
+  open. register.ts now calls `registration.update()` when the page becomes visible and on
+  `online`. No timer (Jeff chose events only).
+- workbox-window 7.4.1, which vite-plugin-pwa's `registerSW` uses to call `onNeedRefresh`,
+  treats a new build found more than 60 s after `register()`, or after it has already seen
+  one, as "external", and on the first external one removes its `updatefound` listener for
+  good (`_onUpdateFound`). So `onNeedRefresh` reports at most two new builds per page, and
+  none after one found late that failed to install. The app's check shows the banner itself
+  when a build is waiting behind the running one once the check settles (update.spec.ts:
+  two failed installs, then a good build).
+- By the Service Worker spec, `update()` resolves once the new build starts installing, not
+  once it has installed, so the check waits on the worker's `statechange`.
+- A first install also passes through waiting, with nothing active, on its way to
+  activating; the check tells an update from it by `waiting && active`.
+- To make a build fail to install without an HTTP error (which the guards flag), the test
+  puts a rejecting install handler at the top of the copy's sw.js; it precaches nothing new.
+- The tests dispatch `visibilitychange` themselves: the page's real visibility stays
+  "visible", which is what the app reads.
+- Measured in Chromium with the check's parts removed: with the banner left to
+  `onNeedRefresh`, it never appeared after two failed installs and a good build; an uncaught
+  `update()` rejection offline reaches Playwright as a pageerror ("Failed to update a
+  ServiceWorker ... An unknown error occurred when fetching the script").

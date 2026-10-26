@@ -123,6 +123,9 @@ All notable changes to this project. The format follows
   sent. The first list is a provisional CHEM-311 one.
 
 ### Changed
+- An open app now finds a new version when the student comes back to it (from another tab
+  or window, or after closing the lid) or when the device comes back online, and shows the
+  update banner then, not only at the next launch. Nothing reloads until Reload is clicked.
 - The IR hints' source and licence now sit behind a tick, "Source and licence (CC BY-SA
   4.0)", instead of taking several lines under every list of hints.
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening
