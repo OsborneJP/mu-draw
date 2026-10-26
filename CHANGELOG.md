@@ -114,7 +114,6 @@ All notable changes to this project. The format follows
   α- and β-D-glucopyranose. No drawing of a Haworth projection carries stereo the app can
   read, so they have plain bonds (no thick front edge) and the app shows their
   stereocenters as undefined rather than as a wrong stereoisomer.
-
 - Practice mode (version 2): the Practice button shows a name, the student draws it, and
   Check compares the drawing's InChIKey with the answer's, on the device, offline too.
   Stereochemistry counts only where the name states it (either enantiomer for cis/trans

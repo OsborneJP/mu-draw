@@ -60,7 +60,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
   then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names,
-  record_name_lookups, build_practice_lists. ¹³C table: web/scripts/build-carbon-table.ts (plans/nmr).
+  record_name_lookups, build_practice_lists. ¹³C table: in web/, `node scripts/build-carbon-table.ts <sd>`.
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
@@ -69,13 +69,13 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
-- `web/src/panels/`: Export, Copy image, properties panel, Get name and Name to structure
-  (naming.ts; NamePanel floats), Templates menu (templates.ts); Practice (practice.ts), NMR
-  preview and stereoisomers dock below the canvas, one at a time (nmr.ts/stereo.ts state,
-  *Store.ts wiring, panelWorker.ts their RDKit copy, Docked.tsx).
+- `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts), Get name,
+  Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
+  preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
+  nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
 - `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
-- `web/public/`: icons; functional-groups.json (editable patterns); nmr/ (¹³C table, licence); practice.json.
+- `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.

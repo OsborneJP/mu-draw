@@ -14,10 +14,12 @@ import {
   type PracticeState,
 } from './practice';
 import './practice.css';
+import Docked from './Docked';
 import { useHasAtoms } from './useHasAtoms';
 
-// Practice mode's panel (docs/plans/v2-practice-mode.md), below the canvas like the NMR
-// preview (it takes the bottom of .canvas-area, so it never covers the drawing): the name to
+// Practice mode's panel (docs/plans/v2-practice-mode.md), docked below the canvas like the
+// NMR preview and the stereoisomers (Docked.tsx: the canvas gets shorter and the drawing
+// stays in the middle of it, so the panel never covers it), one at a time: the name to
 // draw, Check, Show answer after a Check that wasn't right, and Previous and Next. Esc inside
 // the panel closes it. data-verdict lets tests read the verdict exactly.
 export default function PracticePanel() {
@@ -31,12 +33,12 @@ export default function PracticePanel() {
     return () => ketcher.changeEvent.remove(drawingChanged);
   }, [ketcher]);
 
-  if (!state.open) return null;
+  if (!state.open || !ketcher) return null;
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') closePractice();
   };
   return (
-    <section className="practice-panel" data-testid="practice-panel" aria-label="Practice" onKeyDown={onKeyDown}>
+    <Docked ketcher={ketcher} className="practice-panel" label="Practice" testId="practice-panel" state={state.lists.kind} onKeyDown={onKeyDown}>
       <div className="practice-head">
         <h2>Practice</h2>
         <button
@@ -49,8 +51,8 @@ export default function PracticePanel() {
           ×
         </button>
       </div>
-      {ketcher && <Body ketcher={ketcher} state={state} hasAtoms={hasAtoms} />}
-    </section>
+      <Body ketcher={ketcher} state={state} hasAtoms={hasAtoms} />
+    </Docked>
   );
 }
 

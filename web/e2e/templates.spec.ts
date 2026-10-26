@@ -297,6 +297,23 @@ async function answerNamesFromRecordings(page: Page): Promise<void> {
   await page.route('**/api/name', (route) => route.fulfill({ json: recorded.cyclohexanol.roundtrip }));
 }
 
+// With the stereoisomer panel (merge review): a placed template's stereo is absolute, as
+// Ketcher shows it ("abs"), so only the stereoisomer drawn matches, not its mirror image too.
+test('a placed Fischer template is absolute stereo: only the drawing matches in the stereoisomer panel', async ({ app }) => {
+  const { page } = app;
+  await emptyCanvas(app);
+  await pick(page, 'fischer-d-glucose');
+  const point = await canvasPoint(page, 0.4, 0.5);
+  await moveTo(page, point);
+  await page.mouse.click(point.x, point.y);
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'ready');
+  await page.getByTestId('stereo-show').click();
+  await expect(page.getByTestId('stereo-panel')).toHaveAttribute('data-state', 'ready');
+  const matching = page.locator('[data-testid="stereo-card"][data-matches="true"]');
+  await expect(matching).toHaveCount(1);
+  await expect(matching).toHaveAttribute('data-inchikey', await inchiKey(page));
+});
+
 test("picking a template puts Add's compound away, and Add puts a template away", async ({ app }) => {
   const { page } = app;
   const changes = await emptyCanvas(app);

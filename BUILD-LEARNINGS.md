@@ -1208,3 +1208,32 @@ Acceptance bar and measurements: docs/plans/v2-templates.md.
   Format tests now use abstract tokens ("2A.B"), not typed formulas.
 - The precache guard's fixture was recaptured with `scripts/capture-sw-fixture.ts`, because
   the guard now requires practice.json.
+
+## Merging the version 2 features (2026-10-26)
+
+IR hints, templates and practice mode were built in their own sessions and merged into main
+after the stereoisomer panel, one at a time, each with check.sh passing on the merged tree.
+- Conflicts were all in shared files: CHANGELOG.md and BUILD-LEARNINGS.md entries, the
+  AGENTS.md layout (folded to stay under 150 lines), the PubChem name sets, the precache
+  guard's required files, App.tsx and the header. The precache guard's sw.js fixture was
+  recaptured from the merged build (`node scripts/capture-sw-fixture.ts`), not hand-merged.
+- The templates branch made test_reference_fixtures first-party for ruff, which re-sorted
+  another file's imports.
+- Practice, the ¹³C NMR preview and the stereoisomers all dock below the canvas; together
+  they squeezed it to nothing. belowCanvas.ts now closes the others when one opens, and
+  Practice uses Docked.tsx like the other two, so the drawing stays in view.
+- A template (KET) came in with its atoms labelled "abs" but no fragment stereo flag, so the
+  drawing was written with chiral flag 0 and the stereoisomer panel marked the enantiomer as
+  matching too. Ketcher's Fragment.addStereoAtom pushes onto a copy of its list and does
+  nothing; placeInHand.ts now calls updateStereoAtom for each labelled atom, which works the
+  flag out as for a drawn wedge.
+- Practice's Next clears the canvas, so a test must wait for that (the properties panel's
+  data-state "empty") before drawing again.
+- Left as known lows from the merge review, for later: one Esc both puts away the item in
+  hand and closes Practice when focus is in its panel; the header is crowded (with a
+  template in hand its badge runs past the window at 1024 px, and at 390 px the page scrolls
+  sideways); a Name to structure answer that arrives late replaces a template picked
+  meanwhile; Practice's Check from the keyboard while a template is in hand judges it too;
+  the templates bar's "picking a template puts Add's compound away" is tested against Name
+  to structure's Add only, not the stereoisomer panel's.
+

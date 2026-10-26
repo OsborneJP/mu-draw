@@ -43,6 +43,18 @@ export async function placeInHand(
   // to the canvas's bond length.
   const struct = await prepareStructToRender(structure, ketcher.structService, ketcher);
   struct.rescale();
+  // Ketcher works out a fragment's stereo flag (ABS, AND, OR) when a wedge is drawn or a
+  // Molfile's chiral flag is read, but not for KET (the templates): their atoms come in
+  // labelled "abs" with no flag, the drawing is then written with chiral flag 0, and the
+  // stereoisomer panel reads that as racemic. So the flag is worked out here from the atoms'
+  // labels, as Ketcher does for a drawn wedge. (Its addStereoAtom pushes onto a copy of the
+  // list and does nothing; updateStereoAtom adds the atom and works the flag out again.)
+  struct.frags.forEach((fragment, id) => {
+    if (!fragment) return;
+    struct.atoms.forEach((atom, aid) => {
+      if (atom.fragment === id && atom.stereoLabel) fragment.updateStereoAtom(struct, aid, id, true);
+    });
+  });
   const editor = ketcher.editor as unknown as Tools;
   const tool = editor.tool('paste', struct);
   if (!tool) throw new Error('Ketcher did not arm its paste tool');

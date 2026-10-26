@@ -1,5 +1,6 @@
-/* Below the canvas (.canvas-area is a column, index.css), above the NMR preview: the editor
-   gives up the height, so the panel never covers the drawing or Ketcher's toolbars. */
+/* Docked below the canvas (.canvas-area is a column, index.css; Docked.tsx), one panel at a
+   time with the NMR preview and the stereoisomers: the editor gives up the height, so the
+   panel never covers the drawing or Ketcher's toolbars. */
 .practice-panel {
   flex: none;
   max-height: 45%;

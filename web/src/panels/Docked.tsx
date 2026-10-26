@@ -1,7 +1,7 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import type { Ketcher } from 'ketcher-core';
 
-/** A panel docked at the bottom of the canvas area (the ¹³C NMR preview, the
+/** A panel docked at the bottom of the canvas area (Practice, the ¹³C NMR preview, the
  * stereoisomers), so the canvas gets shorter instead of being covered. Ketcher keeps its
  * view's top-left corner when the canvas resizes, which would leave the drawing low, behind
  * its bottom toolbar; so the view moves down by half of whatever height the panel takes (and
@@ -14,6 +14,7 @@ export default function Docked({
   label,
   testId,
   state,
+  onKeyDown,
   children,
 }: {
   ketcher: Ketcher;
@@ -21,6 +22,7 @@ export default function Docked({
   label: string;
   testId: string;
   state: string;
+  onKeyDown?: (event: KeyboardEvent) => void;
   children: ReactNode;
 }) {
   const panel = useRef<HTMLElement>(null);
@@ -43,7 +45,7 @@ export default function Docked({
     };
   }, [ketcher]);
   return (
-    <section ref={panel} className={className} aria-label={label} data-testid={testId} data-state={state}>
+    <section ref={panel} className={className} aria-label={label} data-testid={testId} data-state={state} onKeyDown={onKeyDown}>
       {children}
     </section>
   );

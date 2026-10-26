@@ -3,7 +3,7 @@ import { getNmrState, predictNmr, subscribeNmrState } from './nmrStore';
 import { makeRoomFor } from './belowCanvas';
 
 // The properties panel's "Predict ¹³C NMR" button, tagged as a preview (spec "NMR prediction
-// proof of concept"). The result shows in NmrPanel, over the canvas.
+// proof of concept"). The result shows in NmrPanel, docked below the canvas.
 export default function NmrButton() {
   const state = useSyncExternalStore(subscribeNmrState, getNmrState);
   return (

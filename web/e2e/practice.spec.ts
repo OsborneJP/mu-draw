@@ -343,6 +343,10 @@ test('Show answer: a picture of the answer after a wrong Check; the canvas is un
   await expect(picture).toBeVisible();
   expect(await picture.getAttribute('src')).toMatch(/^data:image\/svg\+xml;base64,/);
   expect(await picture.evaluate((img: HTMLImageElement) => img.decode().then(() => img.naturalWidth))).toBeGreaterThan(0);
+  // The canvas view has made up for the height the panel takes, the picture included
+  // (Docked, as for the NMR preview), so the drawing isn't pushed behind the panel.
+  const panel = page.getByTestId('practice-panel');
+  await expect(panel).toHaveAttribute('data-docked', String(await panel.evaluate((e) => (e as HTMLElement).offsetHeight)));
   expect(await page.evaluate(() => window.ketcher!.getKet())).toBe(before);
   await expect(page.getByTestId('practice-show-answer')).toHaveCount(0);
   // It stays while the student edits, and goes with the name.

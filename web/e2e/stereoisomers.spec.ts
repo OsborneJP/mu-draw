@@ -342,7 +342,8 @@ test('one panel below the canvas at a time: Practice too, and it keeps its place
   await expect(page.getByTestId('practice-position')).toHaveText(/^2 of \d+$/);
   const name = await page.getByTestId('practice-name').textContent();
 
-  // Next cleared the canvas for the new name; draw again.
+  // Next clears the canvas for the new name: wait for that, then draw again.
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'empty');
   await load(page, 'L-threonine');
   await page.getByTestId('nmr-predict').click();
   await expect(page.getByTestId('nmr-panel')).toHaveAttribute('data-state', 'ready');
