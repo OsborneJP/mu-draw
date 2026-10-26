@@ -1,0 +1,413 @@
+{
+  "generator": "server/scripts/gen_reference_expected.py",
+  "rdkit_version": "2026.09.1",
+  "settings": {
+    "legacy_stereo_perception": false,
+    "prefer_coordgen": false,
+    "compute2d_canon_orient": true,
+    "molfile_chiral_flag": "1 when any tetrahedral centre is specified, else 0"
+  },
+  "compounds": [
+    {
+      "typed_name": "styrene",
+      "pubchem_cid": 7501,
+      "pubchem_title": "Styrene",
+      "canonical_smiles": "C=Cc1ccccc1",
+      "inchikey": "PPBRXRYQALVLMV-UHFFFAOYSA-N",
+      "heavy_atoms": 8,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [
+        0
+      ],
+      "file": "proton_rules/styrene.mol"
+    },
+    {
+      "typed_name": "2-methylpropene",
+      "pubchem_cid": 8255,
+      "pubchem_title": "Isobutylene",
+      "canonical_smiles": "C=C(C)C",
+      "inchikey": "VQTUBCCKSQIDNK-UHFFFAOYSA-N",
+      "heavy_atoms": 4,
+      "carbon_classes": [
+        [
+          0,
+          3
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_rules/2-methylpropene.mol"
+    },
+    {
+      "typed_name": "3-pentanol",
+      "pubchem_cid": 11428,
+      "pubchem_title": "3-Pentanol",
+      "canonical_smiles": "CCC(O)CC",
+      "inchikey": "AQIXEPGDORPWBJ-UHFFFAOYSA-N",
+      "heavy_atoms": 6,
+      "carbon_classes": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 12,
+      "diastereotopic": [
+        1,
+        3
+      ],
+      "file": "proton_rules/3-pentanol.mol"
+    },
+    {
+      "typed_name": "methylcyclohexane",
+      "pubchem_cid": 7962,
+      "pubchem_title": "Methylcyclohexane",
+      "canonical_smiles": "CC1CCCCC1",
+      "inchikey": "UAEPNZWRGJTJPN-UHFFFAOYSA-N",
+      "heavy_atoms": 7,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 14,
+      "diastereotopic": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "file": "proton_rules/methylcyclohexane.mol"
+    },
+    {
+      "typed_name": "ethyl crotonate",
+      "pubchem_cid": 429065,
+      "pubchem_title": "Ethyl trans-crotonate",
+      "canonical_smiles": "C/C=C/C(=O)OCC",
+      "inchikey": "ZFDIRQKJPRINOQ-HWKANZROSA-N",
+      "heavy_atoms": 8,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ]
+      ],
+      "hydrogen_count": 10,
+      "diastereotopic": [],
+      "file": "proton_rules/ethyl-crotonate.mol"
+    },
+    {
+      "typed_name": "trans-3-hexene",
+      "pubchem_cid": 638066,
+      "pubchem_title": "trans-3-Hexene",
+      "canonical_smiles": "CC/C=C/CC",
+      "inchikey": "ZQDPJFUHLCOCRG-AATRIKPKSA-N",
+      "heavy_atoms": 6,
+      "carbon_classes": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hydrogen_count": 12,
+      "diastereotopic": [],
+      "file": "proton_rules/trans-3-hexene.mol"
+    },
+    {
+      "typed_name": "ethylidenecyclohexane",
+      "pubchem_cid": 13856,
+      "pubchem_title": "Ethylidenecyclohexane",
+      "canonical_smiles": "CC=C1CCCCC1",
+      "inchikey": "BPBOWYWUOUJKLO-UHFFFAOYSA-N",
+      "heavy_atoms": 8,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 14,
+      "diastereotopic": [],
+      "file": "proton_rules/ethylidenecyclohexane.mol"
+    },
+    {
+      "typed_name": "ethyl diazoacetate",
+      "pubchem_cid": 12192,
+      "pubchem_title": "Ethyl diazoacetate",
+      "canonical_smiles": "CCOC(=O)C=[N+]=[N-]",
+      "inchikey": "YVPJCJLMRRTDMQ-UHFFFAOYSA-N",
+      "heavy_atoms": 8,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          5
+        ]
+      ],
+      "hydrogen_count": 6,
+      "diastereotopic": [],
+      "file": "proton_rules/ethyl-diazoacetate.mol"
+    },
+    {
+      "typed_name": "1,2-pentadiene",
+      "pubchem_cid": 11588,
+      "pubchem_title": "Penta-1,2-diene",
+      "canonical_smiles": "C=C=CCC",
+      "inchikey": "LVMTVPFRTKXRPH-UHFFFAOYSA-N",
+      "heavy_atoms": 5,
+      "carbon_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_classes": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          4
+        ]
+      ],
+      "hydrogen_count": 8,
+      "diastereotopic": [],
+      "file": "proton_rules/1-2-pentadiene.mol"
+    }
+  ]
+}

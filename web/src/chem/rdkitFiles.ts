@@ -17,7 +17,11 @@ export const RDKIT_WORKER_CHUNK = 'rdkitWorker';
  * hashed, so anyone can edit it; the precache revision picks up a change. */
 export const PATTERNS_FILE = 'functional-groups.json';
 
-/** The ¹³C shift table (web/scripts/build-carbon-table.ts), which the NMR worker fetches on
- * its first prediction, and the licence it is shared under. */
+/** The ¹³C shift table (web/scripts/build-carbon-table.ts), which the panels' RDKit worker
+ * fetches on its first ¹³C prediction, and the licence it is shared under. */
 export const CARBON_TABLE_FILE = 'nmr/carbon-shifts.bin';
 export const CARBON_TABLE_LICENCE_FILE = 'nmr/LICENSE-nmrshiftdb2.txt';
+
+/** The ¹H shift table (web/scripts/build-proton-table.ts), fetched on the first ¹H
+ * prediction; under the same licence as the ¹³C one. */
+export const PROTON_TABLE_FILE = 'nmr/proton-shifts.bin';

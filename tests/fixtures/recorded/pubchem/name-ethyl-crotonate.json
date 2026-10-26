@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ethyl%20crotonate/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T14:32:33Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 429065,
+          "SMILES": "CCOC(=O)/C=C/C",
+          "Title": "Ethyl trans-crotonate"
+        }
+      ]
+    }
+  }
+}

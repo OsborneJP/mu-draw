@@ -1,0 +1,18 @@
+# Drawings for the ¹H NMR preview's diastereotopic rule only (docs/plans/v2-proton-nmr.md,
+# decision 3): web/src/chem/protonNmr.test.ts compares the browser's flags with server-side
+# RDKit's on them. Not test compounds for shifts: no judgement and no spectra. Each covers a
+# case the test compounds don't: a vinyl group (one group and an H at the other end), an =CH2
+# whose other end carries two identical groups, a diastereotopic CH2 in an achiral molecule,
+# ring CH2 made diastereotopic by a substituent across the ring, and CH2 whose two H are
+# mirror images though the molecule has a stereogenic double bond, an exocyclic one, a diazo
+# group or an allene (the review). How many CH2 each has whose two H can differ is a person's
+# judgement: proton_rules/judged.json.
+styrene
+2-methylpropene
+3-pentanol
+methylcyclohexane
+ethyl crotonate
+trans-3-hexene
+ethylidenecyclohexane
+ethyl diazoacetate
+1,2-pentadiene

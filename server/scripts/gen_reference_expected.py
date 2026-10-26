@@ -5,11 +5,14 @@
 Reads tests/fixtures/reference_compounds.csv (SMILES from PubChem) and writes:
   tests/fixtures/reference_expected.json   descriptors, formula, InChIKey, stereo
   tests/fixtures/molfiles/<slug>.mol       2D Molfiles for the editor tests
-and, from tests/fixtures/functional_group_compounds.csv (the highlighter's test set) and
-tests/fixtures/nmr_compounds.csv (the NMR preview's):
-  tests/fixtures/functional_groups/<slug>.mol and tests/fixtures/nmr/<slug>.mol, each
-  folder with a compounds.json listing them and each compound's carbon symmetry classes
-  (CanonicalRankAtoms without tie-breaking: what the NMR preview's peaks must group)
+and, from tests/fixtures/functional_group_compounds.csv (the highlighter's test set),
+tests/fixtures/nmr_compounds.csv (the ¹³C NMR preview's), proton_nmr_compounds.csv (the ¹H
+preview's) and proton_rule_compounds.csv (drawings for its diastereotopic rule):
+  tests/fixtures/functional_groups/<slug>.mol, nmr/, proton_nmr/ and proton_rules/<slug>.mol,
+  each folder with a compounds.json listing them and each compound's symmetry classes
+  (CanonicalRankAtoms without tie-breaking: what the NMR previews' signals must group) of
+  its carbons and of its atoms carrying H, its number of H, and its CH2 groups whose two H
+  can differ (diastereotopic, by the ¹H preview's rule: docs/plans/v2-proton-nmr.md)
 Only structures: the groups each one should show are a person's judgement
 (functional_groups_expected.json), never generated; so are NMR signal counts.
 
@@ -52,6 +55,10 @@ FG_CSV_FILE = FIXTURES / "functional_group_compounds.csv"
 FG_DIR = "functional_groups"
 NMR_CSV_FILE = FIXTURES / "nmr_compounds.csv"
 NMR_DIR = "nmr"
+PROTON_CSV_FILE = FIXTURES / "proton_nmr_compounds.csv"
+PROTON_DIR = "proton_nmr"
+PROTON_RULE_CSV_FILE = FIXTURES / "proton_rule_compounds.csv"
+PROTON_RULE_DIR = "proton_rules"
 
 # Pairs of reference compounds (typed names) to join; see join().
 INVENTED = (
@@ -272,6 +279,54 @@ def carbon_classes(mol: Chem.Mol) -> list[list[int]]:
     return sorted(classes.values())
 
 
+def hydrogen_classes(mol: Chem.Mol) -> list[list[int]]:
+    """Topologically equivalent atoms carrying H, as carbon_classes groups carbons."""
+    ranks = Chem.CanonicalRankAtoms(mol, breakTies=False, includeChirality=False)
+    classes: dict[int, list[int]] = {}
+    for atom in mol.GetAtoms():
+        if atom.GetTotalNumHs() > 0:
+            classes.setdefault(ranks[atom.GetIdx()], []).append(atom.GetIdx())
+    return sorted(classes.values())
+
+
+def diastereotopic(mol: Chem.Mol) -> list[int]:
+    """CH2 groups whose two H can differ, by the ¹H preview's rule (its browser version is
+    web/src/chem/protonNmr.ts): an sp3 CH2 that becomes a possible stereocentre when one of
+    its H is deuterium, in a molecule that then has another possible stereocentre
+    (FindPotentialStereo; a double bond alone keeps the two H mirror images); an =CH2 whose
+    double bond's other end carries two different groups (by symmetry rank), or one group
+    and an H."""
+    ranks = list(Chem.CanonicalRankAtoms(mol, breakTies=False, includeChirality=False))
+    with_hs = Chem.AddHs(mol)
+    found = []
+    for atom in mol.GetAtoms():
+        i = atom.GetIdx()
+        if atom.GetAtomicNum() != 6 or atom.GetTotalNumHs() != 2 or atom.GetIsAromatic():
+            continue
+        doubles = [b for b in atom.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE]
+        if doubles:
+            other = doubles[0].GetOtherAtom(atom)
+            sides = [n.GetIdx() for n in other.GetNeighbors() if n.GetIdx() != i]
+            one_and_h = len(sides) == 1 and other.GetTotalNumHs() == 1
+            if one_and_h or (len(sides) == 2 and ranks[sides[0]] != ranks[sides[1]]):
+                found.append(i)
+            continue
+        if any(b.GetBondType() != Chem.BondType.SINGLE for b in atom.GetBonds()):
+            continue
+        hydrogens = with_hs.GetAtomWithIdx(i).GetNeighbors()
+        h = next(n.GetIdx() for n in hydrogens if n.GetAtomicNum() == 1)
+        labelled = Chem.RWMol(with_hs)
+        labelled.GetAtomWithIdx(h).SetIsotope(2)
+        Chem.SanitizeMol(labelled)
+        infos = Chem.FindPotentialStereo(labelled, cleanIt=True, flagPossible=True)
+        # Any atom-centred element (tetrahedral, or five-coordinate P), as RDKit.js's stereo
+        # tags list them; never a bond.
+        centres = [x.centeredOn for x in infos if str(x.type).startswith("Atom_")]
+        if i in centres and len(centres) > 1:
+            found.append(i)
+    return found
+
+
 def compound_set(rows: list[dict[str, str]], folder: str) -> dict[str, str]:
     """A test set: one Molfile per compound in `folder`, and an index of them."""
     outputs: dict[str, str] = {}
@@ -292,6 +347,9 @@ def compound_set(rows: list[dict[str, str]], folder: str) -> dict[str, str]:
                 "inchikey": Chem.MolToInchiKey(mol),
                 "heavy_atoms": mol.GetNumHeavyAtoms(),
                 "carbon_classes": carbon_classes(mol),
+                "hydrogen_classes": hydrogen_classes(mol),
+                "hydrogen_count": sum(a.GetTotalNumHs() for a in mol.GetAtoms()),
+                "diastereotopic": diastereotopic(mol),
                 "file": rel,
             }
         )
@@ -326,6 +384,8 @@ def generate(rows: list[dict[str, str]]) -> dict[str, str]:
     outputs[EXPECTED_FILE] = json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
     outputs.update(compound_set(read_rows(FG_CSV_FILE), FG_DIR))
     outputs.update(compound_set(read_rows(NMR_CSV_FILE), NMR_DIR))
+    outputs.update(compound_set(read_rows(PROTON_CSV_FILE), PROTON_DIR))
+    outputs.update(compound_set(read_rows(PROTON_RULE_CSV_FILE), PROTON_RULE_DIR))
     return outputs
 
 

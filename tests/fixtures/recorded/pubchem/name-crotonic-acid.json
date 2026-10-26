@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/crotonic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T14:28:07Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 637090,
+          "SMILES": "C/C=C/C(=O)O",
+          "Title": "Crotonic Acid"
+        }
+      ]
+    }
+  }
+}

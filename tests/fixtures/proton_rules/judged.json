@@ -1,0 +1,16 @@
+{
+  "status": "provisional",
+  "chosen_by": "Claude, 2026-10-26, after the review (docs/plans/v2-proton-nmr.md); for Jeff to check",
+  "how": "How many CH₂ groups in each drawing have two H that can differ (diastereotopic, decision 3), written by reading the structure, not by running the rule: an sp³ CH₂ only in a molecule with a stereocentre, or a ring substituent that makes its faces differ (methylcyclohexane: every ring CH₂, C4 included, has one H cis and one trans to the methyl); an =CH₂ when the other end of its double bond carries two different groups. Two H that a mirror plane swaps are enantiotopic and give one signal: the CH₂ of ethyl crotonate, (E)-hex-3-ene, ethyl diazoacetate and 1,2-pentadiene, and the ring CH₂ of ethylidenecyclohexane (the plane of its C=C).",
+  "molecules": [
+    { "name": "styrene", "diastereotopic": 1 },
+    { "name": "2-methylpropene", "diastereotopic": 0 },
+    { "name": "3-pentanol", "diastereotopic": 2 },
+    { "name": "methylcyclohexane", "diastereotopic": 5 },
+    { "name": "ethyl crotonate", "diastereotopic": 0 },
+    { "name": "trans-3-hexene", "diastereotopic": 0 },
+    { "name": "ethylidenecyclohexane", "diastereotopic": 0 },
+    { "name": "ethyl diazoacetate", "diastereotopic": 0 },
+    { "name": "1,2-pentadiene", "diastereotopic": 0 }
+  ]
+}

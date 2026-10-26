@@ -1,0 +1,23 @@
+typed_name,pubchem_cid,pubchem_title,smiles
+ethanol,702,Ethanol,CCO
+acetone,180,Acetone,CC(=O)C
+ethyl acetate,8857,Ethyl Acetate,CCOC(=O)C
+tert-butanol,6386,tert-Butanol,CC(C)(C)O
+2-chloro-2-methylpropane,10486,tert-BUTYL CHLORIDE,CC(C)(C)Cl
+2-butanol,6568,(+-)-2-Butanol,CCC(C)O
+propanoic acid,1032,Propionic Acid,CCC(=O)O
+diethylamine,8021,Diethylamine,CCNCC
+triethylamine,8471,Triethylamine,CCN(CC)CC
+cyclohexanone,7967,Cyclohexanone,C1CCC(=O)CC1
+toluene,1140,Toluene,CC1=CC=CC=C1
+acetophenone,7410,Acetophenone,CC(=O)C1=CC=CC=C1
+benzyl alcohol,244,Benzyl Alcohol,C1=CC=C(C=C1)CO
+aspirin,2244,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O
+ibuprofen,3672,"Ibuprofen, (+-)-",CC(C)CC1=CC=C(C=C1)C(C)C(=O)O
+caffeine,2519,Caffeine,CN1C=NC2=C1C(=O)N(C(=O)N2C)C
+nicotine,89594,Nicotine,CN1CCC[C@H]1C2=CN=CC=C2
+(E)-cinnamic acid,444539,Cinnamic Acid,C1=CC=C(C=C1)/C=C/C(=O)O
+crotonic acid,637090,Crotonic Acid,C/C=C/C(=O)O
+carvone,7439,"Carvone, (+-)-",CC1=CCC(CC1=O)C(=C)C
+limonene,22311,1-Methyl-4-Prop-1-En-2-Ylcyclohexene,CC1=CCC(CC1)C(=C)C
+menthol,1254,Menthol,CC1CCC(C(C1)O)C(C)C

@@ -120,7 +120,11 @@ export function setGeometry(json: RdkitJson, index: number, geometry: 'cis' | 't
 }
 
 class Reader {
-  constructor(readonly rdkit: MainModule) {}
+  readonly rdkit: MainModule;
+
+  constructor(rdkit: MainModule) {
+    this.rdkit = rdkit;
+  }
 
   read<T>(text: string, work: (mol: Mol) => T): T | null {
     const mol = this.rdkit.get_mol(text, JSON.stringify({ removeHs: false }));

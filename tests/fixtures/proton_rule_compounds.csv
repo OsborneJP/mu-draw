@@ -1,0 +1,10 @@
+typed_name,pubchem_cid,pubchem_title,smiles
+styrene,7501,Styrene,C=CC1=CC=CC=C1
+2-methylpropene,8255,Isobutylene,CC(=C)C
+3-pentanol,11428,3-Pentanol,CCC(CC)O
+methylcyclohexane,7962,Methylcyclohexane,CC1CCCCC1
+ethyl crotonate,429065,Ethyl trans-crotonate,CCOC(=O)/C=C/C
+trans-3-hexene,638066,trans-3-Hexene,CC/C=C/CC
+ethylidenecyclohexane,13856,Ethylidenecyclohexane,CC=C1CCCCC1
+ethyl diazoacetate,12192,Ethyl diazoacetate,CCOC(=O)C=[N+]=[N-]
+"1,2-pentadiene",11588,"Penta-1,2-diene",CCC=C=C

@@ -1,0 +1,207 @@
+{
+  "tolerance_ppm": 0.3,
+  "how": "Written from the shipped table's predictions (web/scripts/protonNmr.test.ts compares them with these); measured shifts are NMRShiftDB2's, from reference_spectra.json, a diastereotopic signal's the higher or lower where the spectrum lists both H.",
+  "outliers": [
+    {
+      "name": "ethanol",
+      "atoms": [
+        1
+      ],
+      "diastereotopic": null,
+      "predicted": 4.02,
+      "measured": 3.7
+    },
+    {
+      "name": "aspirin",
+      "atoms": [
+        6
+      ],
+      "diastereotopic": null,
+      "predicted": 7.53,
+      "measured": 8.25
+    },
+    {
+      "name": "aspirin",
+      "atoms": [
+        5
+      ],
+      "diastereotopic": null,
+      "predicted": 7.1,
+      "measured": 7.53
+    },
+    {
+      "name": "aspirin",
+      "atoms": [
+        7
+      ],
+      "diastereotopic": null,
+      "predicted": 6.88,
+      "measured": 7.3
+    },
+    {
+      "name": "ibuprofen",
+      "atoms": [
+        6,
+        8
+      ],
+      "diastereotopic": null,
+      "predicted": 7.55,
+      "measured": 7.213
+    },
+    {
+      "name": "caffeine",
+      "atoms": [
+        2
+      ],
+      "diastereotopic": null,
+      "predicted": 8.8,
+      "measured": 7.527
+    },
+    {
+      "name": "nicotine",
+      "atoms": [
+        5
+      ],
+      "diastereotopic": null,
+      "predicted": 4,
+      "measured": 3.08
+    },
+    {
+      "name": "carvone",
+      "atoms": [
+        2
+      ],
+      "diastereotopic": null,
+      "predicted": 6.43,
+      "measured": 6.758
+    },
+    {
+      "name": "carvone",
+      "atoms": [
+        4
+      ],
+      "diastereotopic": null,
+      "predicted": 3.04,
+      "measured": 2.689
+    },
+    {
+      "name": "carvone",
+      "atoms": [
+        5
+      ],
+      "diastereotopic": "lower",
+      "predicted": 2.08,
+      "measured": 2.485
+    },
+    {
+      "name": "menthol",
+      "atoms": [
+        5
+      ],
+      "diastereotopic": null,
+      "predicted": 4.18,
+      "measured": 3.42
+    }
+  ],
+  "exchangeable": [
+    {
+      "name": "ethanol",
+      "atoms": [
+        2
+      ],
+      "diastereotopic": null,
+      "predicted": 3.66,
+      "measured": null
+    },
+    {
+      "name": "tert-butanol",
+      "atoms": [
+        4
+      ],
+      "diastereotopic": null,
+      "predicted": 3.34,
+      "measured": 1.64
+    },
+    {
+      "name": "2-butanol",
+      "atoms": [
+        4
+      ],
+      "diastereotopic": null,
+      "predicted": 2.23,
+      "measured": 3.99
+    },
+    {
+      "name": "propanoic acid",
+      "atoms": [
+        4
+      ],
+      "diastereotopic": null,
+      "predicted": 11.5,
+      "measured": 10.49
+    },
+    {
+      "name": "diethylamine",
+      "atoms": [
+        2
+      ],
+      "diastereotopic": null,
+      "predicted": 1.97,
+      "measured": 0.9
+    },
+    {
+      "name": "benzyl alcohol",
+      "atoms": [
+        7
+      ],
+      "diastereotopic": null,
+      "predicted": 2.86,
+      "measured": 2.91
+    },
+    {
+      "name": "aspirin",
+      "atoms": [
+        12
+      ],
+      "diastereotopic": null,
+      "predicted": 12,
+      "measured": 7.06
+    },
+    {
+      "name": "ibuprofen",
+      "atoms": [
+        14
+      ],
+      "diastereotopic": null,
+      "predicted": 10.45,
+      "measured": null
+    },
+    {
+      "name": "(E)-cinnamic acid",
+      "atoms": [
+        10
+      ],
+      "diastereotopic": null,
+      "predicted": 12.6,
+      "measured": 10.92
+    },
+    {
+      "name": "crotonic acid",
+      "atoms": [
+        5
+      ],
+      "diastereotopic": null,
+      "predicted": 11.87,
+      "measured": 11.79
+    },
+    {
+      "name": "menthol",
+      "atoms": [
+        7
+      ],
+      "diastereotopic": null,
+      "predicted": 3.25,
+      "measured": null
+    }
+  ]
+}

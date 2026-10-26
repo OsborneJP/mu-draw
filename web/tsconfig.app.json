@@ -17,6 +17,7 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ethylidenecyclohexane/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T14:32:34Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 13856,
+          "SMILES": "CC=C1CCCCC1",
+          "Title": "Ethylidenecyclohexane"
+        }
+      ]
+    }
+  }
+}

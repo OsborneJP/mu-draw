@@ -1,0 +1,29 @@
+{
+  "status": "provisional",
+  "chosen_by": "Claude, 2026-10-26 (docs/plans/v2-proton-nmr.md, decision 8); for Jeff to check against CHEM-311",
+  "how": "The number of ¹H signals the preview should show for each structure, written by reading the structure, not by running the predictor: one per set of topologically equivalent atoms carrying H, and two for a CH₂ whose two H are diastereotopic (decision 3). By that rule ibuprofen's isobutyl CH₂ counts as two (the molecule is chiral), though its two H are far from the stereocentre. Diastereotopic methyl groups (the isopropyls of menthol and ibuprofen) count as one, as the preview shows them: a known limit.",
+  "molecules": [
+    { "name": "ethanol", "signals": 3 },
+    { "name": "acetone", "signals": 1 },
+    { "name": "ethyl acetate", "signals": 3 },
+    { "name": "tert-butanol", "signals": 2 },
+    { "name": "2-chloro-2-methylpropane", "signals": 1 },
+    { "name": "2-butanol", "signals": 6 },
+    { "name": "propanoic acid", "signals": 3 },
+    { "name": "diethylamine", "signals": 3 },
+    { "name": "triethylamine", "signals": 2 },
+    { "name": "cyclohexanone", "signals": 3 },
+    { "name": "toluene", "signals": 4 },
+    { "name": "acetophenone", "signals": 4 },
+    { "name": "benzyl alcohol", "signals": 5 },
+    { "name": "aspirin", "signals": 6 },
+    { "name": "ibuprofen", "signals": 9 },
+    { "name": "caffeine", "signals": 4 },
+    { "name": "nicotine", "signals": 12 },
+    { "name": "(E)-cinnamic acid", "signals": 6 },
+    { "name": "crotonic acid", "signals": 4 },
+    { "name": "carvone", "signals": 10 },
+    { "name": "limonene", "signals": 12 },
+    { "name": "menthol", "signals": 13 }
+  ]
+}

@@ -44,7 +44,9 @@ and shipped in web/public/nmr/, looked up in the browser, offline.
    (measured below: right about 80% of the time when it says "differ", and 98% when it says
    "same"). Held out, the two rows were off by 0.14 ppm per H, against 0.23 for one averaged
    row. Alternative: one 2H row with the note. Diastereotopic methyl groups (an isopropyl next
-   to a stereocentre, as in menthol) stay one 6H row: a known limit.
+   to a stereocentre, as in menthol) stay one 6H row: a known limit. (After the review: the
+   rule counts another stereocentre, not a double bond; and where the CH₂'s own code matches
+   further out than its pair, the two rows sit half the pair's gap either side of its median.)
 4. **Beside the ¹³C preview: two buttons and two panels in the one place below the canvas, one
    at a time** (belowCanvas.ts gains 'proton'; opening it closes ¹³C, the stereoisomers or
    Practice, and each of those closes it). The ¹³C panel and its tests stay as they are, and
@@ -68,7 +70,9 @@ and shipped in web/public/nmr/, looked up in the browser, offline.
    - Aliphatic: ethanol, acetone, ethyl acetate, tert-butanol, 2-chloro-2-methylpropane,
      2-butanol, propanoic acid, diethylamine, triethylamine, cyclohexanone.
    - Aromatic: toluene, acetophenone, benzyl alcohol, aspirin, ibuprofen, caffeine, nicotine.
-   - Alkenes: (E)-cinnamic acid, (Z)-but-2-enoic acid, carvone, limonene.
+   - Alkenes: (E)-cinnamic acid, crotonic acid ((E)-but-2-enoic acid; first (Z)-but-2-enoic
+     acid, whose only NMRShiftDB2 ¹H spectrum turned out to be the E isomer's: the review),
+     carvone, limonene.
    - Diastereotopic CH₂: menthol (also nicotine, carvone, limonene, 2-butanol).
    - Squalene again for the timing bar only (it has no ¹H spectrum).
    - Aspirin's NMRShiftDB2 record (CDCl₃) puts its COOH H at 7.06 ppm and three ring H 0.4 to
@@ -94,7 +98,9 @@ and shipped in web/public/nmr/, looked up in the browser, offline.
   centred on the atom carrying the H, out to 4 bonds; each spectrum contributes one value per
   atom (the mean of its entries), and the table holds the median per code, backing off one
   sphere at a time. Held out: a fixed 2% of compounds chosen by InChIKey hash (357 compounds
-  with a ¹H spectrum), plus the test set.
+  with a ¹H spectrum), plus the test set. Mistake: those 357 included the 38 test compounds
+  (¹³C's and ¹H's), which are small and easy, so the figures below are better than the random
+  share alone gives (see "While building").
   - C–H signals, 2,286: mean absolute error 0.228 ppm (median 0.10); 77% within ±0.3 ppm, 88%
     within ±0.5. By kind: sp³ 0.22, aromatic 0.23, alkene 0.34, aldehyde 0.11 (13 signals).
   - Exchangeable H, 138: 0.95 ppm (median 0.46); 52% within ±0.5.
@@ -110,7 +116,8 @@ and shipped in web/public/nmr/, looked up in the browser, offline.
     NMRShiftDB data (another data set and protocol).
 - **Diastereotopic CH₂, the rule** (Python RDKit, all 6,448 CH₂ in measured spectra that list
   both H). An sp³ CH₂ qualifies when replacing one of its H by deuterium makes it a possible
-  stereocentre and the molecule then has another stereo element (FindPotentialStereo); an
+  stereocentre and the molecule then has another stereo element (FindPotentialStereo; the
+  review narrowed it to another stereocentre, below); an
   =CH₂ qualifies when the other end of its double bond carries two different groups (by
   symmetry rank), or one group and an H. Flagged sp³: 3,480 of 4,312 differ by more than 0.05
   ppm (81%; median gap 0.22 ppm). Not flagged: 28 of 1,398 differ (2%). Flagged =CH₂: 583 of
@@ -147,10 +154,10 @@ and shipped in web/public/nmr/, looked up in the browser, offline.
    BUILD-LEARNINGS.md; the test fails if the list and the predictions disagree. The
    exchangeable rows' errors are recorded in the same file, outside the bar.
 5. **Shifts, random held out (at build time).** build-proton-table.ts also builds a table
-   without the fixed 2% of compounds and measures it: C–H mean error at most 0.25 ppm and at
-   least 75% within ±0.3 ppm (measured: 0.228, 77%). It writes the figures, by sphere too, into
-   the shipped table's header, and stops without writing a table that misses them. A test
-   reads the header.
+   without the fixed 2% of compounds and measures it: C–H mean error at most 0.27 ppm and at
+   least 72% within ±0.3 ppm (corrected by Jeff, 2026-10-26, from 0.25 and 75%: see "While
+   building"). It writes the figures, by sphere too, into the shipped table's header, and stops
+   without writing a table that misses them. A test reads the header.
 6. **Highlighting both ways** (Playwright): a row or stick colours exactly the atoms carrying
    its H (Ketcher ids, also after ids are reordered); selecting one such atom selects its row
    (the first of a diastereotopic pair); a change to the drawing removes the colour; not an
@@ -184,6 +191,85 @@ and shipped in web/public/nmr/, looked up in the browser, offline.
 - The test compounds are predicted without their own spectra (decision 6).
 - The reference shifts are NMRShiftDB2's as recorded, including records that look wrong
   (aspirin's COOH at 7.06 ppm); they are listed, not corrected.
+- Added by the review (accepted, low): the rule can be wrong in bridged ring systems (RDKit
+  marks bridgeheads as possible stereocentres; adamantane, DABCO, bicyclo[2.2.2]octane and
+  norbornane's C7 get two rows), so the panel then says a CH₂ marked diastereotopic may give
+  one signal; also wrong: an exocyclic CH₂ on C1 of a 1,4-disubstituted cyclohexane (two rows),
+  (E)-cyclooctene and chiral allenes (one row though their CH₂ are diastereotopic), and a
+  C₂-symmetric molecule's central CH₂. A CH₂ that NMRShiftDB2 lists with each H twice gives no
+  pair entries. The solvent preference matches "CDCl3" exactly and counts only D₂O as
+  exchanging. Selecting a drawn H on the canvas selects no row, and a row colours the atom
+  carrying the H, not drawn H atoms. The sticks are reached by mouse only (the rows are the
+  keyboard path), as in the ¹³C panel.
+
+## While building (2026-10-26)
+
+- **Bar 5 was mis-measured.** The builder holds out the random 2% alone (333 compounds with a
+  measured ¹H spectrum, the test compounds apart) and shows decision 3's two rows for each
+  diastereotopic CH₂: C–H mean error 0.257 ppm, 73.4% within ±0.3, 85.1% within ±0.5 (2,534
+  signals; by sphere 0.68, 0.36, 0.22, 0.12 ppm). The two rows were not the cause: plain
+  signals alone score 0.238; one averaged row per CH₂ would score 0.253. CH₂ pairs that
+  NMRShiftDB2 lists only once score about 0.32 however they are shown; where it lists both H
+  the two rows beat one (0.146 against 0.192). Jeff corrected bar 5 to 0.27 and 72%, keeping
+  decision 3 and bar 4.
+- **Bar 4 as built:** all 22 signal counts as expected; 105 C–H signals, mean error 0.137 ppm,
+  92 (87.6%) within ±0.3 and 100 (95.2%) within ±0.5. The 13 outside ±0.3 and every
+  exchangeable signal are in tests/fixtures/proton_nmr/outliers.json. Three spectra leave out
+  an exchangeable H (ethanol's and menthol's OH, ibuprofen's COOH), so those are recorded
+  without a measured shift.
+- **Bar 3 as built:** of 5,027 flagged CH₂ listed with both H, 4,049 (80.5%) differ by more
+  than 0.05 ppm; of 1,363 unflagged, 30 (2.2%).
+- **Speed.** The rule first called the stereo search (src/chem/stereoElements.ts) in full for
+  each CH₂: the stereoisomer list's slowest drawing (cholesterol with =CH₂ for its OH, every H
+  drawn) took 6.8 s. The search for dependent double bonds can't change the answer (it runs
+  only beside open elements, which already count), so the rule skips it: 35 ms. Squalene: 20 ms.
+- **The table:** 812 kB, 145,438 entries (128,066 codes, 8,686 of them with a higher and a
+  lower entry), from 17,939 measured spectra
+  (130,248 atoms); 177 calculated spectra left out.
+
+## After the review (2026-10-26)
+
+A capped review: three reviewers (the chemistry pipeline; the panel, worker and browser tests;
+guards, invariants and docs), and two skeptics who tried to refute each high and medium. Each
+confirmed one is fixed with a test that fails without the fix (guard proofs: BUILD-LEARNINGS.md).
+- **The rule counted a double bond as another stereo element**, so enantiotopic CH₂ got two
+  rows (ethyl crotonate's OCH₂, all ten of squalene's CH₂). A reflection keeps E and Z, so such
+  H are mirror images. In NMRShiftDB2, CH₂ flagged only because of a double bond differ in 6 of
+  81 pairs (7%), against 82% where there is another stereocentre. The rule now asks for another
+  possible stereocentre (RDKit.js's stereo tags; in Python, FindPotentialStereo's atom-centred
+  elements). Nine drawings for the rule alone (tests/fixtures/proton_rules/, from PubChem) carry
+  a judgement (judged.json, provisional) of how many CH₂ in each are diastereotopic.
+- **(Z)-but-2-enoic acid was compared with the E isomer's spectrum**: records were matched on
+  the InChIKey skeleton alone, and NMRShiftDB2 has a ¹H spectrum only for E. Records now match
+  on stereo too (a mirror image, or stereo left undefined on one side, still matches), and the
+  test compound is crotonic acid ((E)-but-2-enoic acid).
+- **A pair matched closer in than the CH₂'s own code replaced the better estimate.** Pairs come
+  only from CH₂ listed with both H; the CH₂'s own median comes from every spectrum. Where that
+  matched further out, the two rows are now half the pair's gap either side of it, as confident
+  as that match (held out: 0.257 to 0.239 ppm).
+- **A click on a stick could select its neighbour**, whose click target covered it (bar 6), and
+  **coincident sticks hid the integration** (toluene's 2H and 1H ring signals drew as one 2H
+  stick). Click targets now stop halfway to each neighbour, and signals drawn closer than a
+  line's width make one stick, as tall as their H together.
+- **"element 17 H"** for H on atoms outside a short list: the panel now uses Ketcher's element
+  table.
+- Also fixed (low): the axis widens below 0 ppm for a negative shift; exchangeable sticks are
+  broad and pale, apart from the dashed low-confidence ones; stick positions are tested; a
+  missing figure (nothing held out, no pairs) stops the build; counts typed into tests now come
+  from the fixtures; bar 2 covers every fixture compound; both tables' round trips are tests;
+  `erasableSyntaxOnly` in the TypeScript configs catches code plain Node can't strip (it found a
+  second such constructor, in stereoisomers.ts); stale comments and counts.
+- Accepted (low): the limits added to "Known limits" above.
+
+**The bar after the review:** bar 3: 4,043 of 4,946 flagged CH₂ differ (81.7%), 36 of 1,444
+unflagged (2.5%). Bar 4: all 22 signal counts as expected; 105 C–H signals, mean error 0.129
+ppm, 94 (89.5%) within ±0.3 and 101 (96.2%) within ±0.5; the 11 outside ±0.3 are in
+outliers.json. Bar 5: 333 compounds, 2,513 C–H signals, mean error 0.239 ppm, 75.6% within
+±0.3, 86.9% within ±0.5 (by sphere 0.74, 0.36, 0.23, 0.12 ppm); exchangeable H 0.89 ppm (128).
+Squalene: 11 ms in Node.
+
+**For Jeff to judge:** how decision 3 places a pair (above); crotonic acid in place of the Z
+isomer; the judgement in proton_rules/judged.json and proton_nmr/expected.json.
 
 ## Build order, once approved
 

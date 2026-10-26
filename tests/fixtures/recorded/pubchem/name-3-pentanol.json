@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/3-pentanol/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T13:58:59Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 11428,
+          "SMILES": "CCC(CC)O",
+          "Title": "3-Pentanol"
+        }
+      ]
+    }
+  }
+}

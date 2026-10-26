@@ -1,0 +1,28 @@
+# The ¹H NMR preview's test compounds (docs/plans/v2-proton-nmr.md, decision 8; approved
+# by Jeff on 2026-10-26 as proposed, provisional). Each has a measured ¹H spectrum in
+# NMRShiftDB2. One name per line, as a student would type it;
+# scripts/fetch_reference_smiles.py asks PubChem for each and writes
+# proton_nmr_compounds.csv. Measured shifts come from NMRShiftDB2
+# (web/scripts/build-proton-table.ts, tests/fixtures/proton_nmr/); nothing here is a value.
+ethanol
+acetone
+ethyl acetate
+tert-butanol
+2-chloro-2-methylpropane
+2-butanol
+propanoic acid
+diethylamine
+triethylamine
+cyclohexanone
+toluene
+acetophenone
+benzyl alcohol
+aspirin
+ibuprofen
+caffeine
+nicotine
+(E)-cinnamic acid
+crotonic acid
+carvone
+limonene
+menthol

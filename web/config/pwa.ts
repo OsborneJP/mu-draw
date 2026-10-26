@@ -58,7 +58,7 @@ export function pwaOptions(base: string): Partial<VitePWAOptions> {
     workbox: {
       // Setting globPatterns replaces Workbox's default; anything not matched here is left
       // out of the precache silently (scripts/verify-dist.ts fails the build instead).
-      // bin: the ¹³C shift table; txt: its licence (both under nmr/).
+      // bin: the ¹³C and ¹H shift tables; txt: their licence (all under nmr/).
       globPatterns: ['**/*.{html,js,css,wasm,png,svg,ico,json,bin,txt,woff,woff2,ttf}'],
       maximumFileSizeToCacheInBytes: MAX_PRECACHE_BYTES,
       navigateFallback: 'index.html',
