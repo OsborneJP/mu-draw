@@ -93,13 +93,13 @@ def keeps_stereo(drawn: Chem.Mol, model: Chem.Mol) -> bool:
     return heavy.HasSubstructMatch(drawn, useChirality=True)
 
 
-def embed_parameters(timeout_s: float = EMBED_TIMEOUT_S) -> rdDistGeom.EmbedParameters:
+def embed_parameters(
+    timeout_s: float = EMBED_TIMEOUT_S, random_start: bool = False
+) -> rdDistGeom.EmbedParameters:
     params = rdDistGeom.ETKDGv3()
     params.randomSeed = SEED
     params.timeout = timeout_s  # 0: none (the fixture generator only)
-    # From random coordinates, not eigenvectors: those failed every time on long chains such
-    # as tristearin's, and on nothing that random ones build (review round 1, measured).
-    params.useRandomCoords = True
+    params.useRandomCoords = random_start
     return params
 
 
@@ -107,7 +107,14 @@ def embed(mol: Chem.Mol, timeout_s: float = EMBED_TIMEOUT_S) -> str | None:
     """RDKit's 3D model of `mol` as a Molfile with every H, or None if it builds none within
     the cap, or none that keeps the drawing's stereo."""
     model = Chem.AddHs(mol)
-    if rdDistGeom.EmbedMolecule(model, embed_parameters(timeout_s)) != 0:
+    # ETKDG's default start (from eigenvectors) fails every time on long chains (tristearin,
+    # n-C80); a random start builds those, but is slower and misses the cap for some that
+    # the default builds (ivermectin). So the default first, then one random start, each
+    # capped (review rounds 1 and 2, measured).
+    for random_start in (False, True):
+        if rdDistGeom.EmbedMolecule(model, embed_parameters(timeout_s, random_start)) == 0:
+            break
+    else:
         return None
     if rdForceFieldHelpers.MMFFHasAllMoleculeParams(model):
         rdForceFieldHelpers.MMFFOptimizeMolecule(model, maxIters=FORCE_FIELD_STEPS)

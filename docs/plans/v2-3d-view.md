@@ -59,8 +59,9 @@ and is computed by RDKit where it has none.
    first would give one model everywhere, online or not, but not PubChem's.
 3. **The fallback: the server computes it with Python RDKit.** RDKit.js can't (measured below:
    the pinned RDKit.js 2026.9.1 has no 3D embedding and no force field). The server's RDKit is
-   the same release. It embeds with ETKDGv3 (fixed seed; from random starting coordinates
-   since review round 1), capped by a 2 s timeout, then
+   the same release. It embeds with ETKDGv3 (fixed seed; since review round 2, from its
+   default start and then, if that fails, once from random coordinates), each attempt capped
+   by a 2 s timeout, then
    MMFF94 for at most 200 steps (UFF where MMFF has no parameters; neither for platinum and
    such). The alternative is OpenChemLib's conformer generator in the browser, which works
    offline but adds a fourth chemistry engine (invariant 3), 2.5 MB, and took 4.3 s for
@@ -231,9 +232,9 @@ each finding. Confirmed and fixed, each with a test that failed on the commit be
   dummy atoms are refused as unreadable (the browser never sends them).
 - **Medium: RDKit failures were cached for 30 days and called impossible.** ETKDG from its
   default (eigenvector) start failed every time on long chains: tristearin (a test compound
-  now), C80. It starts from random coordinates now, which builds those and changes nothing
-  that already built, and a failure is never cached (the 2 s cap is wall-clock). The message
-  no longer says the structure can't exist.
+  now), C80. It started from random coordinates instead (but see round 2), and a failure is
+  never cached (the 2 s cap is wall-clock). The message no longer says the structure can't
+  exist.
 - **Medium (test gaps):** the UFF and no-force-field paths and the 200-step cap now have a
   test, and so does the same-structure check (a drawn cyclohexane against PubChem's
   cholesterol record, which contains its ring).
@@ -260,6 +261,19 @@ Accepted limits (low, after the skeptic):
 - Untested: that the cache key is the canonical SMILES, that "unusable" is cached, the stale
   message's text, and the reaction message in the app. conformers_judged.json is provisional
   until Jeff checks it, including adamantane's reviewed note.
+
+## Review round 2 (2026-10-26, the round-1 fixes only)
+
+One medium, caused by round 1's own fix: random starts alone made some structures that had
+built fail within the cap (ivermectin: 0.7 s from the default start, over 2 s from a random
+one) and slowed others (tacrolimus, rifampicin). Round 1's "changes nothing that already
+built" was measured on the test compounds only. Fixed: the default start first, then one
+random start only if it fails, each capped; tested on the attempts' order and parameters
+(both tests failed on the round-1 commit). Accepted (low): a structure that fails both
+attempts holds the one embedding slot for up to about 4-5 s per request, and failures aren't
+cached, so repeated clicks on one can push other students in the queue past the browser's
+8 s deadline. If a further round finds a new problem caused by a fix, the next step is to
+step back and propose a simpler design to Jeff rather than patch again.
 
 ## Known limits
 

@@ -208,17 +208,33 @@ def test_an_impossible_stereoisomer_has_no_model(tmp_path, fake_time):
 
 
 def test_the_embedding_is_capped(monkeypatch):
+    """Each attempt is capped; the default start first, then one random start only if that
+    fails (review round 2: random starts alone failed ivermectin within the cap)."""
     given = []
 
     def spy(mol, params):
-        given.append((params.timeout, params.randomSeed))
+        given.append((params.timeout, params.randomSeed, params.useRandomCoords))
         return -1
 
     monkeypatch.setattr(threed.rdDistGeom, "EmbedMolecule", spy)
     assert threed.embed(drawn("aspirin")) is None
-    assert given == [(threed.EMBED_TIMEOUT_S, threed.SEED)]
+    cap, seed = threed.EMBED_TIMEOUT_S, threed.SEED
+    assert given == [(cap, seed, False), (cap, seed, True)]
     assert threed.EMBED_TIMEOUT_S == 2
     assert main.create_app.__kwdefaults__["embed"] is threed.embed
+
+
+def test_a_model_from_the_default_start_needs_no_random_one(monkeypatch):
+    real = threed.rdDistGeom.EmbedMolecule
+    starts = []
+
+    def spy(mol, params):
+        starts.append(params.useRandomCoords)
+        return real(mol, params)
+
+    monkeypatch.setattr(threed.rdDistGeom, "EmbedMolecule", spy)
+    assert threed.embed(drawn("aspirin"), timeout_s=0) is not None
+    assert starts == [False]
 
 
 def test_rdkits_model_must_keep_the_drawn_stereo(monkeypatch):

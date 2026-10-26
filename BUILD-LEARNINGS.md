@@ -1275,7 +1275,10 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   (`[PtH40]`-style counts) and whose memory grows with the square of the atoms; cap
   `GetNumAtoms(onlyExplicit=False)` too, and refuse dummy atoms (two bonded ones crash it).
 - ETKDG from its default eigenvector start fails every time on long chains (tristearin,
-  n-C80, any seed); `useRandomCoords` builds them and changed nothing that already built.
+  n-C80, any seed); `useRandomCoords` builds them, but is slower and misses the 2 s cap for
+  some the default builds (ivermectin: 0.7 s against 2.4 s), so the server tries the
+  default first and a random start only after it fails (round 2; round 1 had measured only
+  the test compounds).
 - RDKit reads no stereo from 3D at a three-coordinate P or N (PAMP, an aziridine N), though
   ETKDG honours the tag (the signed volume flips): such drawings get no model (accepted).
 - 3Dmol 2.5.5 renders only through an `OffscreenCanvas` with WebGL2 (unless in a grid); with
