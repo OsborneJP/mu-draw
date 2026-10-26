@@ -1,4 +1,5 @@
 import KetcherEditor from './editor/KetcherEditor';
+import FormsPanel from './panels/FormsPanel';
 import NamePanel from './panels/NamePanel';
 import NmrPanel from './panels/NmrPanel';
 import PracticePanel from './panels/PracticePanel';
@@ -14,13 +15,16 @@ export default function App() {
       <UpdateBanner />
       <main className="workspace">
         {/* The canvas, with Get name's answer over it, and one panel docked below it:
-            Practice, the NMR preview or the stereoisomers. */}
+            Practice, the NMR preview, the stereoisomers, the tautomers or the resonance
+            structures. */}
         <div className="canvas-area">
           <KetcherEditor />
           <NamePanel />
           <PracticePanel />
           <NmrPanel />
           <StereoPanel />
+          <FormsPanel kind="tautomers" />
+          <FormsPanel kind="resonance" />
         </div>
         <PropertiesPanel />
       </main>

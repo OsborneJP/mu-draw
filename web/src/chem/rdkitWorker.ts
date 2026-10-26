@@ -10,12 +10,15 @@
 // (null when RDKit can't read the drawing). The panels' copy (rdkitWorkers.ts) is sent
 // {kind: 'nmr', id, molfile} and answers with the predicted peaks (src/chem/nmr.ts), or
 // {kind: 'stereoisomers', id, molfile} and answers with them and their pictures
-// (src/chem/stereoisomers.ts, stereoPictures.ts). Either copy sends {failed} once if RDKit
+// (src/chem/stereoisomers.ts, stereoPictures.ts), or {kind: 'tautomers' | 'resonance', id,
+// molfile} and answers with those and their pictures (src/chem/tautomers.ts, resonance.ts,
+// formPictures.ts). Either copy sends {failed} once if RDKit
 // can't start. Nothing leaves the device: the worker's
 // only requests are for RDKit's own wasm, the functional-group patterns (on the first
 // properties request) and the ¹³C table (on the first prediction), all from the precache.
 import initRDKitModule from '@rdkit/rdkit';
 import { decodeTable, type CarbonTable } from './carbonTable';
+import { answer, type FormsReply, type FormsRequest } from './formPictures';
 import { computeProperties, configureRdkit, type PatternsOrReason } from './compute';
 import { readPatterns } from './functionalGroups';
 import { predictCarbon, type NmrReply, type NmrRequest } from './nmr';
@@ -25,8 +28,8 @@ import { withPictures, type StereoReply, type StereoRequest } from './stereoPict
 import type { WorkerReply, WorkerRequest } from './tracker';
 
 const scope = self as unknown as {
-  postMessage(message: WorkerReply | NmrReply | StereoReply): void;
-  onmessage: ((event: MessageEvent<WorkerRequest | NmrRequest | StereoRequest>) => void) | null;
+  postMessage(message: WorkerReply | NmrReply | StereoReply | FormsReply): void;
+  onmessage: ((event: MessageEvent<WorkerRequest | NmrRequest | StereoRequest | FormsRequest>) => void) | null;
 };
 
 const ready = initRDKitModule({ locateFile: () => `${import.meta.env.BASE_URL}${RDKIT_WASM_FILE}` }).then(
@@ -107,10 +110,26 @@ function stereoisomers({ id, molfile }: StereoRequest): void {
   );
 }
 
+function forms(request: FormsRequest): void {
+  ready.then(
+    (rdkit) => {
+      try {
+        scope.postMessage(answer(rdkit, request));
+      } catch (error) {
+        console.error(`RDKit could not list the ${request.kind}:`, error);
+        const message = error instanceof Error ? error.message : String(error);
+        scope.postMessage({ kind: request.kind, id: request.id, error: message });
+      }
+    },
+    () => {}, // already reported as {failed}
+  );
+}
+
 scope.onmessage = (event) => {
   if ('kind' in event.data) {
     if (event.data.kind === 'nmr') predict(event.data);
-    else stereoisomers(event.data);
+    else if (event.data.kind === 'stereoisomers') stereoisomers(event.data);
+    else forms(event.data);
     return;
   }
   const { id, molfile } = event.data;
