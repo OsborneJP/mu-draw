@@ -1275,3 +1275,12 @@ Acceptance bar, sources and measurements: docs/plans/v2-formula-text.md.
   Vite bundle a second React ("reading 'useSyncExternalStore'") and Playwright load the other
   checkout's copy ("No tests found"). Leave it out. `npm install --package-lock-only` still
   rewrites node_modules/.package-lock.json, so give a linked copy its own file first.
+- Indigo 1.46 draws a text's subscript or superscript at full size, moved half its height
+  down or up (render_context.cpp), unlike Ketcher's canvas and ChemDraw. Given a smaller size
+  on those runs it draws them smaller, but it ignores a fractional size (9.75 px drew at full
+  size), applies a line's or a text's size only up to the first run with a size of its own
+  (then 13 px), and sizes text from the bond length, not Ketcher's render-font-size. So each
+  picture gets a copy with those runs at a whole 75% of their own size (src/editor/pictureScripts.ts).
+- ketcher-react binds the struct service's methods once (createApi), so wrapping
+  `generateImageAsBase64` in the provider's createStructService, as imageQueue does, reaches
+  every picture: Export, Copy image, Ketcher's Save preview, Save and Copy Image, Practice.

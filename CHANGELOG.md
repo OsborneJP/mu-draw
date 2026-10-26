@@ -157,6 +157,9 @@ All notable changes to this project. The format follows
 - The source is public under the MIT licence (LICENSE); THIRD-PARTY-NOTICES.md lists the
   parts under their own. NMRShiftDB2's data requires prediction software built on it to be
   open source.
+- Pictures of the drawing (Export, Copy image, and Ketcher's Save as SVG or PNG) draw a
+  text's subscripts and superscripts at 75% of its size, as ChemDraw does. Indigo drew them
+  at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
 - The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds

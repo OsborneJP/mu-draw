@@ -2,6 +2,7 @@
 // built app, typed key by key. Each check compares what the editor shows, or what was saved,
 // with the typing rules (src/editor/formula.ts) or with runs fixed here from the plan's table.
 import type { Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { formulaScripts, type Script } from '../src/editor/formula.ts';
 import {
   clearCanvas,
@@ -424,4 +425,94 @@ test('offline: Formula works with the network off, and asks for no file', async 
   await expect.poll(() => shown(page)).toEqual(byTheRules(TYPED));
   expect(textParts(await apply(page))).toEqual([TYPED_PARTS]);
   expect(app.requests.slice(requested).map((request) => request.url())).toEqual([]);
+});
+
+/** An init script: records the drawing that each picture request hands Indigo's worker,
+ * after the app's own changes to it, in window.__pictures. */
+function recordPictures() {
+  const RealWorker = window.Worker;
+  const pictures: string[] = [];
+  Object.assign(window, { __pictures: pictures });
+  window.Worker = class extends RealWorker {
+    constructor(url: string | URL, options?: WorkerOptions) {
+      super(url, options);
+      if (!String(url).includes('indigoWorker')) return;
+      const post = this.postMessage.bind(this);
+      this.postMessage = ((message: { data?: { struct?: string; outputFormat?: string } }, transfer?: Transferable[]) => {
+        if (message?.data?.outputFormat !== undefined) pictures.push(message.data.struct ?? '');
+        post(message, transfer ?? []);
+      }) as Worker['postMessage'];
+    }
+  };
+}
+
+function pictures(page: Page): Promise<string[]> {
+  return page.evaluate(() => (window as unknown as { __pictures: string[] }).__pictures.slice());
+}
+
+/** In an SVG that Indigo drew for the text "O2 2", the subscript 2's height over the
+ * plain 2's: each font size is its own set of glyphs (glyph-<set>-<n>). */
+function subscriptHeightRatio(page: Page, svg: string): Promise<number> {
+  return page.evaluate((markup) => {
+    const holder = document.createElement('div');
+    holder.innerHTML = markup;
+    document.body.append(holder);
+    const uses = [...holder.querySelectorAll('use')];
+    const set = (use: Element) => (use.getAttribute('xlink:href') ?? use.getAttribute('href') ?? '').split('-')[1];
+    const plainSet = set(uses[0]);
+    const sub = uses.filter((use) => set(use) !== plainSet);
+    const plainTwo = uses.at(-1)!; // the last word, a plain 2
+    const ratio = sub.length === 1 ? sub[0].getBBox().height / (plainTwo as SVGGraphicsElement).getBBox().height : NaN;
+    holder.remove();
+    return ratio;
+  }, svg);
+}
+
+test('pictures draw subscripts and superscripts at 75% (Export, Copy image, Save as SVG and PNG)', async ({
+  app,
+}) => {
+  const { page } = app;
+  await app.context.addInitScript(recordPictures);
+  await app.context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(app.server.url).origin });
+  await openEditor(app);
+  await newText(page);
+  await formula(page).click();
+  await page.keyboard.type('O2 2');
+  const drawn = await apply(page);
+  expect(textParts(drawn)).toEqual([[{ text: 'O' }, { text: '2', subscript: true }, { text: ' 2' }]]);
+  // What Indigo is handed: the same text with the subscript at 10 px (13 px × 0.75, whole).
+  const smaller = [[{ text: 'O' }, { text: '2', subscript: true, font: { size: 10 } }, { text: ' 2' }]];
+  const before = (await pictures(page)).length;
+  /** Each picture is one request to Indigo. */
+  const asked = (count: number) => expect.poll(async () => (await pictures(page)).length).toBe(before + count);
+
+  // Export SVG: the subscript 2 is 75% (±3%) of the plain 2's height.
+  await page.getByTestId('app-export-button').click();
+  const dialog = page.getByRole('dialog', { name: 'Export image' });
+  const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button', { name: 'Download SVG' }).click()]);
+  const svg = readFileSync((await download.path())!, 'utf8');
+  await asked(1);
+  const ratio = await subscriptHeightRatio(page, svg);
+  expect(ratio).toBeGreaterThanOrEqual(0.72);
+  expect(ratio).toBeLessThanOrEqual(0.78);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+
+  // Copy image, and Ketcher's Save as SVG and as PNG, hand Indigo the same smaller copy.
+  await page.getByTestId('app-copy-image-button').click();
+  await expect(page.getByTestId('copy-status')).toHaveText('Image copied');
+  await asked(2);
+  for (const [i, format] of ['SVG Document', 'PNG Image'].entries()) {
+    await page.getByTestId('save-file-button').filter({ visible: true }).click();
+    const save = page.getByTestId('save-dialog');
+    await save.getByRole('combobox').click();
+    await page.getByTestId(`${format}-option`).click();
+    await asked(3 + i);
+    await save.getByRole('button', { name: 'Cancel' }).click();
+    await expect(save).toHaveCount(0);
+  }
+  expect((await pictures(page)).slice(before).map(textParts)).toEqual([smaller, smaller, smaller, smaller]);
+
+  // The drawing itself is unchanged.
+  expect(textParts(await ket(page))).toEqual(textParts(drawn));
 });

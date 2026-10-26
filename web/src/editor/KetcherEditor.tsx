@@ -9,6 +9,7 @@ import './editor.css';
 import { imageQueue } from './imageQueue';
 import { setKetcher } from './instance';
 import { DISABLE_MACROMOLECULES_EDITOR, HIDDEN_BUTTONS } from './ketcherUi';
+import { withSmallerScripts } from './pictureScripts';
 
 declare global {
   interface Window {
@@ -17,12 +18,13 @@ declare global {
 }
 
 // Every service this provider creates asks Indigo for images and conversions one at a time
-// (imageQueue.ts).
+// (imageQueue.ts), and draws every picture with smaller subscripts and superscripts in its
+// text (pictureScripts.ts).
 class QueuedImageProvider extends StandaloneStructServiceProvider {
   private readonly queueImages = imageQueue();
 
   createStructService(options: StructServiceOptions) {
-    return this.queueImages(super.createStructService(options));
+    return this.queueImages(withSmallerScripts(super.createStructService(options)));
   }
 }
 

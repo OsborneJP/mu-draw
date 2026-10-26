@@ -65,7 +65,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug keys, image queue, instance.ts, drawing.ts,
-  stereoHighlight.ts, placeInHand.ts, templates.json; Formula text: formula.ts, formulaText.ts.
+  stereoHighlight.ts, placeInHand.ts, templates.json; Formula text: formula.ts, formulaText.ts, pictureScripts.ts.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.

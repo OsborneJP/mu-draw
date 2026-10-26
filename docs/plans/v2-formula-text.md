@@ -172,6 +172,8 @@ Jeff approved the plan as written, with every proposed answer:
 
 ## Built (2026-10-26, on branch claude/v2-formula-text)
 
+- Two commits after the plan, each after check.sh passed: the Formula button (rules, Text Editor, lexical pin; bars A, B, C1, C2, C4, C5, D), then the pictures at 75% (decision 6, bar C3). Bar A is src/editor/formula.test.ts, formulaText.test.ts and pictureScripts.test.ts; bars B to D are e2e/formula.spec.ts (11 browser tests) and config/pins.test.ts.
+- Review: two capped rounds of independent reviewers, each finding checked here before it was fixed. Round 1 found one high (the properties test could pass on the panel's old state) and four mediums (a click on a greyed button lost the focus; the Formula button squeezed Ketcher's; italic was untested; the Redo check could not fail), all fixed, with the tests shown to fail without each fix where it was code. Round 2 found nothing high or medium; its lows are under "Known limits".
 - Changed while building: the Formula button sits on a row of its own inside Ketcher's toolbar, under the formatting buttons. Beside them there was no room in the 340 px dialog: it squeezed Ketcher's buttons from 28 px to about 16 px and clipped the bold icon (review finding).
 - Found in review and fixed, each with a browser test that failed without the fix: a click on a greyed subscript or superscript button took the focus out of the text, so the next keys went nowhere and Enter applied the dialog.
 - For Jeff to decide (not built, not in the approved rules): whether a charge before a closing bracket, slash or quote should be raised, for concentrations and redox couples ([Cu2+], Cu2+/Cu). Proposed: yes, by treating `)`, `]`, `/` and quotes after a charge like the trailing punctuation of rule 3.
