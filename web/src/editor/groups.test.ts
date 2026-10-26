@@ -1,6 +1,6 @@
 // The group rules (groups.ts) on small made-up canvases: atom ids and bonds, no chemistry.
 import { describe, expect, it } from 'vitest';
-import { grouped, molecules, offer, pruned, restored, saved, selectionOf, ungrouped, widened, type Canvas, type Group } from './groups';
+import { carried, grouped, molecules, offer, pruned, restored, saved, selectionOf, ungrouped, widened, type Canvas, type Group } from './groups';
 
 const none = { texts: [], rxnArrows: [], rxnPluses: [], simpleObjects: [], images: [], multitailArrows: [] };
 
@@ -89,7 +89,8 @@ describe('a group with fewer than two items left', () => {
     expect(widened([GROUP], { atoms: [1] }, noText)).toBeNull();
     expect(offer([GROUP], { atoms: [0, 1, 2], bonds: [0, 1] }, noText)).toBeNull();
     expect(ungrouped([GROUP], { atoms: [1] }, noText)).toEqual([GROUP]);
-    expect(grouped([GROUP], { atoms: [1, 3] }, noText)).toEqual([GROUP, { atoms: [0, 1, 2, 3, 4], objects: none }]);
+    // Group takes it in (it ends), so no item is ever in two groups.
+    expect(grouped([GROUP], { atoms: [1, 3] }, noText)).toEqual([{ atoms: [0, 1, 2, 3, 4], objects: none }]);
     expect(saved([GROUP], noText, () => ({ x: 0, y: 0 })).groups).toEqual([]);
   });
 
@@ -153,8 +154,8 @@ describe('saved and restored by where items are', () => {
       'rxnArrows 0': { x: 3, y: 1 },
     };
     const groups = restored(kept, reloaded, (kind, id) => after[`${kind} ${id}`] ?? null);
-    expect(groups).toEqual([{ atoms: [2], objects: { ...none, texts: [1] } }]);
-    expect(selectionOf(groups[0], reloaded).atoms).toEqual([2, 3, 4]);
+    // Every atom of the molecule, as Group makes it.
+    expect(groups).toEqual([{ atoms: [2, 3, 4], objects: { ...none, texts: [1] } }]);
   });
 
   it('finds them after Ketcher scales the drawing and moves it, and images, which move unscaled', () => {
@@ -170,7 +171,7 @@ describe('saved and restored by where items are', () => {
       const s = kind === 'images' ? 1 : 1.25;
       return { x: s * p.x + 7, y: s * p.y - 3 };
     };
-    expect(restored(kept, withImage, loaded)).toEqual([group]);
+    expect(restored(kept, withImage, loaded)).toEqual([{ ...group, atoms: [0, 1, 2] }]);
     // Moved any other way, nothing is found.
     const nudged = (kind: string, id: number) => {
       const p = loaded(kind, id);
@@ -186,14 +187,100 @@ describe('saved and restored by where items are', () => {
     expect(restored(saved([group], images, at(0)), images, at(5))).toEqual([group]);
   });
 
+  it('keeps every atom of a restored molecule, so erasing one or splitting it keeps the rest', () => {
+    const chain: Canvas = { ...CANVAS, objects: { ...none, texts: [0] } };
+    const kept = saved([GROUP], chain, where);
+    const back = restored(kept, chain, where);
+    // Atom 0 (the one saved for the molecule) erased, and the bond 1-2 deleted.
+    const edited: Canvas = { atoms: [1, 2, 3, 4], bonds: [{ id: 2, begin: 3, end: 4 }], objects: { ...none, texts: [0] } };
+    expect(widened(back, { texts: [0] }, edited)).toEqual({ atoms: [1, 2], texts: [0] });
+  });
+
+  it('finds images when the groups were saved from a drawing moved since its last save', () => {
+    // Saved at K + t (Ketcher moved the drawing by t after the file was written); loaded from
+    // the file K, scaled by 1.25 and moved by v, the image moved by v only.
+    const withImage: Canvas = { ...CANVAS, objects: { ...CANVAS.objects, images: [0] } };
+    const file: Record<string, { x: number; y: number }> = { ...points, 'images 0': { x: 6, y: 2 } };
+    const t = { x: 3, y: -2 };
+    const v = { x: 7, y: 1 };
+    const group: Group = { atoms: [0, 1, 2], objects: { ...none, images: [0] } };
+    const kept = saved([group], withImage, (kind, id) => {
+      const p = file[`${kind} ${id}`];
+      return p ? { x: p.x + t.x, y: p.y + t.y } : null;
+    });
+    const loaded = (kind: string, id: number) => {
+      const p = file[`${kind} ${id}`];
+      if (!p) return null;
+      const s = kind === 'images' ? 1 : 1.25;
+      return { x: s * p.x + v.x, y: s * p.y + v.y };
+    };
+    expect(restored(kept, withImage, loaded)).toEqual([group]);
+  });
+
   it('leaves out what is not found, and a group left with one item', () => {
-    const kept = saved([GROUP], CANVAS, where);
-    expect(restored(kept, { atoms: [], bonds: [], objects: { ...none, texts: [0] } }, () => ({ x: 4, y: 4 }))).toEqual([]);
+    // A text and an image grouped; the image is gone (images don't count in the frame's centre,
+    // so the text is found where it was).
+    const withImage: Canvas = { ...CANVAS, objects: { ...CANVAS.objects, images: [0] } };
+    const at = (kind: string, id: number) => (kind === 'images' ? { x: 6, y: 2 } : where(kind, id));
+    const group: Group = { atoms: [], objects: { ...none, texts: [0], images: [0] } };
+    const kept = saved([group], withImage, at);
+    expect(restored(kept, withImage, at)).toEqual([group]);
+    expect(restored(kept, CANVAS, where)).toEqual([]);
   });
 
   it('gives no groups for anything unreadable', () => {
-    const frame = { bond: 1, centre: null, imageCentre: null };
-    const unreadable = [null, 3, 'x', [], [{ molecules: [{ x: 0, y: 0 }], objects: [] }], { frame: {}, groups: [] }, { frame, groups: [{ molecules: [{ x: 'a', y: 0 }], objects: [] }] }, { frame, groups: [{ molecules: [], objects: [{ kind: 'atoms', at: { x: 0, y: 0 } }] }] }];
-    for (const kept of unreadable) expect(restored(kept, CANVAS, where)).toEqual([]);
+    // Each would give a group (or throw) if it were read: a text and an arrow, where they were.
+    const items = [{ kind: 'texts', at: { x: 4, y: 4 } }, { kind: 'rxnArrows', at: { x: 3, y: 1 } }];
+    const kept = saved([{ atoms: [], objects: { ...none, texts: [0], rxnArrows: [0] } }], CANVAS, where);
+    expect(restored(kept, CANVAS, where)).toHaveLength(1);
+    const unreadable = [
+      null,
+      3,
+      [],
+      { ...kept, frame: {} },
+      // Numbers as text: JavaScript would read them, so only the check refuses them.
+      { ...kept, frame: { ...kept.frame, bond: String(kept.frame.bond) } },
+      { ...kept, frame: { ...kept.frame, centre: { x: String(kept.frame.centre!.x), y: String(kept.frame.centre!.y) } } },
+      { ...kept, groups: [{ molecules: [{ x: 'a', y: 0 }], objects: items }] },
+      { ...kept, groups: [{ molecules: [], objects: [...items, { kind: 'atoms', at: { x: 0, y: 0 } }] }] },
+      { ...kept, groups: [{ molecules: [], objects: [...items, { kind: 'texts' }] }] },
+    ];
+    for (const bad of unreadable) expect(restored(bad, CANVAS, where)).toEqual([]);
+    // An image's centre as text, likewise.
+    const withImage: Canvas = { ...CANVAS, objects: { ...CANVAS.objects, images: [0] } };
+    const at = (kind: string, id: number) => (kind === 'images' ? { x: 6, y: 2 } : where(kind, id));
+    const image = saved([{ atoms: [], objects: { ...none, texts: [0], images: [0] } }], withImage, at);
+    expect(restored(image, withImage, at)).toHaveLength(1);
+    const centre = image.frame.imageCentre!;
+    expect(restored({ ...image, frame: { ...image.frame, imageCentre: { x: String(centre.x), y: String(centre.y) } } }, withImage, at)).toEqual([]);
+  });
+
+  it('carries groups onto a drawing Ketcher made from this one, and not onto another', () => {
+    const from = { canvas: CANVAS, where };
+    const scaled = { canvas: CANVAS, where: (kind: string, id: number) => {
+      const p = where(kind, id);
+      return p && { x: 2 * p.x - 1, y: 2 * p.y + 3 };
+    } };
+    expect(carried([GROUP], from, scaled)).toEqual([GROUP]);
+    const other = { canvas: CANVAS, where: (kind: string, id: number) => {
+      const p = where(kind, id);
+      return p && { x: p.y, y: p.x * 3 };
+    } };
+    expect(carried([GROUP], from, other)).toEqual([]);
+  });
+
+  it('carries only groups found whole (Layout moves items one by one)', () => {
+    // Both molecules and the text grouped; the text moves down and another text up, so the
+    // drawing's centre stays and the molecules are found where they were.
+    const two: Canvas = { ...CANVAS, objects: { ...CANVAS.objects, texts: [0, 1] } };
+    const at: Record<string, { x: number; y: number }> = { ...points, 'texts 1': { x: 9, y: 9 } };
+    const before = (kind: string, id: number) => at[`${kind} ${id}`] ?? null;
+    const after = (kind: string, id: number) => {
+      const p = before(kind, id);
+      return p && kind === 'texts' ? { x: p.x, y: p.y + (id === 0 ? 1 : -1) } : p;
+    };
+    const group: Group = { atoms: [0, 1, 2, 3, 4], objects: { ...none, texts: [0] } };
+    expect(restored(saved([group], two, before), two, after)).toEqual([{ ...group, objects: none }]);
+    expect(carried([group], { canvas: two, where: before }, { canvas: two, where: after })).toEqual([]);
   });
 });

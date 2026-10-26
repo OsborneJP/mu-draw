@@ -16,6 +16,8 @@ export default function GroupButton() {
       data-offer={offer}
       data-anchored={anchored}
       title={offer === 'group' ? 'Group these, to move them together' : 'Ungroup: move each on its own again'}
+      // Focus stays on the canvas, so Ketcher's keys (Delete, Ctrl+Z) work straight after.
+      onMouseDown={(event) => event.preventDefault()}
       onClick={offer === 'group' ? groupSelection : ungroupSelection}
     >
       {label}

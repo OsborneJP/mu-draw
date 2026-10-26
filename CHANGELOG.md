@@ -124,9 +124,11 @@ All notable changes to this project. The format follows
 - Grouping: select two or more items (molecules, text, arrows, + signs, shapes, images) and
   click Group, beside the selection. A click on any member then picks up the whole group,
   so it moves, rotates and deletes as one; with a group selected the button says Ungroup.
-  An atom drawn onto a grouped molecule joins the group. Groups are kept with the drawing
-  in this browser and come back after a relaunch, but files, copies and exports don't
-  carry them; opening another drawing or Clear Canvas ends them.
+  An atom drawn onto a grouped molecule joins the group, and a double-click on an atom edits
+  that atom only. Groups are kept with the drawing in this browser and come back after a
+  relaunch, but files, copies and exports don't carry them. Opening another drawing or
+  Clear Canvas ends them, as do Clean Up and Layout where they move a group's items apart;
+  Undo brings them back.
 
 ### Changed
 - The Text tool's editor now says, under its formatting buttons: "Highlight the text first:

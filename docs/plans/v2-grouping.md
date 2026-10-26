@@ -77,6 +77,33 @@ and deletes as one.
   one drawing; so a group keeps the ids of members that have gone, and a group with fewer
   than two left does nothing until they come back.
 
+- Ketcher puts a new drawing object in place not only for Open, Clear Canvas and setMolecule
+  (Name to structure's Replace, Practice) but also for Aromatize, Dearomatize, Calculate CIP,
+  explicit H, Clean Up, Layout and Settings; Undo and Redo put the earlier object back. The
+  first version took every new object for a new drawing and dropped all groups (review round
+  1). Now each drawing object keeps its groups for Undo and Redo, and a new one gets the
+  groups found whole on it after the same change of scale and place as a relaunch: an edit
+  that only rescales or moves the whole drawing keeps them; a different drawing, or one whose
+  items moved one by one, ends them. (Layout on the test drawing, which has a reaction arrow,
+  moved everything together: its group stayed.)
+- Ketcher's double-click edits every selected atom or bond, and the press before it has
+  selected the group; so a double-click on an atom or bond of a group first selects that one
+  alone (round 1: changing one carbon to N changed the whole group).
+
+## Review (round 1, 2026-10-26)
+
+Three reviewers against this bar, each high or medium finding put to a skeptic. Confirmed
+(all medium) and fixed, each with a test that fails on e55b2ab: groups dropped by Ketcher's
+in-place edits and not brought back by their Undo; a restored group held one atom per
+molecule; a double-click on a grouped atom edited the whole group; the Clear Canvas test
+passed without clearing. Lows fixed: images restored with the wrong shift when Ketcher had
+moved the drawing since its last save; Group takes in a group doing nothing, so no item is in
+two groups; the button keeps the focus off itself (Ketcher's keys work straight after it) and
+sits clear of the zoom control when not beside the floating tools; Group redraws Ketcher's
+rotate frame; two restore tests could not fail. Lows accepted (below, and): the Undo button's
+wait in the move test is always already met; the browser tests press on atom 0 (the unit
+tests cover the other kinds of member).
+
 ## Known limits
 
 - Groups live only in this browser with the drawing; files, copies and exports don't carry
@@ -84,6 +111,15 @@ and deletes as one.
 - A group isn't shown on the canvas until it is clicked (ChemDraw doesn't outline them either).
 - Shift+click can't take one group out of a larger selection: the rest of the group puts it
   back. Click the canvas and select again.
+- Clean Up, Layout and explicit H keep a group only if they leave all of it where the
+  drawing's change of scale and place puts it; a group whose items they move one by one ends
+  (Undo brings it back). In the test drawing (with a reaction arrow) Layout moved everything
+  together and the group stayed. Undo or Redo past such an edit gives that drawing the groups
+  it had then, so a Group or Ungroup made since is undone with it.
+- With a group selected, an element or bond type picked in the toolbar changes every atom or
+  bond in it, as for any selection in Ketcher.
+- With the ¹³C NMR preview open, a click on a carbon of a grouped molecule selects the whole
+  group, so it no longer picks out that carbon's peak.
 - In the test browser, Ketcher 3.18 can't turn a selection that holds a text with its rotate
   handle (it stops after moving the text), group or no group. The rotate test uses a group
   without text; worth checking in a real browser.

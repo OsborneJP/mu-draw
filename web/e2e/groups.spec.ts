@@ -3,7 +3,7 @@
 // one; Ungroup ends it; groups survive a relaunch and end with the drawing. Ketcher's own
 // selection and coordinates are read back exactly.
 import type { Page } from '@playwright/test';
-import { clearCanvas, expect, fixture, nextAutosave, openEditor, referenceCompound, test } from './fixtures.ts';
+import { expect, fixture, nextAutosave, openEditor, referenceCompound, test } from './fixtures.ts';
 
 const CANVAS = '[data-testid="ketcher-canvas"][data-canvasmode="molecules-mode"]';
 
@@ -108,7 +108,8 @@ async function canvasPoint(page: Page, fx: number, fy: number) {
 }
 
 async function selectTool(page: Page) {
-  await page.getByTestId('select-rectangle').filter({ visible: true }).click();
+  // The left toolbar's: in a narrow window its tool menu shows the same button too.
+  await page.getByTestId('select-rectangle').filter({ visible: true }).first().click();
 }
 
 /** Two molecules, a text and an arrow, each made as a student would. */
@@ -216,8 +217,14 @@ test('a group moves as one, in one Undo step; deletes as one, and Undo brings it
   await expect.poll(async () => same(await snapshot(page), before)).toBe(true);
 
   // Delete with the group selected: all of it goes. Undo brings it back, still a group.
+  // Ungroup and Group again first: Ketcher's keys work straight after the button.
   await clickAtom(page, 0);
   const whole = await everything(page);
+  const button = page.getByTestId('group-button');
+  await button.click();
+  await expect(button).toHaveAttribute('data-offer', 'group');
+  await button.click();
+  await expect(button).toHaveAttribute('data-offer', 'ungroup');
   await page.keyboard.press('Delete');
   await expect.poll(() => everything(page)).toEqual({ atoms: [], bonds: [], texts: [], rxnArrows: [] });
   await expect(undo).toBeEnabled();
@@ -320,21 +327,80 @@ test('groups survive a relaunch, and end when the drawing is replaced or cleared
   await expect.poll(() => selection(app.page)).toEqual({ atoms: [0], bonds: [], texts: [], rxnArrows: [] });
 });
 
-test('Clear Canvas ends the groups', async ({ app }) => {
+test('Clear Canvas ends the groups, and Undo brings them back', async ({ app }) => {
   const { page } = app;
   await openEditor(app);
   await drawing(page);
   await groupEverything(page);
   await deselect(page);
-  await clearCanvas(page);
-  await page.evaluate(
-    async ([a, b]) => {
-      await window.ketcher!.addFragment(a);
-      await window.ketcher!.addFragment(b);
-    },
-    [molfile('aspirin'), molfile('caffeine')],
-  );
+  const whole = await everything(page);
+  const empty = { atoms: [], bonds: [], texts: [], rxnArrows: [] };
+  const clear = page.getByTestId('clear-canvas').filter({ visible: true });
+  await clear.click();
+  await expect.poll(() => everything(page)).toEqual(empty);
+  const undo = page.getByTestId('undo').filter({ visible: true });
+  await undo.click();
+  await expect.poll(() => everything(page)).toEqual(whole);
+  await clickAtom(page, 0);
+  await expect.poll(() => selection(page)).toEqual(whole);
+  // Cleared again, and two bonds drawn by hand: their atoms are numbered from 0 again, but
+  // they are in no group.
+  await clear.click();
+  await expect.poll(() => everything(page)).toEqual(empty);
+  await page.getByTestId('bonds').filter({ visible: true }).click();
+  for (const [fx, fy] of [[0.3, 0.4], [0.7, 0.6]]) {
+    const at = await canvasPoint(page, fx, fy);
+    await page.mouse.click(at.x, at.y);
+  }
+  await expect.poll(async () => (await everything(page)).atoms).toEqual([0, 1, 2, 3]);
   await selectTool(page);
   await clickAtom(page, 0);
   await expect.poll(() => selection(page)).toEqual({ atoms: [0], bonds: [], texts: [], rxnArrows: [] });
+});
+
+/** Press one of Ketcher's buttons that puts a new drawing in place, and wait for it. Ketcher
+ * then selects what Indigo marked selected: start again from no selection. */
+async function replacing(page: Page, testId: string) {
+  await page.evaluate(() => ((window as unknown as { before: unknown }).before = window.ketcher!.editor.struct()));
+  await page.getByTestId(testId).filter({ visible: true }).click();
+  await expect.poll(() => page.evaluate(() => window.ketcher!.editor.struct() !== (window as unknown as { before: unknown }).before)).toBe(true);
+  await deselect(page);
+}
+
+// Ketcher (Indigo) makes a new drawing for Aromatize, the same items where they were. (Whether
+// Layout or Clean Up keep a group depends on whether they move its items together; the rule,
+// a group carried only when found whole, is in groups.test.ts.)
+test('Aromatize keeps the groups, and so does its Undo', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await drawing(page);
+  await groupEverything(page);
+  await deselect(page);
+  await replacing(page, 'Aromatize button');
+  await clickAtom(page, 0);
+  const whole = await everything(page);
+  await expect.poll(() => selection(page)).toEqual(whole);
+  await deselect(page);
+  // The drawing from before, with its own ids (Indigo numbered the arrow afresh).
+  await replacing(page, 'undo');
+  await clickAtom(page, 0);
+  await expect.poll(() => selection(page)).toEqual(await everything(page));
+});
+
+test('a double-click on a grouped atom edits that atom only', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await drawing(page);
+  await groupEverything(page);
+  await deselect(page);
+  const labels = () =>
+    page.evaluate(() => [...(window.ketcher!.editor.struct() as unknown as { atoms: Map<number, { label: string }> }).atoms].map(([id, a]) => [id, a.label]));
+  const before = await labels();
+  const at = await atomOnPage(page, 0);
+  await page.mouse.dblclick(at.x, at.y);
+  const label = page.getByTestId('label-input');
+  await expect(label).toBeVisible();
+  await label.fill('N');
+  await page.getByTestId('OK').click();
+  await expect.poll(labels).toEqual(before.map(([id, l]) => [id, id === 0 ? 'N' : l]));
 });

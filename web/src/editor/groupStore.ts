@@ -4,12 +4,18 @@
 //   widened to the whole group in Ketcher's selectionChange event, before the drag begins, so
 //   one drag moves it all (measured: Ketcher's drag takes the widened selection).
 // - On every change the groups are saved beside the autosaved drawing, by where their items
-//   are. A group keeps members that have gone, for Undo (groups.ts). A drawing loaded afresh
-//   (Open, Name to structure's Replace) is a new Ketcher struct: its groups start empty.
+//   are. A group keeps members that have gone, for Undo (groups.ts).
+// - Many of Ketcher's actions put a new struct object in place of the drawing: Open, Clear
+//   Canvas and setMolecule (Name to structure's Replace, Practice), but also Aromatize, Clean
+//   Up, Layout, Calculate CIP, explicit H and Settings. Undo and Redo put the earlier object
+//   back. So each struct keeps the groups it had, for Undo and Redo, and a new one gets the
+//   groups of the last whose items it still has where they were (groups.ts carried()).
+// - A double-click on an atom or bond of a group edits that one only: Ketcher's double-click
+//   edits every selected atom or bond, and the press before it selected the group.
 // - The Group / Ungroup button sits beside Ketcher's own floating tools (flip, delete) when they
 //   show, which they do over a selection; groupButton.css anchors it there.
 import type { Ketcher } from 'ketcher-core';
-import { grouped, OBJECT_KINDS, offer, restored, saved, selectionOf, ungrouped, widened, type Canvas, type Group, type ObjectKind, type Point, type Selection } from './groups';
+import { carried, grouped, OBJECT_KINDS, offer, restored, saved, selectionOf, ungrouped, widened, type Canvas, type Drawing, type Group, type ObjectKind, type Point, type Selection } from './groups';
 
 export function groupsKey(base: string): string {
   return `groups:${base}`;
@@ -32,6 +38,9 @@ interface Struct {
 interface Editor {
   struct(): Struct;
   selection(selection?: Selection | null): Selection | null;
+  findItem(event: MouseEvent, maps: string[]): { map: string; id: number } | null;
+  render: { clientArea: { contains(node: Node): boolean } };
+  rotateController?: { rerender(): void };
   event: {
     selectionChange: { add(handler: (value: unknown) => unknown): void };
     updateFloatingTools: { add(handler: (payload: { visible?: boolean }) => void): void };
@@ -83,6 +92,8 @@ const listeners = new Set<() => void>();
 let groups: Group[] = [];
 let editor: Editor | null = null;
 let drawing: Struct | null = null; // the struct the groups are of
+let others = new WeakMap<Struct, Group[]>(); // earlier structs' groups, for Undo and Redo
+let quiet = false; // setting a selection that must not be widened
 let persist: (groups: Group[], struct: Struct) => void = () => {};
 
 function set(next: Partial<GroupState>): void {
@@ -101,11 +112,15 @@ export function subscribeGroups(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+function drawingOf(struct: Struct): Drawing {
+  return { canvas: canvasOf(struct), where: whereIn(struct) };
+}
+
 function selectionChanged(): void {
   if (!editor) return;
   const selection = editor.selection() ?? {};
   const canvas = canvasOf(editor.struct());
-  const wide = widened(groups, selection, canvas);
+  const wide = quiet ? null : widened(groups, selection, canvas);
   // Setting it fires this event again, with nothing left to widen.
   if (wide) editor.selection(wide);
   else set({ offer: offer(groups, selection, canvas) });
@@ -114,17 +129,38 @@ function selectionChanged(): void {
 function drawingChanged(): void {
   if (!editor) return;
   const struct = editor.struct();
-  if (struct !== drawing) groups = [];
-  drawing = struct;
+  if (struct !== drawing) {
+    if (drawing) others.set(drawing, groups);
+    groups = others.get(struct) ?? (drawing ? carried(groups, drawingOf(drawing), drawingOf(struct)) : []);
+    drawing = struct;
+  }
   persist(groups, struct);
   set({ offer: offer(groups, editor.selection() ?? {}, canvasOf(struct)) });
 }
 
+/** A double-click on an atom or bond of a group: select only it first (see the top). */
+function editOne(event: Event): void {
+  const target = event.target as Node | null;
+  if (!editor || !target || !editor.render.clientArea.contains(target)) return;
+  const item = editor.findItem(event as MouseEvent, ['atoms', 'bonds']);
+  if (!item || (item.map !== 'atoms' && item.map !== 'bonds')) return;
+  const one = { [item.map]: [item.id] };
+  if (!widened(groups, one, canvasOf(editor.struct()))) return; // not in a group
+  quiet = true;
+  try {
+    editor.selection(one);
+  } finally {
+    quiet = false;
+  }
+}
+
 /** Restore the saved groups onto the restored drawing, then keep them: call once the
- * autosave has put the drawing back. `storage` is a getter, as for the autosave. */
-export function startGroups(ketcher: Ketcher, storage: () => Storage, key: string): void {
+ * autosave has put the drawing back. `storage` is a getter, as for the autosave; `events` is
+ * where double-clicks are heard first (the window, capturing). */
+export function startGroups(ketcher: Ketcher, storage: () => Storage, key: string, events: EventTarget): void {
   editor = ketcher.editor as unknown as Editor;
   drawing = editor.struct();
+  others = new WeakMap();
   persist = (current, struct) => {
     try {
       // Nothing is kept while there are no groups (Practice, for one, stores nothing).
@@ -151,6 +187,7 @@ export function startGroups(ketcher: Ketcher, storage: () => Storage, key: strin
     if (payload.visible !== undefined) set({ anchored: payload.visible });
   });
   ketcher.changeEvent.add(drawingChanged);
+  events.addEventListener('dblclick', editOne, true);
   // Ketcher puts back the selection saved with the drawing: widen it, and offer the button.
   selectionChanged();
 }
@@ -164,6 +201,8 @@ export function groupSelection(): void {
   groups = next;
   persist(groups, editor.struct());
   editor.selection(selectionOf(groups[groups.length - 1], canvas));
+  // Ketcher redraws its rotate frame (and floating tools) only for its own selections.
+  editor.rotateController?.rerender();
 }
 
 /** The button's Ungroup: every group the selection touches ends; the selection stays. */

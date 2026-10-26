@@ -63,7 +63,7 @@ function onInit(ketcher: Ketcher) {
   const key = autosaveKey(import.meta.env.BASE_URL);
   void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus).then(() => {
     // The groups beside the restored drawing (docs/plans/v2-grouping.md).
-    startGroups(ketcher, () => window.localStorage, groupsKey(import.meta.env.BASE_URL));
+    startGroups(ketcher, () => window.localStorage, groupsKey(import.meta.env.BASE_URL), window);
     setKetcher(ketcher);
     window.dispatchEvent(new Event('editor-ready'));
   });

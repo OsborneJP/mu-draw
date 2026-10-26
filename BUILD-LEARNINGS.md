@@ -1255,3 +1255,11 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   (getBBox() gives undefined) and stops after moving the text, with or without groups
   (Ctrl+A, no groups: same); without a text it turns. Its handle is
   `data-testid="rotation-handle"`, 40 px below the floating tools.
+- Ketcher replaces `editor.struct()` with a new object (a CanvasLoad, with a change event) for
+  Open, Clear Canvas, setMolecule, addFragment without a position, Settings (a clone, then
+  centred) and every Indigo transform (Aromatize, Dearomatize, CIP, explicit H, Clean Up,
+  Layout: a new struct from Indigo's KET, rescaled but for Aromatize and Dearomatize; Layout
+  also centred; then Ketcher selects what Indigo marked selected). Undo and Redo put
+  the very same earlier object back. Paste and the paste tool (Add, Templates) keep it.
+  Ketcher's double-click edits every selected atom; `editor.rotateController.rerender()`
+  redraws the rotate frame, which `editor.selection(...)` alone does only for 'all'.

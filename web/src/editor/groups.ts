@@ -133,11 +133,12 @@ export function offer(groups: Group[], selection: Selection, canvas: Canvas): 'g
 }
 
 /** The groups with the selection grouped: one flat group of everything it holds and every
- * group it touches. Unchanged for fewer than two items. */
+ * group it touches (a group doing nothing, too: it ends, so no item is in two groups).
+ * Unchanged for fewer than two items. */
 export function grouped(groups: Group[], selection: Selection, canvas: Canvas): Group[] {
   const of = molecules(canvas);
   const items = selected(selection, canvas, of);
-  const touched = live(groups, canvas, of).filter((g) => touches(g, items, canvas, of));
+  const touched = groups.filter((g) => touches(g, items, canvas, of));
   const all = selected(touched.reduce((s, g) => union(s, selectionOf(g, canvas, of)), selection), canvas, of);
   if (count(all) < 2) return groups;
   const group: Group = {
@@ -243,18 +244,22 @@ const NEAR = 1e-3;
  * two items found is dropped. Anything unreadable gives no groups. */
 export function restored(kept: unknown, canvas: Canvas, where: Where): Group[] {
   if (!isSaved(kept)) return [];
+  return pruned(located(kept, canvas, where).map((l) => l.group), canvas);
+}
+
+/** Each saved group as found on the canvas, and whether every item of it was found. */
+function located(kept: SavedGroups, canvas: Canvas, where: Where): { group: Group; whole: boolean }[] {
   const now = frameOf(canvas, where);
   const was = kept.frame;
   const scale = was.bond && now.bond ? now.bond / was.bond : 1;
-  const shift =
-    was.centre && now.centre
-      ? { x: now.centre.x - scale * was.centre.x, y: now.centre.y - scale * was.centre.y }
-      : was.imageCentre && now.imageCentre
-        ? { x: now.imageCentre.x - was.imageCentre.x, y: now.imageCentre.y - was.imageCentre.y }
-        : { x: 0, y: 0 };
+  const imageShift = was.imageCentre && now.imageCentre ? { x: now.imageCentre.x - was.imageCentre.x, y: now.imageCentre.y - was.imageCentre.y } : null;
+  const shift = was.centre && now.centre ? { x: now.centre.x - scale * was.centre.x, y: now.centre.y - scale * was.centre.y } : (imageShift ?? { x: 0, y: 0 });
   const moved = (kind: 'atoms' | ObjectKind, p: Point): Point => {
-    const s = kind === 'images' ? 1 : scale;
-    return { x: s * p.x + shift.x, y: s * p.y + shift.y };
+    if (kind === 'images') {
+      const by = imageShift ?? shift;
+      return { x: p.x + by.x, y: p.y + by.y };
+    }
+    return { x: scale * p.x + shift.x, y: scale * p.y + shift.y };
   };
   const find = (kind: 'atoms' | ObjectKind, at: Point): number[] => {
     const target = moved(kind, at);
@@ -266,12 +271,35 @@ export function restored(kept: unknown, canvas: Canvas, where: Where): Group[] {
     }
     return best ? [best.id] : [];
   };
-  const found = kept.groups.map((s) => {
-    const group: Group = { atoms: s.molecules.flatMap((at) => find('atoms', at)), objects: noObjects() };
-    for (const { kind, at } of s.objects) group.objects[kind].push(...find(kind, at));
-    return group;
+  const of = molecules(canvas);
+  return kept.groups.map((s) => {
+    // Every atom of each molecule found, as Group makes it.
+    const atoms = s.molecules.flatMap((at) => find('atoms', at));
+    const named = new Set(atoms.map((a) => of.get(a)));
+    const group: Group = { atoms: canvas.atoms.filter((a) => named.has(of.get(a))), objects: noObjects() };
+    let objects = 0;
+    for (const { kind, at } of s.objects) {
+      const ids = find(kind, at);
+      group.objects[kind].push(...ids);
+      objects += ids.length;
+    }
+    return { group, whole: atoms.length === s.molecules.length && objects === s.objects.length };
   });
-  return pruned(found, canvas);
+}
+
+/** A drawing as carrying groups needs it: its items and where they are. */
+export interface Drawing {
+  canvas: Canvas;
+  where: Where;
+}
+
+/** The groups of one drawing found on another that Ketcher made from it in one step: an edit
+ * that scales or moves the whole drawing (Aromatize, Calculate CIP, Settings) keeps them, as a
+ * relaunch does. A group not found whole ends: after a drawing put in its place (Open, Clear
+ * Canvas, Replace), or an edit that moves its items apart (Clean Up or Layout may). */
+export function carried(groups: Group[], from: Drawing, to: Drawing): Group[] {
+  const kept = saved(groups, from.canvas, from.where);
+  return pruned(located(kept, to.canvas, to.where).flatMap((l) => (l.whole ? [l.group] : [])), to.canvas);
 }
 
 const isPoint = (p: unknown): p is Point =>
