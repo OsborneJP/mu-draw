@@ -30,5 +30,7 @@ known-first-party = [
   "opsin",
   "fetch_reference_smiles",
   "gen_reference_expected",
+  "gen_templates",
+  "test_reference_fixtures",
   "render_server_config",
 ]

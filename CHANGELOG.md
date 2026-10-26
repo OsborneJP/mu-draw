@@ -102,6 +102,18 @@ All notable changes to this project. The format follows
   faculty-checked table, ir-bands.json (CC BY-SA 4.0), credited under the hints; bands
   still to be checked against a reference text are not shown, and their group says so.
   Works offline. An entry of the table the app can't use is named and skipped.
+- Templates (header): conformation and projection templates to drop onto the canvas. A click
+  on one puts it in hand, as Add does: it follows the mouse until a click places it, Esc
+  puts it away, and one Undo removes it. Works offline. The templates: the cyclohexane chair
+  with all 12 hydrogens, axial and equatorial, and the same chair ring-flipped; Newman
+  projections, staggered and eclipsed, drawn as pictures with six "H" labels to edit (the
+  properties panel leaves them out); Fischer projections with 1, 2 and 4 stereocenters to
+  fill in, and D-glucose. A Fischer cross's horizontal bonds are wedges toward the viewer,
+  which is what the cross means, so Get name and the stereocenter count read the right
+  stereoisomer; Haworth projections of a pyranose and a furanose ring to fill in, and of
+  α- and β-D-glucopyranose. No drawing of a Haworth projection carries stereo the app can
+  read, so they have plain bonds (no thick front edge) and the app shows their
+  stereocenters as undefined rather than as a wrong stereoisomer.
 
 ### Changed
 - Save and Open no longer show the raw text of the file. Save asks only for the file name
@@ -130,6 +142,10 @@ All notable changes to this project. The format follows
 - The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds
   stereogenic only through the stereocentres beside them, so its stereogenic double bonds
   and "Stereoisomers, at most" were too low.
+- Ketcher's Structure Library no longer offers its "Sugars" group: its Haworth drawings of
+  eight α-D-hexopyranoses were misread (α-D-glucopyranose came out with 2 of its 5
+  stereocenters undefined and one inverted). The same sugars are still in "α-D-Sugars",
+  drawn so they read correctly, and the Templates menu has Haworth projections.
 - Ketcher's image previews and exports could hang when two were made at once; they now
   take turns.
 - Get name could wait forever if Ketcher was converting another drawing at the same moment

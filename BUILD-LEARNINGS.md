@@ -1105,3 +1105,55 @@ Acceptance bar: docs/plans/v2-ir-hints.md.
 - **Guards checked by breaking them.** Removing the verify filter failed both browser verify
   tests and the unit tests. Removing the de-duplication, the also_show rule, the shared
   entry, the regions' span check or the credit's filter each failed a unit test.
+
+## Conformation and projection templates (v2, 2026-10-25)
+
+Acceptance bar and measurements: docs/plans/v2-templates.md.
+- Ketcher's Structure Library ships inside ketcher-react's bundle. An app can add templates
+  only through localStorage `ketcher-tmpls`, and Ketcher shows those as "User Templates",
+  which students can edit or delete. So the templates have their own menu and are placed
+  with the paste tool, which also carries shapes and text (one Undo removes all of it).
+- RDKit's real chair (MMFF) is not the textbook drawing: its axial C-H bonds are up to 3°
+  off the ring axis in projection, and its equatorial C-H bonds are 4° off the ring bonds
+  one removed (9° once projected). The template keeps RDKit's ring and puts each hydrogen in
+  the textbook direction; tests/test_templates.py checks the real chair is within 5° of it.
+- In a true projection, the axial bonds of the two inner carbons always cross the opposite
+  ring edge (at every tilt from 18° to 35°). The template keeps the real geometry.
+- `Chem.RemoveHs(m).GetRingInfo()` raised MemoryError: the ring info of a temporary
+  molecule. Assign the molecule first.
+- ketcher-react's `StructRender` caches pictures by structure name; unnamed structures share
+  one entry, so the menu passes `needCache: false`. Its SVG's text (Raphaël's credit, atom
+  labels) became each menu button's accessible name; the picture is `aria-hidden`.
+- Ketcher's bottom toolbar already uses `data-testid` `template-0`..`template-7` and
+  `template-lib`; the menu's items are `template-item-<id>`.
+- A Newman projection can't be one molecule in Ketcher (both carbons at one point), so it
+  is lines, a circle and text. Ketcher's paste tool holds a drawing without atoms by its
+  first shape's `center()`, which for an ellipse is a corner of its box: the Newman sat off
+  the mouse until a front bond, which starts at the centre, became its first shape.
+- Ketcher 3.18 writes text as KET 2.0 (`boundingBox` and `paragraphs`) and still reads the
+  older Draft.js `content`. A one-letter label at the default size measures 0.235 × 0.375
+  bond lengths. With eclipsed back bonds 15° off the front ones, the labels of a pair
+  overlapped; at 20° they don't.
+- Indigo's SVG strokes shapes as `<path fill="none">` (a circle with curves, a line with
+  straight segments) and draws each letter as one `<use>` glyph, so a test can count them.
+- Fischer projections: with plain crosses RDKit reads every centre as undefined. With the
+  horizontal bonds wedged, exactly one of the 16 ways to put D-glucose's OH groups left or
+  right reads as PubChem's aldehydo-D-glucose, so the generator searches for it instead of
+  typing the layout. A template in KET with no stereo label loads as absolute stereo
+  (Indigo's InChIKey matches PubChem's); the same drawing as a Molfile with chiral flag 0
+  loaded as "AND Enantiomer".
+- Ketcher labels a lone bond end "CH3", so the Fischer skeletons show CH3 at each end until
+  the student relabels it.
+- Haworth projections: up or down comes from RDKit's 3D model of the PubChem sugar (the
+  side of the ring plane from which O, C1, C2 run clockwise is up). The test rebuilds the
+  drawing as a 3D model and compares RDKit's stereo with PubChem's. With each carbon's up
+  and down groups exactly collinear, `AssignStereochemistryFrom3D` assigned nothing (a zero
+  chiral volume from the first three neighbours, measured on CHFClBr too); the rebuild
+  splays them outward a little, as real ones are.
+- On a regular flattened hexagon, a back carbon's group pointing down and a front carbon's
+  pointing up share one vertical line inside the ring and their labels collide. The ring is
+  drawn in perspective (back edge narrower) and bonds into the ring are shorter.
+- Ketcher's Structure Library gives each group's summary row `data-testid="<group>-accordion-item"`
+  (the raw group name: "alpha-D-Sugars", shown as "α-D-Sugars"), a direct child of MUI's
+  `MuiAccordion-root`, so `:has(> [data-testid='Sugars-accordion-item'])` hides one whole
+  group, also when a search lists it. Its "Sugars" Haworths are hidden that way.

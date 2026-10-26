@@ -29,6 +29,16 @@
   display: none !important;
 }
 
+/* Ketcher's Structure Library: its "Sugars" group draws eight α-D-hexopyranoses as Haworth
+   projections, which RDKit and Indigo misread (its α-D-glucopyranose shows 2 of 5 centres
+   undefined and C2 inverted; docs/plans/v2-templates.md). Hidden (Jeff, 2026-10-25); the
+   same sugars stay in "α-D-Sugars", drawn so they read correctly, and the app's own
+   Templates menu has Haworths with plain bonds. The exact test id leaves "alpha-D-Sugars",
+   "beta-D-Sugars" and "D-Sugars" alone, and the rule holds when a search lists the group. */
+[class*='MuiAccordion-root']:has(> [data-testid='Sugars-accordion-item']) {
+  display: none !important;
+}
+
 /* Without the preview, Save's fixed 310px would be blank space; Open's one tile is centred. */
 [data-testid='save-dialog'] [class*='Save-module_formContainer'] {
   height: auto;

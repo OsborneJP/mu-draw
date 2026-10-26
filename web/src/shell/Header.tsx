@@ -4,6 +4,7 @@ import CopyImageButton from '../panels/CopyImageButton';
 import ExportDialog from '../panels/ExportDialog';
 import GetNameButton from '../panels/GetNameButton';
 import NameToStructure from '../panels/NameToStructure';
+import TemplatesMenu from '../panels/TemplatesMenu';
 import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
@@ -47,6 +48,7 @@ export default function Header() {
         <GetNameButton />
         <CopyImageButton />
         <ExportDialog />
+        <TemplatesMenu />
         <AboutBox title={TITLE} />
       </div>
     </header>

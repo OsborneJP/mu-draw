@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/alpha-D-glucopyranose/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-25T18:32:39Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 79025,
+          "SMILES": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O",
+          "Title": "Alpha-D-Glucose"
+        }
+      ]
+    }
+  }
+}

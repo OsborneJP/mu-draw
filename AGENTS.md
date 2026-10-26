@@ -59,21 +59,21 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
-  then in server/scripts: gen_reference_expected, record_pubchem_names, record_name_lookups.
+  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names, record_name_lookups.
   ¹³C table: in web/, `node scripts/build-carbon-table.ts <nmrshiftdb2withsignals.sd>` (plans/nmr).
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker, image queue, the
-  ready Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts (Add's paste tool).
+  ready Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts, templates.json.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
 - `web/src/panels/`: Export, Copy image, properties panel, Get name and Name to structure
-  (naming.ts; NamePanel floats), NMR preview and stereoisomers (nmr.ts/stereo.ts state, *Store.ts
-  wiring, panelWorker.ts their RDKit copy, Docked.tsx below the canvas, one open at a time).
-- `web/src/api.ts`: calls to `<base>api/*` (name, structure), with the 8 s deadline.
-- `web/src/pwa/`: service-worker registration (prompt mode) and the banner's Reload.
+  (naming.ts; NamePanel floats), Templates menu (templates.ts), NMR preview and stereoisomers
+  (nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy, Docked.tsx below
+  the canvas, one open at a time).
+- `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
 - `web/public/`: icons; functional-groups.json (editable patterns); nmr/ (¹³C table, licence).
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.

@@ -1,0 +1,8 @@
+# The structures inside the conformation and projection templates
+# (docs/plans/v2-templates.md). One name per line; scripts/fetch_reference_smiles.py asks
+# PubChem for each and writes template_compounds.csv, from which
+# server/scripts/gen_templates.py draws the templates. Nothing here is a value.
+cyclohexane
+aldehydo-D-glucose
+alpha-D-glucopyranose
+beta-D-glucopyranose

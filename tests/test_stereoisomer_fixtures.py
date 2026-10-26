@@ -11,6 +11,7 @@ import gen_stereoisomers_expected as gen
 import pytest
 from rdkit import Chem
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
+
 from test_reference_fixtures import locked_version
 
 JUDGED = gen.FIXTURES / "stereoisomers_judged.json"
