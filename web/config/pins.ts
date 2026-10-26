@@ -2,7 +2,9 @@
 // because ketcher-react and ketcher-standalone depend on it as "*". @rdkit/rdkit must also
 // match the server's rdkit release (tests/test_versions.py). lexical is the Text Editor's
 // engine inside ketcher-react; Formula text imports it too, and both must get the one copy
-// (one lockfile entry), or the app's transforms would not be the dialog's.
+// (one lockfile entry), or the app's transforms would not be the dialog's. indigo-ketcher
+// (the biochem worker's Indigo) must be the very release ketcher-standalone pins, so one
+// Indigo ships.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -15,6 +17,7 @@ export const PINNED: Record<string, string> = {
   'ketcher-core': '3.18.0',
   '@rdkit/rdkit': '2026.9.1',
   lexical: '0.40.0',
+  'indigo-ketcher': '1.46.0',
 };
 // The Ketcher packages must move together.
 export const SAME_VERSION = ['ketcher-react', 'ketcher-standalone', 'ketcher-core'] as const;
@@ -26,6 +29,8 @@ export interface PinInputs {
   lock: { packages: Record<string, { version?: string }> };
   /** Version found in node_modules/<name>/package.json, or undefined if not installed. */
   installed: Record<string, string | undefined>;
+  /** The indigo-ketcher version ketcher-standalone's own package.json depends on. */
+  ketcherIndigo?: string;
 }
 
 export function checkPins(inputs: PinInputs, pinned: Record<string, string> = PINNED): string[] {
@@ -58,6 +63,11 @@ export function checkPins(inputs: PinInputs, pinned: Record<string, string> = PI
   }
   const versions = new Set(SAME_VERSION.filter((n) => names.includes(n)).map((n) => deps[n]));
   if (versions.size > 1) errors.push(`Ketcher packages differ: ${[...versions].join(', ')}`);
+  if ('indigo-ketcher' in pinned && inputs.ketcherIndigo !== deps['indigo-ketcher']) {
+    errors.push(
+      `indigo-ketcher: package.json has ${deps['indigo-ketcher']}, but ketcher-standalone uses ${inputs.ketcherIndigo}`,
+    );
+  }
   return errors;
 }
 
@@ -74,5 +84,10 @@ export function readPinInputs(names: readonly string[] = Object.keys(PINNED)): P
       installed[name] = undefined;
     }
   }
-  return { packageJson: json('package.json'), lock: json('package-lock.json'), installed };
+  return {
+    packageJson: json('package.json'),
+    lock: json('package-lock.json'),
+    installed,
+    ketcherIndigo: json('node_modules/ketcher-standalone/package.json').dependencies?.['indigo-ketcher'],
+  };
 }

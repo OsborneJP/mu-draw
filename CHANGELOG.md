@@ -172,6 +172,17 @@ All notable changes to this project. The format follows
   only are "low confidence", a signal and the atoms carrying its H highlight each other, the
   banner and NMRShiftDB2's notice show on every prediction, and a change to the drawing
   clears it. It docks below the canvas with the other panels, one at a time.
+- Biochem tools (version 2, at the foot of the properties panel): "Peptide or nucleic acid"
+  takes a typed sequence (a peptide in one- or three-letter codes, DNA or RNA; up to 1000)
+  and shows the values Ketcher's macromolecules mode would, computed in the browser by the
+  same Indigo; that mode stays hidden. A peptide gets its formula and average mass, its net
+  charge at a pH the student sets and its isoelectric point (Bjellqvist's pKa values, as
+  ExPASy uses), ε280 with every Cys reduced and with every two Cys paired, and a
+  hydrophobicity bar for each residue (Black and Mould). DNA of 15 to 70 bases gets the
+  Tm of the strand paired with its complement, at a [Na⁺] and strand concentration the
+  student can change; RNA, and shorter or longer DNA, say why there is none. Works offline. Ketcher's
+  own "isoelectric point" (a median of pKa values) is not shown: it is far from the
+  standard answer.
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."

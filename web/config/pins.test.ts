@@ -61,7 +61,27 @@ describe('pin check', () => {
 
   it('covers every pinned engine', () => {
     expect(Object.keys(PINNED)).toEqual(
-      expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit', 'lexical']),
+      expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit', 'lexical', 'indigo-ketcher']),
+    );
+  });
+
+  // The biochem worker's Indigo and Ketcher's must be one release, so one wasm ships.
+  const WITH_INDIGO = { ...KETCHER, 'indigo-ketcher': '1.46.0' };
+  function withIndigo(ketcherUses: string | undefined, ours = '1.46.0'): PinInputs {
+    const base = inputs();
+    base.packageJson.dependencies!['indigo-ketcher'] = ours;
+    base.lock.packages['node_modules/indigo-ketcher'] = { version: ours };
+    base.installed['indigo-ketcher'] = ours;
+    return { ...base, ketcherIndigo: ketcherUses };
+  }
+
+  it('passes when indigo-ketcher is the release ketcher-standalone uses', () => {
+    expect(checkPins(withIndigo('1.46.0'), WITH_INDIGO)).toEqual([]);
+  });
+
+  it('rejects an indigo-ketcher that differs from ketcher-standalone\'s', () => {
+    expect(checkPins(withIndigo('1.47.0'), WITH_INDIGO)).toContain(
+      'indigo-ketcher: package.json has 1.46.0, but ketcher-standalone uses 1.47.0',
     );
   });
 

@@ -1,0 +1,35 @@
+{
+  "_about": "Inputs for the biochem generators (docs/plans/v2-biochem.md, decision 11): sequences and test conditions only. Every value expected of them is generated: server/scripts/gen_biochem_expected.py (Biopython) and web/scripts/gen-biochem-indigo.ts (Indigo). The generators add every residue alone, at the N-terminus (XG) and at the C-terminus (GX). DNA sequences are also tested as RNA (T read as U).",
+  "peptides": [
+    { "name": "all twenty", "sequence": "ACDEFGHIKLMNPQRSTVWY" },
+    { "name": "two Cys", "sequence": "CC" },
+    { "name": "three Cys", "sequence": "CCC" },
+    { "name": "Trp, Cys, Tyr, Cys", "sequence": "WCYC" },
+    { "name": "Asp x10", "repeat": "D", "times": 10 },
+    { "name": "Arg x10", "repeat": "R", "times": 10 },
+    { "name": "Gly x10", "repeat": "G", "times": 10 },
+    { "name": "YGGFL", "sequence": "YGGFL" },
+    { "name": "RPPGFSPFR", "sequence": "RPPGFSPFR" },
+    { "name": "DRVYIHPF", "sequence": "DRVYIHPF" },
+    { "name": "CYIQNCPLG", "sequence": "CYIQNCPLG" },
+    { "name": "29 residues", "sequence": "HSQGTFTSDYSKYLDSRRAQDFVQWLMNT" },
+    { "name": "1000 residues (the limit)", "repeat": "ACDEFGHIKLMNPQRSTVWY", "times": 50 }
+  ],
+  "nucleic": [
+    { "name": "14 bases (no Tm)", "sequence": "ACGTTGCAAGGCTT" },
+    { "name": "15 bases (the shortest with a Tm)", "sequence": "ACGTTGCAAGGCTTA" },
+    { "name": "GC-rich 16", "sequence": "GCGGCCGCGGCGCCGC" },
+    { "name": "AT-rich 16", "sequence": "ATTAAATATTTAATAT" },
+    { "name": "mixed 16", "sequence": "ACGTTGCAAGGCTTAA" },
+    { "name": "20 bases", "sequence": "AGCTTAGCCGATCGGATCCA" },
+    { "name": "70 bases (the longest with a Tm)", "repeat": "ACGTTGCAAG", "times": 7 },
+    { "name": "71 bases (no Tm)", "sequence": "ACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGC" },
+    { "name": "100 bases", "repeat": "ACGTTGCAAGGCTTAAGCCG", "times": 5 },
+    { "name": "1000 bases (the limit)", "repeat": "ACGTTGCAAGGCTTAAGCCG", "times": 50 }
+  ],
+  "_concentrations": "For Tm: [Na+] in mM and strand concentration in uM. The first pair is Ketcher's own default (ketcher-react 3.18's initial state), which the app also starts with.",
+  "concentrations": [
+    { "sodium_mM": 140, "strand_uM": 200 },
+    { "sodium_mM": 50, "strand_uM": 0.5 }
+  ]
+}

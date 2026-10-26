@@ -600,4 +600,51 @@ export function holdableIndigoReplies() {
   };
 }
 
+/** An init script (context.addInitScript): the biochem worker's replies reach the app only
+ * while not held, and its requests are counted. window.__holdBiochem(),
+ * window.__releaseBiochem(), window.__heldBiochem() counts the replies held now, and
+ * window.__biochemRequests() the requests (not the library) posted to it so far, and
+ * window.__biochemWorkers() how many biochem workers have started. */
+export function holdableBiochemReplies() {
+  const RealWorker = window.Worker;
+  let holding = false;
+  let requests = 0;
+  let started = 0;
+  const held: MessageEvent[] = [];
+  let release = () => {};
+  Object.assign(window, {
+    __holdBiochem: () => (holding = true),
+    __releaseBiochem: () => {
+      holding = false;
+      release();
+    },
+    __heldBiochem: () => held.length,
+    __biochemRequests: () => requests,
+    __biochemWorkers: () => started,
+  });
+  window.Worker = class extends RealWorker {
+    constructor(url: string | URL, options?: WorkerOptions) {
+      super(url, options);
+      if (options?.name !== 'biochem') return;
+      started += 1;
+      let appHandler: ((event: MessageEvent) => void) | null = null;
+      // The app sets worker.onmessage after construction; deliver through this filter.
+      RealWorker.prototype.addEventListener.call(this, 'message', (event: Event) => {
+        if (holding) held.push(event as MessageEvent);
+        else appHandler?.(event as MessageEvent);
+      });
+      Object.defineProperty(this, 'onmessage', {
+        get: () => appHandler,
+        set: (handler: ((event: MessageEvent) => void) | null) => (appHandler = handler),
+      });
+      const post = RealWorker.prototype.postMessage;
+      this.postMessage = (message: { kind?: string }, ...rest: never[]) => {
+        if (message?.kind === 'compute') requests += 1;
+        post.call(this, message, ...rest);
+      };
+      release = () => held.splice(0).forEach((event) => appHandler?.(event));
+    }
+  };
+}
+
 export { expect };
