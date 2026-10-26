@@ -4,8 +4,9 @@
     python scripts/fetch_reference_smiles.py --missing  # network: record only new names
     python scripts/fetch_reference_smiles.py --offline  # rebuild CSVs from the recordings
 
-Each name in a names file (SETS: the reference compounds, the functional-group, NMR and
-stereoisomer test sets, and the structures in the drawing templates) is looked up with PUG
+Each name in a names file (SETS: the reference compounds, the functional-group, NMR,
+stereoisomer, tautomer and resonance test sets, and the structures in the drawing
+templates) is looked up with PUG
 REST and the raw response is saved under tests/fixtures/recorded/pubchem/ (one recording per
 name, shared by the sets). Each CSV is always built from those recordings by parse() and
 write_csv(), which is what the replay test checks, so the CSVs' SMILES provably came from
@@ -38,6 +39,10 @@ STEREO_NAMES_FILE = FIXTURES / "stereoisomer_names.txt"
 STEREO_CSV_FILE = FIXTURES / "stereoisomer_compounds.csv"
 TEMPLATE_NAMES_FILE = FIXTURES / "template_names.txt"
 TEMPLATE_CSV_FILE = FIXTURES / "template_compounds.csv"
+TAUTOMER_NAMES_FILE = FIXTURES / "tautomer_names.txt"
+TAUTOMER_CSV_FILE = FIXTURES / "tautomer_compounds.csv"
+RESONANCE_NAMES_FILE = FIXTURES / "resonance_names.txt"
+RESONANCE_CSV_FILE = FIXTURES / "resonance_compounds.csv"
 # (names file, CSV built from its recordings)
 SETS = (
     (NAMES_FILE, CSV_FILE),
@@ -45,6 +50,8 @@ SETS = (
     (NMR_NAMES_FILE, NMR_CSV_FILE),
     (STEREO_NAMES_FILE, STEREO_CSV_FILE),
     (TEMPLATE_NAMES_FILE, TEMPLATE_CSV_FILE),
+    (TAUTOMER_NAMES_FILE, TAUTOMER_CSV_FILE),
+    (RESONANCE_NAMES_FILE, RESONANCE_CSV_FILE),
 )
 PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 # Current PubChem names: SMILES includes stereo. Never IsomericSMILES/CanonicalSMILES.

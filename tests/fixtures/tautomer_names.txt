@@ -1,0 +1,48 @@
+# Test compounds for the tautomer enumerator (docs/plans/v2-tautomers-resonance.md,
+# decision 9, approved by Jeff 2026-10-26). One PubChem name per line; their SMILES come
+# from PubChem through scripts/fetch_reference_smiles.py, never typed.
+acetone
+2-butanone
+cyclohexanone
+acetylacetone
+ethyl acetoacetate
+dimedone
+phenylpyruvic acid
+phenol
+2-pyridone
+acetamide
+thioacetamide
+(Z)-acetaldehyde oxime
+nitrosobenzene
+4-nitrosophenol
+N-methylethanimine
+nitromethane
+imidazole
+1,2,4-triazole
+tetrazole
+guanine
+cytosine
+uracil
+thymine
+adenine
+barbituric acid
+creatinine
+allopurinol
+warfarin
+histidine
+testosterone
+aldehydo-D-glucose
+curcumin
+ethanol
+# Small molecules for RDKit's rarer rules, which RDKit's NCI set never needs: HCN/HNC,
+# cyanic/isocyanic acid, ketene/ynol, the formamidinesulfinic acid and phosphite rules.
+hydrogen cyanide
+cyanic acid
+ketene
+thiourea dioxide
+dimethyl phosphite
+# The same, drawn as their other forms, for the rules back.
+ethynol
+isocyanic acid
+hydrogen isocyanide
+nitrosoethane

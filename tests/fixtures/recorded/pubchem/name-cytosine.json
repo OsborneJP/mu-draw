@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/cytosine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:07Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 597,
+          "SMILES": "C1=C(NC(=O)N=C1)N",
+          "Title": "Cytosine"
+        }
+      ]
+    }
+  }
+}

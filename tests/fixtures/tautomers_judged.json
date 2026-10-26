@@ -1,0 +1,306 @@
+{
+ "status": "provisional",
+ "chosen_by": "Claude, 2026-10-26, for Jeff to check (docs/plans/v2-tautomers-resonance.md, bar A.3)",
+ "how": "Written by reading each structure against RDKit's 37 rules. Most were seen in the planning probes before this was written, so it is a review of RDKit's lists, not a blind prediction. For each compound: what the panel lists ('listed', or 'too-many' beyond 32), how many tautomers RDKit gives, and whether the drawing's stereo is lost. A test compares the generated tests/fixtures/tautomers_expected.json with this file.",
+ "compounds": [
+  {
+   "name": "acetone",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "the ketone and its enol"
+  },
+  {
+   "name": "2-butanone",
+   "outcome": "listed",
+   "count": 3,
+   "stereo_dropped": false,
+   "why": "the ketone and its enols toward either side (RDKit leaves the internal enol's E/Z open)"
+  },
+  {
+   "name": "cyclohexanone",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "the ketone and its enol"
+  },
+  {
+   "name": "acetylacetone",
+   "outcome": "listed",
+   "count": 5,
+   "stereo_dropped": false,
+   "why": "the diketone, the enol toward the CH2 (the familiar one) and toward a CH3, and two dienols"
+  },
+  {
+   "name": "ethyl acetoacetate",
+   "outcome": "listed",
+   "count": 5,
+   "stereo_dropped": false,
+   "why": "the keto ester, the ketone's enols toward each side, the ester's enol (a ketene acetal) and a dienol"
+  },
+  {
+   "name": "dimedone",
+   "outcome": "listed",
+   "count": 5,
+   "stereo_dropped": false,
+   "why": "as cyclohexane-1,3-dione: the dione, the enols toward C2 and toward C4, and two dienols"
+  },
+  {
+   "name": "phenylpyruvic acid",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "the keto acid and its enol toward the benzylic CH2"
+  },
+  {
+   "name": "phenol",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "phenol and cyclohexa-2,4-dienone: RDKit's 1,3 rule moves the H to an ortho carbon only"
+  },
+  {
+   "name": "2-pyridone",
+   "outcome": "listed",
+   "count": 3,
+   "stereo_dropped": false,
+   "why": "2-pyridone, 2-hydroxypyridine, and the 3H-pyridin-2-one with the H on carbon"
+  },
+  {
+   "name": "acetamide",
+   "outcome": "listed",
+   "count": 3,
+   "stereo_dropped": false,
+   "why": "the amide, the imidic acid, and the enol of the amide"
+  },
+  {
+   "name": "thioacetamide",
+   "outcome": "listed",
+   "count": 3,
+   "stereo_dropped": false,
+   "why": "as acetamide, with S"
+  },
+  {
+   "name": "(Z)-acetaldehyde oxime",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": true,
+   "why": "the oxime and nitrosoethane; the C=N's Z is lost, as the H moves through it"
+  },
+  {
+   "name": "nitrosobenzene",
+   "outcome": "listed",
+   "count": 1,
+   "stereo_dropped": false,
+   "why": "no H to move: RDKit's oxime rule needs an sp3 C-H beside the N"
+  },
+  {
+   "name": "4-nitrosophenol",
+   "outcome": "listed",
+   "count": 4,
+   "stereo_dropped": false,
+   "why": "the nitrosophenol, the quinone monoxime, and two dienones from the phenol's keto shift"
+  },
+  {
+   "name": "N-methylethanimine",
+   "outcome": "listed",
+   "count": 1,
+   "stereo_dropped": false,
+   "why": "RDKit's imine rules need N-H or N-aryl, so no enamine for an N-alkyl imine"
+  },
+  {
+   "name": "nitromethane",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "nitromethane and its aci-nitro form"
+  },
+  {
+   "name": "imidazole",
+   "outcome": "listed",
+   "count": 1,
+   "stereo_dropped": false,
+   "why": "its two N-H tautomers are one compound"
+  },
+  {
+   "name": "1,2,4-triazole",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "1H and 4H (2H is 1H again)"
+  },
+  {
+   "name": "tetrazole",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "1H and 2H"
+  },
+  {
+   "name": "guanine",
+   "outcome": "listed",
+   "count": 15,
+   "stereo_dropped": false,
+   "why": "the keto-amino form and RDKit's enols, imines and N-H shifts across both rings"
+  },
+  {
+   "name": "cytosine",
+   "outcome": "listed",
+   "count": 6,
+   "stereo_dropped": false,
+   "why": "amino/imino with keto/enol and the ring N-H positions"
+  },
+  {
+   "name": "uracil",
+   "outcome": "listed",
+   "count": 9,
+   "stereo_dropped": false,
+   "why": "the diketo form, mono- and di-enols with their ring N-H positions, and two C-H forms"
+  },
+  {
+   "name": "thymine",
+   "outcome": "listed",
+   "count": 9,
+   "stereo_dropped": false,
+   "why": "as uracil, with the methyl"
+  },
+  {
+   "name": "adenine",
+   "outcome": "listed",
+   "count": 8,
+   "stereo_dropped": false,
+   "why": "the 9H and 7H amino forms, imino forms, and N-H shifts"
+  },
+  {
+   "name": "barbituric acid",
+   "outcome": "listed",
+   "count": 10,
+   "stereo_dropped": false,
+   "why": "the triketo form and its enols, including the aromatic trihydroxypyrimidine"
+  },
+  {
+   "name": "creatinine",
+   "outcome": "listed",
+   "count": 5,
+   "stereo_dropped": false,
+   "why": "the amino and imino forms, an enol, and two with the ring aromatic"
+  },
+  {
+   "name": "allopurinol",
+   "outcome": "listed",
+   "count": 9,
+   "stereo_dropped": false,
+   "why": "its keto/enol and N-H positions across the pyrazole and pyrimidine rings"
+  },
+  {
+   "name": "warfarin",
+   "outcome": "listed",
+   "count": 9,
+   "stereo_dropped": false,
+   "why": "the 4-hydroxycoumarin, its 2-hydroxychromone and diketo forms, each with the side-chain ketone or one of its enols"
+  },
+  {
+   "name": "histidine",
+   "outcome": "listed",
+   "count": 8,
+   "stereo_dropped": true,
+   "why": "the imidazole's two N-H forms, each with the acid, its enols and the imine; the alpha carbon's stereo is lost, as an H moves to and from it"
+  },
+  {
+   "name": "testosterone",
+   "outcome": "listed",
+   "count": 5,
+   "stereo_dropped": false,
+   "why": "the enone and its dienols toward C2 and C6, with the C=C moved; its stereocentres are not where an H moves"
+  },
+  {
+   "name": "aldehydo-D-glucose",
+   "outcome": "listed",
+   "count": 6,
+   "stereo_dropped": true,
+   "why": "the aldehyde, the enediols along the chain, and the 2- and 3-ketoses; every centre an H passes loses its stereo"
+  },
+  {
+   "name": "curcumin",
+   "outcome": "too-many",
+   "why": "51 tautomers in the planning probe: more than 32"
+  },
+  {
+   "name": "ethanol",
+   "outcome": "listed",
+   "count": 1,
+   "stereo_dropped": false,
+   "why": "nothing to move"
+  },
+  {
+   "name": "hydrogen cyanide",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "HCN and HNC (RDKit's isocyanide rule)"
+  },
+  {
+   "name": "cyanic acid",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "cyanic and isocyanic acid"
+  },
+  {
+   "name": "ketene",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "ketene and ethynol"
+  },
+  {
+   "name": "thiourea dioxide",
+   "outcome": "listed",
+   "count": 3,
+   "stereo_dropped": false,
+   "why": "the sulfinic acid, its S-H form, and the C=S(=O)=O form"
+  },
+  {
+   "name": "dimethyl phosphite",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "the P(=O)H phosphonate and the P-OH phosphite"
+  },
+  {
+   "name": "ethynol",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "as ketene, drawn the other way"
+  },
+  {
+   "name": "isocyanic acid",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "as cyanic acid, drawn the other way"
+  },
+  {
+   "name": "hydrogen isocyanide",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "as hydrogen cyanide, drawn the other way"
+  },
+  {
+   "name": "nitrosoethane",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "nitrosoethane and acetaldoxime"
+  },
+  {
+   "name": "thiourea dioxide, drawn as RDKit's tautomer with C=S",
+   "outcome": "listed",
+   "count": 3,
+   "stereo_dropped": false,
+   "why": "as thiourea dioxide, drawn the other way"
+  }
+ ]
+}

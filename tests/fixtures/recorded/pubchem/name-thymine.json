@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/thymine/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:59:09Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 1135,
+          "SMILES": "CC1=CNC(=O)NC1=O",
+          "Title": "Thymine"
+        }
+      ]
+    }
+  }
+}

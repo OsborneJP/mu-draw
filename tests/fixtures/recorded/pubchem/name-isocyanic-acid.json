@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/isocyanic%20acid/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T13:08:13Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 6347,
+          "SMILES": "C(=N)=O",
+          "Title": "Isocyanic acid"
+        }
+      ]
+    }
+  }
+}
