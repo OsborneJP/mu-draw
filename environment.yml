@@ -28,3 +28,6 @@ dependencies:
   - pytest-socket
   - ruff
   - pillow
+  # The biochem tools' pKa values (Bjellqvist) and reference values: build-time only,
+  # read by server/scripts/gen_biochem_expected.py and its tests, never by the API.
+  - biopython=1.88

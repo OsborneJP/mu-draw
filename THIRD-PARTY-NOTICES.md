@@ -18,5 +18,10 @@ own licences:
   12.1 (https://openstax.org/books/organic-chemistry/pages/12-7-interpreting-infrared-spectra),
   which is CC BY-NC-SA 4.0: values only, no text copied. The app shows this credit, in plain
   text, wherever it shows the hints.
+- web/src/chem/biochemData.json and tests/fixtures/biochem_peptides_expected.json: values
+  read from Biopython 1.88 (https://biopython.org; Biopython License Agreement, in the
+  package's LICENSE.rst) by server/scripts/gen_biochem_expected.py: the 20 standard amino
+  acids' codes, the base pairs, and Bjellqvist's pKa values (Electrophoresis 1993, 14,
+  1023-1031; 1994, 15, 529-539), with Biopython's answers for the test peptides.
 - tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
 - Packages installed by npm and conda are under their own licences.

@@ -22,18 +22,18 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
    (it put the drawing in the URL; web/src/editor/debugHotkeys.ts + online smoke test).
    Accounts and analytics: review only.
-3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, NMRShiftDB2 (¹³C
-   shifts), or the faculty-checked IR table web/public/ir-bands.json (every band cites its sources;
-   one marked "verify" is never shown): never from an LLM and never hand-typed into code or tests.
-   Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's header names
-   its SD file's SHA-256), web/src/chem/irBands.test.ts, and scripts/checks/chem_literals.py (no
-   Molfile/CDXML/InChI text in source). SMILES and numeric literals in source: review only.
+3. Chemistry values come only from RDKit, Ketcher/Indigo, OPSIN, PubChem, NMRShiftDB2 (¹³C),
+   Biopython (Bjellqvist pKa values) or the faculty-checked IR table web/public/ir-bands.json
+   (every band cites its sources; one marked "verify" is never shown): never from an LLM, never
+   hand-typed into code or tests. Enforced by: generated fixtures with drift tests (tests/fixtures/;
+   the ¹³C table's header names its SD file's SHA-256), web/src/chem/irBands.test.ts, and
+   scripts/checks/chem_literals.py (no Molfile/CDXML/InChI text). SMILES, numbers in source: review only.
 4. Everything except the naming endpoints works offline.
    Enforced by: the precache guard (web/scripts/checks/precache.ts, run by
    web/scripts/verify-dist.ts in every check.sh and deploy build, not by a bare
    `npm run build`) and the two "offline:" smoke tests.
-5. ketcher-react, ketcher-standalone, and @rdkit/rdkit are pinned to exact versions.
-   Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
+5. ketcher-react, ketcher-standalone, @rdkit/rdkit and indigo-ketcher (Ketcher's own release) are
+   pinned exactly. Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
 6. Build only "Version 1 features", the NMR proof of concept, and the "After v1" features
    Jeff has started, each with his approved plan in docs/plans/v2-*.md. Nothing else.
    Enforced by: review. Ketcher's 3D viewer, macromolecules mode, create-monomer and

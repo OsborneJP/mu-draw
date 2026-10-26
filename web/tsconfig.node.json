@@ -29,6 +29,8 @@
     "playwright.config.ts",
     "config",
     "e2e",
-    "scripts"
+    "scripts",
+    // Typings for indigo-ketcher and ketcher-core's monomer library (scripts/gen-biochem-indigo.ts).
+    "src/chem/biochemModules.d.ts"
   ]
 }

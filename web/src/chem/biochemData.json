@@ -1,0 +1,72 @@
+{
+  "_generated": "server/scripts/gen_biochem_expected.py from Biopython 1.88; do not edit",
+  "biopython": "1.88",
+  "residues": {
+    "A": "Ala",
+    "C": "Cys",
+    "D": "Asp",
+    "E": "Glu",
+    "F": "Phe",
+    "G": "Gly",
+    "H": "His",
+    "I": "Ile",
+    "K": "Lys",
+    "L": "Leu",
+    "M": "Met",
+    "N": "Asn",
+    "P": "Pro",
+    "Q": "Gln",
+    "R": "Arg",
+    "S": "Ser",
+    "T": "Thr",
+    "V": "Val",
+    "W": "Trp",
+    "Y": "Tyr"
+  },
+  "complement": {
+    "dna": {
+      "A": "T",
+      "C": "G",
+      "G": "C",
+      "T": "A"
+    },
+    "rna": {
+      "A": "U",
+      "C": "G",
+      "G": "C",
+      "U": "A"
+    }
+  },
+  "pKa": {
+    "citations": [
+      "Bjellqvist B, Hughes GJ, Pasquali Ch, Paquet N, Ravier F, Sanchez J-Ch, Frutiger S, Hochstrasser DF. The focusing positions of polypeptides in immobilized pH gradients can be predicted from their amino acid sequences. Electrophoresis 1993, 14, 1023-1031.",
+      "Bjellqvist B, Basse B, Olsen E, Celis JE. Reference points for comparisons of two-dimensional maps of proteins from different human cell types defined in a pH scale where isoelectric points correlate with polypeptide compositions. Electrophoresis 1994, 15, 529-539."
+    ],
+    "positive": {
+      "Nterm": 7.5,
+      "K": 10.0,
+      "R": 12.0,
+      "H": 5.98
+    },
+    "negative": {
+      "Cterm": 3.55,
+      "D": 4.05,
+      "E": 4.45,
+      "C": 9.0,
+      "Y": 10.0
+    },
+    "nTerminal": {
+      "A": 7.59,
+      "M": 7.0,
+      "S": 6.93,
+      "P": 8.36,
+      "T": 6.82,
+      "V": 7.44,
+      "E": 7.7
+    },
+    "cTerminal": {
+      "D": 4.55,
+      "E": 4.75
+    }
+  }
+}

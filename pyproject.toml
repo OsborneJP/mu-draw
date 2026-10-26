@@ -30,6 +30,7 @@ known-first-party = [
   "fakes",
   "opsin",
   "fetch_reference_smiles",
+  "gen_biochem_expected",
   "gen_reference_expected",
   "gen_templates",
   "test_reference_fixtures",
