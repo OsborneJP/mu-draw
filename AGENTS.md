@@ -64,8 +64,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
-- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker, image queue, the
-  ready Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts, templates.json.
+- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug-key blocker, image queue, ready
+  Ketcher (instance.ts), drawing.ts, stereoHighlight.ts, placeInHand.ts, templates.json, the ACS
+  default (acsStyle.ts; acsStart.ts: main.tsx's first import). `src/shell/`: header, About, banners.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
@@ -74,7 +75,6 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
   nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
 - `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
-- `web/src/shell/`: header, offline badge, About box, update banner.
 - `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`

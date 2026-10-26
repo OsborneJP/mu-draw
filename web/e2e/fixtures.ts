@@ -586,4 +586,44 @@ export function holdableIndigoReplies() {
   };
 }
 
+interface Ket {
+  root: { nodes: { $ref?: string }[] };
+  [name: string]: unknown;
+}
+
+/** Each atom's label and position relative to the drawing's lower-left corner, sorted.
+ * Ketcher moves the whole drawing without a change event (it centres a loaded drawing,
+ * and shifts everything when a drawing nears the canvas edge), so a saved copy can sit
+ * elsewhere on the canvas than the live drawing; Redo also renumbers atoms. Rounded,
+ * since loading rescales bonds to (almost exactly) the same length. */
+export function shape(text: string): string[] {
+  const parsed = JSON.parse(text) as Ket;
+  const atoms = parsed.root.nodes
+    .filter((node) => node.$ref)
+    .flatMap((node) => (parsed[node.$ref!] as { atoms: { label: string; location: number[] }[] }).atoms);
+  const x0 = Math.min(...atoms.map((a) => a.location[0]));
+  const y0 = Math.min(...atoms.map((a) => a.location[1]));
+  const round = (v: number) => (Math.abs(v) < 5e-5 ? 0 : v).toFixed(4);
+  return atoms.map((a) => `${a.label} ${round(a.location[0] - x0)} ${round(a.location[1] - y0)}`).sort();
+}
+
+/** The live drawing is the expected one: same structure (stereo included), and the same
+ * atoms in the same places relative to each other. */
+export async function expectDrawing(page: Page, expected: { inchikey: string; ket: string }) {
+  expect(await inchiKey(page)).toBe(expected.inchikey);
+  expect(shape(await ket(page))).toEqual(shape(expected.ket));
+}
+
+/** Steps Ketcher can undo and redo (not in its published types, but stable in 3.18). */
+export async function history(page: Page): Promise<{ undo: number; redo: number }> {
+  return page.evaluate(() =>
+    (window.ketcher!.editor as unknown as { historySize(): { undo: number; redo: number } }).historySize(),
+  );
+}
+
+/** Ketcher's display settings, as its settings service holds them. */
+export function ketcherSettings(page: Page): Promise<Record<string, unknown>> {
+  return page.evaluate(() => ({ ...window.ketcher!.settingsService!.getSettings() }));
+}
+
 export { expect };

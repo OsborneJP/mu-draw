@@ -123,6 +123,11 @@ All notable changes to this project. The format follows
   sent. The first list is a provisional CHEM-311 one.
 
 ### Changed
+- Drawings start in the ACS Document 1996 style, the one Ketcher's "Set ACS Settings" gives
+  and ChemDraw users know from journals: bonds 0.2 in long, thin lines, 10 pt Arial labels,
+  and every atom black. On screen, molecules are about half their old size at 100% zoom;
+  Ketcher's zoom makes them bigger. A browser that used the app before switches once, and a
+  student's own changes in Settings stay after that.
 - The IR hints' source and licence now sit behind a tick, "Source and licence (CC BY-SA
   4.0)", instead of taking several lines under every list of hints.
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening
