@@ -18,5 +18,11 @@ own licences:
   12.1 (https://openstax.org/books/organic-chemistry/pages/12-7-interpreting-infrared-spectra),
   which is CC BY-NC-SA 4.0: values only, no text copied. The app shows this credit, in plain
   text, wherever it shows the hints.
+- web/src/chem/tautomers.ts, resonance.ts and rdkitTables.json: ported from, and tables taken
+  from, the RDKit's C++ source (www.rdkit.org; release 2026.09.1: MolStandardize/Tautomer.cpp
+  and its tautomerTransforms.in, Resonance.cpp, ConjugHybrid.cpp, Aromaticity.cpp), under
+  RDKit's BSD 3-Clause licence (tests/fixtures/recorded/rdkit/license.txt, which
+  rdkitTables.json carries into the built app). The RDKit source files recorded in
+  tests/fixtures/recorded/rdkit/ are RDKit's own, under the same licence.
 - tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
 - Packages installed by npm and conda are under their own licences.

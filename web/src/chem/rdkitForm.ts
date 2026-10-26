@@ -1,0 +1,164 @@
+// A molecule as RDKit's JSON form holds it, for the ports of RDKit's tautomer enumerator and
+// resonance structure supplier (tautomers.ts, resonance.ts), which RDKit.js lacks: each reads
+// a drawing into this form, changes bond orders, H counts and charges in it, and has RDKit.js
+// read it back with only the sanitization steps RDKit itself runs at that point.
+// - RDKit writes a Kekulé form (Kekulize(mol, false): canonical, aromatic flags kept) with the
+//   aromatic atoms and bonds listed apart; read back with setAromaticBonds false and only the
+//   ring step, it is the form RDKit's enumerator matches its SMARTS against.
+// - A sanitize-flags object turns on only the steps it lists ({} throws), so steps are always
+//   named in full.
+// - Whole-number coordinates are refused by RDKit's JSON reader, so they are written by hand.
+import type { MainModule, Mol } from '@rdkit/rdkit';
+import tables from './rdkitTables.json';
+
+export interface FormAtom {
+  z: number;
+  /** Every H on the atom (RDKit's getTotalNumHs); read back as explicit, noImplicit. */
+  impHs: number;
+  chg: number;
+  nRad: number;
+  isotope: number;
+  stereo: string;
+}
+
+export interface FormBond {
+  atoms: [number, number];
+  /** 1, 2 or 3 (Kekulé). */
+  bo: number;
+  stereo: string;
+  stereoAtoms?: [number, number];
+}
+
+export interface Form {
+  atoms: FormAtom[];
+  bonds: FormBond[];
+  aromaticAtoms: number[];
+  aromaticBonds: number[];
+  atomRings: number[][];
+  coords: number[][] | null;
+}
+
+interface RawJson {
+  defaults: { atom: Partial<FormAtom>; bond: Partial<FormBond> };
+  molecules: {
+    atoms: Partial<FormAtom>[];
+    bonds?: Partial<FormBond>[];
+    conformers?: { dim: number; coords: number[][] }[];
+    extensions?: { name: string; aromaticAtoms?: number[]; aromaticBonds?: number[]; atomRings?: number[][] }[];
+  }[];
+}
+
+const ATOM_DEFAULTS: FormAtom = { z: 6, impHs: 0, chg: 0, nRad: 0, isotope: 0, stereo: 'unspecified' };
+const BOND_DEFAULTS = { bo: 1, stereo: 'unspecified' };
+
+export function formOf(mol: Mol): Form {
+  const json = JSON.parse(mol.get_json()) as RawJson;
+  const molecule = json.molecules[0];
+  const extension: Omit<NonNullable<RawJson['molecules'][0]['extensions']>[0], 'name'> =
+    molecule.extensions?.find((e) => e.name === 'rdkitRepresentation') ?? {};
+  return {
+    atoms: molecule.atoms.map((a) => ({ ...ATOM_DEFAULTS, ...json.defaults.atom, ...a }) as FormAtom),
+    bonds: (molecule.bonds ?? []).map((b) => ({ ...BOND_DEFAULTS, ...json.defaults.bond, ...b }) as FormBond),
+    aromaticAtoms: extension.aromaticAtoms ?? [],
+    aromaticBonds: extension.aromaticBonds ?? [],
+    atomRings: extension.atomRings ?? [],
+    coords: molecule.conformers?.[0]?.coords ?? null,
+  };
+}
+
+export function copyForm(form: Form): Form {
+  return structuredClone(form);
+}
+
+/** RDKit's JSON text of a form; with `aromatic`, its aromatic atoms and bonds are listed. */
+export function jsonOf(form: Form, { aromatic = true, coords = false } = {}): string {
+  const extension: Record<string, unknown> = { name: 'rdkitRepresentation', formatVersion: 2, toolkitVersion: tables.rdkit_version };
+  if (aromatic) {
+    extension.aromaticAtoms = form.aromaticAtoms;
+    extension.aromaticBonds = form.aromaticBonds;
+  }
+  if (form.atomRings.length > 0) extension.atomRings = form.atomRings;
+  const text = JSON.stringify({
+    rdkitjson: { version: 12 },
+    defaults: { atom: ATOM_DEFAULTS, bond: BOND_DEFAULTS },
+    molecules: [{ atoms: form.atoms, bonds: form.bonds, extensions: [extension] }],
+  });
+  if (!coords || !form.coords) return text;
+  const number = (v: number) => (Number.isInteger(v) ? v.toFixed(1) : String(v));
+  const written = `{"dim":2,"coords":[${form.coords.map((p) => `[${p.map(number).join(',')}]`).join(',')}]}`;
+  return text.replace(/\}\]\}$/, `,"conformers":[${written}]}]}`);
+}
+
+/** The sanitization steps by RDKit's names; only these run. */
+export type Step =
+  | 'SANITIZE_CLEANUP'
+  | 'SANITIZE_PROPERTIES'
+  | 'SANITIZE_SYMMRINGS'
+  | 'SANITIZE_KEKULIZE'
+  | 'SANITIZE_FINDRADICALS'
+  | 'SANITIZE_SETAROMATICITY'
+  | 'SANITIZE_SETCONJUGATION'
+  | 'SANITIZE_SETHYBRIDIZATION'
+  | 'SANITIZE_CLEANUPCHIRALITY'
+  | 'SANITIZE_ADJUSTHS';
+
+export interface ReadOptions {
+  steps: Step[];
+  /** Bonds listed aromatic become aromatic bonds; else they keep their Kekulé order and are
+   * only flagged aromatic. */
+  setAromaticBonds: boolean;
+  /** List the form's aromatic atoms and bonds (else it is read as plain Kekulé). */
+  aromatic: boolean;
+  assignStereo: boolean;
+  coords?: boolean;
+}
+
+/** Read a form into RDKit.js, run `work` on it, and free it. Null when RDKit refuses it. */
+export function withForm<T>(rdkit: MainModule, form: Form, options: ReadOptions, work: (mol: Mol) => T): T | null {
+  const details = {
+    setAromaticBonds: options.setAromaticBonds,
+    assignStereo: options.assignStereo,
+    sanitize: Object.fromEntries(options.steps.map((s) => [s, true])),
+  };
+  const mol = rdkit.get_mol(jsonOf(form, { aromatic: options.aromatic, coords: options.coords ?? false }), JSON.stringify(details));
+  if (!mol) return null;
+  try {
+    return work(mol);
+  } finally {
+    mol.delete();
+  }
+}
+
+/** The number of separate structures (connected pieces) in a form. */
+export function pieces(form: Form): number {
+  const parent = form.atoms.map((_, i) => i);
+  const root = (i: number): number => (parent[i] === i ? i : (parent[i] = root(parent[i])));
+  for (const { atoms: [a, b] } of form.bonds) parent[root(a)] = root(b);
+  return new Set(form.atoms.map((_, i) => root(i))).size;
+}
+
+/** Each atom's bonds, by bond index, in RDKit's order (the order the bonds were added). */
+export function atomBonds(form: Form): number[][] {
+  const out: number[][] = form.atoms.map(() => []);
+  form.bonds.forEach((b, i) => {
+    out[b.atoms[0]].push(i);
+    out[b.atoms[1]].push(i);
+  });
+  return out;
+}
+
+export function otherAtom(bond: FormBond, atom: number): number {
+  return bond.atoms[0] === atom ? bond.atoms[1] : bond.atoms[0];
+}
+
+/** The Molfile's chiral flag (its counts line), so a structure placed from the panel keeps
+ * the drawing's: Ketcher reads flag 0 as an AND (racemic) group. */
+export function chiralFlagOf(molfile: string): boolean {
+  return (molfile.split('\n')[3] ?? '').slice(12, 15).trim() === '1';
+}
+
+export function withChiralFlag(molfile: string, flag: boolean): string {
+  const lines = molfile.split('\n');
+  lines[3] = `${lines[3].slice(0, 12)}${flag ? '  1' : '  0'}${lines[3].slice(15)}`;
+  return lines.join('\n');
+}

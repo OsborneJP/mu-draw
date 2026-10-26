@@ -12,7 +12,8 @@ RDKit.js has neither. They need data RDKit keeps in its C++ source or its period
 The two source files are recorded once, at the release tag of the pinned RDKit, under
 tests/fixtures/recorded/rdkit/; web/src/chem/rdkitTables.json is always built from those
 recordings and the periodic table, which tests/test_rdkit_tables.py checks by rebuilding it,
-and by loading the transforms into Python's own enumerator.
+and by loading the transforms into Python's own enumerator. RDKit's licence is recorded too,
+and copied into the table, so it ships with the code ported from RDKit.
 """
 
 from __future__ import annotations
@@ -34,6 +35,8 @@ TAG = "Release_" + rdkit.__version__.replace(".", "_")
 SOURCES = {
     "tautomerTransforms.in": "Code/GraphMol/MolStandardize/TautomerCatalog/tautomerTransforms.in",
     "Resonance.cpp": "Code/GraphMol/Resonance.cpp",
+    # RDKit's BSD licence, which the ported code and these tables carry (THIRD-PARTY-NOTICES).
+    "license.txt": "license.txt",
 }
 RAW = "https://raw.githubusercontent.com/rdkit/rdkit"
 # The elements RDKit's periodic table holds (0, a dummy atom, to 118).
@@ -104,6 +107,8 @@ def build(directory: Path = RECORDINGS) -> str:
         "tautomer_transforms": transforms(texts["tautomerTransforms.in"]),
         "electronegativity": electronegativities(texts["Resonance.cpp"]),
         "elements": elements(),
+        # Shipped with the code ported from RDKit, as its BSD licence asks of a redistribution.
+        "rdkit_license": texts["license.txt"],
     }
     return json.dumps(data, indent=1) + "\n"
 
