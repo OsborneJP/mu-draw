@@ -73,7 +73,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
   preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
   nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
-- `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
+- `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, update checks, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
 - `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.

@@ -131,6 +131,9 @@ All notable changes to this project. The format follows
   Undo brings them back.
 
 ### Changed
+- An open app now finds a new version when the student comes back to it (from another tab
+  or window, or after closing the lid) or when the device comes back online, and shows the
+  update banner then, not only at the next launch. Nothing reloads until Reload is clicked.
 - The Text tool's editor now says, under its formatting buttons: "Highlight the text first:
   formatting applies to what is highlighted."
 - The IR hints' source and licence now sit behind a tick, "Source and licence (CC BY-SA
