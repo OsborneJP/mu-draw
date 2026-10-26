@@ -4,7 +4,8 @@
 // ../tests/fixtures/biochem_indigo_expected.json: for each peptide (and every residue alone, first
 // in XG and last in GX, as the Biopython generator has them)
 // Indigo's formula, mass, ε and hydrophobicity; for each nucleic acid, as DNA and as RNA, the
-// single strand's formula and mass, and the DNA duplex's Tm at each test concentration.
+// single strand's formula and mass, and, from 15 to 70 bases, the DNA duplex's Tm at each test
+// concentration.
 //
 // Independent of the app's code on purpose: each duplex is built here from two strands
 // converted apart and joined base to base by hydrogen-bond connections in KET, where the app
@@ -20,6 +21,7 @@ const path = (rel: string) => fileURLToPath(new URL(rel, import.meta.url));
 export const INPUTS = path('../../tests/fixtures/biochem_sequences.json');
 export const OUTPUT = path('../../tests/fixtures/biochem_indigo_expected.json');
 const TM_MIN_BASES = 15; // decision 8: the paper's shortest
+const TM_MAX_BASES = 70; // Jeff, 2026-10-26: the paper's window; Tm only where the app shows one
 
 interface Entry {
   name: string;
@@ -167,7 +169,7 @@ export async function generate(): Promise<string> {
       return { formula: p.grossFormula, mass: p.mass };
     };
     let tm: number[] | null = null;
-    if (dna.length >= TM_MIN_BASES) {
+    if (dna.length >= TM_MIN_BASES && dna.length <= TM_MAX_BASES) {
       const complement = [...dna].reverse().map((b) => pairs.dna[b]).join('');
       const both = duplex(ket(dna, 'chemical/x-dna-sequence'), ket(complement, 'chemical/x-dna-sequence'), dna, complement);
       tm = inputs.concentrations.map((c) => {

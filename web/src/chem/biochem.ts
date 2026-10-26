@@ -14,6 +14,9 @@ export type ChainType = 'peptide' | 'dna' | 'rna';
 export const MAX_LENGTH = 1000;
 /** Decision 8: Khandelwal and Bhyravabhotla fitted 15-mers upward. */
 export const TM_MIN_BASES = 15;
+/** Jeff's decision (2026-10-26): no Tm above the paper's 70-base window. Indigo applies the
+ * formula to the whole length, which passes 100 °C by about 100 bases. */
+export const TM_MAX_BASES = 70;
 
 /** One-letter code → three-letter code, the 20 standard amino acids. */
 export const RESIDUES: Readonly<Record<string, string>> = data.residues;

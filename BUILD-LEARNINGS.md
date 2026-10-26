@@ -1284,3 +1284,5 @@ panel; Indigo's values from the app's own worker, net charge and pI from Bjellqv
   dipeptides; a late answer for an undone edit could hide the current one; reusing the
   properties panel's `.properties-list` class inherited its "updating" grey. indigo-ketcher's
   default entry embeds the wasm as base64 (`AGFzbQ`), which a `.wasm` count can't see.
+- Jeff's decision on the Tm of long DNA (after the build): Tm only from 15 to 70 bases, the
+  paper's window, since Indigo applies the oligonucleotide formula to the whole length.

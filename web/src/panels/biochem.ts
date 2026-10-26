@@ -9,6 +9,7 @@ import {
   netCharge,
   parseSequence,
   problemMessage,
+  TM_MAX_BASES,
   TM_MIN_BASES,
   type SequenceType,
 } from '../chem/biochem.ts';
@@ -39,6 +40,7 @@ export const NOTES = {
   mass: "Formula and average mass: Ketcher's Indigo, for the neutral chain with free ends.",
   tm: "Tm: Khandelwal and Bhyravabhotla (2010), Ketcher's method, for the strand paired with its exact complement. Fitted for DNA of 15 base pairs or more, in 0.015-0.6 M Na⁺.",
   short: 'Tm needs 15 bases or more: the method was fitted on 15-mers and longer.',
+  long: 'Tm is shown up to 70 bases: the method was fitted on short DNA, and for longer DNA its authors average over 70-base windows, which this calculation does not.',
   rna: "No Tm for RNA: Ketcher's method is for DNA.",
   conditions: 'Tm needs a positive [Na⁺] and strand concentration.',
 };
@@ -50,7 +52,7 @@ export type IndigoPart =
   | { kind: 'unavailable'; reason: string };
 
 /** Why a nucleic acid shows no Tm. */
-export type TmNote = 'short' | 'rna' | 'conditions' | null;
+export type TmNote = 'short' | 'long' | 'rna' | 'conditions' | null;
 
 export type BiochemState =
   | { kind: 'empty'; inputs: Inputs }
@@ -117,6 +119,7 @@ export function createBiochem(send: (request: BiochemRequest) => void, show: (st
     let tm: BiochemRequest['tm'] = null;
     if (type === 'rna') tmNote = 'rna';
     else if (type === 'dna' && sequence.length < TM_MIN_BASES) tmNote = 'short';
+    else if (type === 'dna' && sequence.length > TM_MAX_BASES) tmNote = 'long';
     else if (type === 'dna') {
       const sodium = positive(inputs.sodium);
       const strand = positive(inputs.strand);

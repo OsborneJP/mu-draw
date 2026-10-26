@@ -22,6 +22,8 @@
     { "name": "AT-rich 16", "sequence": "ATTAAATATTTAATAT" },
     { "name": "mixed 16", "sequence": "ACGTTGCAAGGCTTAA" },
     { "name": "20 bases", "sequence": "AGCTTAGCCGATCGGATCCA" },
+    { "name": "70 bases (the longest with a Tm)", "repeat": "ACGTTGCAAG", "times": 7 },
+    { "name": "71 bases (no Tm)", "sequence": "ACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGC" },
     { "name": "100 bases", "repeat": "ACGTTGCAAGGCTTAAGCCG", "times": 5 },
     { "name": "1000 bases (the limit)", "repeat": "ACGTTGCAAGGCTTAAGCCG", "times": 50 }
   ],

@@ -1984,15 +1984,41 @@
       }
     },
     {
+      "name": "70 bases (the longest with a Tm)",
+      "sequence": "ACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAG",
+      "dna": {
+        "formula": "C686 H855 N280 O411 P69",
+        "mass": 21736.140683,
+        "tm": [
+          91.081686,
+          80.64237
+        ]
+      },
+      "rna": {
+        "formula": "C672 H827 N280 O481 P69",
+        "mass": 22659.692659
+      }
+    },
+    {
+      "name": "71 bases (no Tm)",
+      "sequence": "ACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGACGTTGCAAGC",
+      "dna": {
+        "formula": "C695 H867 N283 O417 P70",
+        "mass": 22025.324679,
+        "tm": null
+      },
+      "rna": {
+        "formula": "C681 H839 N283 O488 P70",
+        "mass": 22964.875654
+      }
+    },
+    {
       "name": "100 bases",
       "sequence": "ACGTTGCAAGGCTTAAGCCGACGTTGCAAGGCTTAAGCCGACGTTGCAAGGCTTAAGCCGACGTTGCAAGGCTTAAGCCGACGTTGCAAGGCTTAAGCCG",
       "dna": {
         "formula": "C975 H1221 N390 O593 P99",
         "mass": 30958.055547,
-        "tm": [
-          99.355929,
-          88.916613
-        ]
+        "tm": null
       },
       "rna": {
         "formula": "C955 H1181 N390 O693 P99",
@@ -2005,10 +2031,7 @@
       "dna": {
         "formula": "C9750 H12201 N3900 O5948 P999",
         "mass": 310138.231479,
-        "tm": [
-          139.811955,
-          129.372639
-        ]
+        "tm": null
       },
       "rna": {
         "formula": "C9550 H11801 N3900 O6948 P999",

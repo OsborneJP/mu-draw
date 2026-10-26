@@ -6,7 +6,15 @@ import type { Page } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isoelectricPoint, netCharge, parseSequence, problemMessage, RESIDUES, type Parsed } from '../src/chem/biochem.ts';
+import {
+  isoelectricPoint,
+  netCharge,
+  parseSequence,
+  problemMessage,
+  RESIDUES,
+  TM_MIN_BASES,
+  type Parsed,
+} from '../src/chem/biochem.ts';
 import { shown } from '../src/chem/properties.ts';
 import { NOTES } from '../src/panels/biochem.ts';
 import {
@@ -173,7 +181,7 @@ test('three-letter codes give the same values as one-letter', async ({ app }) =>
 test('DNA: the Tm the generator recorded, at the defaults and after changing both boxes; short DNA and RNA say why there is none', async ({
   app,
 }) => {
-  test.slow(); // the 1000-base duplex takes Indigo a few seconds, twice
+  test.slow(); // ten DNA and ten RNA strands, up to 1000 bases, and seven duplexes twice
   const { page } = app;
   await openEditor(app);
   await openSection(page);
@@ -197,7 +205,8 @@ test('DNA: the Tm the generator recorded, at the defaults and after changing bot
       await expect(page.getByTestId('biochem-tm-note')).toHaveCount(0);
       await expect(page.getByTestId('biochem-values')).toContainText(/Khandelwal and Bhyravabhotla \(2010\)/);
     } else {
-      await expect(page.getByTestId('biochem-tm-note')).toHaveText(NOTES.short);
+      const note = expected.sequence.length < TM_MIN_BASES ? NOTES.short : NOTES.long;
+      await expect(page.getByTestId('biochem-tm-note')).toHaveText(note);
       await expect(page.getByTestId('biochem-tm')).toHaveCount(0);
     }
     await type.selectOption('rna');

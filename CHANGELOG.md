@@ -127,9 +127,9 @@ All notable changes to this project. The format follows
   same Indigo; that mode stays hidden. A peptide gets its formula and average mass, its net
   charge at a pH the student sets and its isoelectric point (Bjellqvist's pKa values, as
   ExPASy uses), ε280 with every Cys reduced and with every two Cys paired, and a
-  hydrophobicity bar for each residue (Black and Mould). DNA of 15 bases or more gets the
+  hydrophobicity bar for each residue (Black and Mould). DNA of 15 to 70 bases gets the
   Tm of the strand paired with its complement, at a [Na⁺] and strand concentration the
-  student can change; RNA and shorter DNA say why there is none. Works offline. Ketcher's
+  student can change; RNA, and shorter or longer DNA, say why there is none. Works offline. Ketcher's
   own "isoelectric point" (a median of pKa values) is not shown: it is far from the
   standard answer.
 

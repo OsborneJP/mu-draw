@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import Module from 'indigo-ketcher/binaryWasm';
 import library from 'ketcher-core/dist/application/editor/data/monomers.modern.js';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { TM_MIN_BASES } from './biochem';
+import { TM_MAX_BASES, TM_MIN_BASES } from './biochem';
 import { createEngine, type BiochemRequest, type BiochemValues, type Engine } from './indigoBiochem';
 
 interface IndigoExpected {
@@ -81,7 +81,8 @@ describe('nucleic acids', () => {
   it.each(indigoFixture.nucleic.map((n) => [n.name, n] as const))(
     '%s: the strand as DNA (with Tm at each concentration) and as RNA',
     (_, expected) => {
-      const long = expected.sequence.length >= TM_MIN_BASES;
+      const { length } = expected.sequence;
+      const long = length >= TM_MIN_BASES && length <= TM_MAX_BASES; // long enough, and not too long
       expect(expected.dna.tm !== null).toBe(long);
       indigoFixture.concentrations.forEach((c, i) => {
         const dna = compute({ type: 'dna', sequence: expected.sequence, tm: long ? molar(c) : null });

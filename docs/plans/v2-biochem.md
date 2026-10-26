@@ -43,7 +43,7 @@ The aim: a student types a peptide, DNA or RNA sequence in the side panel and se
    With no Trp, Tyr or Cys, it says ε280 is 0 and the peptide can't be measured at 280 nm. The alternative is Indigo's number with a note.
 7. **Hydrophobicity: Indigo's per-residue Black & Mould (1991) values as a bar chart, no summary number.** This is what Ketcher shows. A mean of this scale is not a standard figure, and GRAVY (Kyte–Doolittle) isn't Ketcher's.
 8. **Tm:**
-   - **DNA of 15 bases or more**, paired with its exact complement, by Indigo (Khandelwal and Bhyravabhotla 2010, Ketcher's method);
+   - **DNA of 15 bases or more**, paired with its exact complement, by Indigo (Khandelwal and Bhyravabhotla 2010, Ketcher's method); amended by Jeff on 2026-10-26 to 15 to 70 bases, see "Jeff's decision on long DNA";
    - **both concentrations editable**, any positive value;
    - **under 15 bases, a note instead of a value**, since the paper fits 15-mers upward and Indigo gives a 4-mer 36 °C;
    - **RNA: no Tm, with a note** that the method is for DNA. Indigo treats U as T, but RNA duplexes are more stable. Ketcher does show it for RNA.
@@ -179,7 +179,8 @@ The aim: a student types a peptide, DNA or RNA sequence in the side panel and se
   - concentrations outside that range are accepted without a warning;
   - Indigo applies it to the whole length, so long DNA gets impossible values (measured while
     building, at the default concentrations): 100 bases 99 °C, 1000 bases 140 °C. The paper
-    averages genomic DNA over 70-bp windows; Indigo doesn't. An open question for Jeff.
+    averages genomic DNA over 70-bp windows; Indigo doesn't. Jeff decided (2026-10-26): Tm
+    only from 15 to 70 bases, and a note above that (see "Jeff's decision on long DNA").
 - **Hydrophobicity** is the Black & Mould scale only, residue by residue, with no window averaging.
 - **A second Indigo instance** runs once the section has been opened, alongside Ketcher's own. Measured while building: about 60 MB once loaded, about 120 MB after a 1000-residue peptide and 1000 DNA bases (BUILD-LEARNINGS).
 
@@ -213,12 +214,28 @@ Accepted limits (low):
   letters (AlaGlyCys…; any Glu, Leu or Pro is rejected); an invisible pasted character
   (zero-width space) is named in a message that looks empty.
 - Clearing a concentration box to retype it asks Indigo again for the formula and mass.
-- The DNA smoke test changes both concentration boxes for the 1000-base duplex too, so each Tm
-  check there waits for two duplex runs (about 6 s against the 30 s limit).
 - The smoke tests' CSP guard listens in documents only, so a violation inside a worker that
   the code survives goes unreported (true of every worker).
 - Indigo's Tm doesn't check that the bases pair, so equal Tm values from the app and the
   generator don't prove the pairing; the HELM test does.
+
+## Jeff's decision on long DNA (2026-10-26)
+
+Asked after the build: Indigo gives a 100-base duplex 99 °C and a 1000-base one 140 °C.
+Decision 8 now reads: **DNA of 15 to 70 bases** gets a Tm (70 bases is the window the paper
+averages genomic DNA over); **longer DNA gets a note instead**, as shorter DNA does: "Tm is
+shown up to 70 bases: the method was fitted on short DNA, and for longer DNA its authors
+average over 70-base windows, which this calculation does not."
+
+Bar for this change:
+1. The 70/71-base boundary: Vitest asks for Tm at 70 bases and not at 71, with the note
+   (src/panels/biochem.test.ts); new test inputs of 70 and 71 bases
+   (tests/fixtures/biochem_sequences.json).
+2. The Indigo generator records a Tm only from 15 to 70 bases, and the engine test requires
+   the fixture to have one exactly where the app asks for one.
+3. The DNA smoke test shows the long-DNA note for 71, 100 and 1000 bases, and no Tm.
+(The accepted limit about the 1000-base duplex in the DNA smoke test no longer applies: the
+longest duplex is now 70 bases.)
 
 ## Priority
 

@@ -145,6 +145,18 @@ describe('the biochem section', () => {
     expect(h.sent[3]).toMatchObject({ tm: null });
   });
 
+  it('DNA: no Tm above 70 bases, with its note (Jeff, 2026-10-26)', () => {
+    const h = harness();
+    const seventy = 'ACGTTGCAAG'.repeat(7);
+    h.type({ type: 'dna', text: seventy });
+    expect(h.sent[0]).toMatchObject({ sequence: seventy, tm: { sodium: 0.14, strand: 0.0002 } });
+    expect(h.last()).toMatchObject({ kind: 'nucleic', tmNote: null });
+    h.biochem.reply(h.answer(h.sent[0]));
+    h.type({ text: `${seventy}A` });
+    expect(h.sent[1]).toMatchObject({ sequence: `${seventy}A`, tm: null });
+    expect(h.last()).toMatchObject({ kind: 'nucleic', tmNote: 'long' });
+  });
+
   it('RNA never asks for Tm', () => {
     const h = harness();
     h.type({ type: 'rna', text: 'ACGUUGCAAGGCUUAA' });
