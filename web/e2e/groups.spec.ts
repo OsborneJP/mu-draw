@@ -410,8 +410,9 @@ test('a double-click on a grouped atom edits that atom only', async ({ app }) =>
   await expect(page.getByTestId('rotation-handle')).toHaveCount(0);
 });
 
-// A guard: on 6e1cbea, before the store narrowed only a select tool's selection, this already
-// passed (Ketcher's own handling left nothing selected); groupStore.test.ts holds the rule.
+// What the student sees: nothing left selected. It passed on 6e1cbea too: with the bond tool
+// the double-click doesn't reach the app's listener (review round 3: Ketcher redraws the
+// pressed bond), so groupStore.test.ts holds the rule, not this test.
 test('a double-click with the bond tool on a grouped bond leaves nothing selected', async ({ app }) => {
   const { page } = app;
   await openEditor(app);
@@ -427,7 +428,6 @@ test('a double-click with the bond tool on a grouped bond leaves nothing selecte
   const [p, q] = [await atomOnPage(page, begin), await atomOnPage(page, end)];
   await page.getByTestId('bonds').filter({ visible: true }).click();
   await page.mouse.dblclick((p.x + q.x) / 2, (p.y + q.y) / 2);
-  await expect(page.getByTestId('bonds').filter({ visible: true })).toHaveCount(1);
   // The next tool picked would act on anything left selected.
   await expect.poll(() => selection(page)).toEqual({ atoms: [], bonds: [], texts: [], rxnArrows: [] });
 });

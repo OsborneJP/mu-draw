@@ -112,10 +112,18 @@ it. Fixed: after a double-click narrowed the selection to one atom, Ketcher's ro
 and floating tools still framed the group, so the handle turned that atom alone (the store
 now redraws the frame; the browser test fails on 6e1cbea); and the narrowing ran under any
 tool (it now narrows only a selection that holds the item, which only the select tool's
-press makes; the store test fails on 6e1cbea, though in the browser no drawing tool left a
-selection behind even then). A low fixed: the "outside every group" test now has a group on
-the canvas. Lows accepted: reopening the identical drawing, and the Name panel over the
-button's fallback place (below).
+press makes; the store test fails on 6e1cbea. In the browser, Bond, N and Charge tool
+double-clicks left nothing selected even on 6e1cbea: there the double-click doesn't reach the
+app's listener, so the bond-tool browser test only shows what the student sees). A low
+fixed: the "outside every group" test now has a group on the canvas. Lows accepted:
+reopening the identical drawing, and the Name panel over the button's fallback place
+(below).
+
+## Review (round 3, 2026-10-26)
+
+Two reviewers on c8781bf, skeptics on each medium: nothing high or medium (the one finding
+put to a skeptic came back low), so the review stops here. Lows: the bond-tool browser
+test's comment gave the wrong reason (corrected); the rest are accepted below.
 
 ## Known limits
 
@@ -137,6 +145,11 @@ button's fallback place (below).
   Aromatize or Settings, which hand Ketcher an unchanged copy.
 - In a narrow window the Name panel can cover the Group button when it is not beside Ketcher's
   floating tools (images or shapes alone, or a browser without CSS anchor positioning).
+- With the Hand or Fragment Selection tool, a double-click on an atom of a selected group
+  selects just that atom (nothing is edited): those tools keep the selection, so the store
+  can't tell them from the select tool.
+- A double-click on an atom right beside a grouped text, where Ketcher picks the text, leaves
+  the group selected without its rotate frame until the next click.
 - In the test browser, Ketcher 3.18 can't turn a selection that holds a text with its rotate
   handle (it stops after moving the text), group or no group. The rotate test uses a group
   without text; worth checking in a real browser.
