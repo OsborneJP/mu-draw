@@ -4,7 +4,11 @@ import type { Placement } from '../editor/placeInHand';
 import { GLASSWARE, GLASSWARE_CREDIT, GLASSWARE_GROUPS, loadPiece, pickGlassware, pieceKet, pieceUrl, type Piece } from './glassware';
 import { heldTemplate, pickTemplate, putAwayTemplate, subscribeTemplates, TEMPLATES, type Placer } from './templates';
 
-const KETCHER = {} as Ketcher; // the menu touches Ketcher only through the placer
+// The menu touches Ketcher only through the placer, and reads which tool it has.
+let tool: object = {};
+const KETCHER = { editor: { tool: () => tool } } as unknown as Ketcher;
+// Unit tests run in Node: a stand-in for the page, where pick() listens for Esc.
+(globalThis as { document?: EventTarget }).document ??= new EventTarget();
 const [FIRST, SECOND] = GLASSWARE;
 
 /** A placer whose picks are in hand at once, each with its own placement to settle. */
@@ -47,7 +51,20 @@ function holding(item: object | null): Promise<void> {
   });
 }
 
-afterEach(() => putAwayTemplate());
+/** An Esc watcher the test presses; it counts the listeners still watching. */
+function escKey() {
+  const listeners = new Set<() => void>();
+  const escapes = (listener: () => void) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  };
+  return { escapes, press: () => listeners.forEach((listener) => listener()), watching: () => listeners.size };
+}
+
+afterEach(() => {
+  putAwayTemplate();
+  tool = {};
+});
 
 describe('the generated glassware', () => {
   it('comes in the groups the plan names, every piece in one of them, ids unique', () => {
@@ -157,6 +174,40 @@ describe('picking a piece', () => {
     await holding(TEMPLATES[1]);
     putAwayTemplate();
     expect(await again).toBe(false);
+  });
+
+  it('Esc while a piece loads: it is never placed, and Esc is no longer watched', async () => {
+    const { place, placed } = placer();
+    const { load, release } = heldLoader();
+    const esc = escKey();
+    const picked = pickGlassware(KETCHER, FIRST, place, load, esc.escapes);
+    expect(esc.watching()).toBe(1);
+    esc.press();
+    release(FIRST);
+    expect(await picked).toBe(false);
+    expect(placed).toEqual([]);
+    expect(heldTemplate()).toBeNull();
+    expect(esc.watching()).toBe(0);
+  });
+
+  it('another tool, or Add arming its own, while a piece loads: it is never placed', async () => {
+    const { place, placed } = placer();
+    const { load, release } = heldLoader();
+    const picked = pickGlassware(KETCHER, FIRST, place, load, escKey().escapes);
+    tool = {}; // the bond tool, or Add's paste tool
+    release(FIRST);
+    expect(await picked).toBe(false);
+    expect(placed).toEqual([]);
+  });
+
+  it('Esc after a piece has loaded is left to the placement (placeInHand handles it)', async () => {
+    const { place, placed } = placer();
+    const esc = escKey();
+    const picked = pickGlassware(KETCHER, FIRST, place, async (p) => `ket of ${p.id}`, esc.escapes);
+    await holding(FIRST);
+    expect(esc.watching()).toBe(0);
+    placed[0].settle(true);
+    expect(await picked).toBe(true);
   });
 
   it('a piece that could not be loaded leaves the hand empty', async () => {

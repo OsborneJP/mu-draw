@@ -1269,3 +1269,10 @@ Acceptance bar, the survey of sets and the measurements: docs/plans/v2-glassware
 - On a first visit the page isn't controlled by the service worker, so `page.route` can hold
   a glassware fetch. The Glassware tab's pictures load the same files as images: hold only
   `resourceType() === 'fetch'`.
+- The review found the generator's denylist let SMIL animation (`<set attributeName="href">`),
+  CSS escapes (`\75 rl(`), `@\69mport`, `image-set("…")` and XHTML wrappers through; an
+  allowlist of drawing elements closes the class. The shipped-piece test checks the files
+  with its own rules, not the script's, so one blind spot can't hide in both.
+- A pick that is still fetching its file is not "in hand" for placeInHand's Esc, so pick()
+  watches Esc itself while it waits and drops the pick if Ketcher's tool changed meanwhile
+  (another tool, or Add arming its paste tool: `editor.tool()` is a new object each time).

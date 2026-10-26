@@ -6,7 +6,7 @@
 // works offline.
 import type { Ketcher } from 'ketcher-core';
 import generated from '../editor/glassware.json';
-import { pick, type Placer } from './templates';
+import { pick, type EscWatch, type Placer } from './templates';
 
 export interface Piece {
   id: string;
@@ -64,6 +64,7 @@ export function pickGlassware(
   piece: Piece,
   place: Placer,
   load: (piece: Piece) => Promise<string> = loadPiece,
+  escapes?: EscWatch,
 ): Promise<boolean> {
-  return pick(ketcher, piece, () => load(piece), place);
+  return pick(ketcher, piece, () => load(piece), place, escapes);
 }

@@ -127,7 +127,8 @@ export default function TemplatesMenu() {
                 type="button"
                 role="tab"
                 aria-selected={tab === t.id}
-                aria-controls={`templates-panel-${t.id}`}
+                // Only the shown panel is in the page.
+                aria-controls={tab === t.id ? `templates-panel-${t.id}` : undefined}
                 tabIndex={tab === t.id ? 0 : -1}
                 data-testid={`templates-tab-${t.id}`}
                 onClick={() => setTab(t.id)}

@@ -263,3 +263,34 @@ Jeff approved the plan as written, with every proposed answer:
 6. Placed at source size, shipped at 4×.
 7. The link guard judges canvas images as images.
 8. Orientation variants instead of rotation.
+
+## Done (2026-10-26, on branch claude/v2-glassware)
+
+Commits, in order: the plan (aa02f22); the link guard for canvas images (ec08dc8); the 23 pieces and their generator (f0345d6); the Glassware tab (39447dc); the review's fixes (the commit after). Each passed check.sh. Nothing is merged, pushed or deployed.
+- **Bar A:** tests/test_glassware.py (64 tests, among them a doctored original for each refusal) and the browser test of the crop boxes in web/e2e/glassware.spec.ts.
+- **Bars B and C:** web/e2e/glassware.spec.ts (12 browser tests) and web/src/panels/glassware.test.ts (forced orderings with a held loader).
+- **Bar D:** web/config/requestPolicy.test.ts, web/e2e/guards.spec.ts, and the precache guard's test.
+- **Bar F:** a contact sheet of every piece, and a distillation and a reflux built from them and exported with the app's Export, sent to Jeff with the build report.
+
+Changed while building:
+- **A3 is measured in placed px** (1 px on screen at 100% zoom), not in source px: the source units differ about 100-fold between drawings. Every crop leaves 0.9 to 1.4 placed px around the ink.
+- **The beaker and conical flask** come from B_Lachner's sheets of several. The two- and three-neck flasks, the filter funnel and the dropping funnel come from Jü's drawings, whose paths have no ids, so the script picks them by region.
+- **The TLC tank** is the developing-tank frame (with lid) of Quantockgoblin's TLC sequence.
+
+The capped review (two reviewers, a skeptic verifying each finding; one round):
+- **Fixed, each with a test that fails without it (mediums):**
+  - The generator's refusals were a denylist that SMIL animation (`<set>`, `<animate>` on href), CSS escapes, an escaped `@import`, `image-set()`, XHTML wrappers (`src`, `data`) and `xml:base` got past. It is now an allowlist of drawing elements, and refuses those attributes and any CSS escape or at-rule.
+  - The credit test couldn't fail on a wrong licence. It now matches each source's exact entry.
+  - Negative tests now cover each refusal from inside a kept element.
+  - A piece still loading (the page's first session isn't controlled by the service worker, so the file comes over the network) wasn't in hand, so Esc, another tool or Add couldn't stop it, and it took over Ketcher's tool when it arrived. Now Esc, or any change of Ketcher's tool, while it loads drops it.
+  - A browser test could count the service worker's precaching as the app's own fetches.
+- **Fixed (lows):**
+  - three shipped pieces held duplicate ids;
+  - `class` on a kept element (its stylesheet isn't carried) is refused;
+  - the root's style references are carried;
+  - an empty piece, path data with numbers after Z, and a `<use>` in region mode are named errors;
+  - the script clears any other file out of web/public/glassware/;
+  - the inactive tab's `aria-controls`.
+- **Accepted limits (lows):**
+  - A piece that can't be loaded does nothing visible (it is logged). This can only happen on a page the service worker doesn't control, for example when the network drops during a first session.
+  - The z-order browser test judges atom labels only: after a placement by hand, Ketcher's canvas held one other `<text>` before the image, and what it is was not established.

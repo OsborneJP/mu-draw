@@ -34,6 +34,22 @@ export interface Pickable {
   name: string;
 }
 
+/** Calls `listener` when Esc is pressed anywhere in the page; returns what stops it. */
+export type EscWatch = (listener: () => void) => () => void;
+
+function watchEsc(listener: () => void): () => void {
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') listener();
+  };
+  document.addEventListener('keydown', onKeyDown, true);
+  return () => document.removeEventListener('keydown', onKeyDown, true);
+}
+
+/** Ketcher's tool now: a new object whenever the student (or Add) picks a tool. */
+function currentTool(ketcher: Ketcher): unknown {
+  return (ketcher.editor as unknown as { tool(): unknown }).tool();
+}
+
 let held: { item: Pickable; placement: Placement } | null = null;
 let latest = 0; // each pick's number: an earlier pick that arrives late is put away
 const listeners = new Set<() => void>();
@@ -67,21 +83,33 @@ export function pickTemplate(ketcher: Ketcher, template: Template, place: Placer
 }
 
 /** Puts `item` in the student's hand once `structure` has made its KET. True once a click has
- * placed it; false if it was put away (Esc, another tool, Add, a later pick), if a later pick
- * came while its KET was being made, or if it could not be made or Ketcher could not take it. */
+ * placed it; false if it was put away (Esc, another tool, Add, a later pick), if the student
+ * moved on while its KET was being made, or if it could not be made or Ketcher could not
+ * take it. */
 export async function pick(
   ketcher: Ketcher,
   item: Pickable,
   structure: () => Promise<string>,
   place: Placer,
+  escapes: EscWatch = watchEsc,
 ): Promise<boolean> {
   const mine = ++latest;
   putAwayTemplate();
+  // While its KET is being made (a glassware file loading), the item isn't in hand yet, but the
+  // student may move on: a later pick, Esc, another tool, or Add (which arms Ketcher's paste
+  // tool). Arming the paste tool after that would take over from what they chose.
+  const tool = currentTool(ketcher);
+  let escaped = false;
+  const stopWatching = escapes(() => (escaped = true));
   let placement: Placement;
   try {
-    const ket = await structure();
-    // A later pick came meanwhile: arming Ketcher's paste tool now would put that one away.
-    if (mine !== latest) return false;
+    let ket: string;
+    try {
+      ket = await structure();
+    } finally {
+      stopWatching();
+    }
+    if (mine !== latest || escaped || currentTool(ketcher) !== tool) return false;
     placement = await place(ketcher, ket, (drop) => drop());
   } catch (error) {
     console.error(`Could not pick up ${item.name}:`, error);

@@ -25,6 +25,7 @@ import hashlib
 import json
 import math
 import re
+import shutil
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -40,6 +41,7 @@ MENU_FILE = ROOT / "web" / "src" / "editor" / "glassware.json"
 SVG = "http://www.w3.org/2000/svg"
 XLINK = "http://www.w3.org/1999/xlink"
 XML = "http://www.w3.org/XML/1998/namespace"
+XML_SPACE = f"{{{XML}}}space"
 ET.register_namespace("", SVG)
 ET.register_namespace("xlink", XLINK)
 
@@ -48,11 +50,26 @@ PX_PER_MODEL_UNIT = 40
 RASTER_SCALE = 4
 LICENCES = ("Public domain", "CC0 1.0")
 
-REFUSED_ELEMENTS = {"script", "foreignObject", "image", "iframe", "audio", "video", "canvas"}
+# An allowlist: the static drawing elements the originals use (and their close kin). Anything
+# else in the SVG namespace is refused, so animation (<set>, <animate>), <script>, <image>,
+# <foreignObject>, links (<a>), filters and the rest never get in. Text and metadata are
+# dropped, not refused. Elements of other namespaces are editor metadata, dropped; one that
+# encloses a kept element, or one from XHTML anywhere, is refused.
+DRAWING_ELEMENTS = {
+    "svg", "g", "defs", "path", "rect", "circle", "ellipse", "line", "polyline", "polygon",
+    "use", "linearGradient", "radialGradient", "stop", "clipPath", "mask", "marker", "pattern",
+    "symbol", "style",
+}  # fmt: skip
 TEXT_ELEMENTS = {"text", "tspan", "textPath", "flowRoot", "flowRegion", "flowPara", "flowSpan"}
 DROPPED_ELEMENTS = TEXT_ELEMENTS | {"metadata", "title", "desc"}
+XHTML = "http://www.w3.org/1999/xhtml"
+# Attributes that load or run something on any element.
+REFUSED_ATTRIBUTES = {"src", "data"}
 LOCAL_URL = re.compile(r"url\(\s*['\"]?#[^)'\"]+['\"]?\s*\)")
 ANY_URL = re.compile(r"url\(", re.IGNORECASE)
+# CSS that could reach outside without a plain url(): escapes (\75 rl( is url(), at-rules
+# (@import, also escaped), and image-set()/image()/src() with a bare string.
+CSS_ESCAPES_AND_RULES = re.compile(r"[\\@]|image-set\(|image\(|src\(", re.IGNORECASE)
 REFERENCE = re.compile(r"url\(\s*['\"]?#([^)'\"]+)['\"]?\s*\)")
 
 
@@ -140,24 +157,31 @@ def refused(root: ET.Element) -> list[str]:
         if not isinstance(element.tag, str):
             continue
         name = local(element.tag)
-        if name in REFUSED_ELEMENTS:
+        if namespace(element.tag) == SVG and name not in DRAWING_ELEMENTS | DROPPED_ELEMENTS:
             problems.append(f"<{name}>")
-        if name == "style" and element.text and bad_css(element.text):
+        if namespace(element.tag) == XHTML:
+            problems.append(f"XHTML <{name}>")
+        if name == "style" and element.text and bad_css(element.text, stylesheet=True):
             problems.append("<style> loads something")
         for attribute, value in element.attrib.items():
             attr = local(attribute)
             if attr.lower().startswith("on"):
                 problems.append(f"{attr} attribute on <{name}>")
+            elif attr in REFUSED_ATTRIBUTES or attribute == f"{{{XML}}}base":
+                problems.append(f"{attr} attribute on <{name}>")
             elif attr == "href" and not value.startswith("#"):
                 problems.append(f"<{name}> links to {value[:40]!r}")
-            elif bad_css(value):
+            elif bad_css(value, stylesheet=attr == "style"):
                 problems.append(f"{attr} on <{name}> loads something")
     return sorted(set(problems))
 
 
-def bad_css(text: str) -> bool:
-    """CSS that imports, or points a url() anywhere but at an element of the same drawing."""
-    return "@import" in text.lower() or len(ANY_URL.findall(text)) != len(LOCAL_URL.findall(text))
+def bad_css(text: str, stylesheet: bool = False) -> bool:
+    """A url() to anything but an element of the same drawing; and in a style attribute or
+    <style>, any escape, at-rule or image-set()/image()/src()."""
+    if stylesheet and CSS_ESCAPES_AND_RULES.search(text):
+        return True
+    return len(ANY_URL.findall(text)) != len(LOCAL_URL.findall(text))
 
 
 def references(element: ET.Element) -> set[str]:
@@ -179,6 +203,11 @@ def cleaned(element: ET.Element) -> ET.Element | None:
         return None
     if local(element.tag) in DROPPED_ELEMENTS:
         return None
+    if element.get("class") is not None:
+        # A class's rules live in a <style> the piece doesn't carry: it would ship unstyled.
+        raise GlasswareError(
+            f"<{local(element.tag)} class={element.get('class')!r}> needs a stylesheet"
+        )
     copy_ = ET.Element(element.tag, clean_attributes(element.attrib))
     if local(element.tag) == "style":
         copy_.text = element.text
@@ -193,7 +222,7 @@ def clean_attributes(attributes: dict[str, str]) -> dict[str, str]:
     kept = {}
     for attribute, value in attributes.items():
         ns = namespace(attribute)
-        if ns == "" or (ns == XLINK and local(attribute) == "href") or ns == XML:
+        if ns == "" or (ns == XLINK and local(attribute) == "href") or attribute == XML_SPACE:
             kept[attribute] = value
     return kept
 
@@ -222,6 +251,8 @@ def cut(root: ET.Element, piece: Piece, where: str) -> tuple[list[ET.Element], s
             return cleaned(element)
         if not contains(element):
             return None
+        if namespace(element.tag) != SVG or local(element.tag) not in DRAWING_ELEMENTS:
+            raise GlasswareError(f"{where}: a kept element is inside <{local(element.tag)}>")
         shell = ET.Element(element.tag, clean_attributes(element.attrib))
         for child in element:
             part = walk(child)
@@ -239,6 +270,8 @@ def cut(root: ET.Element, piece: Piece, where: str) -> tuple[list[ET.Element], s
     used = set()
     for part in body:
         used |= references(part)
+    if not any(local(e.tag) in SHAPES for part in body for e in part.iter()):
+        raise GlasswareError(f"{where}: nothing to draw is left (text and definitions are not)")
     return body, used
 
 
@@ -306,6 +339,8 @@ def path_points(d: str) -> list[tuple[float, float]]:
                 x, y = start
                 continue
         size = sizes[command.upper()]
+        if size == 0:  # numbers right after Z, which takes none
+            raise GlasswareError(f"path data has numbers after {command}: {d[:40]!r}")
         args = [float(t) for t in tokens[i : i + size]]
         i += size
         if len(args) < size:
@@ -355,6 +390,9 @@ def shapes_in(root: ET.Element, region: tuple[float, float, float, float]) -> se
         if not isinstance(element.tag, str) or local(element.tag) in ("defs", *DROPPED_ELEMENTS):
             return
         matrix = multiply(matrix, transform_of(element.get("transform")))
+        if local(element.tag) == "use":
+            # Placed by what it points at, which its own x and y don't say: keep it by id.
+            raise GlasswareError(f"region mode can't place <use id={element.get('id')!r}>")
         if local(element.tag) in SHAPES:
             points = shape_points(element)
             if points:
@@ -373,8 +411,9 @@ def shapes_in(root: ET.Element, region: tuple[float, float, float, float]) -> se
     return chosen
 
 
-def definitions(root: ET.Element, used: set[str]) -> ET.Element | None:
-    """Copies of the elements the piece refers to, and those they refer to in turn."""
+def definitions(root: ET.Element, used: set[str], drawn: set[str]) -> ET.Element | None:
+    """Copies of the elements the piece refers to, and those they refer to in turn, except
+    those it draws itself (`drawn`), so no id is in the piece twice."""
     by_id = {e.get("id"): e for e in root.iter() if e.get("id")}
     wanted, todo = set(), list(used)
     while todo:
@@ -383,6 +422,9 @@ def definitions(root: ET.Element, used: set[str]) -> ET.Element | None:
             continue
         wanted.add(ident)
         todo.extend(references(by_id[ident]))
+    if not wanted:
+        return None
+    wanted -= drawn
     if not wanted:
         return None
     defs = ET.Element(f"{{{SVG}}}defs")
@@ -444,13 +486,16 @@ def piece_svg(piece: Piece, source: dict, root: ET.Element, uncropped: bool = Fa
         },
     )
     out.append(ET.Comment(f" {credit_of(source)} Cut out by scripts/build_glassware.py. "))
-    defs = definitions(root, used)
-    if defs is not None:
-        out.append(defs)
-    group = ET.SubElement(out, f"{{{SVG}}}g")
+    group = ET.Element(f"{{{SVG}}}g")
     for attribute in ("style", "fill", "stroke", "stroke-width", "fill-rule"):
         if root.get(attribute) is not None:
             group.set(attribute, root.get(attribute))
+    used |= references(group)  # the root's own presentation attributes, now on this group
+    drawn = {e.get("id") for part in body for e in part.iter() if e.get("id")}
+    defs = definitions(root, used, drawn)
+    if defs is not None:
+        out.append(defs)
+    out.append(group)
     if piece.rotate:
         group.set("transform", f"rotate({number(piece.rotate)})")
     group.extend(body)
@@ -521,11 +566,11 @@ def main(argv: list[str] | None = None) -> int:
     except GlasswareError as error:
         print(f"build_glassware: {error}", file=sys.stderr)
         return 1
-    stale = {p.name for p in PIECES_DIR.glob("*.svg")} - {
-        Path(path).name for path in outputs if path.endswith(".svg")
-    }
-    for name in stale:
-        (PIECES_DIR / name).unlink()
+    # The folder holds exactly the pieces: anything else would ship and be precached unchecked.
+    keep = {Path(path).name for path in outputs if path.startswith("web/public/glassware/")}
+    for path in PIECES_DIR.iterdir() if PIECES_DIR.exists() else ():
+        if path.name not in keep:
+            shutil.rmtree(path) if path.is_dir() else path.unlink()
     PIECES_DIR.mkdir(parents=True, exist_ok=True)
     for path, text in outputs.items():
         (ROOT / path).write_text(text, encoding="utf-8")

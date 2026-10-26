@@ -271,22 +271,28 @@ test('a piece and a template put each other away; the one picked last is placed'
   expect(await page.evaluate(() => window.ketcher!.editor.struct().atoms.size)).toBeGreaterThan(0);
 });
 
-test("a piece whose file arrives after a later pick is put away, and the later one stays in hand", async ({ app }) => {
-  const { page } = app;
-  await emptyCanvas(app);
-  // The first visit isn't controlled by the service worker yet, so the files come over the
-  // network, where the test can hold one.
-  // The tab's pictures load the same files as images; only the app's fetch is held.
+/** Holds the app's fetch of `piece`'s file (the tab's pictures load the same file as
+ * images; those go through). The first visit isn't controlled by the service worker yet, so
+ * the file comes over the network, where the test can hold it. `asked` resolves once the
+ * fetch is held; `release` lets it go. */
+async function holdFile(page: Page, piece: Piece) {
   let held: Route | null = null;
   const asked = new Promise<void>((resolve) =>
-    page.route(`**/${FIRST.file}`, (route) => {
+    page.route(`**/${piece.file}`, (route) => {
       if (route.request().resourceType() !== 'fetch') return route.continue();
       held = route;
       resolve();
     }),
   );
-  // Resolves, per URL, once the page has read a response's body (Response.arrayBuffer).
+  return { asked, release: () => held!.continue() };
+}
+
+/** Resolves once the page has read the body of `url` (Response.arrayBuffer): the pick that
+ * asked for it has then run on from there before the test's next step. Call before the read. */
+async function bodyRead(page: Page, url: string): Promise<Promise<void>> {
   await page.evaluate(() => {
+    const w = window as unknown as { __readOf?: (url: string) => Promise<void> };
+    if (w.__readOf) return;
     const read = new Map<string, () => void>();
     const reads = new Map<string, Promise<void>>();
     const arrayBuffer = Response.prototype.arrayBuffer;
@@ -295,19 +301,25 @@ test("a piece whose file arrives after a later pick is put away, and the later o
       read.get(this.url)?.();
       return body;
     };
-    (window as unknown as { __readOf: (url: string) => Promise<void> }).__readOf = (url) => {
-      if (!reads.has(url)) reads.set(url, new Promise((resolve) => read.set(url, resolve)));
-      return reads.get(url)!;
+    w.__readOf = (u) => {
+      if (!reads.has(u)) reads.set(u, new Promise((resolve) => read.set(u, resolve)));
+      return reads.get(u)!;
     };
   });
-  const firstUrl = new URL(FIRST.file, app.server.url).href;
-  const firstRead = page.evaluate((url) => (window as unknown as { __readOf: (u: string) => Promise<void> }).__readOf(url), firstUrl);
+  return page.evaluate((u) => (window as unknown as { __readOf: (u: string) => Promise<void> }).__readOf(u), url);
+}
+
+test("a piece whose file arrives after a later pick is put away, and the later one stays in hand", async ({ app }) => {
+  const { page } = app;
+  await emptyCanvas(app);
+  const file = await holdFile(page, FIRST);
+  const firstRead = bodyRead(page, new URL(FIRST.file, app.server.url).href);
   await openGlassware(page);
   await page.getByTestId(`glassware-item-${FIRST.id}`).click();
-  await asked; // the first piece's file is on its way, and held
+  await file.asked; // the first piece's file is on its way, and held
   await expect(page.getByTestId('templates-placing')).toHaveCount(0);
   await pick(page, SECOND); // the second is in hand
-  await held!.continue();
+  await file.release();
   await firstRead; // the first piece's file is read; its pick has run on from there
   await expect(page.getByTestId('templates-placing')).toHaveText(PLACING);
   const point = await canvasPoint(page, 0.5, 0.5);
@@ -316,6 +328,39 @@ test("a piece whose file arrives after a later pick is put away, and the later o
   const placed = await images(page);
   expect(placed).toHaveLength(1);
   expectPlaced(placed[0], SECOND, point);
+});
+
+test('Esc, or another tool, while a piece is loading: it never arrives in hand', async ({ app }) => {
+  const { page } = app;
+  const changes = await emptyCanvas(app);
+  // Esc.
+  let file = await holdFile(page, FIRST);
+  let read = bodyRead(page, new URL(FIRST.file, app.server.url).href);
+  await openGlassware(page);
+  await page.getByTestId(`glassware-item-${FIRST.id}`).click();
+  await file.asked;
+  await page.keyboard.press('Escape');
+  await file.release();
+  await read;
+  await expect(page.getByTestId('templates-placing')).toHaveCount(0);
+  const point = await canvasPoint(page, 0.5, 0.5);
+  await moveTo(page, point);
+  await page.mouse.click(point.x, point.y);
+  expect(await images(page)).toEqual([]);
+  expect(await changes()).toBe(0);
+  // The bond tool: the next click draws a bond, not the piece.
+  file = await holdFile(page, SECOND);
+  read = bodyRead(page, new URL(SECOND.file, app.server.url).href);
+  await openGlassware(page);
+  await page.getByTestId(`glassware-item-${SECOND.id}`).click();
+  await file.asked;
+  await page.getByTestId('bonds').filter({ visible: true }).click();
+  await file.release();
+  await read;
+  await expect(page.getByTestId('templates-placing')).toHaveCount(0);
+  await page.mouse.click(point.x, point.y);
+  expect(await images(page)).toEqual([]);
+  expect(await page.evaluate(() => window.ketcher!.editor.struct().bonds.size)).toBe(1);
 });
 
 test('offline: a piece is picked and placed from the precache', async ({ app }) => {
@@ -339,7 +384,7 @@ test('placing a piece asks only for its own file, and the app reads it as a pict
   // worker precaches every file in the background): just this piece's file.
   const fetched = app.requests
     .slice(from)
-    .filter((r) => r.resourceType() === 'fetch' && r.url().includes('/glassware/'))
+    .filter((r) => r.resourceType() === 'fetch' && !r.serviceWorker() && r.url().includes('/glassware/'))
     .map((r) => r.url());
   expect(fetched).toEqual([new URL(FIRST.file, app.server.url).href]);
   await expect(page.getByTestId('properties-message')).toHaveText('Draw a structure to see its properties');
