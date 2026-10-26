@@ -66,10 +66,10 @@ function checkWhenBack(registration: ServiceWorkerRegistration): void {
 
 /** Fetch sw.js; if it changed, let the new build install; then show the banner if a build
  * is waiting. onNeedRefresh can't be trusted for this: workbox-window stops listening for
- * good after the first new build it sees more than a minute after the page opened, so one
- * failed install (a download cut off) would hide every later build. A check that can't
- * reach the server shows nothing, and the next one tries again. Tests wait for
- * sw-update-checked. */
+ * good after its second new build, or its first one more than a minute after the page
+ * opened, so one failed install (a download cut off) would hide every later build
+ * (update.spec.ts shows it). A check that can't reach the server shows nothing, and the
+ * next one tries again. Tests wait for sw-update-checked. */
 async function checkForUpdate(registration: ServiceWorkerRegistration): Promise<void> {
   try {
     await registration.update();
