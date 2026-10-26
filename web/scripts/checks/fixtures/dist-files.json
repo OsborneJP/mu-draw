@@ -1,14 +1,14 @@
 [
   {
-    "path": "assets/index-8aqlHzY4.js",
-    "size": 7921621
+    "path": "assets/index-DiUFACdc.css",
+    "size": 193929
   },
   {
-    "path": "assets/index-DZ5mvGmw.css",
-    "size": 188258
+    "path": "assets/index-RtopH5h2.js",
+    "size": 7964201
   },
   {
-    "path": "assets/index.modern-55d8e3ef-CMZXhdZW.js",
+    "path": "assets/index.modern-55d8e3ef-M0dtVDOE.js",
     "size": 425354
   },
   {
@@ -33,31 +33,31 @@
   },
   {
     "path": "functional-groups.json",
-    "size": 2980
+    "size": 3550
+  },
+  {
+    "path": "icons/icon-192.png",
+    "size": 8210
+  },
+  {
+    "path": "icons/icon-512.png",
+    "size": 20821
+  },
+  {
+    "path": "icons/icon-maskable-512.png",
+    "size": 14872
+  },
+  {
+    "path": "index.html",
+    "size": 1191
   },
   {
     "path": "ir-bands.json",
     "size": 20950
   },
   {
-    "path": "icons/icon-192.png",
-    "size": 12996
-  },
-  {
-    "path": "icons/icon-512.png",
-    "size": 32809
-  },
-  {
-    "path": "icons/icon-maskable-512.png",
-    "size": 21994
-  },
-  {
-    "path": "index.html",
-    "size": 1200
-  },
-  {
     "path": "manifest.webmanifest",
-    "size": 553
+    "size": 535
   },
   {
     "path": "nmr/LICENSE-nmrshiftdb2.txt",
@@ -68,16 +68,20 @@
     "size": 1971438
   },
   {
+    "path": "practice.json",
+    "size": 16711
+  },
+  {
     "path": "rdkit/RDKit_minimal.wasm",
     "size": 7379879
   },
   {
     "path": "rdkit/worker.js",
-    "size": 71400
+    "size": 84360
   },
   {
     "path": "sw.js",
-    "size": 2079
+    "size": 2211
   },
   {
     "path": "workbox-2fbc6a65.js",

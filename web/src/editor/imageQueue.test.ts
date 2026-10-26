@@ -25,6 +25,10 @@ class FakeService {
   convert(data: ConvertData): Promise<ConvertResult> {
     return this.start(data.struct).then((struct) => ({ struct, format: data.output_format }));
   }
+  /** An InChIKey request, keyed by its drawing. */
+  getInChIKey(struct: string): Promise<string> {
+    return this.start(struct);
+  }
   private start(data: string): Promise<string> {
     this.started.push(data);
     this.whenStarted(data).resolve();
@@ -110,5 +114,24 @@ describe('imageQueue', () => {
     await service.whenStarted('another image').promise;
     service.answers.get('another image')!.resolve('image 2');
     expect(await another).toBe('image 2');
+  });
+
+  it('queues InChIKeys with images and conversions', async () => {
+    const service = imageQueue()(new FakeService());
+    const image = service.generateImageAsBase64('image');
+    const first = service.getInChIKey('first drawing');
+    const second = service.getInChIKey('second drawing');
+    await service.whenStarted('image').promise;
+    // Unqueued, both InChIKey requests would have started already.
+    expect(service.started).toEqual(['image']);
+    service.answers.get('image')!.resolve('image 1');
+    await image;
+    await service.whenStarted('first drawing').promise;
+    expect(service.started).toEqual(['image', 'first drawing']);
+    service.answers.get('first drawing')!.resolve('key 1');
+    expect(await first).toBe('key 1');
+    await service.whenStarted('second drawing').promise;
+    service.answers.get('second drawing')!.resolve('key 2');
+    expect(await second).toBe('key 2');
   });
 });

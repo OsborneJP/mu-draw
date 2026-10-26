@@ -9,12 +9,16 @@
 // Conversions (`convert`: getSmiles(), getMolfile(), the Save dialog's preview) work the same
 // way on their own shared event, so Get name's SMILES could be lost to a conversion of
 // another drawing; they wait in the same queue (the worker answers one request at a time).
+// InChIKeys (`getInChIKey`, Practice mode's Check) have a shared event too, and an answer
+// doesn't even say which drawing it is for: two requests in flight both got the first one's
+// key (measured). They wait in the same queue.
 import type { StructService } from 'ketcher-core';
 
-export type QueuedService = Pick<StructService, 'generateImageAsBase64' | 'convert'>;
+export type QueuedService = Pick<StructService, 'generateImageAsBase64' | 'convert' | 'getInChIKey'>;
 
-/** Returns a function that makes a service's `generateImageAsBase64` and `convert` wait until
- * every earlier request through the same queue has settled. One queue for the whole page. */
+/** Returns a function that makes a service's `generateImageAsBase64`, `convert` and
+ * `getInChIKey` wait until every earlier request through the same queue has settled. One
+ * queue for the whole page. */
 export function imageQueue(): <S extends QueuedService>(service: S) => S {
   let last: Promise<unknown> = Promise.resolve();
   function enqueue<T>(start: () => Promise<T>): Promise<T> {
@@ -28,6 +32,8 @@ export function imageQueue(): <S extends QueuedService>(service: S) => S {
     target.generateImageAsBase64 = (data, options) => enqueue(() => generate(data, options));
     const convert = target.convert.bind(service);
     target.convert = (data, options) => enqueue(() => convert(data, options));
+    const inchiKey = target.getInChIKey.bind(service);
+    target.getInChIKey = (struct) => enqueue(() => inchiKey(struct));
     return service;
   };
 }

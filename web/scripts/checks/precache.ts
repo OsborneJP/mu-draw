@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { RDKIT_WASM_FILE, RDKIT_WORKER_FILE } from '../../config/rdkitWasm.ts';
 import { CARBON_TABLE_FILE, CARBON_TABLE_LICENCE_FILE, PATTERNS_FILE } from '../../src/chem/rdkitFiles.ts';
 import { IR_BANDS_FILE } from '../../src/chem/irBands.ts';
+import { PRACTICE_FILE } from '../../src/panels/practiceFile.ts';
 
 export interface DistFile {
   path: string;
@@ -83,5 +84,6 @@ export function checkPrecache(files: DistFile[], precached: string[]): string[] 
   if (!paths.has(CARBON_TABLE_FILE)) errors.push(`¹³C shift table missing: ${CARBON_TABLE_FILE}`);
   if (!paths.has(CARBON_TABLE_LICENCE_FILE)) errors.push(`¹³C shift table's licence missing: ${CARBON_TABLE_LICENCE_FILE}`);
   if (!paths.has(IR_BANDS_FILE)) errors.push(`IR hint table missing: ${IR_BANDS_FILE}`);
+  if (!paths.has(PRACTICE_FILE)) errors.push(`practice list file missing: ${PRACTICE_FILE}`);
   return errors;
 }
