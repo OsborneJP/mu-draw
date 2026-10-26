@@ -133,7 +133,7 @@ Two buttons, and two panels below the canvas built alike. A student sees acetone
 ## Known limits (to state in the panels' notes and BUILD-LEARNINGS)
 
 - Tautomers are what RDKit's 37 rules reach, not their stabilities. Unusual forms appear, and no form is called the most stable.
-- RDKit's tautomer list can differ for the same compound drawn in another atom order (a pyrrole diester: 9 or 10). The app equals Python for the same drawing.
+- RDKit's tautomer and resonance lists can differ for the same compound drawn in another atom order (a pyrrole diester: 9 or 10 tautomers). The app runs RDKit in the drawing's canonical atom order, so every drawing of a compound gets the same lists (Jeff's decision, after the build).
 - Stereo at any atom an H moves to or from is dropped in every tautomer, the drawing's own included.
 - Resonance covers conjugated groups only, with decision 2's settings. Isolated carbonyls, enones, esters and acids get no charge-separated forms; anilines, phenols and enol ethers get only their Kekulé forms; diazomethane gets one form. Hypervalent S and P are outside RDKit's conjugated groups (sulfate: 1).
 - No lone pairs or curved arrows.
@@ -169,7 +169,15 @@ What changed from the plan as approved, for Jeff to confirm:
   how it was drawn; each structure is mapped back to the drawing's atoms.** Phenolate now
   lists 5 and acetylacetonate 3; cyclopentadienide and tropylium still miss one each. A test
   draws every resonance test drawing with its atoms reversed and requires the same list.
-  Tautomers keep the drawing's own order, as approved.
+  **Tautomers too (Jeff, the same day):** RDKit enumerates the drawing in canonical atom
+  order, and each tautomer is rebuilt in the drawing's own order from its Hs, charges and
+  bonds, with the drawing's stereo cleared as RDKit clears it (a chiral tag can't be carried
+  between atom orders). No test drawing's list changed; in barbituric acid an H moved to the
+  symmetry-equivalent atom. Of NCI's first 5,000 molecules one list depends on the order:
+  Knorr's pyrrole (the pyrrole diester above, line 2033), 9 tautomers in NCI's order and 10 in
+  canonical order. It is now a test drawing kept in NCI's order (judged: 10). Tests require
+  the same list for every test drawing renumbered in reverse and in canonical order, and for
+  every NCI sample molecule in reverse.
 - **RDKit's licence.** The ports are derived from RDKit's BSD-licensed C++; its licence is
   recorded, credited in THIRD-PARTY-NOTICES, and carried in rdkitTables.json into the app.
 

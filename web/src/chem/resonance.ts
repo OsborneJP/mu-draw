@@ -18,9 +18,10 @@
 // ConjugHybrid.cpp, Copyright (C) 2001-2024 Greg Landrum and other RDKit contributors;
 // Aromaticity.cpp, Copyright (C) 2003-2022 Greg Landrum and other RDKit contributors; under
 // RDKit's BSD licence (tests/fixtures/recorded/rdkit/license.txt; rdkitTables.json ships it).
-import type { MainModule, Mol } from '@rdkit/rdkit';
+import type { MainModule } from '@rdkit/rdkit';
 import {
   atomBonds,
+  canonical,
   chiralFlagOf,
   copyForm,
   DATIVE_BOND,
@@ -33,6 +34,7 @@ import {
   withChiralFlag,
   withForm,
   ZERO_BOND,
+  type Canonical,
   type Form,
 } from './rdkitForm';
 import tables from './rdkitTables.json';
@@ -878,46 +880,19 @@ function structureMolfile(rdkit: MainModule, drawing: Form, bonds: number[], cha
   return withChiralFlag(text, chiralFlag);
 }
 
-/** The molecule in RDKit's canonical atom order, as its canonical SMILES lists the atoms, and
- * the molecule's own atom for each of them, or null. RDKit's resonance list depends on the
- * atom order, so the panel runs it in this one (Jeff's decision, 2026-10-26). As the
- * generator's canonical(). */
-export function canonical(rdkit: MainModule, mol: Mol): { form: Form; order: number[] } | null {
-  const smiles = mol.get_smiles();
-  const order = JSON.parse(mol.get_prop('_smilesAtomOutputOrder')) as number[];
-  const canon = rdkit.get_mol(smiles);
-  if (!canon) return null;
-  try {
-    return { form: formOf(canon), order };
-  } finally {
-    canon.delete();
-  }
-}
-
-/** A structure of the canonical molecule as bond orders and charges by the molecule's own
- * bond and atom indices. */
-function inOwnOrder(own: Form, canon: { form: Form; order: number[] }, bonds: number[], charges: number[]) {
-  const at = new Map(canon.order.map((atom, k) => [atom, k]));
-  const pair = (a: number, b: number) => `${Math.min(a, b)} ${Math.max(a, b)}`;
-  const bond = new Map(canon.form.bonds.map((b, j) => [pair(b.atoms[0], b.atoms[1]), j]));
-  return {
-    bonds: own.bonds.map((b) => bonds[bond.get(pair(at.get(b.atoms[0])!, at.get(b.atoms[1])!))!]),
-    charges: own.atoms.map((_, a) => charges[at.get(a)!]),
-  };
-}
-
 /** The panel's list for a drawing, or null when RDKit can't read it: RDKit's structures for
  * it in canonical atom order, by the drawing's own indices. */
 export function listResonance(rdkit: MainModule, molfile: string): ResonanceList | null {
   const mol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: true }));
   if (!mol) return null;
   let drawing: Form;
-  let canon: ReturnType<typeof canonical>;
+  let canon: Canonical | null;
   try {
     drawing = formOf(mol);
     if (pieces(drawing) > 1) return { outcome: 'several' };
     if (!plainBonds(drawing)) return { outcome: 'bonds' };
-    canon = canonical(rdkit, mol);
+    canon = canonical(rdkit, mol, drawing);
+    canon?.mol.delete();
   } finally {
     mol.delete();
   }
@@ -933,7 +908,9 @@ export function listResonance(rdkit: MainModule, molfile: string): ResonanceList
   return {
     outcome: 'listed',
     structures: supplied.structures.map((s, n) => {
-      const { bonds, charges } = inOwnOrder(drawing, canon, s.bonds, s.charges);
+      // By the drawing's own bonds and atoms.
+      const bonds = canon.bonds.map((j) => s.bonds[j]);
+      const charges = canon.atoms.map((k) => s.charges[k]);
       return {
         number: n + 1,
         bonds,

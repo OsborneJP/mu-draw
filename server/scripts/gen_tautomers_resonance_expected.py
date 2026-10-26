@@ -107,6 +107,10 @@ DRAWN_AS_TAUTOMER = (
         "formamidinesulfinic acid f",
     ),
 )
+# Tautomer test drawings kept in the atom order of a line of RDKit's NCI set, where RDKit's
+# list in that order differs from its list in canonical order, which the panel shows (Jeff's
+# decision): (name, line). The only such molecule among NCI's first 5,000 with at most 32.
+DRAWN_IN_NCI_ORDER = (("Knorr's pyrrole, drawn in the atom order of RDKit's NCI set", 2033),)
 
 
 def changed(parent: Chem.Mol, change: str, smarts: str) -> Chem.Mol:
@@ -231,12 +235,14 @@ def closest(forms: list[list[int]], drawn: Chem.Mol) -> list[int]:
 
 
 def tautomers(mol: Chem.Mol, text: str) -> dict:
-    """What the tautomer panel lists for a drawing (RDKit's reading of it, and the Molfile).
-    Each tautomer is drawn in its Kekulé form closest to the drawing, so the bonds that look
-    different are the ones highlighted."""
+    """What the tautomer panel lists for a drawing (RDKit's reading of it, and the Molfile):
+    RDKit's tautomers of it in canonical atom order, by the drawing's own indices. Each is
+    drawn in its Kekulé form closest to the drawing, so the bonds that look different are the
+    ones highlighted."""
     if len(Chem.GetMolFrags(mol)) > 1:
         return {"outcome": "several"}
-    result = tautomer_enumerator().Enumerate(mol)
+    canon, at, bond_of = canonical(mol)
+    result = tautomer_enumerator().Enumerate(canon)
     status = str(result.status)
     if status != "Completed" or len(result.smiles) > LIMITS["drawn"]:
         return {"outcome": "too-many", "status": status}
@@ -244,23 +250,24 @@ def tautomers(mol: Chem.Mol, text: str) -> dict:
     charges = [a.GetFormalCharge() for a in mol.GetAtoms()]
     drawn = as_drawn(text)
     drawn_aromatic = [b.GetBondType() == Chem.BondType.AROMATIC for b in drawn.GetBonds()]
-    own = drawing_smiles(mol, result)
+    own = drawing_smiles(canon, result)
     listed = []
     for smiles, tautomer in zip(result.smiles, result.tautomers, strict=True):
         # The drawing's own is shown as drawn: RDKit may keep it with an H elsewhere that
         # gives the same SMILES (histidine's acid H on its other O).
-        tautomer = mol if smiles == own else tautomer
-        kekule = closest(kekule_forms(tautomer), drawn)
-        h = [a.GetTotalNumHs() for a in tautomer.GetAtoms()]
-        c = [a.GetFormalCharge() for a in tautomer.GetAtoms()]
+        tautomer = canon if smiles == own else tautomer
+        # From here on by the drawing's own atoms and bonds.
+        kekule = closest([[f[j] for j in bond_of] for f in kekule_forms(tautomer)], drawn)
+        h = [tautomer.GetAtomWithIdx(k).GetTotalNumHs() for k in at]
+        c = [tautomer.GetAtomWithIdx(k).GetFormalCharge() for k in at]
         atoms = [i for i in range(len(h)) if h[i] != hydrogens[i] or c[i] != charges[i]]
         # A bond drawn aromatic changes where the tautomer's is not aromatic; any other bond
         # where its order in the picture is not the drawn one.
         bonds = [
             i
-            for i, b in enumerate(tautomer.GetBonds())
+            for i, j in enumerate(bond_of)
             if (
-                not b.GetIsAromatic()
+                not tautomer.GetBondWithIdx(j).GetIsAromatic()
                 if drawn_aromatic[i]
                 else kekule[i] != drawn.GetBondWithIdx(i).GetBondTypeAsDouble()
             )
@@ -284,8 +291,8 @@ def tautomers(mol: Chem.Mol, text: str) -> dict:
         Chem.BondStereo.STEREOCIS,
         Chem.BondStereo.STEREOTRANS,
     )
-    atoms = (mol.GetAtomWithIdx(i).GetChiralTag() for i in result.modifiedAtoms)
-    bonds = (mol.GetBondWithIdx(i).GetStereo() for i in result.modifiedBonds)
+    atoms = (canon.GetAtomWithIdx(i).GetChiralTag() for i in result.modifiedAtoms)
+    bonds = (canon.GetBondWithIdx(i).GetStereo() for i in result.modifiedBonds)
     dropped = any(t in defined_atom for t in atoms) or any(s in defined_bond for s in bonds)
     return {"outcome": "listed", "status": status, "stereo_dropped": dropped, "tautomers": listed}
 
@@ -396,25 +403,20 @@ def as_drawn(text: str) -> Chem.Mol:
     return Chem.RemoveHs(Chem.MolFromMolBlock(text, sanitize=False, removeHs=False), sanitize=False)
 
 
-def canonical(mol: Chem.Mol) -> tuple[Chem.Mol, list[int]]:
-    """The molecule in RDKit's canonical atom order, as its canonical SMILES lists the atoms,
-    and the molecule's own atom for each of them. RDKit's resonance list depends on the atom
-    order, so the panel runs it in this one (Jeff's decision, 2026-10-26)."""
+def canonical(mol: Chem.Mol) -> tuple[Chem.Mol, list[int], list[int]]:
+    """The molecule in RDKit's canonical atom order (as its canonical SMILES lists the atoms),
+    and, for each of the molecule's own atoms and bonds, the canonical one. RDKit's tautomer
+    and resonance lists depend on the atom order, so the panels run RDKit in this one (Jeff's
+    decision, 2026-10-26)."""
     smiles = Chem.MolToSmiles(mol)
-    return Chem.MolFromSmiles(smiles), json.loads(mol.GetProp("_smilesAtomOutputOrder"))
-
-
-def in_own_order(
-    mol: Chem.Mol, canon: Chem.Mol, order: list[int], bonds: list[int], charges: list[int]
-):
-    """A structure of the canonical molecule, as bond orders and charges by the molecule's own
-    bond and atom indices."""
-    at = {atom: k for k, atom in enumerate(order)}
-    bond = [
-        canon.GetBondBetweenAtoms(at[b.GetBeginAtomIdx()], at[b.GetEndAtomIdx()]).GetIdx()
+    order = json.loads(mol.GetProp("_smilesAtomOutputOrder"))
+    canon = Chem.MolFromSmiles(smiles)
+    atoms = [order.index(a) for a in range(mol.GetNumAtoms())]
+    bonds = [
+        canon.GetBondBetweenAtoms(atoms[b.GetBeginAtomIdx()], atoms[b.GetEndAtomIdx()]).GetIdx()
         for b in mol.GetBonds()
     ]
-    return [bonds[j] for j in bond], [charges[at[a]] for a in range(mol.GetNumAtoms())]
+    return canon, atoms, bonds
 
 
 def resonance(mol: Chem.Mol, text: str) -> dict:
@@ -422,12 +424,13 @@ def resonance(mol: Chem.Mol, text: str) -> dict:
     RDKit's structures for it in canonical atom order, by the drawing's own indices."""
     if len(Chem.GetMolFrags(mol)) > 1:
         return {"outcome": "several"}
-    canon, order = canonical(mol)
+    canon, atoms, bonds = canonical(mol)
     found = {**resonance_structures(canon), "conjugated": conjugated_groups(mol)[0]}
     if found["outcome"] != "listed":
         return found
+    # By the drawing's own bonds and atoms.
     found["structures"] = [
-        (*in_own_order(mol, canon, order, b, c), r) for b, c, r in found["structures"]
+        ([b[j] for j in bonds], [c[k] for k in atoms], r) for b, c, r in found["structures"]
     ]
     drawn = as_drawn(text)
     if [a.GetAtomicNum() for a in drawn.GetAtoms()] != [a.GetAtomicNum() for a in mol.GetAtoms()]:
@@ -469,6 +472,9 @@ def drawings() -> tuple[list[dict], list[dict], dict[str, str]]:
     )
     for name, parent, change, smarts in GENERATED:
         by_name[name] = changed(by_name[parent], change, smarts)
+    nci_lines = NCI_SOURCE.read_text(encoding="utf-8").splitlines()
+    for name, line in DRAWN_IN_NCI_ORDER:
+        by_name[name] = Chem.MolFromSmiles(nci_lines[line].split()[0])
     for name, parent, transform in DRAWN_AS_TAUTOMER:
         by_name[name] = drawn_as_tautomer(by_name[parent], transform)
     for name, parent, flag in DRAWN_AS_RESONANCE:
@@ -482,6 +488,7 @@ def drawings() -> tuple[list[dict], list[dict], dict[str, str]]:
     tautomer_names = [
         *sets[0],
         *(d[0] for d in DRAWN_AS_TAUTOMER),
+        *(d[0] for d in DRAWN_IN_NCI_ORDER),
         *(d[0] for d in DRAWN_AROMATIC if d[2] == "tautomers"),
     ]
     resonance_names = [

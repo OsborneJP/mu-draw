@@ -4,8 +4,9 @@
 // RDKit's 37 transforms (rdkitTables.json, from its source): RDKit.js finds the matches on
 // the Kekulé form and reads each product back with the sanitization steps RDKit runs there.
 // tautomers.test.ts requires Python RDKit's Enumerate() answers for every test drawing and
-// for 304 molecules of RDKit's NCI set. Measured (plan): the answer can depend on atom order
-// (in Python too), so a drawing is read as drawn, never through SMILES.
+// for 304 molecules of RDKit's NCI set. RDKit's answer can depend on the atom order (in
+// Python too), so the panel runs it on the drawing in RDKit's canonical atom order (Jeff's
+// decision) and rebuilds each tautomer in the drawing's own order.
 //
 // Kept as RDKit has it, so the two agree: its map of tautomers keyed by canonical SMILES and
 // walked in key order while it grows; its limits (a stop at 33 tautomers here, decision 7;
@@ -17,6 +18,7 @@
 // license.txt; rdkitTables.json ships it with the app).
 import type { MainModule, Mol } from '@rdkit/rdkit';
 import {
+  canonical,
   chiralFlagOf,
   copyForm,
   formOf,
@@ -27,6 +29,7 @@ import {
   readAsDrawn,
   withChiralFlag,
   withForm,
+  type Canonical,
   type Form,
   type Step,
 } from './rdkitForm';
@@ -350,58 +353,91 @@ function molfileOf(rdkit: MainModule, form: Form, kekule: number[], coords: numb
   return withChiralFlag(text, chiralFlag);
 }
 
-/** The panel's list for a drawing, or null when RDKit can't read it. */
+/** A tautomer of the canonical molecule rebuilt in the drawing's own atom and bond order: its
+ * Hs, charges, bond orders and aromaticity put onto the drawing, whose stereo is then cleared
+ * and settled as RDKit clears every tautomer's. Stereo is never carried from one atom order to
+ * the other: a chiral tag is relative to the order of an atom's bonds. */
+function inOwnOrder(rdkit: MainModule, drawing: Form, canon: Canonical, form: Form, atoms: Set<number>, bonds: Set<number>) {
+  const own = { ...copyForm(drawing), coords: null };
+  own.atoms.forEach((atom, a) => {
+    const { impHs, chg, nRad } = form.atoms[canon.atoms[a]];
+    Object.assign(atom, { impHs, chg, nRad });
+  });
+  own.bonds.forEach((bond, i) => (bond.bo = form.bonds[canon.bonds[i]].bo));
+  const aromaticAtoms = new Set(form.aromaticAtoms);
+  const aromaticBonds = new Set(form.aromaticBonds);
+  own.aromaticAtoms = own.atoms.flatMap((_, a) => (aromaticAtoms.has(canon.atoms[a]) ? [a] : []));
+  own.aromaticBonds = own.bonds.flatMap((_, i) => (aromaticBonds.has(canon.bonds[i]) ? [i] : []));
+  clearStereo(own, atoms, bonds);
+  return settle(rdkit, own, bonds);
+}
+
+/** The panel's list for a drawing, or null when RDKit can't read it: RDKit's tautomers of it
+ * in canonical atom order (see canonical()), each by the drawing's own indices. */
 export function listTautomers(rdkit: MainModule, molfile: string): TautomerList | null {
   const mol = readDrawing(rdkit, molfile);
   if (!mol) return null;
+  let canonicalMol: Mol | null = null;
   try {
     const drawing = formOf(mol);
     if (pieces(drawing) > 1) return { outcome: 'several' };
     if (!plainBonds(drawing)) return { outcome: 'bonds' };
-    const found = enumerate(rdkit, mol);
+    const canon = canonical(rdkit, mol, drawing);
+    if (!canon) return null;
+    canonicalMol = canon.mol;
+    const found = enumerate(rdkit, canon.mol);
     if (tautomerOutcome(found.status, found.tautomers.length) === 'too-many') return { outcome: 'too-many', status: found.status };
-    // Each tautomer is drawn in its Kekulé form closest to the drawing, so the bonds that look
-    // different are the ones highlighted.
-    const drawn = readAsDrawn(rdkit, molfile, drawing) ?? drawing;
-    const drawnAromatic = new Set(drawn.aromaticBonds);
-    const changes = (form: Form, kekule: number[]) => {
-      const aromatic = new Set(form.aromaticBonds);
-      return {
-        changedAtoms: form.atoms.flatMap((a, i) => (a.impHs !== drawing.atoms[i].impHs || a.chg !== drawing.atoms[i].chg ? [i] : [])),
-        changedBonds: kekule.flatMap((bo, i) => ((drawnAromatic.has(i) ? !aromatic.has(i) : bo !== orderOf(drawn.bonds[i])) ? [i] : [])),
-      };
-    };
     // The drawing's own tautomer is the one RDKit keys by the drawing's SMILES once its stereo
     // is cleared as everyone's is. RDKit may have kept it in a form of the same SMILES with an H
     // elsewhere (histidine's acid H on its other O), so it is shown as drawn.
-    const own = { ...copyForm(drawing), coords: null };
-    clearStereo(own, new Set(found.modifiedAtoms), new Set(found.modifiedBonds));
-    const settled = settle(rdkit, own, new Set(found.modifiedBonds));
+    const ownForm = { ...copyForm(canon.form), coords: null };
+    clearStereo(ownForm, new Set(found.modifiedAtoms), new Set(found.modifiedBonds));
+    const settled = settle(rdkit, ownForm, new Set(found.modifiedBonds));
     const at = found.tautomers.findIndex((t) => t.smiles === settled?.smiles);
     if (!settled || at < 0) throw new Error('RDKit did not list the drawing among its own tautomers');
     const shown = found.tautomers.map((t, i) => (i === at ? { ...t, form: settled.form } : t));
     const ordered = [shown[at], ...shown.filter((_, i) => i !== at)];
+    // The atoms and bonds RDKit modified, by the drawing's own indices.
+    const modifiedAtoms = new Set(found.modifiedAtoms);
+    const modifiedBonds = new Set(found.modifiedBonds);
+    const atoms = new Set(canon.atoms.flatMap((k, a) => (modifiedAtoms.has(k) ? [a] : [])));
+    const bonds = new Set(canon.bonds.flatMap((j, i) => (modifiedBonds.has(j) ? [i] : [])));
+    // Each tautomer is drawn in its Kekulé form closest to the drawing, so the bonds that look
+    // different are the ones highlighted.
+    const drawn = readAsDrawn(rdkit, molfile, drawing) ?? drawing;
+    const drawnAromatic = new Set(drawn.aromaticBonds);
     const flag = chiralFlagOf(molfile);
     const stereoDropped =
-      found.modifiedAtoms.some((a) => drawing.atoms[a].stereo === 'cw' || drawing.atoms[a].stereo === 'ccw') ||
-      found.modifiedBonds.some((b) => drawing.bonds[b].stereo === 'cis' || drawing.bonds[b].stereo === 'trans');
+      [...atoms].some((a) => drawing.atoms[a].stereo === 'cw' || drawing.atoms[a].stereo === 'ccw') ||
+      [...bonds].some((b) => drawing.bonds[b].stereo === 'cis' || drawing.bonds[b].stereo === 'trans');
     return {
       outcome: 'listed',
       stereoDropped,
       tautomers: ordered.map((t, n) => {
-        const kekule = closest(kekuleForms(t.form), drawn);
+        const rebuilt = inOwnOrder(rdkit, drawing, canon, t.form, atoms, bonds);
+        if (rebuilt?.smiles !== t.smiles) throw new Error('a tautomer changed when rebuilt in the drawing’s atom order');
+        const kekule = closest(
+          kekuleForms(t.form).map((f) => canon.bonds.map((j) => f[j])),
+          drawn,
+        );
+        const aromatic = new Set(t.form.aromaticBonds);
+        const form = rebuilt.form;
         return {
           number: n + 1,
           smiles: t.smiles,
           drawing: n === 0,
-          hydrogens: t.form.atoms.map((a) => a.impHs),
+          hydrogens: form.atoms.map((a) => a.impHs),
           kekule,
-          ...changes(t.form, kekule),
-          molfile: molfileOf(rdkit, t.form, kekule, drawing.coords, flag),
+          changedAtoms: form.atoms.flatMap((a, i) => (a.impHs !== drawing.atoms[i].impHs || a.chg !== drawing.atoms[i].chg ? [i] : [])),
+          changedBonds: kekule.flatMap((bo, i) =>
+            (drawnAromatic.has(i) ? !aromatic.has(canon.bonds[i]) : bo !== orderOf(drawn.bonds[i])) ? [i] : [],
+          ),
+          molfile: molfileOf(rdkit, form, kekule, drawing.coords, flag),
         };
       }),
     };
   } finally {
+    canonicalMol?.delete();
     mol.delete();
   }
 }

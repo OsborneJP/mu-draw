@@ -308,6 +308,13 @@
    "count": 2,
    "stereo_dropped": false,
    "why": "as phenol: an aromatic ring drawn as such is read as the same molecule"
+  },
+  {
+   "name": "Knorr's pyrrole, drawn in the atom order of RDKit's NCI set",
+   "outcome": "listed",
+   "count": 10,
+   "stereo_dropped": false,
+   "why": "the NH pyrrole; three with the NH's H moved onto a ring carbon; two ester enols with a ring C=N; four with a methyl's H moved, giving an exocyclic C=CH2. In NCI's atom order RDKit misses one of the ring-carbon forms (9); the panel uses its canonical order"
   }
  ]
 }

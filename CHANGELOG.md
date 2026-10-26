@@ -132,7 +132,8 @@ All notable changes to this project. The format follows
   lone C=O, an enone or an ester; only Kekulé forms for aniline and phenol). Up to 32 are
   drawn; a conjugated system of more than 60 bonds is not listed. A drawing with a bond that
   is not single, double or triple (an aromatic bond outside a ring, as in a carboxylate drawn
-  as its hybrid, a hydrogen bond or a query bond) is told so.
+  as its hybrid, a hydrogen bond or a query bond) is told so. A compound gets the same lists
+  however its atoms were drawn (RDKit runs in its canonical atom order).
 
 ### Changed
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening

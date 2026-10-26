@@ -1264,7 +1264,14 @@ Python RDKit 2026.09.1.
   Jeff chose to run resonance on the drawing in RDKit's canonical atom order (its canonical
   SMILES read back; `_smilesAtomOutputOrder`, which RDKit.js's `get_prop` reads after
   `get_smiles()` exactly as Python does, maps each structure back), so the list no longer
-  depends on how the drawing was numbered. Tautomers keep the drawing's order.
+  depends on how the drawing was numbered; then tautomers too. A tautomer found in canonical
+  order is rebuilt onto the drawing (its Hs, charges, bond orders and aromaticity by the atom
+  and bond maps) and its stereo cleared and settled again, never permuted: a chiral tag is
+  relative to the order of the atom's bonds, so carrying it to another order can invert it.
+  Each rebuilt tautomer must give the canonical one's SMILES, or the panel fails. Order
+  dependence is rare for tautomers: of NCI's first 5,000 only Knorr's pyrrole (line 2033)
+  changes (9 or 10), and not when its atoms are merely reversed; a renumbering test needs a
+  witness found by trying the actual orders.
 - RDKit keeps the drawing's own tautomer under its SMILES, but may have stored it with an H
   elsewhere that gives the same SMILES (histidine's acid H on its other O), so the drawing's
   card is found by that SMILES and drawn as drawn, not by comparing atoms.

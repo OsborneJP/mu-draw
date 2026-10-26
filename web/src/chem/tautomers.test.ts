@@ -8,6 +8,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
 import { chiralFlagOf, formOf, orderOf } from './rdkitForm';
 import { enumerate, listTautomers, readDrawing, TAUTOMER_LIMITS, tautomerOutcome, type TautomerList } from './tautomers';
+import { reversed, withDoubleBondTyped } from './testMolfiles';
 
 interface ExpectedTautomer {
   smiles: string;
@@ -135,18 +136,6 @@ describe('the test drawings', () => {
   });
 });
 
-/** A version 2 Molfile with its first double bond retyped (Molfile bond types: 4 aromatic, 5 to 8
- * query bonds, 10 a hydrogen bond), as Ketcher writes them. */
-function withDoubleBondTyped(molfile: string, type: number): string {
-  const lines = molfile.split('\n');
-  const first = 4 + Number(lines[3].slice(0, 3));
-  const bonds = Number(lines[3].slice(3, 6));
-  const at = lines.slice(first, first + bonds).findIndex((line) => line.slice(6, 9).trim() === '2');
-  if (at < 0) throw new Error('no double bond to retype');
-  lines[first + at] = `${lines[first + at].slice(0, 6)}${String(type).padStart(3)}${lines[first + at].slice(9)}`;
-  return lines.join('\n');
-}
-
 describe('a bond RDKit reads as none of single, double or triple (review finding)', () => {
   const acetone = () => drawing(fixture.compounds.find((c) => c.name === 'acetone')!);
 
@@ -157,6 +146,49 @@ describe('a bond RDKit reads as none of single, double or triple (review finding
   it('is not refused when single or double', () => {
     for (const type of [1, 2]) expect(listTautomers(rdkit, withDoubleBondTyped(acetone(), type))?.outcome, `type ${type}`).toBe('listed');
   });
+});
+
+describe('the atom order (Jeff’s decision: RDKit’s canonical order)', () => {
+  /** What a list says about the compound, not about its atom numbers. */
+  const same = (list: TautomerList | null) =>
+    list?.outcome === 'listed' ? { outcome: list.outcome, stereoDropped: list.stereoDropped, smiles: list.tautomers.map((t) => t.smiles) } : list;
+
+  /** The drawing renumbered in RDKit's canonical atom order (its canonical SMILES read back). */
+  const inCanonicalOrder = (molfile: string) => {
+    const mol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: true }))!;
+    const canonical = rdkit.get_mol(mol.get_smiles())!;
+    mol.delete();
+    canonical.set_new_coords();
+    const text = canonical.get_molblock();
+    canonical.delete();
+    return text;
+  };
+
+  it('lists the same tautomers, in the same order, however the atoms were numbered', () => {
+    for (const c of fixture.compounds) {
+      if (/^M {2}V30 /m.test(drawing(c))) continue; // the helper reads version 2 columns
+      expect(same(listTautomers(rdkit, reversed(drawing(c)))), c.name).toEqual(same(results.get(c.name)!));
+      expect(same(listTautomers(rdkit, inCanonicalOrder(drawing(c)))), c.name).toEqual(same(results.get(c.name)!));
+    }
+  });
+
+  it('does so for every NCI sample molecule too, each card a Molfile of its own tautomer', () => {
+    for (const m of nci.molecules) {
+      const mol = rdkit.get_mol(m.smiles)!;
+      mol.set_new_coords();
+      const molfile = mol.get_molblock();
+      mol.delete();
+      if (/^M {2}V30 /m.test(molfile)) continue;
+      const list = listTautomers(rdkit, molfile);
+      expect(same(listTautomers(rdkit, reversed(molfile))), m.smiles).toEqual(same(list));
+      if (list?.outcome !== 'listed') continue;
+      for (const t of list.tautomers) {
+        const read = rdkit.get_mol(t.molfile)!;
+        expect(read.get_smiles(), m.smiles).toBe(t.smiles);
+        read.delete();
+      }
+    }
+  }, 60_000); // about 10 s: every molecule listed twice
 });
 
 describe('RDKit’s NCI sample', () => {

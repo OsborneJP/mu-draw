@@ -167,6 +167,35 @@ export function readAsDrawn(rdkit: MainModule, molfile: string, reading: Form): 
   }
 }
 
+/** A molecule in RDKit's canonical atom order (as its canonical SMILES lists the atoms), with,
+ * for each of the molecule's own atoms and bonds, the canonical one. */
+export interface Canonical {
+  /** The caller deletes it. */
+  mol: Mol;
+  form: Form;
+  atoms: number[];
+  bonds: number[];
+}
+
+/** RDKit's tautomer and resonance lists depend on the atom order, so the panels run RDKit on
+ * the drawing in its canonical atom order (Jeff's decision, 2026-10-26) and map each answer
+ * back to the drawing's atoms and bonds. Null if RDKit can't read its SMILES back. As the
+ * generator's canonical(). */
+export function canonical(rdkit: MainModule, mol: Mol, own: Form): Canonical | null {
+  const smiles = mol.get_smiles();
+  // Set by get_smiles(): position k of the SMILES holds the molecule's atom order[k].
+  const order = JSON.parse(mol.get_prop('_smilesAtomOutputOrder')) as number[];
+  const canon = rdkit.get_mol(smiles);
+  if (!canon) return null;
+  const form = formOf(canon);
+  const atoms: number[] = [];
+  order.forEach((atom, k) => (atoms[atom] = k));
+  const pair = (a: number, b: number) => `${Math.min(a, b)} ${Math.max(a, b)}`;
+  const index = new Map(form.bonds.map((b, j) => [pair(b.atoms[0], b.atoms[1]), j]));
+  const bonds = own.bonds.map((b) => index.get(pair(atoms[b.atoms[0]], atoms[b.atoms[1]]))!);
+  return { mol: canon, form, atoms, bonds };
+}
+
 /** The number of separate structures (connected pieces) in a form. */
 export function pieces(form: Form): number {
   const parent = form.atoms.map((_, i) => i);

@@ -10,6 +10,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
 import { chiralFlagOf, formOf, orderOf } from './rdkitForm';
 import { listResonance, RESONANCE_LIMITS, resonanceOutcome, supply, type ResonanceList } from './resonance';
+import { reversed, withDoubleBondTyped } from './testMolfiles';
 
 interface ExpectedStructure {
   bonds: number[];
@@ -132,18 +133,6 @@ describe('the test drawings', () => {
   });
 });
 
-/** A version 2 Molfile with its first double bond retyped (Molfile bond types: 4 aromatic, 5 to 8
- * query bonds, 10 a hydrogen bond), as Ketcher writes them. */
-function withDoubleBondTyped(molfile: string, type: number): string {
-  const lines = molfile.split('\n');
-  const first = 4 + Number(lines[3].slice(0, 3));
-  const bonds = Number(lines[3].slice(3, 6));
-  const at = lines.slice(first, first + bonds).findIndex((line) => line.slice(6, 9).trim() === '2');
-  if (at < 0) throw new Error('no double bond to retype');
-  lines[first + at] = `${lines[first + at].slice(0, 6)}${String(type).padStart(3)}${lines[first + at].slice(9)}`;
-  return lines.join('\n');
-}
-
 describe('a bond RDKit reads as none of single, double or triple (review finding)', () => {
   const acetate = () => drawing(fixture.compounds.find((c) => c.name === 'acetate')!);
 
@@ -173,27 +162,6 @@ describe('RDKit’s NCI sample', () => {
     }
   });
 });
-
-/** A version 2 Molfile with its atoms listed in reverse: the same structure, drawn in another
- * order. Bonds and charge lines follow their atoms. */
-function reversed(molfile: string): string {
-  const lines = molfile.split('\n');
-  const atoms = Number(lines[3].slice(0, 3));
-  const bonds = Number(lines[3].slice(3, 6));
-  const renumber = (n: number) => atoms + 1 - n;
-  const atomLines = lines.slice(4, 4 + atoms).reverse();
-  const bondLines = lines.slice(4 + atoms, 4 + atoms + bonds).map((line) => {
-    const [a, b] = [Number(line.slice(0, 3)), Number(line.slice(3, 6))];
-    return `${String(renumber(a)).padStart(3)}${String(renumber(b)).padStart(3)}${line.slice(6)}`;
-  });
-  const rest = lines.slice(4 + atoms + bonds).map((line) => {
-    if (!line.startsWith('M  CHG')) return line;
-    const fields = line.slice(6).trim().split(/\s+/).map(Number);
-    const pairs = fields.slice(1).flatMap((v, i) => (i % 2 === 0 ? [renumber(v)] : [v]));
-    return `M  CHG${String(fields[0]).padStart(3)}${pairs.map((v) => String(v).padStart(4)).join('')}`;
-  });
-  return [...lines.slice(0, 4), ...atomLines, ...bondLines, ...rest].join('\n');
-}
 
 describe('the atom order (Jeff’s decision: RDKit’s canonical order)', () => {
   it('lists the same structures, in the same order, however the atoms were numbered', () => {

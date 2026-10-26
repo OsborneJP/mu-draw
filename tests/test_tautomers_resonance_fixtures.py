@@ -192,3 +192,12 @@ def test_rdkits_order_follows_the_recorded_ranks(generated):
     ]
     assert len(ranked) > 100
     assert all(out_of_order(list(reversed(s))) for s in ranked)
+
+
+def test_knorrs_pyrrole_still_depends_on_the_atom_order(generated):
+    """The witness for running RDKit in canonical atom order (Jeff's decision): in its own
+    atom order RDKit lists a different set of tautomers than the fixture's."""
+    ((name, _line),) = gen.DRAWN_IN_NCI_ORDER
+    c = next(c for c in compounds(generated, gen.TAUTOMERS_FILE) if c["name"] == name)
+    own_order = gen.tautomer_enumerator().Enumerate(Chem.MolFromMolBlock(generated[c["file"]]))
+    assert sorted(own_order.smiles) != sorted(t["smiles"] for t in c["tautomers"])

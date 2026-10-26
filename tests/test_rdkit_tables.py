@@ -19,10 +19,10 @@ from test_reference_fixtures import locked_version
 TABLES = json.loads(gen.TABLES_FILE.read_text(encoding="utf-8"))
 FIXTURES = gen.ROOT / "tests" / "fixtures"
 # Each transform, and a test molecule whose tautomers differ without it: a test drawing by
-# name, or an NCI molecule by its line in RDKit's set (forms_nci_expected.json). Each is the
-# first found, trying every test drawing and then every NCI molecule, whose whole answer the
-# panel lists (RDKit completes it, with at most 32 tautomers) and that a tautomer of it
-# matches the transform's pattern.
+# name, or an NCI molecule by its line in RDKit's set (forms_nci_expected.json). Found by
+# trying every test drawing and then every NCI molecule for one whose whole answer the panel
+# lists (RDKit completes it, with at most 32 tautomers) and that a tautomer of it matches the
+# transform's pattern.
 WITNESSES: dict[str, str | int] = {
     "1,3 (thio)keto/enol f": "acetone",
     "1,3 (thio)keto/enol r": "phenol",
