@@ -3,24 +3,28 @@
 Chemistry only. `names` (Get name): a canonical SMILES and what PubChem said about it (CID
 and names, or that it has no record). `structures` (Name to structure's fallback): a
 lowercased name and PubChem's first record for it (CID, SMILES, title, how many records), or
-that it has none. Each with the time PubChem said it; nothing about who asked. Busy and
-unavailable answers are never stored, so the next request asks PubChem again. OPSIN's answers
-aren't cached: OPSIN runs here and answers in milliseconds.
+that it has none. `hazards` (Safety): a CID and the safety snapshot read from PubChem's GHS
+section (server/ghs.py), or that it lists none. Each with the time PubChem said it; nothing
+about who asked. Busy and unavailable answers are never stored, so the next request asks
+PubChem again. OPSIN's answers aren't cached: OPSIN runs here and answers in milliseconds.
 """
 
 from __future__ import annotations
 
+import json
 import sqlite3
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
+from ghs import Classification, Others, Pictogram, Snapshot, Statement
 from pubchem import NameRecord, Record
 
 MAX_AGE_S = 30 * 24 * 60 * 60
 COLUMNS = ("smiles", "cid", "iupac", "title", "stored_at")
 STRUCTURE_COLUMNS = ("name", "cid", "smiles", "title", "matches", "stored_at")
+HAZARD_COLUMNS = ("cid", "classification", "others", "stored_at")
 SCHEMA = (
     """CREATE TABLE IF NOT EXISTS names (
     smiles TEXT PRIMARY KEY,
@@ -35,6 +39,12 @@ SCHEMA = (
     smiles TEXT,
     title TEXT,
     matches INTEGER,
+    stored_at REAL NOT NULL
+)""",
+    """CREATE TABLE IF NOT EXISTS hazards (
+    cid INTEGER PRIMARY KEY,
+    classification TEXT,
+    others TEXT NOT NULL,
     stored_at REAL NOT NULL
 )""",
 )
@@ -99,5 +109,47 @@ class NameCache:
             "INSERT OR REPLACE INTO structures VALUES (?, ?, ?, ?, ?, ?)", (name, *values, now)
         )
 
+    def get_hazards(self, cid: int) -> Snapshot | None:
+        row = self._db.execute(
+            "SELECT classification, others FROM hazards WHERE cid = ? AND stored_at > ?",
+            (cid, self._clock() - MAX_AGE_S),
+        ).fetchone()
+        if row is None:
+            return None
+        classification, others = row
+        try:
+            return Snapshot(
+                None if classification is None else _classification(json.loads(classification)),
+                _others(json.loads(others)),
+            )
+        except (ValueError, TypeError, KeyError):
+            return None  # written by another version of the app: ask PubChem again
+
+    def put_hazards(self, cid: int, snapshot: Snapshot) -> None:
+        now = self._clock()
+        found = snapshot.classification
+        values = (
+            None if found is None else json.dumps(found.as_json()),
+            json.dumps(snapshot.others.as_json()),
+        )
+        self._db.execute("DELETE FROM hazards WHERE stored_at <= ?", (now - MAX_AGE_S,))
+        self._db.execute("INSERT OR REPLACE INTO hazards VALUES (?, ?, ?, ?)", (cid, *values, now))
+
     def close(self) -> None:
         self._db.close()
+
+
+def _classification(stored: dict) -> Classification:
+    return Classification(
+        **{
+            **stored,
+            "pictograms": tuple(Pictogram(**p) for p in stored["pictograms"]),
+            "statements": tuple(Statement(**s) for s in stored["statements"]),
+            "notes": tuple(stored["notes"]),
+            "summary": tuple(stored["summary"]),
+        }
+    )
+
+
+def _others(stored: dict) -> Others:
+    return Others(stored["count"], tuple(stored["sources"]))

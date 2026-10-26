@@ -34,6 +34,15 @@ Rules:
   a 404 `PUGREST.NotFound`) and the structure-to-name answer for what the server draws.
   OPSIN isn't recorded: it runs locally from the pinned jar, so tests run the real thing.
   The script rebuilds tests/fixtures/structure_responses.json from these and OPSIN.
+- `pubchem/ghs-*.json`, made by `server/scripts/record_ghs.py` through the server's own
+  PubChem client: PUG View's GHS section (GET
+  `pug_view/data/compound/<CID>/JSON?heading=GHS+Classification`, only the CID in the URL; a
+  compound with no GHS section is a 404 `PUGVIEW.NotFound`) for each name in
+  tests/fixtures/safety_names.txt that PubChem has a record of. Those are Get name's test
+  compounds, so their `smiles-*.json` give the CIDs (the invented one's is `CID 0`, so the
+  server never asks PUG View for it). The script rebuilds tests/fixtures/safety_responses.json,
+  the server's answers that the browser tests replay. These recordings contain ECHA's data,
+  under its terms (THIRD-PARTY-NOTICES.md).
 - Practice mode's names (practice/*.txt and tests/fixtures/practice_test_names.txt) share the
   `pubchem/byname-*.json` name lookups; `server/scripts/build_practice_lists.py` records any
   that are missing, then builds web/public/practice.json and the practice test fixtures from

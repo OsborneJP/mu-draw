@@ -183,6 +183,16 @@ All notable changes to this project. The format follows
   student can change; RNA, and shorter or longer DNA, say why there is none. Works offline. Ketcher's
   own "isoelectric point" (a median of pKa values) is not shown: it is far from the
   standard answer.
+- Safety snapshot (version 2): a Safety button after Get name looks up the drawing's GHS
+  hazard classification in PubChem and shows it below the canvas: the signal word, the
+  hazard pictograms and the hazard statements, with the source credited. It shows one
+  classification: the EU harmonised one when PubChem has it, otherwise the first of the
+  companies' notifications to ECHA (with their percentages and ECHA's note), otherwise the
+  first PubChem lists; it counts the others, which may differ, and links to the compound's
+  PubChem page. A reminder says it is a summary for learning, not a safety data sheet or a
+  risk assessment. It says when PubChem lists no classification, or has no record of the
+  structure. The drawing is sent only on the click; it needs a connection (greyed offline).
+  The pictograms ship with the app. The naming service needs a restart for the new lookup.
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."

@@ -70,6 +70,24 @@ def test_every_request_waits_for_the_rate_limit(fake_time):
     assert [t for t, _ in server.requests] == [0.0] * 5 + [1.0] * 2
 
 
+def test_safetys_get_waits_for_the_same_rate_limit(fake_time):
+    server, pug = client(fake_time, [(200, found(1))])  # ghs() returns any JSON as is
+
+    async def mixed() -> None:
+        await asyncio.gather(*(pug.ghs(i + 1) for i in range(4)), pug.name("s"), pug.name("t"))
+
+    run(mixed())
+    assert [t for t, _ in server.requests] == [0.0] * 5 + [1.0]
+    assert [form for _, form in server.requests].count({}) == 4  # the GETs: no body
+
+
+@pytest.mark.parametrize("error", [httpx.ReadTimeout("t"), httpx.ConnectError("c")])
+def test_safetys_get_failing_is_unavailable(fake_time, error):
+    _, pug = client(fake_time, [(0, error)])
+    with pytest.raises(Unavailable, match=type(error).__name__):
+        run(pug.ghs(1))
+
+
 def test_429_is_retried_once_after_one_second(fake_time):
     server, names = client(fake_time, [(429, {}), (200, found(7))])
     assert run(names.name("s")) == Record(cid=7, iupac="i", title="t")

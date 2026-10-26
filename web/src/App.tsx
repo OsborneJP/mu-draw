@@ -6,6 +6,7 @@ import NmrPanel from './panels/NmrPanel';
 import PracticePanel from './panels/PracticePanel';
 import ProtonNmrPanel from './panels/ProtonNmrPanel';
 import PropertiesPanel from './panels/PropertiesPanel';
+import SafetyPanel from './panels/SafetyPanel';
 import StereoPanel from './panels/StereoPanel';
 import Header from './shell/Header';
 import UpdateBanner from './shell/UpdateBanner';
@@ -17,8 +18,8 @@ export default function App() {
       <UpdateBanner />
       <main className="workspace">
         {/* The canvas, with Get name's answer over it, and one panel docked below it:
-            Practice, an NMR preview (¹³C or ¹H), the stereoisomers, the tautomers or the
-            resonance structures. */}
+            Practice, an NMR preview (¹³C or ¹H), the stereoisomers, the tautomers, the
+            resonance structures or Safety. */}
         <div className="canvas-area">
           <KetcherEditor />
           <GroupButton />
@@ -29,6 +30,7 @@ export default function App() {
           <StereoPanel />
           <FormsPanel kind="tautomers" />
           <FormsPanel kind="resonance" />
+          <SafetyPanel />
         </div>
         <PropertiesPanel />
       </main>

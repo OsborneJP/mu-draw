@@ -1,14 +1,18 @@
 [
   {
-    "path": "assets/index-BEOreadS.css",
-    "size": 197096
+    "path": "assets/biochemWorker-0N0MBlUM.js",
+    "size": 71118
   },
   {
-    "path": "assets/index-BY0V0qVA.js",
-    "size": 8012700
+    "path": "assets/index-B7hNiaRb.css",
+    "size": 199287
   },
   {
-    "path": "assets/index.modern-55d8e3ef-DWnctM1H.js",
+    "path": "assets/index-DoabUGYR.js",
+    "size": 8034129
+  },
+  {
+    "path": "assets/index.modern-55d8e3ef-Bp-4YY8d.js",
     "size": 425349
   },
   {
@@ -34,6 +38,42 @@
   {
     "path": "functional-groups.json",
     "size": 3550
+  },
+  {
+    "path": "ghs/GHS01.svg",
+    "size": 17787
+  },
+  {
+    "path": "ghs/GHS02.svg",
+    "size": 792
+  },
+  {
+    "path": "ghs/GHS03.svg",
+    "size": 3202
+  },
+  {
+    "path": "ghs/GHS04.svg",
+    "size": 2412
+  },
+  {
+    "path": "ghs/GHS05.svg",
+    "size": 7812
+  },
+  {
+    "path": "ghs/GHS06.svg",
+    "size": 5927
+  },
+  {
+    "path": "ghs/GHS07.svg",
+    "size": 721
+  },
+  {
+    "path": "ghs/GHS08.svg",
+    "size": 9554
+  },
+  {
+    "path": "ghs/GHS09.svg",
+    "size": 1526
   },
   {
     "path": "glassware/allihn-condenser.svg",
@@ -177,7 +217,7 @@
   },
   {
     "path": "sw.js",
-    "size": 4157
+    "size": 4806
   },
   {
     "path": "workbox-2fbc6a65.js",

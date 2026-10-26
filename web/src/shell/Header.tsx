@@ -6,6 +6,7 @@ import GetNameButton from '../panels/GetNameButton';
 import NameToStructure from '../panels/NameToStructure';
 import TemplatesMenu from '../panels/TemplatesMenu';
 import PracticeButton from '../panels/PracticeButton';
+import SafetyButton from '../panels/SafetyButton';
 import AboutBox from './AboutBox';
 import './shell.css';
 import { useOnline } from './useOnline';
@@ -48,6 +49,7 @@ export default function Header() {
         <PracticeButton />
         <NameToStructure />
         <GetNameButton />
+        <SafetyButton />
         <CopyImageButton />
         <ExportDialog />
         <TemplatesMenu />

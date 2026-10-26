@@ -5,17 +5,17 @@
 ## Purpose
 A free, installable structure editor (PWA) that replaces ChemSketch Freeware for Manchester
 chemistry students. Ketcher (drawing, Indigo wasm) and RDKit.js (properties) run in the
-browser; a small FastAPI service on osbornelab does the two naming lookups. Spec: docs/SPEC.md.
+browser; a small FastAPI service on osbornelab does the naming and safety lookups. Spec: docs/SPEC.md.
 
 ## Invariants (never break these; each line names what enforces it)
 "/draw/" means the configured base (`path` in app.config.json); staging is "/draw-staging/".
 1. The app requests nothing except /draw/api/* and its own static files. Only a link the
-   student clicks may leave it, and the only such link is Get name's PubChem compound page.
+   student clicks may leave it, and only to a compound's PubChem page (Get name, Safety).
    Enforced by: the CSP from web/csp.json (meta tag + Apache header; checker web/scripts/checks/
    csp.ts allows only listed sources; the RDKit worker alone adds 'unsafe-eval', web/csp-workers.json,
-   and nothing else); the request guard and the link guard on every smoke test (web/e2e/fixtures.ts;
-   links per web/config/requestPolicy.ts); the built-HTML link check (web/scripts/checks/html.ts,
-   incl. the relative icon link, since Playwright can't see /favicon.ico); Help/About hidden.
+   and nothing else); the request and link guards on every smoke test (web/e2e/fixtures.ts; links per
+   web/config/requestPolicy.ts); the built-HTML link check (checks/html.ts, incl. the relative icon
+   link: Playwright can't see /favicon.ico); the GHS pictograms' allowlist (checks/svg.ts); Help/About hidden.
 2. No accounts, student identifiers, analytics, or logging of request bodies.
    Enforced by: server/tests/test_privacy.py (a sentinel body never reaches logs), uvicorn
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
@@ -27,7 +27,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    "verify" is never shown): never from an LLM, never hand-typed into code or tests. Enforced by:
    generated fixtures with drift tests (tests/fixtures/; the NMR and RDKit tables' headers name their
    sources' SHA-256), irBands.test.ts, chem_literals.py (no Molfile/CDXML/InChI); SMILES, numbers: review.
-4. Everything except the naming endpoints works offline.
+4. Everything except the naming and safety lookups works offline.
    Enforced by: the precache guard (web/scripts/checks/precache.ts, run by web/scripts/verify-dist.ts
    in every check.sh and deploy build, not by a bare `npm run build`) and the "offline:" smoke tests.
 5. ketcher-react, ketcher-standalone, @rdkit/rdkit and indigo-ketcher (Ketcher's own release) are
@@ -70,19 +70,19 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   biochem.ts (sequences, charge, pI), indigoBiochem.ts (Indigo's values; biochemWorker.ts runs it).
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts; at its foot
   BiochemSection.tsx), Get name, Name to structure (naming.ts; NamePanel floats), Templates menu
-  (+ Glassware tab: glassware.ts); Practice, NMR previews (¹³C, ¹H), stereoisomers, tautomers and
-  resonance (FormsPanel.tsx) dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
-  nmr/protonNmr/stereo/forms/biochem.ts state, *Store.ts wiring, panelWorker.ts (RDKit).
+  (+ Glassware tab: glassware.ts); Practice, NMR previews (¹³C, ¹H), stereoisomers, tautomers,
+  resonance (FormsPanel.tsx) and Safety (safety*.ts) dock below the canvas (Docked.tsx), one at a
+  time (belowCanvas.ts); nmr/protonNmr/stereo/forms/biochem.ts state, *Store.ts, panelWorker.ts (RDKit).
 - `web/src/`: api.ts (`<base>api/*`, 8 s); pwa/ (SW, update checks, Reload); shell/ (header, badge, About, banner).
-- `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H tables); practice.json; glassware/.
+- `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H); practice.json; glassware/; ghs/.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
   export.spec.ts reads PNG headers, pixels and the clipboard back; `holdable{Rdkit,Indigo,Biochem}Replies()`
   (fixtures.ts) hold workers' replies; naming specs hold API answers.
-- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
-  test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
-  `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
+- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure`, `/api/safety` (`create_app()`
+  takes test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py` (PubChem's GHS),
+  `cache.py` (SQLite in `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar) on the env's Java.
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators (build_glassware.py
   cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json).
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e

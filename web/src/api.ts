@@ -1,14 +1,13 @@
-// Calls to the app's own API under <base>api/, the only server the app talks to. Get name
-// sends just the drawing's SMILES and Name to structure just the typed name, each in a POST
-// body, so neither appears in a URL or a log line.
+// Calls to the app's own API under <base>api/, the only server the app talks to. Get name and
+// Safety send just the drawing's SMILES and Name to structure just the typed name, each in a
+// POST body, so neither appears in a URL or a log line.
+import { safetyOutcome, type SafetyOutcome } from './panels/safetyAnswer';
+import { pubchemCompoundPage } from './pubchemPage';
+
+export { pubchemCompoundPage };
 
 /** With no answer after this long, the naming service counts as not responding (spec). */
 export const NAMING_DEADLINE_MS = 8000;
-
-/** The one page outside the app that the app links to (AGENTS.md, invariant 1). */
-export function pubchemCompoundPage(cid: number): string {
-  return `https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`;
-}
 
 export type NameOutcome =
   | {
@@ -133,4 +132,10 @@ export function structureOutcome(status: number, body: unknown): StructureOutcom
 export async function requestStructure(name: string, signal: AbortSignal): Promise<StructureOutcome> {
   const answer = await post('structure', { name }, signal);
   return answer ? structureOutcome(answer.status, answer.body) : NOT_RESPONDING;
+}
+
+/** Ask the server for the drawing's GHS classification. Same deadline as requestName. */
+export async function requestSafety(smiles: string, signal: AbortSignal): Promise<SafetyOutcome> {
+  const answer = await post('safety', { smiles }, signal);
+  return answer ? safetyOutcome(answer.status, answer.body) : NOT_RESPONDING;
 }

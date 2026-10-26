@@ -1,6 +1,14 @@
 import sqlite3
 
-from cache import COLUMNS, MAX_AGE_S, STRUCTURE_COLUMNS, Hit, NameCache, StructureHit
+from cache import (
+    COLUMNS,
+    HAZARD_COLUMNS,
+    MAX_AGE_S,
+    STRUCTURE_COLUMNS,
+    Hit,
+    NameCache,
+    StructureHit,
+)
 from pubchem import NameRecord, Record
 
 RECORD = Record(cid=1, iupac="one", title="One")
@@ -20,10 +28,12 @@ def test_the_cache_holds_chemistry_only(tmp_path):
     tables = [row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")]
     names = tuple(row[1] for row in db.execute("PRAGMA table_info(names)"))
     structures = tuple(row[1] for row in db.execute("PRAGMA table_info(structures)"))
-    assert tables == ["names", "structures"]
+    hazards = tuple(row[1] for row in db.execute("PRAGMA table_info(hazards)"))
+    assert tables == ["names", "structures", "hazards"]
     assert names == COLUMNS == ("smiles", "cid", "iupac", "title", "stored_at")
     assert structures == STRUCTURE_COLUMNS
     assert STRUCTURE_COLUMNS == ("name", "cid", "smiles", "title", "matches", "stored_at")
+    assert hazards == HAZARD_COLUMNS == ("cid", "classification", "others", "stored_at")
 
 
 def test_found_and_not_found_come_back(tmp_path):
@@ -95,3 +105,39 @@ def test_expired_structures_are_deleted(tmp_path):
     cache.put_structure("new", NAME_RECORD)
     rows = sqlite3.connect(tmp_path / "c.sqlite").execute("SELECT name FROM structures").fetchall()
     assert rows == [("new",)]
+
+
+def test_every_recorded_classification_comes_back_exactly(tmp_path):
+    # Every entry of every GHS recording, not only the chosen ones, and the shapes they cover:
+    # shares, Annex VI notes, not classified, notes and summaries.
+    import json
+
+    import ghs
+    import record_ghs
+
+    cache = NameCache(tmp_path / "c.sqlite")
+    stored = 0
+    for c in record_ghs.test_compounds():
+        path = record_ghs.recording_path(c["name"])
+        if not path.exists() or json.loads(path.read_text("utf-8"))["status"] != 200:
+            continue
+        for entry in ghs.entries(json.loads(path.read_text("utf-8"))["body"]):
+            snapshot = ghs.Snapshot(ghs.read(entry), ghs.Others(3, ("a", "b")))
+            cache.put_hazards(1, snapshot)
+            assert cache.get_hazards(1) == snapshot
+            stored += 1
+    assert stored > 50
+
+
+def test_a_hazards_row_another_version_wrote_reads_as_a_miss(tmp_path):
+    import ghs
+
+    cache = NameCache(tmp_path / "c.sqlite")
+    cache.put_hazards(1, ghs.NONE)
+    db = sqlite3.connect(tmp_path / "c.sqlite")
+    db.execute("""UPDATE hazards SET classification = '{"source": "eu"}'""")
+    db.commit()
+    assert cache.get_hazards(1) is None
+    db.execute("UPDATE hazards SET classification = NULL, others = 'not json'")
+    db.commit()
+    assert cache.get_hazards(1) is None

@@ -1,0 +1,765 @@
+{
+  "generator": "server/scripts/record_ghs.py",
+  "responses": {
+    "ethanol": {
+      "found": true,
+      "cid": 702,
+      "title": "Ethanol",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/702",
+      "classification": {
+        "source": "eu",
+        "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+        "entry": "ethanol; ethyl alcohol",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
+        "index_no": "603-002-00-5",
+        "not_classified": false,
+        "signal": "Danger",
+        "pictograms": [
+          {
+            "code": "GHS02",
+            "name": "Flammable"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H225",
+            "annex_note": null,
+            "share": null,
+            "words": "Highly Flammable liquid and vapor",
+            "hazard_class": "Danger Flammable liquids"
+          }
+        ],
+        "notes": [],
+        "summary": []
+      },
+      "others": {
+        "count": 10,
+        "sources": [
+          "European Chemicals Agency (ECHA)",
+          "NITE-CMC",
+          "Hazardous Chemical Information System (HCIS), Safe Work Australia",
+          "Hazardous Substances Data Bank (HSDB)"
+        ]
+      }
+    },
+    "caffeine": {
+      "found": true,
+      "cid": 2519,
+      "title": "Caffeine",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/2519",
+      "classification": {
+        "source": "eu",
+        "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+        "entry": "caffeine",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
+        "index_no": "613-086-00-5",
+        "not_classified": false,
+        "signal": "Warning",
+        "pictograms": [
+          {
+            "code": "GHS07",
+            "name": "Irritant"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H302",
+            "annex_note": null,
+            "share": null,
+            "words": "Harmful if swallowed",
+            "hazard_class": "Warning Acute toxicity, oral"
+          }
+        ],
+        "notes": [],
+        "summary": []
+      },
+      "others": {
+        "count": 3,
+        "sources": [
+          "European Chemicals Agency (ECHA)",
+          "NITE-CMC",
+          "Hazardous Chemical Information System (HCIS), Safe Work Australia"
+        ]
+      }
+    },
+    "toluene": {
+      "found": true,
+      "cid": 1140,
+      "title": "Toluene",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/1140",
+      "classification": {
+        "source": "eu",
+        "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+        "entry": "toluene",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
+        "index_no": "601-021-00-3",
+        "not_classified": false,
+        "signal": "Danger",
+        "pictograms": [
+          {
+            "code": "GHS02",
+            "name": "Flammable"
+          },
+          {
+            "code": "GHS07",
+            "name": "Irritant"
+          },
+          {
+            "code": "GHS08",
+            "name": "Health Hazard"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H225",
+            "annex_note": null,
+            "share": null,
+            "words": "Highly Flammable liquid and vapor",
+            "hazard_class": "Danger Flammable liquids"
+          },
+          {
+            "code": "H304",
+            "annex_note": null,
+            "share": null,
+            "words": "May be fatal if swallowed and enters airways",
+            "hazard_class": "Danger Aspiration hazard"
+          },
+          {
+            "code": "H315",
+            "annex_note": null,
+            "share": null,
+            "words": "Causes skin irritation",
+            "hazard_class": "Warning Skin corrosion/irritation"
+          },
+          {
+            "code": "H336",
+            "annex_note": null,
+            "share": null,
+            "words": "May cause drowsiness or dizziness",
+            "hazard_class": "Warning Specific target organ toxicity, single exposure; Narcotic effects"
+          },
+          {
+            "code": "H361d",
+            "annex_note": "***",
+            "share": null,
+            "words": "Suspected of damaging the unborn child",
+            "hazard_class": "Warning Reproductive toxicity"
+          },
+          {
+            "code": "H373",
+            "annex_note": "**",
+            "share": null,
+            "words": "May causes damage to organs through prolonged or repeated exposure",
+            "hazard_class": "Warning Specific target organ toxicity, repeated exposure"
+          }
+        ],
+        "notes": [],
+        "summary": []
+      },
+      "others": {
+        "count": 6,
+        "sources": [
+          "European Chemicals Agency (ECHA)",
+          "NITE-CMC",
+          "Hazardous Chemical Information System (HCIS), Safe Work Australia",
+          "Hazardous Substances Data Bank (HSDB)"
+        ]
+      }
+    },
+    "boric acid": {
+      "found": true,
+      "cid": 7628,
+      "title": "Boric Acid",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/7628",
+      "classification": {
+        "source": "eu",
+        "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+        "entry": "boric acid",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
+        "index_no": "005-007-00-2",
+        "not_classified": false,
+        "signal": "Danger",
+        "pictograms": [
+          {
+            "code": "GHS08",
+            "name": "Health Hazard"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H360FD",
+            "annex_note": null,
+            "share": null,
+            "words": "May damage fertility; May damage the unborn child",
+            "hazard_class": "Danger Reproductive toxicity"
+          }
+        ],
+        "notes": [],
+        "summary": []
+      },
+      "others": {
+        "count": 8,
+        "sources": [
+          "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+          "European Chemicals Agency (ECHA)",
+          "NITE-CMC",
+          "Hazardous Chemical Information System (HCIS), Safe Work Australia"
+        ]
+      }
+    },
+    "nicotine": {
+      "found": true,
+      "cid": 89594,
+      "title": "Nicotine",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/89594",
+      "classification": {
+        "source": "eu",
+        "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+        "entry": "nicotine (ISO); 3-[(2S)-1-methylpyrrolidin-2-yl]pyridine",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
+        "index_no": "614-001-00-4",
+        "not_classified": false,
+        "signal": "Danger",
+        "pictograms": [
+          {
+            "code": "GHS06",
+            "name": "Acute Toxic"
+          },
+          {
+            "code": "GHS09",
+            "name": "Environmental Hazard"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H300",
+            "annex_note": null,
+            "share": null,
+            "words": "Fatal if swallowed",
+            "hazard_class": "Danger Acute toxicity, oral"
+          },
+          {
+            "code": "H310",
+            "annex_note": null,
+            "share": null,
+            "words": "Fatal in contact with skin",
+            "hazard_class": "Danger Acute toxicity, dermal"
+          },
+          {
+            "code": "H330",
+            "annex_note": null,
+            "share": null,
+            "words": "Fatal if inhaled",
+            "hazard_class": "Danger Acute toxicity, inhalation"
+          },
+          {
+            "code": "H411",
+            "annex_note": null,
+            "share": null,
+            "words": "Toxic to aquatic life with long lasting effects",
+            "hazard_class": "Hazardous to the aquatic environment, long-term hazard"
+          }
+        ],
+        "notes": [],
+        "summary": []
+      },
+      "others": {
+        "count": 5,
+        "sources": [
+          "European Chemicals Agency (ECHA)",
+          "NITE-CMC",
+          "Hazardous Chemical Information System (HCIS), Safe Work Australia"
+        ]
+      }
+    },
+    "(R)-2-butanol": {
+      "found": true,
+      "cid": 84682,
+      "title": "(-)-2-Butanol",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/84682",
+      "classification": {
+        "source": "eu",
+        "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
+        "entry": "(R)-butan-2-ol",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
+        "index_no": "603-127-00-5",
+        "not_classified": false,
+        "signal": "Warning",
+        "pictograms": [
+          {
+            "code": "GHS02",
+            "name": "Flammable"
+          },
+          {
+            "code": "GHS07",
+            "name": "Irritant"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H226",
+            "annex_note": null,
+            "share": null,
+            "words": "Flammable liquid and vapor",
+            "hazard_class": "Warning Flammable liquids"
+          },
+          {
+            "code": "H319",
+            "annex_note": null,
+            "share": null,
+            "words": "Causes serious eye irritation",
+            "hazard_class": "Warning Serious eye damage/eye irritation"
+          },
+          {
+            "code": "H335",
+            "annex_note": null,
+            "share": null,
+            "words": "May cause respiratory irritation",
+            "hazard_class": "Warning Specific target organ toxicity, single exposure; Respiratory tract irritation"
+          },
+          {
+            "code": "H336",
+            "annex_note": null,
+            "share": null,
+            "words": "May cause drowsiness or dizziness",
+            "hazard_class": "Warning Specific target organ toxicity, single exposure; Narcotic effects"
+          }
+        ],
+        "notes": [],
+        "summary": []
+      },
+      "others": {
+        "count": 2,
+        "sources": [
+          "European Chemicals Agency (ECHA)",
+          "Hazardous Chemical Information System (HCIS), Safe Work Australia"
+        ]
+      }
+    },
+    "dimethyl sulfoxide": {
+      "found": true,
+      "cid": 679,
+      "title": "Dimethyl Sulfoxide",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/679",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "Dimethyl sulfoxide (EC: 200-664-3)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=200-664-3",
+        "index_no": null,
+        "not_classified": false,
+        "signal": "Warning",
+        "pictograms": [
+          {
+            "code": "GHS07",
+            "name": "Irritant"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H315",
+            "annex_note": null,
+            "share": "28.4%",
+            "words": "Causes skin irritation",
+            "hazard_class": "Warning Skin corrosion/irritation"
+          },
+          {
+            "code": "H319",
+            "annex_note": null,
+            "share": "33.6%",
+            "words": "Causes serious eye irritation",
+            "hazard_class": "Warning Serious eye damage/eye irritation"
+          },
+          {
+            "code": "H335",
+            "annex_note": null,
+            "share": "13.8%",
+            "words": "May cause respiratory irritation",
+            "hazard_class": "Warning Specific target organ toxicity, single exposure; Respiratory tract irritation"
+          }
+        ],
+        "notes": [
+          "This chemical does not meet GHS hazard criteria for 65.1% (611 of 938) of all reports."
+        ],
+        "summary": [
+          "Aggregated GHS information provided per 938 reports by companies from 27 notifications to the ECHA C&L Inventory. Each notification may be associated with multiple companies.",
+          "Reported as not meeting GHS hazard criteria per 611 of 938 reports by companies.",
+          "There are 24 notifications provided by 327 of 938 reports by companies with hazard statement code(s).",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 2,
+        "sources": [
+          "NITE-CMC",
+          "Hazardous Substances Data Bank (HSDB)"
+        ]
+      }
+    },
+    "aspirin": {
+      "found": true,
+      "cid": 2244,
+      "title": "Aspirin",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/2244",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "O-acetylsalicylic acid (EC: 200-064-1)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=200-064-1",
+        "index_no": null,
+        "not_classified": false,
+        "signal": "Warning",
+        "pictograms": [
+          {
+            "code": "GHS07",
+            "name": "Irritant"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H302",
+            "annex_note": null,
+            "share": "95.6%",
+            "words": "Harmful if swallowed",
+            "hazard_class": "Warning Acute toxicity, oral"
+          },
+          {
+            "code": "H315",
+            "annex_note": null,
+            "share": "20.6%",
+            "words": "Causes skin irritation",
+            "hazard_class": "Warning Skin corrosion/irritation"
+          },
+          {
+            "code": "H319",
+            "annex_note": null,
+            "share": "22.2%",
+            "words": "Causes serious eye irritation",
+            "hazard_class": "Warning Serious eye damage/eye irritation"
+          },
+          {
+            "code": "H335",
+            "annex_note": null,
+            "share": "20%",
+            "words": "May cause respiratory irritation",
+            "hazard_class": "Warning Specific target organ toxicity, single exposure; Respiratory tract irritation"
+          }
+        ],
+        "notes": [
+          "This chemical does not meet GHS hazard criteria for 0.3% (1  of 315) of reports."
+        ],
+        "summary": [
+          "Aggregated GHS information provided per 315 reports by companies from 23 notifications to the ECHA C&L Inventory. Each notification may be associated with multiple companies.",
+          "Reported as not meeting GHS hazard criteria per 1 of 315 reports by companies.",
+          "There are 22 notifications provided by 314 of 315 reports by companies with hazard statement code(s).",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 3,
+        "sources": [
+          "NITE-CMC"
+        ]
+      }
+    },
+    "paraquat": {
+      "found": true,
+      "cid": 15939,
+      "title": "Paraquat",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/15939",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "1,1'-dimethyl-4,4'-bipyridinium (EC: 225-141-7)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=225-141-7",
+        "index_no": null,
+        "not_classified": false,
+        "signal": "Danger",
+        "pictograms": [
+          {
+            "code": "GHS05",
+            "name": "Corrosive"
+          },
+          {
+            "code": "GHS06",
+            "name": "Acute Toxic"
+          },
+          {
+            "code": "GHS08",
+            "name": "Health Hazard"
+          },
+          {
+            "code": "GHS09",
+            "name": "Environmental Hazard"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H290",
+            "annex_note": null,
+            "share": "100%",
+            "words": "May be corrosive to metals",
+            "hazard_class": "Warning Corrosive to Metals"
+          },
+          {
+            "code": "H301+H311",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Toxic if swallowed or in contact with skin",
+            "hazard_class": "Danger Acute toxicity, oral; acute toxicity, dermal"
+          },
+          {
+            "code": "H301",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Toxic if swallowed",
+            "hazard_class": "Danger Acute toxicity, oral"
+          },
+          {
+            "code": "H311",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Toxic in contact with skin",
+            "hazard_class": "Danger Acute toxicity, dermal"
+          },
+          {
+            "code": "H315",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Causes skin irritation",
+            "hazard_class": "Warning Skin corrosion/irritation"
+          },
+          {
+            "code": "H319",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Causes serious eye irritation",
+            "hazard_class": "Warning Serious eye damage/eye irritation"
+          },
+          {
+            "code": "H330",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Fatal if inhaled",
+            "hazard_class": "Danger Acute toxicity, inhalation"
+          },
+          {
+            "code": "H335",
+            "annex_note": null,
+            "share": "100%",
+            "words": "May cause respiratory irritation",
+            "hazard_class": "Warning Specific target organ toxicity, single exposure; Respiratory tract irritation"
+          },
+          {
+            "code": "H372",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Causes damage to organs through prolonged or repeated exposure",
+            "hazard_class": "Danger Specific target organ toxicity, repeated exposure"
+          },
+          {
+            "code": "H400",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Very toxic to aquatic life",
+            "hazard_class": "Warning Hazardous to the aquatic environment, acute hazard"
+          },
+          {
+            "code": "H410",
+            "annex_note": null,
+            "share": "100%",
+            "words": "Very toxic to aquatic life with long lasting effects",
+            "hazard_class": "Warning Hazardous to the aquatic environment, long-term hazard"
+          }
+        ],
+        "notes": [],
+        "summary": [
+          "Aggregated GHS information provided per 28 reports by companies from 1 notifications to the ECHA C&L Inventory. Each notification may be associated with multiple companies.",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 2,
+        "sources": [
+          "NITE-CMC"
+        ]
+      }
+    },
+    "sodium benzoate": {
+      "found": true,
+      "cid": 517055,
+      "title": "Sodium Benzoate",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/517055",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "Sodium benzoate (EC: 208-534-8)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=208-534-8",
+        "index_no": null,
+        "not_classified": false,
+        "signal": "Warning",
+        "pictograms": [
+          {
+            "code": "GHS07",
+            "name": "Irritant"
+          }
+        ],
+        "statements": [
+          {
+            "code": "H319",
+            "annex_note": null,
+            "share": "37.9%",
+            "words": "Causes serious eye irritation",
+            "hazard_class": "Warning Serious eye damage/eye irritation"
+          }
+        ],
+        "notes": [
+          "This chemical does not meet GHS hazard criteria for 61.8% (1827 of 2956) of all reports."
+        ],
+        "summary": [
+          "Aggregated GHS information provided per 2956 reports by companies from 12 notifications to the ECHA C&L Inventory.",
+          "Reported as not meeting GHS hazard criteria per 1827 of 2956 reports by companies.",
+          "There are 10 notifications provided by 1129 of 2956 reports by companies with hazard statement code(s).",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 2,
+        "sources": [
+          "NITE-CMC",
+          "Hazardous Substances Data Bank (HSDB)"
+        ]
+      }
+    },
+    "glucose": {
+      "found": true,
+      "cid": 5793,
+      "title": "D-Glucose",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5793",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "Glucose (EC: 200-075-1)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=200-075-1",
+        "index_no": null,
+        "not_classified": true,
+        "signal": null,
+        "pictograms": [],
+        "statements": [],
+        "notes": [
+          "This chemical does not meet GHS hazard criteria for 97.6% (946 of 969) of all reports.",
+          "Reported as not meeting GHS hazard criteria by 946 of 969 companies (only 2.4% companies provided GHS information). For more detailed information, please visit  ECHA C&L website."
+        ],
+        "summary": [
+          "Aggregated GHS information provided per 969 reports by companies from 4 notifications to the ECHA C&L Inventory.",
+          "Reported as not meeting GHS hazard criteria per 946 of 969 reports by companies.",
+          "There are 2 notifications provided by 23 of 969 reports by companies with hazard statement code(s).",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 2,
+        "sources": [
+          "European Chemicals Agency (ECHA)"
+        ]
+      }
+    },
+    "L-alanine": {
+      "found": true,
+      "cid": 5950,
+      "title": "L-Alanine",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/5950",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "L-alanine (EC: 200-273-8)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=200-273-8",
+        "index_no": null,
+        "not_classified": true,
+        "signal": null,
+        "pictograms": [],
+        "statements": [],
+        "notes": [
+          "This chemical does not meet GHS hazard criteria for 99% (294 of 297) of all reports.",
+          "Reported as not meeting GHS hazard criteria by 294 of 297 companies (only 1% companies provided GHS information). For more detailed information, please visit  ECHA C&L website."
+        ],
+        "summary": [
+          "Aggregated GHS information provided per 297 reports by companies from 5 notifications to the ECHA C&L Inventory.",
+          "Reported as not meeting GHS hazard criteria per 294 of 297 reports by companies.",
+          "There are 3 notifications provided by 3 of 297 reports by companies with hazard statement code(s).",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 0,
+        "sources": []
+      }
+    },
+    "(E)-cinnamic acid": {
+      "found": true,
+      "cid": 444539,
+      "title": "Cinnamic Acid",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/444539",
+      "classification": {
+        "source": "echa",
+        "source_name": "European Chemicals Agency (ECHA)",
+        "entry": "Cinnamic acid (EC: 210-708-3)",
+        "source_url": "https://chem.echa.europa.eu/substance-search?searchText=210-708-3",
+        "index_no": null,
+        "not_classified": true,
+        "signal": null,
+        "pictograms": [],
+        "statements": [],
+        "notes": [
+          "This chemical does not meet GHS hazard criteria for 97.8% (1644 of 1681) of all reports.",
+          "Reported as not meeting GHS hazard criteria by 1644 of 1681 companies (only 2.2% companies provided GHS information). For more detailed information, please visit  ECHA C&L website."
+        ],
+        "summary": [
+          "Aggregated GHS information provided per 1681 reports by companies from 7 notifications to the ECHA C&L Inventory.",
+          "Reported as not meeting GHS hazard criteria per 1644 of 1681 reports by companies.",
+          "There are 6 notifications provided by 37 of 1681 reports by companies with hazard statement code(s).",
+          "Information may vary between notifications depending on impurities, additives, and other factors. The percentage value in parenthesis indicates the notified classification ratio from companies that provide hazard codes. Only hazard codes with percentage values above 10% are shown. For more detailed information, please visit  ECHA C&L website."
+        ]
+      },
+      "others": {
+        "count": 1,
+        "sources": [
+          "European Chemicals Agency (ECHA)"
+        ]
+      }
+    },
+    "aldehydo-D-glucose": {
+      "found": true,
+      "cid": 107526,
+      "title": "(2R,3S,4R,5R)-2,3,4,5,6-pentahydroxyhexanal",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/107526",
+      "classification": null,
+      "others": {
+        "count": 0,
+        "sources": []
+      }
+    },
+    "tetramethylammonium": {
+      "found": true,
+      "cid": 6380,
+      "title": "Tetramethylammonium",
+      "url": "https://pubchem.ncbi.nlm.nih.gov/compound/6380",
+      "classification": null,
+      "others": {
+        "count": 0,
+        "sources": []
+      }
+    },
+    "invented: aspirin + (E)-cinnamic acid": {
+      "found": false,
+      "cid": null,
+      "title": null,
+      "url": null,
+      "classification": null,
+      "others": {
+        "count": 0,
+        "sources": []
+      }
+    }
+  }
+}

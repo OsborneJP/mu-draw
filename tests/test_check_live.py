@@ -38,8 +38,22 @@ def good_results() -> dict[str, cl.Fetched]:
         if e.worker_csp:
             headers["content-security-policy"] = [WORKERS[e.path]]
         body = json.dumps(e.body_json).encode() if e.body_json is not None else b""
+        if e.body_fields is not None:
+            body = json.dumps(nested(e.body_fields)).encode()
         results[e.path] = cl.Fetched(200, headers, body)
     return results
+
+
+def nested(fields: dict[str, object]) -> dict:
+    """{"a.b": 1} as {"a": {"b": 1}}."""
+    out: dict = {}
+    for path, value in fields.items():
+        *parents, last = path.split(".")
+        node = out
+        for key in parents:
+            node = node.setdefault(key, {})
+        node[last] = value
+    return out
 
 
 def test_a_correct_deploy_passes():
@@ -123,6 +137,41 @@ def test_name_to_structure_must_answer_as_recorded():
     wrong = {**structure.body_json, "source": "PubChem"}
     results["api/structure"] = cl.Fetched(200, {}, json.dumps(wrong).encode())
     assert "api/structure: body" in cl.check(results, expected, POLICY, WORKERS)[0]
+
+
+def test_safety_must_find_the_recorded_record_and_source():
+    expected = cl.expectations(FILES)
+    (safety,) = [e for e in expected if e.path == "api/safety"]
+    assert set(safety.post_json) == {"smiles"}
+    assert safety.body_fields["found"] is True
+    results = good_results()
+    # The hazards themselves may change at PubChem: other fields are not compared.
+    body = {**nested(safety.body_fields), "others": {"count": 99, "sources": []}}
+    results["api/safety"] = cl.Fetched(200, {}, json.dumps(body).encode())
+    assert cl.check(results, expected, POLICY, WORKERS) == []
+    results["api/safety"] = cl.Fetched(502, {}, b'{"error":"unavailable"}')
+    assert cl.check(results, expected, POLICY, WORKERS) == ["api/safety: HTTP 502"]
+    source = safety.body_fields["classification.source"]
+    other = "echa" if source != "echa" else "eu"
+    body = nested({**safety.body_fields, "classification.source": other})
+    results["api/safety"] = cl.Fetched(200, {}, json.dumps(body).encode())
+    assert cl.check(results, expected, POLICY, WORKERS) == [
+        f"api/safety: classification.source is {other!r}, want {source!r}"
+    ]
+    results["api/safety"] = cl.Fetched(200, {}, b"<html>proxy error</html>")
+    assert cl.check(results, expected, POLICY, WORKERS)[0] == "api/safety: found is None, want True"
+
+
+def test_the_pictograms_must_be_served_as_svg_under_the_pages_csp():
+    results = good_results()
+    results["ghs/GHS07.svg"].headers["content-type"] = ["text/plain"]
+    del results["ghs/GHS07.svg"].headers["content-security-policy"]
+    results["ghs/GHS07.svg"].headers["cache-control"] = [IMMUTABLE]
+    assert cl.check(results, cl.expectations(FILES), POLICY, WORKERS) == [
+        f"ghs/GHS07.svg: Cache-Control [{IMMUTABLE!r}], want ['no-cache']",
+        "ghs/GHS07.svg: Content-Type ['text/plain'], want image/svg+xml",
+        "ghs/GHS07.svg: Content-Security-Policy differs from web/csp.json",
+    ]
 
 
 def test_functional_group_patterns_must_be_this_commits():

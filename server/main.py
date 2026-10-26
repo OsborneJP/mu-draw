@@ -1,7 +1,8 @@
 """Naming API, served by uvicorn behind Apache at <base>api/.
 
 POST /api/name names a structure from PubChem (Get name). POST /api/structure draws a name
-(Name to structure): OPSIN first (server/opsin.py, local), then PubChem's name lookup. Rules
+(Name to structure): OPSIN first (server/opsin.py, local), then PubChem's name lookup. POST
+/api/safety gives a structure's GHS hazard classification from PubChem (server/ghs.py). Rules
 for every endpoint here (see AGENTS.md): SMILES and names travel in POST bodies only, request
 bodies are never logged, and user input never goes into exception or log messages.
 
@@ -25,6 +26,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, StringConstraints
 
 import chem
+import ghs
 from cache import NameCache
 from opsin import COMMAND as OPSIN_COMMAND
 from opsin import Opsin, OpsinUnavailable
@@ -75,6 +77,19 @@ def answer(record: Record | None, undefined_stereo: int) -> dict[str, object]:
         "cid": record.cid if found else None,
         "url": COMPOUND_PAGE.format(cid=record.cid) if found else None,
         "undefined_stereo": undefined_stereo,
+    }
+
+
+def safety_answer(record: Record | None, snapshot: ghs.Snapshot) -> dict[str, object]:
+    found = record is not None
+    classification = snapshot.classification
+    return {
+        "found": found,
+        "cid": record.cid if found else None,
+        "title": record.title if found else None,
+        "url": COMPOUND_PAGE.format(cid=record.cid) if found else None,
+        "classification": None if classification is None else classification.as_json(),
+        "others": snapshot.others.as_json(),
     }
 
 
@@ -189,6 +204,32 @@ def create_app(
             return JSONResponse({"error": "unavailable"}, status_code=502)
         naming.cache.put(smiles, record)
         return answer(record, undefined)
+
+    @app.post("/api/safety")
+    async def safety(body: NameRequest, request: Request):
+        mol = chem.parse(body.smiles)
+        if mol is None:
+            return JSONResponse({"error": "invalid_structure"}, status_code=400)
+        smiles = chem.canonical(mol)
+        naming: Naming = request.app.state.naming
+        try:
+            hit = naming.cache.get(smiles)  # shared with Get name
+            record = hit.record if hit is not None else await naming.pubchem.name(smiles)
+            if hit is None:
+                naming.cache.put(smiles, record)
+            if record is None:
+                return safety_answer(None, ghs.NONE)
+            snapshot = naming.cache.get_hazards(record.cid)
+            if snapshot is None:
+                section = await naming.pubchem.ghs(record.cid)
+                snapshot = ghs.NONE if section is None else ghs.snapshot(section)
+                naming.cache.put_hazards(record.cid, snapshot)
+        except Busy:
+            return JSONResponse({"error": "busy"}, status_code=503)
+        except Unavailable as error:
+            log.warning("PubChem safety lookup failed: %s", error)
+            return JSONResponse({"error": "unavailable"}, status_code=502)
+        return safety_answer(record, snapshot)
 
     async def by_name(naming: Naming, name: str) -> NameRecord | None:
         """PubChem's first record for a name, from the cache when it has one. Raises Busy or

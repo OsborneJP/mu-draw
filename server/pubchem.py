@@ -1,9 +1,10 @@
-"""PubChem PUG REST client for Get name and Name to structure.
+"""PubChem PUG REST client for Get name and Name to structure, and PUG View for Safety.
 
 Every request, from every student at once, passes one rate limit (PubChem allows 5 requests
 a second and 400 a minute). A 429 or 503 is retried once, after 1 s; a second one means
 PubChem is busy. Anything else unexpected means it is unavailable. The SMILES or name goes
 in the POST body, so it is never in a URL, and nothing here logs it or puts it in an exception.
+Safety's GET has only a CID in its URL.
 """
 
 from __future__ import annotations
@@ -26,6 +27,9 @@ NAME_URL = f"{PUG}/compound/smiles/property/IUPACName,Title/JSON"
 # Name to structure's fallback: SMILES (with stereo) and title for a name, POSTed as `name`.
 STRUCTURE_URL = f"{PUG}/compound/name/property/SMILES,Title/JSON"
 COMPOUND_PAGE = "https://pubchem.ncbi.nlm.nih.gov/compound/{cid}"
+# Safety: PUG View's GHS section for a CID (server/ghs.py reads it).
+GHS_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON"
+GHS_PARAMS = {"heading": "GHS Classification"}
 # (requests, seconds): at most this many requests start in any window this long.
 LIMITS = ((5, 1.0), (400, 60.0))
 RETRY_STATUSES = frozenset({429, 503})
@@ -106,12 +110,11 @@ def parse_structure(body: object) -> NameRecord:
     return NameRecord(cid=cid, smiles=smiles, title=title, matches=len(rows))
 
 
-def not_found(response: httpx.Response) -> bool:
-    """PubChem's answer for a name it doesn't know: 404 with PUGREST.NotFound."""
+def not_found(response: httpx.Response, code: str = "PUGREST.NotFound") -> bool:
+    """PubChem's answer for a name it doesn't know: 404 with PUGREST.NotFound (PUG View: a
+    compound with no such section, PUGVIEW.NotFound)."""
     try:
-        return (
-            response.status_code == 404 and response.json()["Fault"]["Code"] == "PUGREST.NotFound"
-        )
+        return response.status_code == 404 and response.json()["Fault"]["Code"] == code
     except (ValueError, KeyError, TypeError):
         return False
 
@@ -140,15 +143,18 @@ class PubChem:
         self._limit = limit
         self._sleep = sleep
 
-    async def _post(self, url: str, form: dict[str, str]) -> httpx.Response:
+    async def _post(self, url: str, form: dict[str, str] | None) -> httpx.Response:
+        """POST `form`, or GET when there is none."""
         await self._limit.acquire()
         try:
+            if form is None:
+                return await self._http.get(url)
             return await self._http.post(url, data=form)
         except httpx.HTTPError as error:
             raise Unavailable(type(error).__name__) from None
 
-    async def _ask(self, url: str, form: dict[str, str]) -> httpx.Response:
-        """POST, retrying once after RETRY_AFTER_S on 429 or 503."""
+    async def _ask(self, url: str, form: dict[str, str] | None) -> httpx.Response:
+        """POST (or GET), retrying once after RETRY_AFTER_S on 429 or 503."""
         response = await self._post(url, form)
         if response.status_code in RETRY_STATUSES:
             await self._sleep(RETRY_AFTER_S)
@@ -176,6 +182,14 @@ class PubChem:
         if not_found(response):
             return None
         return parse_structure(self._json(response))
+
+    async def ghs(self, cid: int) -> object | None:
+        """PUG View's GHS section for a compound (JSON), or None if PubChem lists none."""
+        url = str(httpx.URL(GHS_URL.format(cid=cid), params=GHS_PARAMS))
+        response = await self._ask(url, None)
+        if not_found(response, "PUGVIEW.NotFound"):
+            return None
+        return self._json(response)
 
 
 def new_http(transport: httpx.AsyncBaseTransport | None = None) -> httpx.AsyncClient:

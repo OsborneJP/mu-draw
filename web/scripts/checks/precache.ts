@@ -7,6 +7,7 @@ import { CARBON_TABLE_FILE, CARBON_TABLE_LICENCE_FILE, PATTERNS_FILE, PROTON_TAB
 import { IR_BANDS_FILE } from '../../src/chem/irBands.ts';
 import { PRACTICE_FILE } from '../../src/panels/practiceFile.ts';
 import glassware from '../../src/editor/glassware.json' with { type: 'json' };
+import { GHS_PICTOGRAMS, pictogramFile } from '../../src/panels/ghsPictograms.ts';
 
 export interface DistFile {
   path: string;
@@ -89,6 +90,9 @@ export function checkPrecache(files: DistFile[], precached: string[]): string[] 
   if (!paths.has(PRACTICE_FILE)) errors.push(`practice list file missing: ${PRACTICE_FILE}`);
   for (const piece of glassware.pieces) {
     if (!paths.has(piece.file)) errors.push(`glassware piece missing: ${piece.file}`);
+  }
+  for (const code of GHS_PICTOGRAMS) {
+    if (!paths.has(pictogramFile(code))) errors.push(`GHS pictogram missing: ${pictogramFile(code)}`);
   }
   return errors;
 }
