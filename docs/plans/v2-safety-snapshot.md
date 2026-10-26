@@ -358,11 +358,15 @@ that fail without them: the SVG check's transform pattern backtracked exponentia
 value would hang verify-dist; the test runs the check in a child process with a deadline,
 because a regular expression blocks its thread), and the new no-cache requirement on the live
 pictogram had no failing test. Its lows are fixed too: inherited names such as `constructor`
-passed the attribute allowlist, a hazard code in any form after "Not Classified" now reads as
-"unavailable", and the comment on the "[n]" suffix is corrected. The review stops here.
+passed the attribute allowlist, a line starting with a hazard code in any form after "Not
+Classified" now reads as "unavailable", and the comment on the "[n]" suffix is corrected. The review stops here.
 
 Accepted limits (low):
 - AGENTS.md's Layout doesn't name src/pubchemPage.ts or panels/ghsPictograms.ts (149 of 149
   lines).
 - The SVG check runs on the nine pictograms only, not on every SVG in the build: other features
   may ship SVGs that aren't plain shapes.
+- After "Not Classified", only a line that starts with a hazard code is refused; a code later
+  in a line (" H225: …", "… (H225)") would show as a note, word for word. No recording has one.
+- If the SVG check's child process fails to start (a bad import), the test fails with a JSON
+  error rather than the child's own message.

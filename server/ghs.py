@@ -241,7 +241,7 @@ def read(entry: _Entry) -> Classification:
     if not_classified:
         if signals or pictograms:
             raise _unexpected("not classified, with a signal word or pictogram")
-        if any(re.match(_CODE, t) for t in texts[1:]):  # a hazard code, in any form
+        if any(re.match(_CODE, t) for t in texts[1:]):  # a line starting with a hazard code
             raise _unexpected("not classified, with a hazard statement")
         statements, notes = (), tuple(_texts(entry, NOTE) + texts[1:])
     else:
