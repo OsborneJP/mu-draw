@@ -36,8 +36,8 @@ const ANSWERS = (JSON.parse(fixture('conformer_responses.json')) as { responses:
 
 const ONE_SHAPE = 'One shape the molecule can take. Real molecules flex and rotate about single bonds.';
 const MESSAGES: Record<string, string> = {
-  too_big: 'Too big for a 3D model here (more than 100 non-hydrogen atoms).',
-  no_model: 'RDKit could not build a 3D model of this structure. Some arrangements of bridged rings cannot exist.',
+  too_big: 'Too big for a 3D model here (more than 100 atoms, or 300 counting hydrogens).',
+  no_model: "RDKit could not build a 3D model of this structure. It may be an arrangement that can't exist, as in some bridged rings, or too large and flexible to build in time.",
   one_structure: 'The 3D view works on one structure at a time.',
   busy: 'Busy, try again shortly.',
   not_responding: "The 3D service isn't responding. Your drawing is safe; try again in a minute.",

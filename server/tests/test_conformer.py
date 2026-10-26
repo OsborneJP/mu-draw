@@ -153,6 +153,51 @@ def test_too_big_is_never_embedded(tmp_path, fake_time):
     assert embed.calls == []
 
 
+def many_hydrogens() -> str:
+    """Ten platinum atoms in a chain, each with 40 H: 10 heavy atoms, 410 with the H (built
+    here, not typed)."""
+    chain = Chem.RWMol()
+    for i in range(10):
+        atom = Chem.Atom("Pt")
+        atom.SetNumExplicitHs(40)
+        chain.AddAtom(atom)
+        if i:
+            chain.AddBond(i - 1, i, Chem.BondType.SINGLE)
+    mol = chain.GetMol()
+    mol.UpdatePropertyCache(strict=False)
+    return Chem.MolToSmiles(mol)
+
+
+def test_hydrogens_count_toward_the_size_cap(tmp_path, fake_time):
+    """Review round 1 (high): the cap counted heavy atoms only, so a short SMILES with large
+    H counts was embedded with hundreds of atoms (memory grows with their square)."""
+    embed = Counting()
+    smiles_in = many_hydrogens()
+    mol = Chem.MolFromSmiles(smiles_in)
+    assert mol.GetNumHeavyAtoms() <= threed.MAX_HEAVY_ATOMS
+    assert mol.GetNumAtoms(onlyExplicit=False) > threed.MAX_ATOMS
+    _, app = app_with(
+        tmp_path, fake_time, [(400, "Status: 400\nCode: PUGREST.BadRequest\n")], embed=embed
+    )
+    with TestClient(app) as client:
+        answer = client.post("/api/conformer", json={"smiles": smiles_in}).json()
+    assert (answer["found"], answer["reason"]) == (False, "too_big")
+    assert embed.calls == []
+
+
+def test_atoms_that_are_not_elements_are_refused(tmp_path, fake_time):
+    """Review round 1: R-groups (atomic number 0) crashed the embedding or slipped past the
+    cap; the browser never sends them (src/editor/drawing.ts), so the server refuses them."""
+    mol = Chem.RWMol(drawn("aspirin"))
+    mol.GetAtomWithIdx(0).SetAtomicNum(0)
+    embed = Counting()
+    server, app = app_with(tmp_path, fake_time, [recorded("aspirin")], embed=embed)
+    with TestClient(app) as client:
+        response = client.post("/api/conformer", json={"smiles": Chem.MolToSmiles(mol)})
+    assert (response.status_code, response.json()) == (400, {"error": "invalid_structure"})
+    assert (server.requests, embed.calls) == ([], [])
+
+
 # A.5: what can't exist gets no model, and production's embedding is capped.
 def test_an_impossible_stereoisomer_has_no_model(tmp_path, fake_time):
     name = "camphor, a stereoisomer that can't exist"
@@ -191,6 +236,31 @@ def test_rdkits_model_must_keep_the_drawn_stereo(monkeypatch):
     monkeypatch.setattr(threed.rdDistGeom, "EmbedMolecule", mirrored)
     assert threed.embed(drawn("(R)-2-butanol"), timeout_s=0) is None
     assert threed.embed(drawn("aspirin"), timeout_s=0) is not None  # no stereo to keep
+
+
+@pytest.mark.parametrize(
+    "mmff, uff, used",
+    [(True, True, "MMFF"), (False, True, "UFF"), (False, False, None)],
+    ids=["MMFF", "UFF where MMFF has no parameters", "neither"],
+)
+def test_the_force_field_and_its_cap(monkeypatch, mmff, uff, used):
+    """Bar A.3: MMFF94, else UFF, else neither, each for at most FORCE_FIELD_STEPS steps."""
+    ran = []
+    monkeypatch.setattr(threed.rdForceFieldHelpers, "MMFFHasAllMoleculeParams", lambda mol: mmff)
+    monkeypatch.setattr(threed.rdForceFieldHelpers, "UFFHasAllMoleculeParams", lambda mol: uff)
+    monkeypatch.setattr(
+        threed.rdForceFieldHelpers,
+        "MMFFOptimizeMolecule",
+        lambda mol, maxIters: ran.append(("MMFF", maxIters)),
+    )
+    monkeypatch.setattr(
+        threed.rdForceFieldHelpers,
+        "UFFOptimizeMolecule",
+        lambda mol, maxIters: ran.append(("UFF", maxIters)),
+    )
+    assert threed.embed(drawn("aspirin"), timeout_s=0) is not None
+    assert ran == ([] if used is None else [(used, threed.FORCE_FIELD_STEPS)])
+    assert threed.FORCE_FIELD_STEPS == 200
 
 
 # A.2, A.4: a record that isn't the drawing as drawn is not shown.
@@ -242,6 +312,8 @@ def test_a_flat_record_is_not_shown(tmp_path, fake_time):
         ("adamantane", "adamantane", True),
         ("camphor", "camphor", True),
         ("cholesterol", "cholesterol", True),
+        # A ring of the record matches the drawing: only the same-structure check rejects it.
+        ("cyclohexane", "cholesterol", False),
     ],
 )
 def test_keeps_stereo(drawing, record, keeps):
@@ -302,14 +374,16 @@ def test_no_answer_from_pubchem_gives_rdkits_model_uncached(tmp_path, fake_time,
     assert len(embed.calls) == 2
 
 
-def test_no_model_is_cached_when_pubchem_answered(tmp_path, fake_time):
+def test_no_model_is_never_cached(tmp_path, fake_time):
+    """Review round 1: RDKit's time cap is wall-clock, so a failure can be the machine's, not
+    the structure's: it is never kept, even when PubChem answered."""
     embed = Counting(answer=None)
     server, app = app_with(tmp_path, fake_time, [recorded("erythromycin")], embed=embed)
     with TestClient(app) as client:
         first = ask(client, "erythromycin").json()
         assert ask(client, "erythromycin").json() == first
     assert (first["found"], first["reason"]) == (False, "no_model")
-    assert (len(server.requests), len(embed.calls)) == (1, 1)
+    assert (len(server.requests), len(embed.calls)) == (2, 2)
 
 
 # A.8: PubChem's rate limit and retry are the naming ones.
@@ -365,15 +439,17 @@ def test_one_embedding_at_a_time(tmp_path, fake_time):
                     asyncio.create_task(client.post("/api/conformer", json=body))
                     for _ in range(1 + threed.MAX_WAITING)
                 ]
-                await queue.until_load(1 + threed.MAX_WAITING)
-                # The sixth is either answered at once or joins the queue: whichever comes
-                # first decides, so a queue without a limit fails here instead of hanging.
-                sixth = asyncio.create_task(client.post("/api/conformer", json=body))
-                queued = asyncio.create_task(queue.until_load(2 + threed.MAX_WAITING))
-                await asyncio.wait({sixth, queued}, return_when=asyncio.FIRST_COMPLETED)
-                was_queued = queued.done()
-                queued.cancel()
-                held.release.set()
+                try:
+                    await queue.until_load(1 + threed.MAX_WAITING)
+                    # The sixth is either answered at once or joins the queue: whichever
+                    # comes first decides, so a queue without a limit fails, not hangs.
+                    sixth = asyncio.create_task(client.post("/api/conformer", json=body))
+                    queued = asyncio.create_task(queue.until_load(2 + threed.MAX_WAITING))
+                    await asyncio.wait({sixth, queued}, return_when=asyncio.FIRST_COMPLETED)
+                    was_queued = queued.done()
+                    queued.cancel()
+                finally:
+                    held.release.set()  # a failure above must not leave a thread waiting
                 answered = await asyncio.gather(*waiting)
                 return was_queued, await sixth, answered
 

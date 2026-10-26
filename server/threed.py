@@ -27,8 +27,11 @@ from pubchem import Busy, PubChem, Unavailable
 
 log = logging.getLogger("naming")
 
-# docs/plans/v2-3d-view.md, decisions 3 and 11.
+# docs/plans/v2-3d-view.md, decisions 3 and 11. The embedding's work grows with every atom it
+# builds, H included (its memory with their square), and its timeout doesn't bound all of it,
+# so both counts are capped (review round 1).
 MAX_HEAVY_ATOMS = 100
+MAX_ATOMS = 300  # with every H
 EMBED_TIMEOUT_S = 2
 FORCE_FIELD_STEPS = 200
 SEED = 20261026
@@ -57,6 +60,18 @@ class TooBusy(Exception):
     """An embedding is running and MAX_WAITING more are waiting."""
 
 
+def elements_only(mol: Chem.Mol) -> bool:
+    """No R-group or other dummy atom (atomic number 0): RDKit can't embed those, and the
+    browser never sends them (src/editor/drawing.ts)."""
+    return all(atom.GetAtomicNum() > 0 for atom in mol.GetAtoms())
+
+
+def too_big(mol: Chem.Mol) -> bool:
+    return (
+        mol.GetNumHeavyAtoms() > MAX_HEAVY_ATOMS or mol.GetNumAtoms(onlyExplicit=False) > MAX_ATOMS
+    )
+
+
 def flat(mol: Chem.Mol) -> str:
     """Canonical SMILES without stereo: the structure, whatever its configuration."""
     copy = Chem.Mol(mol)
@@ -82,6 +97,9 @@ def embed_parameters(timeout_s: float = EMBED_TIMEOUT_S) -> rdDistGeom.EmbedPara
     params = rdDistGeom.ETKDGv3()
     params.randomSeed = SEED
     params.timeout = timeout_s  # 0: none (the fixture generator only)
+    # From random coordinates, not eigenvectors: those failed every time on long chains such
+    # as tristearin's, and on nothing that random ones build (review round 1, measured).
+    params.useRandomCoords = True
     return params
 
 
@@ -153,7 +171,7 @@ async def model_for(mol: Chem.Mol, smiles: str, pubchem: PubChem, queue: EmbedQu
         if from_pubchem(mol, record.molblock):
             return Model("found", "pubchem", record.cid, record.molblock, None)
         said = "unusable"
-    if mol.GetNumHeavyAtoms() > MAX_HEAVY_ATOMS:
+    if too_big(mol):
         return Model(said, None, None, None, "too_big")
     molblock = await queue.run(mol)
     if molblock is None:
@@ -162,5 +180,6 @@ async def model_for(mol: Chem.Mol, smiles: str, pubchem: PubChem, queue: EmbedQu
 
 
 def cacheable(model: Model) -> bool:
-    """PubChem's answers are kept; when it didn't answer, the next request asks again."""
-    return model.pubchem != "no_answer"
+    """PubChem's answers are kept; when it didn't answer, the next request asks again. RDKit's
+    failures aren't kept either: its time cap is wall-clock, so a busy machine can cause one."""
+    return model.pubchem != "no_answer" and model.reason != "no_model"

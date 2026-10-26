@@ -20,8 +20,8 @@ const MESSAGES: Record<ThreeDMessage, string> = {
   offline: OFFLINE,
   busy: 'Busy, try again shortly.',
   'not-responding': "The 3D service isn't responding. Your drawing is safe; try again in a minute.",
-  'too-big': 'Too big for a 3D model here (more than 100 non-hydrogen atoms).',
-  'no-model': 'RDKit could not build a 3D model of this structure. Some arrangements of bridged rings cannot exist.',
+  'too-big': 'Too big for a 3D model here (more than 100 atoms, or 300 counting hydrogens).',
+  'no-model': "RDKit could not build a 3D model of this structure. It may be an arrangement that can't exist, as in some bridged rings, or too large and flexible to build in time.",
 };
 
 const PROBLEMS: Record<ViewerProblem, string> = {

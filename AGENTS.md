@@ -59,8 +59,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 - Server config (Apache, systemd): `python scripts/render_server_config.py` rewrites
   docs/server-setup.md. A person applies it; agents never edit /etc.
 - Fixtures (network only for new names): `python scripts/fetch_reference_smiles.py --missing`,
-  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names,
-  record_name_lookups, build_practice_lists. ¹³C table: in web/, `node scripts/build-carbon-table.ts <sd>`.
+  then server/scripts/: gen_reference_expected, gen_templates, record_pubchem_names, record_name_lookups,
+  build_practice_lists, record_conformers. ¹³C table: in web/, `node scripts/build-carbon-table.ts <sd>`.
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.

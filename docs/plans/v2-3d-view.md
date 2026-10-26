@@ -21,8 +21,8 @@ and is computed by RDKit where it has none.
    structure at a time". Offline the button says "Needs an internet connection" (decision 4).
 2. A panel docked below the canvas, like the ¹³C NMR preview (decision 5). Opening it closes
    Practice, the NMR preview or the stereoisomers, and opening any of those closes it.
-3. The model, which the student turns by dragging, zooms with the wheel or a pinch, and moves
-   with a right-drag or two fingers. Under it:
+3. The model, which the student turns by dragging and zooms with the wheel, a right-drag or a
+   pinch (3Dmol moves it with a middle-drag, Ctrl-drag or three fingers). Under it:
    - the style: **Ball and stick** (first), **Sticks**, **Space-filling**; a **Hydrogens**
      checkbox (ticked); **Reset view** (decision 6);
    - where the model came from, in plain text: "3D model from PubChem (CID 2244)" or "3D model
@@ -34,8 +34,9 @@ and is computed by RDKit where it has none.
 4. Any change to the drawing: "The drawing has changed." with a **Show again** button, as in
    the NMR preview. A model for an older drawing is never shown.
 5. Instead of a model, when there is none: "Busy, try again shortly"; "The 3D service is not
-   responding"; "Too big for a 3D model here (more than 100 non-hydrogen atoms)"; "RDKit could
-   not build a 3D model of this structure. Some arrangements of bridged rings cannot exist.";
+   responding"; "Too big for a 3D model here (more than 100 atoms, or 300 counting
+   hydrogens)"; "RDKit could not build a 3D model of this structure. It may be an arrangement
+   that can't exist, as in some bridged rings, or too large and flexible to build in time.";
    "This browser can't show 3D graphics (WebGL is turned off)."
 
 ## Decisions for Jeff (proposed answers in bold)
@@ -58,7 +59,8 @@ and is computed by RDKit where it has none.
    first would give one model everywhere, online or not, but not PubChem's.
 3. **The fallback: the server computes it with Python RDKit.** RDKit.js can't (measured below:
    the pinned RDKit.js 2026.9.1 has no 3D embedding and no force field). The server's RDKit is
-   the same release. It embeds with ETKDGv3 (fixed seed), capped by a 2 s timeout, then
+   the same release. It embeds with ETKDGv3 (fixed seed; from random starting coordinates
+   since review round 1), capped by a 2 s timeout, then
    MMFF94 for at most 200 steps (UFF where MMFF has no parameters; neither for platinum and
    such). The alternative is OpenChemLib's conformer generator in the browser, which works
    offline but adds a fourth chemistry engine (invariant 3), 2.5 MB, and took 4.3 s for
@@ -217,6 +219,47 @@ Small differences from the text above, none of them a decision:
   changed as in bar D.
 - PubChem's record of another structure or configuration is "unusable" (bar A.2): RDKit's model
   is shown, and the source line says "PubChem's model didn't match the drawing".
+
+## Review round 1 (2026-10-26)
+
+Three reviewers (server, browser, tests against this bar) and a skeptic who tried to refute
+each finding. Confirmed and fixed, each with a test that failed on the commit before:
+- **High: the size cap counted heavy atoms only.** A short SMILES with large H counts (a chain
+  of Pt atoms with 40 H each) was embedded with hundreds of atoms; the embedding's memory grows
+  with their square and its timeout doesn't bound that, so one request could take the API past
+  its 512 MB limit. Now at most 100 heavy atoms and 300 with their H, and R-groups and other
+  dummy atoms are refused as unreadable (the browser never sends them).
+- **Medium: RDKit failures were cached for 30 days and called impossible.** ETKDG from its
+  default (eigenvector) start failed every time on long chains: tristearin (a test compound
+  now), C80. It starts from random coordinates now, which builds those and changes nothing
+  that already built, and a failure is never cached (the 2 s cap is wall-clock). The message
+  no longer says the structure can't exist.
+- **Medium (test gaps):** the UFF and no-force-field paths and the 200-step cap now have a
+  test, and so does the same-structure check (a drawn cyclohexane against PubChem's
+  cholesterol record, which contains its ring).
+
+Accepted limits (low, after the skeptic):
+- A stereocentre at three-coordinate P or N (PAMP, an aziridine N): RDKit reads no stereo
+  there from 3D coordinates, so no model passes the stereo check and the panel says RDKit
+  could not build one. Not wrong chemistry; rare in teaching.
+- 3Dmol 2.5.5 draws only through an OffscreenCanvas with WebGL2. A browser with WebGL1 only
+  (Safari before 16.4; WebGL2 blocklisted) gets an empty viewer box instead of the WebGL message.
+- Each model shown keeps a dead 3Dmol viewer for the session (3Dmol has no dispose); no
+  visible failure (one shared WebGL context).
+- The 3D smoke tests replay answers by compound and don't check the SMILES the browser sends
+  (Get name's tests check the same `getSmiles` path on their compounds).
+- Focus is lost when Show in 3D greys itself or Show again disappears; the panel's messages
+  are not in a live region (as the NMR preview). With a viewer problem, the style controls
+  stay and do nothing.
+- The browser's 8 s deadline can cut off the slowest path (PubChem timing out at 5 s, then
+  an embedding behind others): "not responding" instead of RDKit's model.
+- A SMILES PubChem can't read (400) counts as "PubChem did not answer"; PubChem is asked
+  before the size and queue checks, using the naming rate limit.
+- A cancelled request could let a second embedding start beside a running one (Starlette
+  doesn't cancel JSON routes today). The conformer cache has no size bound.
+- Untested: that the cache key is the canonical SMILES, that "unusable" is cached, the stale
+  message's text, and the reaction message in the app. conformers_judged.json is provisional
+  until Jeff checks it, including adamantane's reviewed note.
 
 ## Known limits
 

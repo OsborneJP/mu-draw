@@ -19,3 +19,4 @@ adamantane
 erythromycin
 vancomycin
 sodium acetate
+tristearin

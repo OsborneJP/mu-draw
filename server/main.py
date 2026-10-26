@@ -255,7 +255,7 @@ def create_app(
     @app.post("/api/conformer")
     async def conformer(body: NameRequest, request: Request):
         mol = chem.parse(body.smiles)
-        if mol is None:
+        if mol is None or not threed.elements_only(mol):
             return JSONResponse({"error": "invalid_structure"}, status_code=400)
         if len(Chem.GetMolFrags(mol)) != 1:
             return JSONResponse({"error": "one_structure"}, status_code=400)

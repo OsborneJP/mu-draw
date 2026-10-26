@@ -19,6 +19,7 @@
     "erythromycin": {"answer": "rdkit", "note": false},
     "vancomycin": {"answer": "too_big", "note": false},
     "sodium acetate": {"answer": "one_structure", "note": null},
+    "tristearin": {"answer": "rdkit", "note": false},
     "(R)-2-butanol, stereo not drawn": {"answer": "pubchem", "note": true},
     "cocaine, stereo not drawn": {"answer": "pubchem", "note": true},
     "camphor, a stereoisomer that can't exist": {"answer": "no_model", "note": false},

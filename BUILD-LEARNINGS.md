@@ -1271,3 +1271,12 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   was taken out; it now races the extra request against "it joined the queue".
 - The shared heavy-command lock: a queued `flock … check.sh` was killed while waiting (exit
   143) and never started, and .check.log still held the run before. Read the exit status.
+- Review round 1: a heavy-atom cap doesn't bound the embedding, which builds every H
+  (`[PtH40]`-style counts) and whose memory grows with the square of the atoms; cap
+  `GetNumAtoms(onlyExplicit=False)` too, and refuse dummy atoms (two bonded ones crash it).
+- ETKDG from its default eigenvector start fails every time on long chains (tristearin,
+  n-C80, any seed); `useRandomCoords` builds them and changed nothing that already built.
+- RDKit reads no stereo from 3D at a three-coordinate P or N (PAMP, an aziridine N), though
+  ETKDG honours the tag (the signed volume flips): such drawings get no model (accepted).
+- 3Dmol 2.5.5 renders only through an `OffscreenCanvas` with WebGL2 (unless in a grid); with
+  WebGL1 only, its own try/catch swallows the error and `createViewer` throws later.

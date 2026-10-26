@@ -678,6 +678,30 @@
       "error": "one_structure"
     },
     {
+      "name": "tristearin",
+      "file": "conformers/tristearin.mol",
+      "status": 200,
+      "found": true,
+      "source": "rdkit",
+      "cid": null,
+      "pubchem": "none",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 57,
+        "H": 110,
+        "O": 6
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {}
+      }
+    },
+    {
       "name": "(R)-2-butanol, stereo not drawn",
       "file": "conformers/r-2-butanol-stereo-not-drawn.mol",
       "status": 200,
