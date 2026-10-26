@@ -123,6 +123,8 @@ All notable changes to this project. The format follows
   sent. The first list is a provisional CHEM-311 one.
 
 ### Changed
+- The IR hints' source and licence now sit behind a tick, "Source and licence (CC BY-SA
+  4.0)", instead of taking several lines under every list of hints.
 - Practice, the ¹³C NMR preview and the stereoisomers all sit below the canvas, so opening
   one now closes the others; Practice comes back to the same name when reopened.
 - Save and Open no longer show the raw text of the file. Save asks only for the file name

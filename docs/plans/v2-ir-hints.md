@@ -171,3 +171,16 @@ Not in scope: a drawn IR spectrum or a band chart; matching a student's peak lis
   - check the 9 `verify` bands against Pavia or Silverstein, set `verify` to false and cite the book (until then amide, thiol, epoxide and 2° amine N–H show no band);
   - bump the table's `version` from 0.1-draft once it has been reviewed;
   - say when the main session may merge, deploy to staging and promote.
+
+## Change after the merge: the credit behind a tick (Jeff, 2026-10-26)
+
+The credit line took too much of the properties panel. Acceptance bar:
+1. Under the hints, a tick "Source and licence (CC BY-SA 4.0)" shows the credit; it starts
+   unticked, so the credit is hidden until asked for, and unticking hides it again.
+   CC BY-SA 4.0 §3(a)(2) allows the credit "in any reasonable manner based on the medium";
+   it stays one tick away, in place, and the tick's own label names the licence.
+2. Ticked, the credit is exactly as before: the same text, still plain text with no links
+   (invariant 1).
+3. Tests (Playwright): hidden by default, shown with the text from ir-bands.json once
+   ticked, hidden again once unticked; the hidden-by-default check fails without the change.
+

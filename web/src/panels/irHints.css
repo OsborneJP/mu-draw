@@ -75,8 +75,15 @@
   list-style: none;
 }
 
-.ir-credit {
+.ir-credit-toggle {
+  display: block;
   margin: 6px 0 0;
+  color: #57606a;
+  font-size: 12px;
+}
+
+.ir-credit {
+  margin: 2px 0 0;
   color: #57606a;
   font-size: 11px;
   overflow-wrap: anywhere;

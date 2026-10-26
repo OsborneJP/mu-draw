@@ -170,7 +170,13 @@ test('bands marked verify are not shown, and the credit names what the shown ban
   await expectEntries(page, ['amide', 'phenol', 'arene', 'alkane']);
   await expectBandsFromFile(page);
 
+  // The credit is one tick away: hidden until asked for, the tick naming the licence.
   const credit = page.getByTestId('ir-credit');
+  const creditTick = page.getByTestId('ir-credit-toggle');
+  await expect(credit).toHaveCount(0);
+  await expect(creditTick).not.toBeChecked();
+  await expect(page.getByText(`Source and licence (${TABLE.license})`)).toBeVisible();
+  await creditTick.check();
   await expect(credit).toContainText(`${TABLE.title}, version ${TABLE.version}, compiled by ${TABLE.compiled_by}.`);
   await expect(credit).toContainText(`${TABLE.license} (https://creativecommons.org/licenses/by-sa/4.0/)`);
   const keys = await entries(page);
@@ -181,6 +187,8 @@ test('bands marked verify are not shown, and the credit names what the shown ban
     expected.map((a) => `${a.text}${a.url ? ` (${a.url})` : ''}.`),
   );
   await expect(page.getByTestId('ir-hints').locator('a')).toHaveCount(0);
+  await creditTick.uncheck();
+  await expect(credit).toHaveCount(0);
   // The regions are there, closed until opened.
   const regions = page.getByTestId('ir-regions');
   await expect(regions.getByTestId('ir-region').first()).toBeHidden();

@@ -7,7 +7,8 @@ import './irHints.css';
 // The IR hints (docs/plans/v2-ir-hints.md), in the functional-group section: for the
 // groups found, the bands of web/public/ir-bands.json, bold where the table says to look
 // first, and the table's credit, which its licence (CC BY-SA 4.0) requires wherever it is
-// shown. Plain text only: nothing here may link out (invariant 1). data-* attributes let
+// shown: one tick away, the tick naming the licence. Plain text only: nothing here may link
+// out (invariant 1). data-* attributes let
 // the tests compare what is shown with the file.
 
 /** "1715–1720", or "≈1735" for a single typical value. */
@@ -41,6 +42,9 @@ function BandRow({ band }: { band: Band }) {
 
 export default function IrHints({ groups }: { groups: GroupsView }) {
   const [file, setFile] = useState<IrFile | null>(null);
+  // The credit is one tick away (Jeff, 2026-10-26): shown in full it took too much of the
+  // panel. CC BY-SA 4.0 §3(a)(2) allows any reasonable manner, and the tick names the licence.
+  const [creditShown, showCredit] = useState(false);
   useEffect(() => {
     let live = true;
     void loadIrTable().then((loaded) => live && setFile(loaded));
@@ -121,16 +125,28 @@ export default function IrHints({ groups }: { groups: GroupsView }) {
             </ul>
           </div>
         )}
-        <p className="ir-credit" data-testid="ir-credit">
-          {table.title}, version {table.version}, compiled by {table.compiledBy}. Licence: {table.licence} ({table.licenceUri}).
-          {citedAttributions(hints, table).map((a) => (
-            <span key={a.key} data-testid="ir-attribution" data-key={a.key}>
-              {' '}
-              {a.text}
-              {a.url ? ` (${a.url})` : ''}.
-            </span>
-          ))}
-        </p>
+        <label className="ir-credit-toggle">
+          <input
+            type="checkbox"
+            data-testid="ir-credit-toggle"
+            aria-controls="ir-credit"
+            checked={creditShown}
+            onChange={(e) => showCredit(e.target.checked)}
+          />
+          Source and licence ({table.licence})
+        </label>
+        {creditShown && (
+          <p className="ir-credit" id="ir-credit" data-testid="ir-credit">
+            {table.title}, version {table.version}, compiled by {table.compiledBy}. Licence: {table.licence} ({table.licenceUri}).
+            {citedAttributions(hints, table).map((a) => (
+              <span key={a.key} data-testid="ir-attribution" data-key={a.key}>
+                {' '}
+                {a.text}
+                {a.url ? ` (${a.url})` : ''}.
+              </span>
+            ))}
+          </p>
+        )}
       </>
     );
   };
