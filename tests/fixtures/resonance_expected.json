@@ -38,6 +38,7 @@
       -1,
       0
      ],
+     "rank": "0,0,1,-3610,0,0,2,2",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -60,6 +61,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,3,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -87,6 +89,7 @@
       -1,
       0
      ],
+     "rank": "0,0,1,-3610,0,0,1,1",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -107,6 +110,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,2,0",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -154,6 +158,7 @@
       -1,
       0
      ],
+     "rank": "0,0,1,-3610,0,0,7,13",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -187,6 +192,7 @@
       -1,
       0
      ],
+     "rank": "0,0,1,-3610,0,0,7,19",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -226,6 +232,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,8,12",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -253,6 +260,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,8,18",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -297,6 +305,7 @@
       0,
       0
      ],
+     "rank": "0,0,1,-3610,0,0,4,7",
      "drawing": false,
      "changed_atoms": [
       4,
@@ -327,6 +336,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,6,4",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -368,6 +378,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,6,6",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -391,6 +402,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,6,10",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -421,6 +433,7 @@
       0,
       0
      ],
+     "rank": "1,0,1,-2544,0,0,0,10",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -452,6 +465,7 @@
       0,
       0
      ],
+     "rank": "1,0,1,-2544,0,0,2,9",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -508,6 +522,7 @@
       0,
       -1
      ],
+     "rank": "0,0,3,-4154,6,6,22,13",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -543,6 +558,7 @@
       0,
       -1
      ],
+     "rank": "0,0,3,-4154,6,6,22,20",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -584,6 +600,7 @@
       -1,
       -1
      ],
+     "rank": "0,0,3,-4154,6,6,23,12",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -613,6 +630,7 @@
       -1,
       -1
      ],
+     "rank": "0,0,3,-4154,6,6,23,19",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -649,6 +667,7 @@
       -1,
       0
      ],
+     "rank": "1,0,3,-4154,2,2,21,16",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -689,6 +708,7 @@
       -1,
       0
      ],
+     "rank": "0,0,2,-7220,2,0,3,2",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -711,6 +731,7 @@
       0,
       -1
      ],
+     "rank": "0,0,2,-7220,2,0,4,1",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -733,6 +754,7 @@
       -1,
       -1
      ],
+     "rank": "0,0,2,-7220,2,0,5,0",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -763,6 +785,7 @@
       -1,
       0
      ],
+     "rank": "0,0,3,-4154,2,2,3,2",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -785,6 +808,7 @@
       0,
       -1
      ],
+     "rank": "0,0,3,-4154,2,2,4,1",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -807,6 +831,7 @@
       -1,
       -1
      ],
+     "rank": "0,0,3,-4154,2,2,5,0",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -834,6 +859,7 @@
       1,
       -1
      ],
+     "rank": "0,0,3,-3066,2,2,3,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -848,6 +874,7 @@
       1,
       0
      ],
+     "rank": "1,0,3,-3066,0,1,1,1",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -868,6 +895,7 @@
       1,
       -2
      ],
+     "rank": "1,0,3,-3066,0,1,3,0",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -909,6 +937,7 @@
       0,
       0
      ],
+     "rank": "0,0,1,-2544,0,0,0,4",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -928,6 +957,7 @@
       0,
       0
      ],
+     "rank": "0,0,1,-2544,0,0,2,3",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -953,6 +983,7 @@
       -1,
       0
      ],
+     "rank": "0,0,1,-2544,0,0,3,5",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -978,6 +1009,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-2544,0,0,4,2",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -1015,6 +1047,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -1031,6 +1064,7 @@
       -1,
       1
      ],
+     "rank": "1,0,2,-544,0,2,5,2",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -1068,6 +1102,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -1086,6 +1121,7 @@
       1,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -1173,6 +1209,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -1231,6 +1268,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       18,
@@ -1295,6 +1333,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       14,
@@ -1359,6 +1398,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       10,
@@ -1423,6 +1463,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -1487,6 +1528,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -1551,6 +1593,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       14,
@@ -1619,6 +1662,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       10,
@@ -1687,6 +1731,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       10,
@@ -1755,6 +1800,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -1823,6 +1869,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -1891,6 +1938,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -1959,6 +2007,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2027,6 +2076,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2095,6 +2145,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2163,6 +2214,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2231,6 +2283,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       10,
@@ -2303,6 +2356,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -2375,6 +2429,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -2447,6 +2502,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -2519,6 +2575,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2591,6 +2648,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2663,6 +2721,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2735,6 +2794,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2807,6 +2867,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2879,6 +2940,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -2951,6 +3013,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       6,
@@ -3027,6 +3090,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;0,0,0,0,0,0,0,5;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3103,6 +3167,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;0,0,0,0,0,0,0,9;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3179,6 +3244,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;0,0,0,0,0,0,0,13;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3255,6 +3321,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;0,0,0,0,0,0,0,17;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3331,6 +3398,7 @@
       0,
       0
      ],
+     "rank": "1,0,2,-544,0,2,5,2;1,0,2,-544,0,2,13,6;1,0,2,-544,0,2,21,10;1,0,2,-544,0,2,29,14;1,0,2,-544,0,2,37,18;0,0,0,0,0,0,0,21",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3382,6 +3450,7 @@
       -1,
       0
      ],
+     "rank": "0,0,2,-544,0,1,3,2",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3404,6 +3473,7 @@
       0,
       -1
      ],
+     "rank": "0,0,2,-544,0,1,4,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3451,6 +3521,7 @@
       -1,
       0
      ],
+     "rank": "0,0,2,-544,0,1,13,13",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -3484,6 +3555,7 @@
       -1,
       0
      ],
+     "rank": "0,0,2,-544,0,1,13,19",
      "drawing": false,
      "changed_atoms": [
       7,
@@ -3523,6 +3595,7 @@
       0,
       -1
      ],
+     "rank": "0,0,2,-544,0,1,14,12",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3550,6 +3623,7 @@
       0,
       -1
      ],
+     "rank": "0,0,2,-544,0,1,14,18",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -3598,6 +3672,7 @@
       0,
       -1
      ],
+     "rank": "0,0,2,-544,0,1,9,6",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3621,6 +3696,7 @@
       0,
       -1
      ],
+     "rank": "0,0,2,-544,0,1,9,10",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -3655,6 +3731,7 @@
       1,
       0
      ],
+     "rank": "0,0,2,0,0,1,1,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3669,6 +3746,7 @@
       1,
       -1
      ],
+     "rank": "0,0,2,0,0,1,3,0",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -3702,6 +3780,7 @@
       1,
       -1
      ],
+     "rank": "0,0,2,0,0,1,3,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3732,6 +3811,7 @@
       0,
       0
      ],
+     "rank": "0,0,1,3066,0,0,1,0",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3748,6 +3828,7 @@
       1,
       0
      ],
+     "rank": "0,0,1,3066,0,0,2,1",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -3770,6 +3851,7 @@
       0,
       1
      ],
+     "rank": "0,0,1,3066,0,0,3,2",
      "drawing": false,
      "changed_atoms": [
       1,
@@ -3817,6 +3899,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,0,9",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -3848,6 +3931,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,2,8",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -3877,6 +3961,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,3,11",
      "drawing": false,
      "changed_atoms": [
       3,
@@ -3910,6 +3995,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,4,7",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -3933,6 +4019,7 @@
       1,
       0
      ],
+     "rank": "0,2,1,2544,0,0,5,10",
      "drawing": false,
      "changed_atoms": [
       4,
@@ -3966,6 +4053,7 @@
       0,
       1
      ],
+     "rank": "0,2,1,2544,0,0,6,6",
      "drawing": false,
      "changed_atoms": [
       4,
@@ -4010,6 +4098,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,6",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4038,6 +4127,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,9",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4090,6 +4180,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,20",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4120,6 +4211,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,25",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4161,6 +4253,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,30",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4234,6 +4327,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,42",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4273,6 +4367,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,49",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4327,6 +4422,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,56",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4373,6 +4469,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,57",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4494,6 +4591,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,6",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4517,6 +4615,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,10",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4556,6 +4655,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,4",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4585,6 +4685,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4612,6 +4713,7 @@
       0,
       0
      ],
+     "rank": "0,0,0,0,0,0,0,1",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4640,6 +4742,7 @@
       0,
       -1
      ],
+     "rank": "",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4745,6 +4848,22 @@
    "outcome": "too-large"
   },
   {
+   "name": "pyrylium",
+   "file": "forms/pyrylium.mol",
+   "conjugated": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "largest_group": 6,
+   "outcome": "listed",
+   "count": 0,
+   "structures": []
+  },
+  {
    "name": "acetone enolate",
    "file": "forms/acetone-enolate.mol",
    "conjugated": [
@@ -4767,6 +4886,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-3610,0,0,3,0",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -4789,6 +4909,7 @@
       0,
       0
      ],
+     "rank": "1,0,1,-2544,0,0,0,2",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4816,6 +4937,7 @@
       0,
       0
      ],
+     "rank": "0,0,1,-2544,0,0,0,1",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -4836,6 +4958,7 @@
       0,
       -1
      ],
+     "rank": "0,0,1,-2544,0,0,2,0",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4863,6 +4986,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,0,1",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -4883,6 +5007,7 @@
       0,
       1
      ],
+     "rank": "0,2,1,2544,0,0,2,0",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4924,6 +5049,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,0,9",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -4947,6 +5073,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,0,12",
      "drawing": false,
      "changed_atoms": [],
      "changed_bonds": [
@@ -4977,6 +5104,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,2,8",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -5006,6 +5134,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,4,7",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -5037,6 +5166,7 @@
       0,
       1
      ],
+     "rank": "0,2,1,2544,0,0,6,6",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -5083,6 +5213,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,0,5",
      "drawing": false,
      "changed_atoms": [
       0,
@@ -5110,6 +5241,7 @@
       0,
       0
      ],
+     "rank": "0,2,1,2544,0,0,2,4",
      "drawing": true,
      "changed_atoms": [],
      "changed_bonds": []
@@ -5131,6 +5263,7 @@
       1,
       0
      ],
+     "rank": "0,2,1,2544,0,0,4,6",
      "drawing": false,
      "changed_atoms": [
       2,
@@ -5141,6 +5274,303 @@
       1,
       4,
       5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "methyl vinyl ketone, drawn charge-separated",
+   "file": "forms/methyl-vinyl-ketone-drawn-charge-separated.mol",
+   "conjugated": [
+    0,
+    1,
+    3
+   ],
+   "largest_group": 3,
+   "outcome": "listed",
+   "count": 1,
+   "structures": [
+    {
+     "bonds": [
+      2,
+      1,
+      1,
+      2
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "0,0,0,0,0,0,0,3",
+     "drawing": false,
+     "changed_atoms": [
+      0,
+      4
+     ],
+     "changed_bonds": [
+      0,
+      1,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "benzene, drawn with aromatic bonds",
+   "file": "forms/benzene-drawn-with-aromatic-bonds.mol",
+   "conjugated": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "largest_group": 6,
+   "outcome": "listed",
+   "count": 2,
+   "structures": [
+    {
+     "bonds": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "0,0,0,0,0,0,0,6",
+     "drawing": true,
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "bonds": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      2
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "0,0,0,0,0,0,0,9",
+     "drawing": true,
+     "changed_atoms": [],
+     "changed_bonds": []
+    }
+   ]
+  },
+  {
+   "name": "phenolate, drawn with aromatic bonds",
+   "file": "forms/phenolate-drawn-with-aromatic-bonds.mol",
+   "conjugated": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "largest_group": 7,
+   "outcome": "listed",
+   "count": 4,
+   "structures": [
+    {
+     "bonds": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      1
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      -1
+     ],
+     "rank": "0,0,1,-3610,0,0,6,6",
+     "drawing": true,
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "bonds": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      1,
+      2
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      -1
+     ],
+     "rank": "0,0,1,-3610,0,0,6,10",
+     "drawing": true,
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "bonds": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "charges": [
+      -1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "1,0,1,-2544,0,0,0,10",
+     "drawing": false,
+     "changed_atoms": [
+      0,
+      6
+     ],
+     "changed_bonds": [
+      5
+     ]
+    },
+    {
+     "bonds": [
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1
+     ],
+     "charges": [
+      0,
+      0,
+      -1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "1,0,1,-2544,0,0,2,9",
+     "drawing": false,
+     "changed_atoms": [
+      2,
+      6
+     ],
+     "changed_bonds": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "pyridine bound to copper",
+   "file": "forms/pyridine-bound-to-copper.mol",
+   "conjugated": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "largest_group": 6,
+   "outcome": "listed",
+   "count": 2,
+   "structures": [
+    {
+     "bonds": [
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "0,0,0,0,0,0,0,9",
+     "drawing": true,
+     "changed_atoms": [],
+     "changed_bonds": []
+    },
+    {
+     "bonds": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2
+     ],
+     "charges": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "rank": "0,0,0,0,0,0,0,12",
+     "drawing": false,
+     "changed_atoms": [],
+     "changed_bonds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
      ]
     }
    ]

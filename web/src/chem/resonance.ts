@@ -17,7 +17,22 @@
 // Aromaticity.cpp, Copyright (C) 2003-2022 Greg Landrum and other RDKit contributors; under
 // RDKit's BSD licence (tests/fixtures/recorded/rdkit/license.txt; rdkitTables.json ships it).
 import type { MainModule } from '@rdkit/rdkit';
-import { atomBonds, chiralFlagOf, copyForm, formOf, otherAtom, pieces, withChiralFlag, withForm, type Form } from './rdkitForm';
+import {
+  atomBonds,
+  chiralFlagOf,
+  copyForm,
+  DATIVE_BOND,
+  formOf,
+  orderOf,
+  otherAtom,
+  pieces,
+  plainBonds,
+  readAsDrawn,
+  withChiralFlag,
+  withForm,
+  ZERO_BOND,
+  type Form,
+} from './rdkitForm';
 import tables from './rdkitTables.json';
 
 /** RDKit's ResonanceFlags. */
@@ -59,14 +74,26 @@ export interface Metrics {
   sumMb: number;
 }
 
+/** Bond::getValenceContrib: a dative bond counts at its end atom only, a zero bond nowhere. */
+function valenceContribution(bond: Form['bonds'][number], atom: number): number {
+  if (bond.bo === DATIVE_BOND) return atom === bond.atoms[1] ? 1 : 0;
+  return bond.bo;
+}
+
 /** RDKit's view of one molecule, as the supplier keeps it. */
 interface Molecule {
   form: Form;
   atomBonds: number[][];
-  /** Total valence from the Kekulé orders: RDKit's on the aromatic form too. */
+  /** Total valence from the Kekulé orders (RDKit's on the aromatic form too). */
   valence: number[];
+  /** Bonds, every kind (getDegree). */
   degree: number[];
+  /** Bonds and Hs (getTotalDegree). */
   totalDegree: number[];
+  /** countAtomElec's degree: bonds and Hs, less bonds giving this atom no valence. */
+  electronDegree: number[];
+  /** AtomElectrons' first total valence: bonds and Hs, less dative and zero bonds. */
+  sigma: number[];
   conjugated: boolean[];
   bondGroup: number[];
   atomGroup: number[];
@@ -81,7 +108,7 @@ function atomElectrons(m: Molecule, a: number): number {
   const atom = m.form.atoms[a];
   const dv = ELEMENTS[atom.z].valences[0];
   if (dv <= 1) return -1;
-  const degree = m.totalDegree[a];
+  const degree = m.electronDegree[a];
   if (degree > 3) return -1;
   const lonePairs = Math.max(outer(atom.z) - dv - atom.chg, 0);
   return dv - degree + lonePairs - atom.nRad; // RDKit lowers more than 1 to 1 here; no matter
@@ -89,7 +116,7 @@ function atomElectrons(m: Molecule, a: number): number {
 
 /** MolOps::setConjugation on the aromatic form: aromatic bonds, and each pair of bonds at an
  * atom with 2 or 3 substituents, one of them multiple, both to candidates. */
-export function conjugatedBonds(m: Pick<Molecule, 'form' | 'atomBonds' | 'valence' | 'degree' | 'totalDegree'>): boolean[] {
+export function conjugatedBonds(m: Pick<Molecule, 'form' | 'atomBonds' | 'valence' | 'degree' | 'totalDegree' | 'electronDegree'>): boolean[] {
   const aromatic = new Set(m.form.aromaticBonds);
   const conjugated = m.form.bonds.map((_, i) => aromatic.has(i));
   const info = m.form.atoms.map((atom, a) => {
@@ -104,11 +131,11 @@ export function conjugatedBonds(m: Pick<Molecule, 'form' | 'atomBonds' | 'valenc
     }
     return { candidate, substituents: candidate ? m.degree[a] + atom.impHs : 0 };
   });
-  const contribution = (b: number) => (aromatic.has(b) ? 1.5 : m.form.bonds[b].bo);
+  const contribution = (b: number, a: number) => (aromatic.has(b) ? 1.5 : valenceContribution(m.form.bonds[b], a));
   m.form.atoms.forEach((_, a) => {
     if (!info[a].candidate || info[a].substituents < 2 || info[a].substituents > 3) return;
     for (const b1 of m.atomBonds[a]) {
-      if (contribution(b1) < 1.5 || !info[otherAtom(m.form.bonds[b1], a)].candidate) continue;
+      if (contribution(b1, a) < 1.5 || !info[otherAtom(m.form.bonds[b1], a)].candidate) continue;
       for (const b2 of m.atomBonds[a]) {
         if (b1 === b2) continue;
         const other = info[otherAtom(m.form.bonds[b2], a)];
@@ -126,12 +153,16 @@ export function conjugatedBonds(m: Pick<Molecule, 'form' | 'atomBonds' | 'valenc
 function molecule(form: Form): Molecule {
   const bondsAt = atomBonds(form);
   const degree = bondsAt.map((b) => b.length);
+  const totalDegree = form.atoms.map((atom, a) => degree[a] + atom.impHs);
+  const without = (a: number, drop: (b: number) => boolean) => totalDegree[a] - bondsAt[a].filter(drop).length;
   const partial = {
     form,
     atomBonds: bondsAt,
-    valence: form.atoms.map((atom, a) => bondsAt[a].reduce((sum, b) => sum + form.bonds[b].bo, 0) + atom.impHs),
+    valence: form.atoms.map((atom, a) => bondsAt[a].reduce((sum, b) => sum + valenceContribution(form.bonds[b], a), 0) + atom.impHs),
     degree,
-    totalDegree: form.atoms.map((atom, a) => degree[a] + atom.impHs),
+    totalDegree,
+    electronDegree: form.atoms.map((_, a) => without(a, (b) => valenceContribution(form.bonds[b], a) === 0)),
+    sigma: form.atoms.map((_, a) => without(a, (b) => form.bonds[b].bo === DATIVE_BOND || form.bonds[b].bo === ZERO_BOND)),
   };
   const conjugated = conjugatedBonds(partial);
   // assignConjGrpIdx: each group grown from its first bond, by a stack.
@@ -232,7 +263,7 @@ class Electrons {
       e.bonds.set(b, { bo: 1, flags: 0 });
       for (const a of bond.atoms) if (!atoms.includes(a)) atoms.push(a);
     });
-    for (const a of atoms.sort((x, y) => x - y)) e.atoms.set(a, { nb: 0, tv: m.totalDegree[a], fc: 0, flags: 0 });
+    for (const a of atoms.sort((x, y) => x - y)) e.atoms.set(a, { nb: 0, tv: m.sigma[a], fc: 0, flags: 0 });
     let total = 0;
     for (const b of e.bonds.keys()) total += 2 * m.form.bonds[b].bo;
     for (const a of e.atoms.keys()) total += outer(m.form.atoms[a].z) - m.valence[a] - m.form.atoms[a].chg;
@@ -773,7 +804,7 @@ export function supply(form: Form, settings: number = SETTINGS, upTo: number = R
     return 0;
   });
   const structures = combinations.map((v) => {
-    const bonds = form.bonds.map((b) => b.bo);
+    const bonds = form.bonds.map(orderOf);
     const charges = form.atoms.map((a) => a.chg);
     const rank: string[] = [];
     groups.forEach((g, i) => {
@@ -808,30 +839,18 @@ export interface ResonanceStructure {
 
 export type ResonanceList =
   | { outcome: 'several' }
+  /** A bond other than single, double or triple (or aromatic in a ring): see plainBonds. */
+  | { outcome: 'bonds' }
   /** A conjugated group of more bonds than the limit (decision 7). */
   | { outcome: 'too-large'; largestGroup: number }
   /** More than 32: the count only; `capped` when RDKit stopped counting at its maximum. */
   | { outcome: 'counted'; count: number; capped: boolean }
   | { outcome: 'listed'; structures: ResonanceStructure[] };
 
-/** The drawing as drawn: its own bond orders and charges (a bond drawn aromatic listed as
- * such), with the same atoms as RDKit's reading of it, or null. */
-function asDrawn(rdkit: MainModule, molfile: string, reading: Form): Form | null {
-  const mol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: true, kekulize: false, setAromaticity: false }));
-  if (!mol) return null;
-  try {
-    const drawn = formOf(mol);
-    const same = drawn.atoms.length === reading.atoms.length && drawn.atoms.every((a, i) => a.z === reading.atoms[i].z);
-    return same && drawn.bonds.length === reading.bonds.length ? drawn : null;
-  } finally {
-    mol.delete();
-  }
-}
-
 function differences(drawn: Form | null, bonds: number[], charges: number[]) {
   if (!drawn) return { changedAtoms: [], changedBonds: [], drawing: false };
   const aromatic = new Set(drawn.aromaticBonds);
-  const changedBonds = bonds.flatMap((bo, i) => ((aromatic.has(i) ? bo !== 1 && bo !== 2 : bo !== drawn.bonds[i].bo) ? [i] : []));
+  const changedBonds = bonds.flatMap((bo, i) => ((aromatic.has(i) ? bo !== 1 && bo !== 2 : bo !== orderOf(drawn.bonds[i])) ? [i] : []));
   const changedAtoms = charges.flatMap((chg, i) => (chg !== drawn.atoms[i].chg ? [i] : []));
   return { changedAtoms, changedBonds, drawing: changedAtoms.length === 0 && changedBonds.length === 0 };
 }
@@ -839,7 +858,7 @@ function differences(drawn: Form | null, bonds: number[], charges: number[]) {
 function structureMolfile(rdkit: MainModule, drawing: Form, bonds: number[], charges: number[], chiralFlag: boolean): string {
   const form = copyForm(drawing);
   form.bonds.forEach((bond, i) => {
-    if (bond.bo === bonds[i]) return;
+    if (orderOf(bond) === bonds[i]) return;
     bond.bo = bonds[i];
     bond.stereo = 'unspecified';
     delete bond.stereoAtoms;
@@ -868,13 +887,14 @@ export function listResonance(rdkit: MainModule, molfile: string): ResonanceList
     mol.delete();
   }
   if (pieces(drawing) > 1) return { outcome: 'several' };
+  if (!plainBonds(drawing)) return { outcome: 'bonds' };
   const supplied = supply(drawing);
   const outcome = resonanceOutcome(supplied.largestGroup, supplied.count);
   if (outcome === 'too-large') return { outcome, largestGroup: supplied.largestGroup };
   if (outcome === 'counted' || !supplied.structures) {
     return { outcome: 'counted', count: supplied.count, capped: supplied.count >= RESONANCE_LIMITS.maxStructs };
   }
-  const drawn = asDrawn(rdkit, molfile, drawing);
+  const drawn = readAsDrawn(rdkit, molfile, drawing);
   const flag = chiralFlagOf(molfile);
   return {
     outcome: 'listed',

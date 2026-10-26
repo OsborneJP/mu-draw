@@ -15,7 +15,7 @@ export default function FormsButtons({ fragments }: { fragments: number }) {
       <h3>Tautomers and resonance</h3>
       {fragments > 1 ? (
         <p className="properties-note" data-testid="forms-one-at-a-time">
-          Tautomers and resonance structures are listed for one structure at a time.
+          Tautomers and resonance structures are listed for one structure at a time. For a salt, draw the ion on its own.
         </p>
       ) : (
         <div className="forms-buttons">

@@ -6,13 +6,14 @@
 import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
-import { chiralFlagOf, formOf } from './rdkitForm';
+import { chiralFlagOf, formOf, orderOf } from './rdkitForm';
 import { enumerate, listTautomers, readDrawing, TAUTOMER_LIMITS, tautomerOutcome, type TautomerList } from './tautomers';
 
 interface ExpectedTautomer {
   smiles: string;
   drawing: boolean;
   hydrogens: number[];
+  kekule: number[];
   changed_atoms: number[];
   changed_bonds: number[];
 }
@@ -68,6 +69,7 @@ function expected(compound: Expected) {
       smiles: t.smiles,
       drawing: t.drawing,
       hydrogens: t.hydrogens,
+      kekule: t.kekule,
       changedAtoms: t.changed_atoms,
       changedBonds: t.changed_bonds,
     })),
@@ -79,11 +81,12 @@ function comparable(result: TautomerList) {
   if (result.outcome !== 'listed') return result;
   return {
     ...result,
-    tautomers: result.tautomers.map(({ number, smiles, drawing, hydrogens, changedAtoms, changedBonds }) => ({
+    tautomers: result.tautomers.map(({ number, smiles, drawing, hydrogens, kekule, changedAtoms, changedBonds }) => ({
       number,
       smiles,
       drawing,
       hydrogens,
+      kekule,
       changedAtoms,
       changedBonds,
     })),
@@ -107,7 +110,7 @@ describe('the test drawings', () => {
     }
   });
 
-  it('gives each tautomer a Molfile that reads back as it, in the drawing’s layout, with its chiral flag', () => {
+  it('gives each tautomer a Molfile that reads back as it, in its Kekulé form, the drawing’s layout and chiral flag', () => {
     for (const compound of fixture.compounds) {
       const result = results.get(compound.name)!;
       if (result.outcome !== 'listed') continue;
@@ -122,9 +125,37 @@ describe('the test drawings', () => {
           expect(p[1], `${compound.name} ${t.number} atom ${i}`).toBeCloseTo(layout[i][1], 3);
         });
         mol.delete();
+        // Read as the picture reads it: the bonds as written.
+        const asWritten = rdkit.get_mol(t.molfile, JSON.stringify({ kekulize: false, setAromaticity: false }))!;
+        expect(formOf(asWritten).bonds.map(orderOf), `${compound.name} ${t.number}`).toEqual(t.kekule);
+        asWritten.delete();
         expect(chiralFlagOf(t.molfile)).toBe(chiralFlagOf(drawing(compound)));
       }
     }
+  });
+});
+
+/** A version 2 Molfile with its first double bond retyped (Molfile bond types: 4 aromatic, 5 to 8
+ * query bonds, 10 a hydrogen bond), as Ketcher writes them. */
+function withDoubleBondTyped(molfile: string, type: number): string {
+  const lines = molfile.split('\n');
+  const first = 4 + Number(lines[3].slice(0, 3));
+  const bonds = Number(lines[3].slice(3, 6));
+  const at = lines.slice(first, first + bonds).findIndex((line) => line.slice(6, 9).trim() === '2');
+  if (at < 0) throw new Error('no double bond to retype');
+  lines[first + at] = `${lines[first + at].slice(0, 6)}${String(type).padStart(3)}${lines[first + at].slice(9)}`;
+  return lines.join('\n');
+}
+
+describe('a bond RDKit reads as none of single, double or triple (review finding)', () => {
+  const acetone = () => drawing(fixture.compounds.find((c) => c.name === 'acetone')!);
+
+  it('is refused: aromatic outside a ring, a query bond, a hydrogen bond', () => {
+    for (const type of [4, 5, 6, 7, 8, 10]) expect(listTautomers(rdkit, withDoubleBondTyped(acetone(), type)), `type ${type}`).toEqual({ outcome: 'bonds' });
+  });
+
+  it('is not refused when single or double', () => {
+    for (const type of [1, 2]) expect(listTautomers(rdkit, withDoubleBondTyped(acetone(), type))?.outcome, `type ${type}`).toBe('listed');
   });
 });
 

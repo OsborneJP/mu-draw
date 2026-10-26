@@ -142,9 +142,53 @@ def test_resonance_structures_keep_the_skeleton_and_the_charge(generated):
 
 
 def test_generated_drawings_are_the_ions_named(generated):
-    """Each structure made from a parent has one charge, on the atom the SMARTS names."""
+    """Each structure made from a parent is the parent less one H, with one charge of the
+    sign its change gives: the same heavy atoms, one H fewer, no other charge."""
     by_name = {c["name"]: c for c in compounds(generated, gen.RESONANCE_FILE)}
-    for name, _parent, change, _smarts in gen.GENERATED:
+    parents = {row["typed_name"]: row["smiles"] for row in gen.read_rows(gen.RESONANCE_CSV)}
+    parents |= {row["typed_name"]: row["smiles"] for row in gen.read_rows(gen.TAUTOMER_CSV)}
+    for name, parent_name, change, _smarts in gen.GENERATED:
         mol = Chem.MolFromMolBlock(generated[by_name[name]["file"]])
+        parent = Chem.MolFromSmiles(parents[parent_name])
+        heavy = sorted(a.GetSymbol() for a in mol.GetAtoms())
+        assert heavy == sorted(a.GetSymbol() for a in parent.GetAtoms()), name
+        hydrogens = sum(a.GetTotalNumHs() for a in mol.GetAtoms())
+        assert hydrogens == sum(a.GetTotalNumHs() for a in parent.GetAtoms()) - 1, name
         charges = [a.GetFormalCharge() for a in mol.GetAtoms() if a.GetFormalCharge()]
         assert charges == [-1 if change == "deprotonate" else 1], name
+        assert not any(a.GetNumRadicalElectrons() for a in mol.GetAtoms()), name
+
+
+def order_key(rank: str) -> tuple:
+    """Where RDKit puts a structure (ResonanceMolSupplier::prepEnumIdxVect over CEVect2): by
+    the sum of its groups' depths, their largest, the depths in group order, then each
+    group's index sums. Structures of equal key are ones RDKit's order leaves to hashes."""
+    groups = [tuple(map(int, g.split(","))) for g in rank.split(";")] if rank else []
+    depths = [g[0] for g in groups]
+    return (sum(depths), max(depths, default=0), tuple(depths), tuple(g[6:] for g in groups))
+
+
+def out_of_order(structures: list) -> bool:
+    keys = [order_key(s["rank"] if isinstance(s, dict) else s[2]) for s in structures]
+    return any(a > b for a, b in zip(keys, keys[1:], strict=False))
+
+
+def test_rdkits_order_follows_the_recorded_ranks(generated):
+    """The ranks the generator works out agree with RDKit's own order, for every list."""
+    lists = [
+        c["structures"]
+        for c in compounds(generated, gen.RESONANCE_FILE)
+        if c["outcome"] == "listed"
+    ]
+    nci = json.loads(generated[gen.NCI_FILE])["molecules"]
+    lists += [m["resonance"]["structures"] for m in nci if m["resonance"]["outcome"] == "listed"]
+    assert len(lists) > 300
+    assert [i for i, structures in enumerate(lists) if out_of_order(structures)] == []
+    # Not vacuous: ranks differ within most lists of two or more, and a swap is caught.
+    ranked = [
+        s
+        for s in lists
+        if len({order_key(x["rank"] if isinstance(x, dict) else x[2]) for x in s}) > 1
+    ]
+    assert len(ranked) > 100
+    assert all(out_of_order(list(reversed(s))) for s in ranked)

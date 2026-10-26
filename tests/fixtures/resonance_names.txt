@@ -1,9 +1,9 @@
 # Test compounds for the resonance structure generator (docs/plans/v2-tautomers-resonance.md,
 # decision 9, approved by Jeff 2026-10-26). One PubChem name per line; their SMILES come
-# from PubChem through scripts/fetch_reference_smiles.py, never typed. Propene, toluene and
-# 1,3-cyclohexadiene are only parents: gen_tautomers_resonance_expected.py makes the allyl
-# ions, the benzyl cation and benzene's arenium ion from them (and acetone's enolate from
-# acetone), where PubChem has no record or a wrong one.
+# from PubChem through scripts/fetch_reference_smiles.py, never typed. Propene, toluene,
+# 1,3-cyclohexadiene, pyridine and copper are only parents: gen_tautomers_resonance_expected.py
+# makes the allyl ions, the benzyl cation, benzene's arenium ion and pyridine bound to copper
+# from them (and acetone's enolate from acetone), where PubChem has no record or a wrong one.
 acetate
 formate
 benzoate
@@ -34,6 +34,9 @@ acetic acid
 carbon dioxide
 sulfate
 buckminsterfullerene
+pyrylium
 propene
 toluene
 1,3-cyclohexadiene
+pyridine
+copper

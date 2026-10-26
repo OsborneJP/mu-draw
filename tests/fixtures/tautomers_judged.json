@@ -57,7 +57,7 @@
    "outcome": "listed",
    "count": 2,
    "stereo_dropped": false,
-   "why": "phenol and cyclohexa-2,4-dienone: RDKit's 1,3 rule moves the H to an ortho carbon only"
+   "why": "phenol and cyclohexa-2,4-dienone; RDKit's 1,5 rule needs an aliphatic C=C, so no 2,5-dienone"
   },
   {
    "name": "2-pyridone",
@@ -92,14 +92,14 @@
    "outcome": "listed",
    "count": 1,
    "stereo_dropped": false,
-   "why": "no H to move: RDKit's oxime rule needs an sp3 C-H beside the N"
+   "why": "no H to move: RDKit's oxime rule needs an aliphatic C with an H beside the N"
   },
   {
    "name": "4-nitrosophenol",
    "outcome": "listed",
    "count": 4,
    "stereo_dropped": false,
-   "why": "the nitrosophenol, the quinone monoxime, and two dienones from the phenol's keto shift"
+   "why": "the nitrosophenol, the quinone monoxime, the dienone with the H on the carbon beside C=O (the phenol's keto shift) and the dienone with the H on the carbon bearing N (from the oxime, its nitroso shift)"
   },
   {
    "name": "N-methylethanimine",
@@ -155,7 +155,7 @@
    "outcome": "listed",
    "count": 9,
    "stereo_dropped": false,
-   "why": "the diketo form, mono- and di-enols with their ring N-H positions, and two C-H forms"
+   "why": "the diketo form, its enols and dienol with their ring N-H positions, and three with an H moved onto a ring carbon"
   },
   {
    "name": "thymine",
@@ -301,6 +301,13 @@
    "count": 3,
    "stereo_dropped": false,
    "why": "as thiourea dioxide, drawn the other way"
+  },
+  {
+   "name": "phenol, drawn with aromatic bonds",
+   "outcome": "listed",
+   "count": 2,
+   "stereo_dropped": false,
+   "why": "as phenol: an aromatic ring drawn as such is read as the same molecule"
   }
  ]
 }

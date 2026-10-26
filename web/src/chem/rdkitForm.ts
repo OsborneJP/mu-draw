@@ -129,6 +129,44 @@ export function withForm<T>(rdkit: MainModule, form: Form, options: ReadOptions,
   }
 }
 
+// RDKit's JSON bond orders beyond 1 to 4 (MolInterchange): 0 is a zero-order bond, 17 a dative
+// one. RDKit's sanitizing makes a bond from a ligand to a metal dative.
+export const ZERO_BOND = 0;
+export const DATIVE_BOND = 17;
+
+/** Whether every bond is single, double, triple or dative once RDKit has read the drawing: its
+ * JSON has no number for an aromatic bond it can't make Kekulé (one outside a ring), a hydrogen
+ * bond or a query bond, and writes 0. */
+export function plainBonds(form: Form): boolean {
+  return !form.bonds.some((b) => b.bo === ZERO_BOND);
+}
+
+/** A bond's order as Python's GetBondTypeAsDouble gives it in a Kekulé form (dative: 1). */
+export function orderOf(bond: FormBond): number {
+  return bond.bo === DATIVE_BOND ? 1 : bond.bo;
+}
+
+/** The drawing as drawn: its own bond orders and charges, with the same atoms as RDKit's
+ * reading of it, or null. A bond drawn aromatic (Ketcher's aromatic bond, Molfile type 4) is
+ * listed among aromaticBonds. RDKit's JSON lists such a bond only where its atoms are aromatic,
+ * which read without aromaticity they are not, so they are found by RDKit's SMARTS, whose ":"
+ * is that type. */
+export function readAsDrawn(rdkit: MainModule, molfile: string, reading: Form): Form | null {
+  const mol = rdkit.get_mol(molfile, JSON.stringify({ removeHs: true, kekulize: false, setAromaticity: false }));
+  if (!mol) return null;
+  const query = rdkit.get_qmol('*:*');
+  try {
+    const drawn = formOf(mol);
+    const found = JSON.parse(query ? mol.get_substruct_matches(query) : '[]') as { bonds: number[] }[] | Record<string, never>;
+    drawn.aromaticBonds = [...new Set((Array.isArray(found) ? found : []).flatMap((m) => m.bonds))];
+    const same = drawn.atoms.length === reading.atoms.length && drawn.atoms.every((a, i) => a.z === reading.atoms[i].z);
+    return same && drawn.bonds.length === reading.bonds.length ? drawn : null;
+  } finally {
+    query?.delete();
+    mol.delete();
+  }
+}
+
 /** The number of separate structures (connected pieces) in a form. */
 export function pieces(form: Form): number {
   const parent = form.atoms.map((_, i) => i);
@@ -151,14 +189,23 @@ export function otherAtom(bond: FormBond, atom: number): number {
   return bond.atoms[0] === atom ? bond.atoms[1] : bond.atoms[0];
 }
 
+// A version 3 Molfile's counts: "M  V30 COUNTS atoms bonds sgroups 3d chiral" (RDKit writes
+// version 3 where version 2 can't hold a bond, a dative one say).
+const VERSION3_COUNTS = /^(M {2}V30 COUNTS \d+ \d+ \d+ \d+ )(\d+)/;
+
 /** The Molfile's chiral flag (its counts line), so a structure placed from the panel keeps
  * the drawing's: Ketcher reads flag 0 as an AND (racemic) group. */
 export function chiralFlagOf(molfile: string): boolean {
-  return (molfile.split('\n')[3] ?? '').slice(12, 15).trim() === '1';
+  const lines = molfile.split('\n');
+  const version3 = lines.map((l) => VERSION3_COUNTS.exec(l)).find((m) => m !== null);
+  if (version3) return version3[2] === '1';
+  return (lines[3] ?? '').slice(12, 15).trim() === '1';
 }
 
 export function withChiralFlag(molfile: string, flag: boolean): string {
   const lines = molfile.split('\n');
-  lines[3] = `${lines[3].slice(0, 12)}${flag ? '  1' : '  0'}${lines[3].slice(15)}`;
+  const at = lines.findIndex((l) => VERSION3_COUNTS.test(l));
+  if (at >= 0) lines[at] = lines[at].replace(VERSION3_COUNTS, `$1${flag ? 1 : 0}`);
+  else lines[3] = `${lines[3].slice(0, 12)}${flag ? '  1' : '  0'}${lines[3].slice(15)}`;
   return lines.join('\n');
 }

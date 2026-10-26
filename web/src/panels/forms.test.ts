@@ -20,7 +20,7 @@ const card = (number: number) => ({
 const TAUTOMERS: TautomerResult = {
   outcome: 'listed',
   stereoDropped: false,
-  tautomers: [1, 2].map((n) => ({ ...card(n), smiles: `smiles ${n}`, hydrogens: [] })),
+  tautomers: [1, 2].map((n) => ({ ...card(n), smiles: `smiles ${n}`, hydrogens: [], kekule: [] })),
 };
 const RESONANCE: ResonanceResult = {
   outcome: 'listed',

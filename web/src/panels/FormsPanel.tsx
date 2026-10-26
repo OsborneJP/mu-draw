@@ -20,6 +20,8 @@ interface Texts {
   one: string;
   messages: Record<FormsMessage, string>;
   several: string;
+  /** A bond other than single, double or triple (or aromatic in a ring). */
+  bonds: string;
 }
 
 const TEXTS: Record<FormsKind, Texts> = {
@@ -34,6 +36,8 @@ const TEXTS: Record<FormsKind, Texts> = {
       unavailable: 'Tautomers are unavailable',
     },
     several: 'Tautomers are listed for one structure at a time. For a salt, draw the ion on its own.',
+    bonds:
+      'Tautomers need every bond to be single, double or triple (aromatic only within a ring), so hydrogen bonds, query bonds and other aromatic bonds are left out.',
   },
   resonance: {
     title: 'Resonance structures',
@@ -46,10 +50,12 @@ const TEXTS: Record<FormsKind, Texts> = {
       unavailable: 'Resonance structures are unavailable',
     },
     several: 'Resonance structures are listed for one structure at a time. For a salt, draw the ion on its own.',
+    bonds:
+      'Resonance structures need every bond to be single, double or triple (aromatic only within a ring), so hydrogen bonds, query bonds and other aromatic bonds are left out. Draw one resonance structure.',
   },
 };
 
-/** Decisions 4 to 6, word for word in the tests. */
+/** Decisions 4 to 6; e2e/forms.spec.ts checks each word for word. */
 const NOTES = {
   rules:
     'These are the forms RDKit’s tautomer rules reach, not how stable they are. What differs from your drawing is highlighted; a double bond whose E/Z is not known is drawn crossed.',
@@ -57,9 +63,13 @@ const NOTES = {
   order:
     'In RDKit’s order: complete octets first, then fewer charges, then negative charge on the more electronegative atom. What differs from your drawing is highlighted.',
   limits:
-    'RDKit lists resonance only within conjugated groups and, with charges separated, only where no atom is left short of an octet: an isolated C=O, an enone, an ester or an acid shows no charge-separated form, and an aniline or a phenol only its Kekulé forms. Lone pairs and curved arrows are not drawn.',
+    'RDKit lists resonance only within conjugated groups, and leaves out some charge-separated forms textbooks show: an isolated C=O, an enone, an ester or an acid gets none, and an aniline or a phenol only its Kekulé forms. It can also miss one of several equivalent structures. Lone pairs and curved arrows are not drawn.',
   notListed: 'Your drawing is not one of the structures RDKit lists.',
 } as const;
+
+/** RDKit lists no resonance structure at all for some ions (pyrylium): each it finds has either
+ * an atom short of an octet or a positive charge right of nitrogen where another has not. */
+const NONE_LISTED = 'RDKit lists no resonance structures for this drawing, not even the drawing itself: its rules rule out every structure they find here.';
 
 type Note = keyof typeof NOTES;
 
@@ -145,7 +155,11 @@ function resonanceCards(result: Extract<ResonanceResult, { outcome: 'listed' }>)
       ...s,
       data: { bonds: JSON.stringify(s.bonds), charges: JSON.stringify(s.charges), rank: s.rank },
     })),
-    notes: [...(result.structures.length > 1 ? (['order'] as const) : []), ...(drawn ? [] : (['notListed'] as const)), 'limits'],
+    notes: [
+      ...(result.structures.length > 1 ? (['order'] as const) : []),
+      ...(drawn || !result.structures.length ? [] : (['notListed'] as const)),
+      'limits',
+    ],
   };
 }
 
@@ -155,7 +169,7 @@ function ListedCards({ kind, listed, inHand, failedAdd }: { kind: FormsKind; lis
   return (
     <>
       <p className="forms-summary" data-testid={`${kind}-summary`}>
-        {n === 1 ? `1 ${one}: RDKit finds no other.` : `${n} ${one}s.`}
+        {n === 0 ? NONE_LISTED : n === 1 ? `1 ${one}: RDKit finds no other.` : `${n} ${one}s.`}
       </p>
       {/* Stays at the top of the panel while the cards scroll beneath it. */}
       <div className="forms-status">
@@ -182,10 +196,12 @@ function ListedCards({ kind, listed, inHand, failedAdd }: { kind: FormsKind; lis
 
 function Ready({ kind, state }: { kind: FormsKind; state: Extract<FormsState, { kind: 'ready' }> }) {
   const { result, inHand, failedAdd } = state;
-  const { several } = TEXTS[kind];
+  const { several, bonds } = TEXTS[kind];
   switch (result.outcome) {
     case 'several':
       return <Message kind={kind}>{several}</Message>;
+    case 'bonds':
+      return <Message kind={kind}>{bonds}</Message>;
     case 'too-many':
       return (
         <Message kind={kind}>

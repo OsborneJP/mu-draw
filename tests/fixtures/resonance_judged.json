@@ -387,6 +387,52 @@
     "C+"
    ],
    "why": "the charge ortho, ortho and para to the CH2"
+  },
+  {
+   "name": "methyl vinyl ketone, drawn charge-separated",
+   "outcome": "listed",
+   "count": 1,
+   "drawing_listed": false,
+   "charge_sites": [],
+   "why": "drawn as RDKit's own C+-C=C-O- form under wider settings; with decision 2's RDKit lists only the neutral enone, so the panel says the drawing is not among its structures"
+  },
+  {
+   "name": "pyrylium",
+   "outcome": "listed",
+   "count": 0,
+   "drawing_listed": false,
+   "charge_sites": [],
+   "why": "RDKit's rules rule out every structure: each with C+ has a carbon short of an octet, which they drop while a structure with full octets exists, and each with O+ has a cation right of N, which they drop while a structure without one exists; so the panel says none are listed",
+   "exist": 5
+  },
+  {
+   "name": "benzene, drawn with aromatic bonds",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "as benzene; a ring drawn aromatic is like either Kekulé structure, so both are the drawing"
+  },
+  {
+   "name": "phenolate, drawn with aromatic bonds",
+   "outcome": "listed",
+   "count": 4,
+   "drawing_listed": true,
+   "charge_sites": [
+    "C-",
+    "C-",
+    "O-"
+   ],
+   "why": "as phenolate, in the same atom order",
+   "exist": 5
+  },
+  {
+   "name": "pyridine bound to copper",
+   "outcome": "listed",
+   "count": 2,
+   "drawing_listed": true,
+   "charge_sites": [],
+   "why": "pyridine's two Kekulé structures; the N-Cu bond, drawn single and read by RDKit as dative, takes no part"
   }
  ]
 }

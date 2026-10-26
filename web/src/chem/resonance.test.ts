@@ -2,17 +2,19 @@
 // RDKit's ResonanceMolSupplier and its conjugation rules) against what server-side RDKit
 // answered for the same drawings (tests/fixtures/resonance_expected.json) and for 303 molecules
 // of RDKit's NCI set (forms_nci_expected.json): docs/plans/v2-tautomers-resonance.md, bar
-// A.4-A.5. The same structures, the same conjugated bonds, and RDKit's order, except among
-// structures RDKit ranks equal on every measure (there its order follows internal hashes).
+// A.4-A.5. The same structures, the same conjugated bonds, each structure's rank as the
+// generator works it out (a Python test checks RDKit's own order follows those ranks), and
+// RDKit's order except among structures of equal rank (there it follows internal hashes).
 import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
-import { chiralFlagOf, formOf } from './rdkitForm';
+import { chiralFlagOf, formOf, orderOf } from './rdkitForm';
 import { listResonance, RESONANCE_LIMITS, resonanceOutcome, supply, type ResonanceList } from './resonance';
 
 interface ExpectedStructure {
   bonds: number[];
   charges: number[];
+  rank: string;
   drawing: boolean;
   changed_atoms: number[];
   changed_bonds: number[];
@@ -35,7 +37,7 @@ interface Fixture {
 }
 
 interface Nci {
-  molecules: { smiles: string; resonance: Found & { structures?: [number[], number[]][] } }[];
+  molecules: { smiles: string; resonance: Found & { structures?: [number[], number[], string][] } }[];
 }
 
 const fixture = Object.values(
@@ -52,14 +54,14 @@ function drawing(compound: Expected): string {
 
 const key = (bonds: number[], charges: number[]) => JSON.stringify([bonds, charges]);
 
-/** RDKit's order, as far as it is defined: the browser's ranks, read in the fixture's order,
- * are the browser's ranks in its own order; and the two hold the same structures. */
-function sameUpToTies(browser: { bonds: number[]; charges: number[]; rank: string }[], python: [number[], number[]][]): boolean {
-  const rank = new Map(browser.map((s) => [key(s.bonds, s.charges), s.rank]));
-  const theirs = python.map(([b, c]) => key(b, c));
+/** The same structures with the same ranks, in RDKit's order as far as it is defined: the
+ * fixture's ranks, read along the browser's order, are the fixture's ranks along its own. */
+function sameUpToTies(browser: { bonds: number[]; charges: number[]; rank: string }[], python: [number[], number[], string][]): boolean {
+  const rank = new Map(python.map(([b, c, r]) => [key(b, c), r]));
   return (
-    JSON.stringify([...theirs].sort()) === JSON.stringify(browser.map((s) => key(s.bonds, s.charges)).sort()) &&
-    JSON.stringify(theirs.map((k) => rank.get(k))) === JSON.stringify(browser.map((s) => s.rank))
+    JSON.stringify(python.map(([b, c, r]) => key(b, c) + r).sort()) ===
+      JSON.stringify(browser.map((s) => key(s.bonds, s.charges) + s.rank).sort()) &&
+    JSON.stringify(browser.map((s) => rank.get(key(s.bonds, s.charges)))) === JSON.stringify(python.map(([, , r]) => r))
   );
 }
 
@@ -81,7 +83,7 @@ describe('the test drawings', () => {
       if (result.outcome === 'too-large') expect(result.largestGroup, c.name).toBe(c.largest_group);
       if (result.outcome === 'counted') expect(result.count, c.name).toBe(c.count);
       if (result.outcome !== 'listed') continue;
-      const python = c.structures!.map((s) => [s.bonds, s.charges] as [number[], number[]]);
+      const python = c.structures!.map((s) => [s.bonds, s.charges, s.rank] as [number[], number[], string]);
       expect(sameUpToTies(result.structures, python), c.name).toBe(true);
       const byKey = new Map(c.structures!.map((s) => [key(s.bonds, s.charges), s]));
       for (const s of result.structures) {
@@ -116,7 +118,7 @@ describe('the test drawings', () => {
         const mol = rdkit.get_mol(s.molfile, JSON.stringify({ kekulize: false, setAromaticity: false }))!;
         const form = formOf(mol);
         mol.delete();
-        expect({ bonds: form.bonds.map((b) => b.bo), charges: form.atoms.map((a) => a.chg) }, `${c.name} ${s.number}`).toEqual({
+        expect({ bonds: form.bonds.map(orderOf), charges: form.atoms.map((a) => a.chg) }, `${c.name} ${s.number}`).toEqual({
           bonds: s.bonds,
           charges: s.charges,
         });
@@ -127,6 +129,30 @@ describe('the test drawings', () => {
         expect(chiralFlagOf(s.molfile)).toBe(chiralFlagOf(drawing(c)));
       }
     }
+  });
+});
+
+/** A version 2 Molfile with its first double bond retyped (Molfile bond types: 4 aromatic, 5 to 8
+ * query bonds, 10 a hydrogen bond), as Ketcher writes them. */
+function withDoubleBondTyped(molfile: string, type: number): string {
+  const lines = molfile.split('\n');
+  const first = 4 + Number(lines[3].slice(0, 3));
+  const bonds = Number(lines[3].slice(3, 6));
+  const at = lines.slice(first, first + bonds).findIndex((line) => line.slice(6, 9).trim() === '2');
+  if (at < 0) throw new Error('no double bond to retype');
+  lines[first + at] = `${lines[first + at].slice(0, 6)}${String(type).padStart(3)}${lines[first + at].slice(9)}`;
+  return lines.join('\n');
+}
+
+describe('a bond RDKit reads as none of single, double or triple (review finding)', () => {
+  const acetate = () => drawing(fixture.compounds.find((c) => c.name === 'acetate')!);
+
+  it('is refused: aromatic outside a ring (acetate drawn as its hybrid), a query bond, a hydrogen bond', () => {
+    for (const type of [4, 5, 6, 7, 8, 10]) expect(listResonance(rdkit, withDoubleBondTyped(acetate(), type)), `type ${type}`).toEqual({ outcome: 'bonds' });
+  });
+
+  it('is not refused when single or double', () => {
+    for (const type of [1, 2]) expect(listResonance(rdkit, withDoubleBondTyped(acetate(), type))?.outcome, `type ${type}`).toBe('listed');
   });
 });
 
@@ -164,10 +190,11 @@ describe('the limits (decision 7)', () => {
     expect(resonanceOutcome(0, 1)).toBe('listed');
   });
 
-  it('tells ties from order: a swap RDKit’s ranks fix is caught, a swap among equal ranks is not', () => {
+  it('tells ties from order: a swap the ranks fix is caught, one among equal ranks is not, nor is a rank of its own', () => {
     const s = (n: number, rank: string) => ({ bonds: [n], charges: [0], rank });
-    expect(sameUpToTies([s(1, 'a'), s(2, 'a')], [[[2], [0]], [[1], [0]]])).toBe(true);
-    expect(sameUpToTies([s(1, 'a'), s(2, 'b')], [[[2], [0]], [[1], [0]]])).toBe(false);
-    expect(sameUpToTies([s(1, 'a'), s(2, 'b')], [[[1], [0]]])).toBe(false);
+    expect(sameUpToTies([s(1, 'a'), s(2, 'a')], [[[2], [0], 'a'], [[1], [0], 'a']])).toBe(true);
+    expect(sameUpToTies([s(1, 'a'), s(2, 'b')], [[[2], [0], 'b'], [[1], [0], 'a']])).toBe(false);
+    expect(sameUpToTies([s(1, 'a'), s(2, 'a')], [[[1], [0], 'a'], [[2], [0], 'b']])).toBe(false);
+    expect(sameUpToTies([s(1, 'a'), s(2, 'b')], [[[1], [0], 'a']])).toBe(false);
   });
 });

@@ -19,6 +19,7 @@ interface Tautomer {
 interface Structure {
   bonds: number[];
   charges: number[];
+  rank: string;
   drawing: boolean;
   changed_atoms: number[];
   changed_bonds: number[];
@@ -42,6 +43,20 @@ const COMPOUNDS: Record<Kind, Compound[]> = {
 const CANVAS = '[data-testid="ketcher-canvas"][data-canvasmode="molecules-mode"]';
 // The panel's highlight, as RDKit writes it (formPictures.ts).
 const HIGHLIGHT = '#FFCC66';
+// The notes, word for word (decisions 4 to 6): never a "most stable" or "canonical" form.
+const NOTE_TEXTS: Record<string, string> = {
+  rules:
+    'These are the forms RDKit’s tautomer rules reach, not how stable they are. What differs from your drawing is highlighted; a double bond whose E/Z is not known is drawn crossed.',
+  stereo: 'RDKit leaves stereo undefined at every atom and double bond a hydrogen moves through, so those are not defined here.',
+  order:
+    'In RDKit’s order: complete octets first, then fewer charges, then negative charge on the more electronegative atom. What differs from your drawing is highlighted.',
+  limits:
+    'RDKit lists resonance only within conjugated groups, and leaves out some charge-separated forms textbooks show: an isolated C=O, an enone, an ester or an acid gets none, and an aniline or a phenol only its Kekulé forms. It can also miss one of several equivalent structures. Lone pairs and curved arrows are not drawn.',
+  notListed: 'Your drawing is not one of the structures RDKit lists.',
+};
+// What the resonance panel says when RDKit lists no structure at all (pyrylium).
+const NONE_LISTED =
+  'RDKit lists no resonance structures for this drawing, not even the drawing itself: its rules rule out every structure they find here.';
 
 function compound(kind: Kind, name: string): Compound {
   const found = COMPOUNDS[kind].find((c) => c.name === name);
@@ -97,8 +112,11 @@ function cards(page: Page, kind: Kind) {
   );
 }
 
-function notesShown(page: Page, kind: Kind) {
-  return page.getByTestId(`${kind}-note`).evaluateAll((ps) => ps.map((p) => p.getAttribute('data-note')));
+/** The notes shown, each with the text a student reads, checked against NOTE_TEXTS. */
+async function notesShown(page: Page, kind: Kind) {
+  const shown = await page.getByTestId(`${kind}-note`).evaluateAll((ps) => ps.map((p) => [p.getAttribute('data-note')!, p.textContent!]));
+  for (const [note, text] of shown) expect(text, note).toBe(NOTE_TEXTS[note]);
+  return shown.map(([note]) => note);
 }
 
 test('every tautomer test drawing: RDKit’s tautomers, the drawing’s first, what differs highlighted', async ({ app }) => {
@@ -139,15 +157,16 @@ test('every resonance test drawing: RDKit’s structures in its order, what diff
   await openEditor(app);
   const listed = COMPOUNDS.resonance.filter((c) => c.outcome === 'listed');
   expect(listed.length).toBeGreaterThan(30);
+  expect(listed.some((c) => c.structures!.length === 0)).toBe(true); // pyrylium: none listed
   const key = (bonds: unknown, charges: unknown) => JSON.stringify([bonds, charges]);
   for (const c of listed) {
     await load(page, c);
     await show(page, 'resonance');
     const shown = await cards(page, 'resonance');
-    // RDKit's order, except among structures it ranks equal on every measure.
-    const rank = new Map(shown.map((s) => [key(s.bonds, s.charges), s.rank]));
-    expect(c.structures!.map((s) => rank.get(key(s.bonds, s.charges))), c.name).toEqual(shown.map((s) => s.rank));
+    // RDKit's order, except among structures of equal rank (the fixture's ranks, not the
+    // app's: each card's rank must be the fixture's for its structure).
     const byKey = new Map(c.structures!.map((s) => [key(s.bonds, s.charges), s]));
+    expect(shown.map((s) => byKey.get(key(s.bonds, s.charges))?.rank), c.name).toEqual(c.structures!.map((s) => s.rank));
     expect(shown, c.name).toEqual(
       shown.map((s, i) => {
         const e = byKey.get(key(s.bonds, s.charges))!;
@@ -159,6 +178,7 @@ test('every resonance test drawing: RDKit’s structures in its order, what diff
           changedAtoms: e.changed_atoms,
           changedBonds: e.changed_bonds,
           highlighted: { atoms: e.changed_atoms, bonds: e.changed_bonds },
+          rank: e.rank,
           add: 'Add',
         };
       }),
@@ -166,9 +186,13 @@ test('every resonance test drawing: RDKit’s structures in its order, what diff
     const n = shown.length;
     const drawn = c.structures!.some((s) => s.drawing);
     await expect(page.getByTestId('resonance-summary')).toHaveText(
-      n === 1 ? '1 resonance structure: RDKit finds no other.' : `${n} resonance structures.`,
+      n === 0 ? NONE_LISTED : n === 1 ? '1 resonance structure: RDKit finds no other.' : `${n} resonance structures.`,
     );
-    expect(await notesShown(page, 'resonance'), c.name).toEqual([...(n > 1 ? ['order'] : []), ...(drawn ? [] : ['notListed']), 'limits']);
+    expect(await notesShown(page, 'resonance'), c.name).toEqual([
+      ...(n > 1 ? ['order'] : []),
+      ...(drawn || n === 0 ? [] : ['notListed']),
+      'limits',
+    ]);
     await page.getByTestId('resonance-close').click();
   }
 });
@@ -189,12 +213,13 @@ test('the limits: too many tautomers, resonance structures counted, a system too
   await expect(page.getByTestId('resonance-message')).toHaveText(
     `A conjugated system of ${large.largest_group} bonds: too large for RDKit to list its resonance structures here (at most 60).`,
   );
-  await load(page, compound('resonance', 'hexaglycine'));
+  const most = compound('resonance', 'hexaglycine');
+  await load(page, most);
   await show(page, 'resonance');
-  await expect(page.getByTestId('resonance-card')).toHaveCount(32);
+  await expect(page.getByTestId('resonance-card')).toHaveCount(most.structures!.length);
 });
 
-test('more than one structure: no buttons, and a note saying one at a time', async ({ app }) => {
+test('more than one structure: no buttons, and a note saying one at a time (a salt: the ion alone)', async ({ app }) => {
   const { page } = app;
   await openEditor(app);
   await load(page, compound('tautomers', 'acetone'));
@@ -202,10 +227,61 @@ test('more than one structure: no buttons, and a note saying one at a time', asy
   await expect(page.getByTestId('resonance-show')).toBeVisible();
   await page.evaluate((m) => window.ketcher!.addFragment(m), fixture(compound('resonance', 'benzene').file));
   await expect(page.getByTestId('forms-one-at-a-time')).toHaveText(
-    'Tautomers and resonance structures are listed for one structure at a time.',
+    'Tautomers and resonance structures are listed for one structure at a time. For a salt, draw the ion on its own.',
   );
   await expect(page.getByTestId('tautomers-show')).toHaveCount(0);
   await expect(page.getByTestId('resonance-show')).toHaveCount(0);
+});
+
+test('a reaction, or an atom that is no element: no buttons', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  // RDKit's SMILES of two test drawings, from the fixture.
+  const own = (name: string) => compound('tautomers', name).tautomers!.find((t) => t.drawing)!.smiles;
+  const [ethanol, acetone] = [own('ethanol'), own('acetone')];
+  // A reaction: the properties panel says so, and neither button is offered.
+  await page.evaluate((m) => window.ketcher!.setMolecule(m), `${ethanol}>>${acetone}`);
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'reaction');
+  await expect(page.getByTestId('tautomers-show')).toHaveCount(0);
+  await expect(page.getByTestId('resonance-show')).toHaveCount(0);
+  // Back to a structure: the buttons come back, so their absence above was the reaction's.
+  await load(page, compound('tautomers', 'acetone'));
+  await expect(page.getByTestId('tautomers-show')).toBeVisible();
+  // An R-group.
+  await page.evaluate((m) => window.ketcher!.setMolecule(m), `[*:1]${ethanol}`);
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'not-elements');
+  await expect(page.getByTestId('tautomers-show')).toHaveCount(0);
+  await expect(page.getByTestId('resonance-show')).toHaveCount(0);
+});
+
+/** A version 2 Molfile with its first double bond retyped (Molfile bond types: 4 aromatic, 5 to 8
+ * query bonds, 10 a hydrogen bond), as Ketcher writes them. */
+function withDoubleBondTyped(molfile: string, type: number): string {
+  const lines = molfile.split('\n');
+  const first = 4 + Number(lines[3].slice(0, 3));
+  const bonds = Number(lines[3].slice(3, 6));
+  const at = lines.slice(first, first + bonds).findIndex((line) => line.slice(6, 9).trim() === '2');
+  if (at < 0) throw new Error('no double bond to retype');
+  lines[first + at] = `${lines[first + at].slice(0, 6)}${String(type).padStart(3)}${lines[first + at].slice(9)}`;
+  return lines.join('\n');
+}
+
+test('a bond neither single, double nor triple (acetate drawn as its hybrid): each panel says why it lists nothing', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  // Acetate's C=O drawn with Ketcher's aromatic bond, as a hybrid is often drawn.
+  await page.evaluate((m) => window.ketcher!.setMolecule(m), withDoubleBondTyped(fixture(compound('resonance', 'acetate').file), 4));
+  await expect(page.getByTestId('properties-panel')).toHaveAttribute('data-state', 'ready');
+  await show(page, 'resonance');
+  await expect(page.getByTestId('resonance-message')).toHaveText(
+    'Resonance structures need every bond to be single, double or triple (aromatic only within a ring), so hydrogen bonds, query bonds and other aromatic bonds are left out. Draw one resonance structure.',
+  );
+  await expect(page.getByTestId('resonance-card')).toHaveCount(0);
+  await show(page, 'tautomers');
+  await expect(page.getByTestId('tautomers-message')).toHaveText(
+    'Tautomers need every bond to be single, double or triple (aromatic only within a ring), so hydrogen bonds, query bonds and other aromatic bonds are left out.',
+  );
+  await expect(page.getByTestId('tautomers-card')).toHaveCount(0);
 });
 
 /** Click on the canvas away from the drawing, after a move there (Ketcher's paste tool shows

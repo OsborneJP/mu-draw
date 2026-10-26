@@ -20,14 +20,18 @@ import {
   chiralFlagOf,
   copyForm,
   formOf,
+  orderOf,
   pieces,
+  plainBonds,
   jsonOf,
+  readAsDrawn,
   withChiralFlag,
   withForm,
   type Form,
   type Step,
 } from './rdkitForm';
 import tables from './rdkitTables.json';
+import { FLAGS, RESONANCE_LIMITS, supply } from './resonance';
 
 /** Decision 7: up to 32 are drawn, so RDKit's enumeration stops at 33. RDKit's own limit on
  * the transforms applied is kept as it is. */
@@ -283,18 +287,22 @@ export interface Tautomer {
   drawing: boolean;
   /** Every H on each atom, by atom index. */
   hydrogens: number[];
-  /** What differs from the drawing: atoms with another number of H or another charge, bonds of another kind
-   * (aromatic counted as a kind of its own). */
+  /** The Kekulé form it is drawn in: each bond's order, by index (see kekuleForms). */
+  kekule: number[];
+  /** What differs from the drawing: atoms with another number of H or another charge; bonds
+   * drawn in another order, or, where the drawing has an aromatic bond, no longer aromatic. */
   changedAtoms: number[];
   changedBonds: number[];
-  /** In the drawing's layout, with the drawing's chiral flag. A changed double bond RDKit
-   * sees as stereogenic is crossed: its E/Z is not known. */
+  /** Its Kekulé form in the drawing's layout, with the drawing's chiral flag. A changed double
+   * bond RDKit sees as stereogenic is crossed: its E/Z is not known. */
   molfile: string;
 }
 
 export type TautomerList =
   /** More than one structure: one at a time (decision 8). */
   | { outcome: 'several' }
+  /** A bond other than single, double or triple (or aromatic in a ring): see plainBonds. */
+  | { outcome: 'bonds' }
   /** More than 32, or RDKit's own limit on transforms reached (decision 7). */
   | { outcome: 'too-many'; status: EnumerationStatus }
   | { outcome: 'listed'; stereoDropped: boolean; tautomers: Tautomer[] };
@@ -304,9 +312,38 @@ export function readDrawing(rdkit: MainModule, molfile: string): Mol | null {
   return rdkit.get_mol(molfile, JSON.stringify({ removeHs: true }));
 }
 
-function molfileOf(rdkit: MainModule, form: Form, coords: number[][] | null, chiralFlag: boolean): string {
+/** A tautomer's Kekulé forms: RDKit's resonance structures with KEKULE_ALL alone that change
+ * only aromatic bonds and no charge; RDKit's own Kekulé form where there are none, or where a
+ * conjugated group is too large to run. As the generator's kekule_forms(). */
+function kekuleForms(form: Form): number[][] {
+  const own = form.bonds.map(orderOf);
+  const aromatic = new Set(form.aromaticBonds);
+  const forms = (supply({ ...form, coords: null }, FLAGS.KEKULE_ALL, RESONANCE_LIMITS.maxStructs).structures ?? []).filter(
+    ({ bonds, charges }) => charges.every((c, i) => c === form.atoms[i].chg) && bonds.every((bo, i) => aromatic.has(i) || bo === own[i]),
+  );
+  return forms.length ? forms.map((f) => f.bonds) : [own];
+}
+
+/** The Kekulé form with the fewest bonds unlike the drawing's as drawn (a bond drawn aromatic
+ * is like either order), the lowest list of orders among equals. As the generator's closest(). */
+function closest(forms: number[][], drawn: Form): number[] {
+  const aromatic = new Set(drawn.aromaticBonds);
+  const unlike = (f: number[]) => f.filter((bo, i) => !aromatic.has(i) && bo !== orderOf(drawn.bonds[i])).length;
+  const lower = (a: number[], b: number[]) => {
+    const i = a.findIndex((bo, j) => bo !== b[j]);
+    return i >= 0 && a[i] < b[i];
+  };
+  return forms.reduce((best, f) => (unlike(f) < unlike(best) || (unlike(f) === unlike(best) && lower(f, best)) ? f : best));
+}
+
+function molfileOf(rdkit: MainModule, form: Form, kekule: number[], coords: number[][] | null, chiralFlag: boolean): string {
   const drawn = { ...copyForm(form), coords };
-  const text = withForm(rdkit, drawn, { steps: PRODUCT_STEPS, setAromaticBonds: true, aromatic: true, assignStereo: true, coords: true }, (m) =>
+  drawn.bonds.forEach((bond, i) => {
+    if (orderOf(bond) !== kekule[i]) bond.bo = kekule[i];
+  });
+  // Read as plain Kekulé, without aromaticity, so the bonds stay in the form chosen.
+  const steps: Step[] = ['SANITIZE_SYMMRINGS', 'SANITIZE_ADJUSTHS'];
+  const text = withForm(rdkit, drawn, { steps, setAromaticBonds: false, aromatic: false, assignStereo: true, coords: true }, (m) =>
     m.get_molblock(),
   );
   if (text === null) throw new Error('RDKit could not write a tautomer');
@@ -320,13 +357,20 @@ export function listTautomers(rdkit: MainModule, molfile: string): TautomerList 
   try {
     const drawing = formOf(mol);
     if (pieces(drawing) > 1) return { outcome: 'several' };
+    if (!plainBonds(drawing)) return { outcome: 'bonds' };
     const found = enumerate(rdkit, mol);
     if (tautomerOutcome(found.status, found.tautomers.length) === 'too-many') return { outcome: 'too-many', status: found.status };
-    const kinds = bondKinds(drawing);
-    const changes = (form: Form) => ({
-      changedAtoms: form.atoms.flatMap((a, i) => (a.impHs !== drawing.atoms[i].impHs || a.chg !== drawing.atoms[i].chg ? [i] : [])),
-      changedBonds: bondKinds(form).flatMap((kind, i) => (kind !== kinds[i] ? [i] : [])),
-    });
+    // Each tautomer is drawn in its Kekulé form closest to the drawing, so the bonds that look
+    // different are the ones highlighted.
+    const drawn = readAsDrawn(rdkit, molfile, drawing) ?? drawing;
+    const drawnAromatic = new Set(drawn.aromaticBonds);
+    const changes = (form: Form, kekule: number[]) => {
+      const aromatic = new Set(form.aromaticBonds);
+      return {
+        changedAtoms: form.atoms.flatMap((a, i) => (a.impHs !== drawing.atoms[i].impHs || a.chg !== drawing.atoms[i].chg ? [i] : [])),
+        changedBonds: kekule.flatMap((bo, i) => ((drawnAromatic.has(i) ? !aromatic.has(i) : bo !== orderOf(drawn.bonds[i])) ? [i] : [])),
+      };
+    };
     // The drawing's own tautomer is the one RDKit keys by the drawing's SMILES once its stereo
     // is cleared as everyone's is. RDKit may have kept it in a form of the same SMILES with an H
     // elsewhere (histidine's acid H on its other O), so it is shown as drawn.
@@ -344,14 +388,18 @@ export function listTautomers(rdkit: MainModule, molfile: string): TautomerList 
     return {
       outcome: 'listed',
       stereoDropped,
-      tautomers: ordered.map((t, n) => ({
-        number: n + 1,
-        smiles: t.smiles,
-        drawing: n === 0,
-        hydrogens: t.form.atoms.map((a) => a.impHs),
-        ...changes(t.form),
-        molfile: molfileOf(rdkit, t.form, drawing.coords, flag),
-      })),
+      tautomers: ordered.map((t, n) => {
+        const kekule = closest(kekuleForms(t.form), drawn);
+        return {
+          number: n + 1,
+          smiles: t.smiles,
+          drawing: n === 0,
+          hydrogens: t.form.atoms.map((a) => a.impHs),
+          kekule,
+          ...changes(t.form, kekule),
+          molfile: molfileOf(rdkit, t.form, kekule, drawing.coords, flag),
+        };
+      }),
     };
   } finally {
     mol.delete();
