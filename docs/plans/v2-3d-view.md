@@ -4,6 +4,11 @@ Requested by Jeff on 2026-10-26 (docs/SPEC.md, "After v1" > "Teaching features":
 Ketcher already has a basic 3D viewer; v2 adds a PubChem 3D conformer shown with 3Dmol.js,
 sharing code with the FirstGlance replacement").
 
+**Approved by Jeff on 2026-10-26, as proposed**: the server's RDKit is the fallback, offline
+the view says "Needs an internet connection", it docks below the canvas, and "sharing code
+with the FirstGlance replacement" means decision 1's reading (a): the same pinned 3Dmol.js
+(2.5.5) and the same look as ProteinFirst, with no shared files.
+
 The aim: a student draws a structure, presses "3D view", and turns a real 3D model of it
 with the mouse or a finger: the chair of a sugar, the cage of cocaine, the twist of a
 biaryl, the two mirror-image 2-butanols. The model comes from PubChem where PubChem has one
@@ -36,6 +41,7 @@ and is computed by RDKit where it has none.
 ## Decisions for Jeff (proposed answers in bold)
 
 1. **"Sharing code with the FirstGlance replacement": a question for you, not decided here.**
+   (Answered 2026-10-26: reading (a).)
    I found ProteinFirst (~/projects/protfirst), which says it replaces FirstGlance in Jmol: it
    vendors 3Dmol.js 2.5.5 as a global script, with no build step, from a white background with
    Jmol colours (js/viewer.js). What did you mean? Possible readings:
@@ -143,9 +149,10 @@ and is computed by RDKit where it has none.
    `M  END`. An unreadable SMILES gets 400 `invalid_structure`; more than one structure gets
    400 `one_structure`; more than 100 non-hydrogen atoms gets `found: false`, `too_big`, with
    nothing embedded.
-2. PubChem first. A recorded 200 gives PubChem's Molfile and CID unchanged. A record whose
-   connectivity differs from the request, or that isn't 3D or has no CID, counts as PubChem
-   not answering.
+2. PubChem first. A recorded 200 gives PubChem's Molfile and CID unchanged. A record of
+   another structure or configuration, or a flat one, is not shown: RDKit's model is, marked
+   `pubchem: "unusable"` (cached, as PubChem did answer). A record with no CID or no Molfile
+   counts as PubChem not answering.
 3. Recorded 404 and 501 give RDKit's model: ETKDGv3, fixed seed, 2 s timeout, MMFF94 at most
    200 steps (UFF, then none, where it lacks parameters). A generator (server/scripts/, like
    the stereoisomer one) writes tests/fixtures/conformers_expected.json: for each test

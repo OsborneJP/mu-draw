@@ -38,3 +38,10 @@ Rules:
   `pubchem/byname-*.json` name lookups; `server/scripts/build_practice_lists.py` records any
   that are missing, then builds web/public/practice.json and the practice test fixtures from
   them and OPSIN.
+- `pubchem/conformer-*.json`, made by `server/scripts/record_conformers.py` through the
+  server's own client: PubChem's 3D record for each 3D view test compound (POST
+  `compound/smiles/SDF?record_type=3d`, the canonical SMILES in the form body). PubChem
+  answers SDF text, or plain text for "none" (404 `PUGREST.NotFound`: no 3D record; 501
+  `PUGREST.Unimplemented`: no record at all), so these keep the answer as `text` with its
+  `content_type` instead of `body`. The same script rebuilds
+  tests/fixtures/conformer_responses.json and conformers_expected.json from them.

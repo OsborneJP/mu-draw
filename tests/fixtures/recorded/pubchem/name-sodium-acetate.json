@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/sodium%20acetate/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:32:32Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 31372,
+          "SMILES": "CC(=O)[O-].[Na+]",
+          "Title": "Sodium acetate"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/adamantane/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:32:30Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 9238,
+          "SMILES": "C1C2CC3CC1CC(C2)C3",
+          "Title": "Adamantane"
+        }
+      ]
+    }
+  }
+}

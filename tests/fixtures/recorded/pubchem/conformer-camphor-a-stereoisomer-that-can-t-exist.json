@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF?record_type=3d",
+    "form": {
+      "smiles": "CC1(C)[C@@H]2CC[C@]1(C)C(=O)C2"
+    }
+  },
+  "recorded_at": "2026-10-26T12:35:44Z",
+  "status": 404,
+  "content_type": "text/plain",
+  "text": "Status: 404\nCode: PUGREST.NotFound\nMessage: No records found for the given CID(s)\n"
+}

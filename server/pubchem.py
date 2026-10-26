@@ -1,4 +1,4 @@
-"""PubChem PUG REST client for Get name and Name to structure.
+"""PubChem PUG REST client for Get name, Name to structure and the 3D view.
 
 Every request, from every student at once, passes one rate limit (PubChem allows 5 requests
 a second and 400 a minute). A 429 or 503 is retried once, after 1 s; a second one means
@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import time
 from collections import deque
 from collections.abc import Awaitable, Callable
@@ -25,6 +26,13 @@ PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 NAME_URL = f"{PUG}/compound/smiles/property/IUPACName,Title/JSON"
 # Name to structure's fallback: SMILES (with stereo) and title for a name, POSTed as `name`.
 STRUCTURE_URL = f"{PUG}/compound/name/property/SMILES,Title/JSON"
+# The 3D view: PubChem's 3D conformer (an SDF record) for a SMILES POSTed as `smiles`.
+CONFORMER_URL = f"{PUG}/compound/smiles/SDF?record_type=3d"
+# Its two answers for "no 3D model", as text/plain: the compound has no 3D record (404), or
+# PubChem has no record of the structure at all (501, "Cannot (yet) generate 3D coordinates
+# for structures without an existing CID").
+NO_CONFORMER = {404: "PUGREST.NotFound", 501: "PUGREST.Unimplemented"}
+MOLFILE_END = "\nM  END"  # chem-literal-ok: where the record's Molfile ends
 COMPOUND_PAGE = "https://pubchem.ncbi.nlm.nih.gov/compound/{cid}"
 # (requests, seconds): at most this many requests start in any window this long.
 LIMITS = ((5, 1.0), (400, 60.0))
@@ -106,6 +114,27 @@ def parse_structure(body: object) -> NameRecord:
     return NameRecord(cid=cid, smiles=smiles, title=title, matches=len(rows))
 
 
+@dataclass(frozen=True)
+class Conformer:
+    cid: int
+    molblock: str  # the SDF record's Molfile, through its end line (MOLFILE_END)
+
+
+def parse_conformer(text: str) -> Conformer:
+    """The Molfile and CID of PubChem's 3D SDF record. Checked as chemistry by server/threed.py."""
+    end = text.find(MOLFILE_END)
+    cid = re.search(r"^> *<PUBCHEM_COMPOUND_CID>\n(\d+)\n", text, re.MULTILINE)
+    if end == -1 or cid is None or int(cid.group(1)) <= 0:
+        raise Unavailable("unexpected record")
+    return Conformer(cid=int(cid.group(1)), molblock=text[: end + len(MOLFILE_END)] + "\n")
+
+
+def no_conformer(response: httpx.Response) -> bool:
+    """PubChem's plain-text answer that it has no 3D record for the structure."""
+    code = NO_CONFORMER.get(response.status_code)
+    return code is not None and f"\nCode: {code}\n" in response.text
+
+
 def not_found(response: httpx.Response) -> bool:
     """PubChem's answer for a name it doesn't know: 404 with PUGREST.NotFound."""
     try:
@@ -140,19 +169,23 @@ class PubChem:
         self._limit = limit
         self._sleep = sleep
 
-    async def _post(self, url: str, form: dict[str, str]) -> httpx.Response:
+    async def _post(
+        self, url: str, form: dict[str, str], headers: dict[str, str]
+    ) -> httpx.Response:
         await self._limit.acquire()
         try:
-            return await self._http.post(url, data=form)
+            return await self._http.post(url, data=form, headers=headers)
         except httpx.HTTPError as error:
             raise Unavailable(type(error).__name__) from None
 
-    async def _ask(self, url: str, form: dict[str, str]) -> httpx.Response:
+    async def _ask(
+        self, url: str, form: dict[str, str], headers: dict[str, str] | None = None
+    ) -> httpx.Response:
         """POST, retrying once after RETRY_AFTER_S on 429 or 503."""
-        response = await self._post(url, form)
+        response = await self._post(url, form, headers or {})
         if response.status_code in RETRY_STATUSES:
             await self._sleep(RETRY_AFTER_S)
-            response = await self._post(url, form)
+            response = await self._post(url, form, headers or {})
             if response.status_code in RETRY_STATUSES:
                 raise Busy()
         return response
@@ -176,6 +209,17 @@ class PubChem:
         if not_found(response):
             return None
         return parse_structure(self._json(response))
+
+    async def conformer(self, smiles: str) -> Conformer | None:
+        """PubChem's 3D conformer of this exact structure, or None if it has none."""
+        response = await self._ask(
+            CONFORMER_URL, {"smiles": smiles}, {"Accept": "chemical/x-mdl-sdfile"}
+        )
+        if no_conformer(response):
+            return None
+        if response.status_code != 200:
+            raise Unavailable(f"HTTP {response.status_code}")
+        return parse_conformer(response.text)
 
 
 def new_http(transport: httpx.AsyncBaseTransport | None = None) -> httpx.AsyncClient:

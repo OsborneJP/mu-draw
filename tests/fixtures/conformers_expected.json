@@ -1,0 +1,847 @@
+{
+  "generator": "server/scripts/record_conformers.py",
+  "compounds": [
+    {
+      "name": "aspirin",
+      "file": "conformers/aspirin.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 2244,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 9,
+        "H": 8,
+        "O": 4
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {}
+      }
+    },
+    {
+      "name": "(R)-2-butanol",
+      "file": "conformers/r-2-butanol.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 84682,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "4": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 4,
+        "H": 10,
+        "O": 1
+      },
+      "model_labels": {
+        "atoms": {
+          "4": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "(S)-2-butanol",
+      "file": "conformers/s-2-butanol.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 444683,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "4": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 4,
+        "H": 10,
+        "O": 1
+      },
+      "model_labels": {
+        "atoms": {
+          "4": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "trans-2-butene",
+      "file": "conformers/trans-2-butene.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 62695,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {
+          "2-2": [
+            "E"
+          ]
+        }
+      },
+      "atoms": {
+        "C": 4,
+        "H": 8
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {
+          "2-2": [
+            "E"
+          ]
+        }
+      }
+    },
+    {
+      "name": "cis-2-butene",
+      "file": "conformers/cis-2-butene.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 5287573,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {
+          "2-2": [
+            "Z"
+          ]
+        }
+      },
+      "atoms": {
+        "C": 4,
+        "H": 8
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {
+          "2-2": [
+            "Z"
+          ]
+        }
+      }
+    },
+    {
+      "name": "cyclohexane",
+      "file": "conformers/cyclohexane.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 8078,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 6,
+        "H": 12
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {}
+      }
+    },
+    {
+      "name": "beta-D-glucose",
+      "file": "conformers/beta-d-glucose.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 64689,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "10": [
+            "S"
+          ],
+          "11": [
+            "S"
+          ],
+          "7": [
+            "R"
+          ],
+          "8": [
+            "R"
+          ],
+          "9": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 6,
+        "H": 12,
+        "O": 6
+      },
+      "model_labels": {
+        "atoms": {
+          "10": [
+            "S"
+          ],
+          "11": [
+            "S"
+          ],
+          "7": [
+            "R"
+          ],
+          "8": [
+            "R"
+          ],
+          "9": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "cholesterol",
+      "file": "conformers/cholesterol.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 5997,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "20": [
+            "S"
+          ],
+          "21": [
+            "R"
+          ],
+          "22": [
+            "S"
+          ],
+          "23": [
+            "S"
+          ],
+          "24": [
+            "R"
+          ],
+          "25": [
+            "S"
+          ],
+          "26": [
+            "R"
+          ],
+          "27": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 27,
+        "H": 46,
+        "O": 1
+      },
+      "model_labels": {
+        "atoms": {
+          "20": [
+            "S"
+          ],
+          "21": [
+            "R"
+          ],
+          "22": [
+            "S"
+          ],
+          "23": [
+            "S"
+          ],
+          "24": [
+            "R"
+          ],
+          "25": [
+            "S"
+          ],
+          "26": [
+            "R"
+          ],
+          "27": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "cocaine",
+      "file": "conformers/cocaine.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 446220,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "17": [
+            "S"
+          ],
+          "18": [
+            "R"
+          ],
+          "19": [
+            "S"
+          ],
+          "20": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 17,
+        "H": 21,
+        "N": 1,
+        "O": 4
+      },
+      "model_labels": {
+        "atoms": {
+          "17": [
+            "S"
+          ],
+          "18": [
+            "R"
+          ],
+          "19": [
+            "S"
+          ],
+          "20": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "menthol",
+      "file": "conformers/menthol.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 1254,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 3,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 10,
+        "H": 20,
+        "O": 1
+      },
+      "model_labels": {
+        "atoms": {
+          "10": [
+            "S"
+          ],
+          "7": [
+            "R"
+          ],
+          "9": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "camphor",
+      "file": "conformers/camphor.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 2537,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 2,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 10,
+        "H": 16,
+        "O": 1
+      },
+      "model_labels": {
+        "atoms": {
+          "8": [
+            "R"
+          ],
+          "9": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "adamantane",
+      "file": "conformers/adamantane.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 9238,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 4,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 10,
+        "H": 16
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {}
+      }
+    },
+    {
+      "name": "2,2'-dimethylbiphenyl",
+      "file": "conformers/2-2-dimethylbiphenyl.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 11797,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 14,
+        "H": 14
+      },
+      "model_labels": {
+        "atoms": {},
+        "bonds": {}
+      }
+    },
+    {
+      "name": "erythromycin",
+      "file": "conformers/erythromycin.mol",
+      "status": 200,
+      "found": true,
+      "source": "rdkit",
+      "cid": null,
+      "pubchem": "none",
+      "reason": null,
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "32": [
+            "R"
+          ],
+          "33": [
+            "R"
+          ],
+          "34": [
+            "R"
+          ],
+          "35": [
+            "S"
+          ],
+          "36": [
+            "S"
+          ],
+          "37": [
+            "R"
+          ],
+          "38": [
+            "R"
+          ],
+          "39": [
+            "S"
+          ],
+          "40": [
+            "R"
+          ],
+          "41": [
+            "S"
+          ],
+          "42": [
+            "S"
+          ],
+          "43": [
+            "R"
+          ],
+          "44": [
+            "S"
+          ],
+          "45": [
+            "R"
+          ],
+          "46": [
+            "R"
+          ],
+          "48": [
+            "R"
+          ],
+          "49": [
+            "R"
+          ],
+          "50": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 37,
+        "H": 67,
+        "N": 1,
+        "O": 13
+      },
+      "model_labels": {
+        "atoms": {
+          "32": [
+            "R"
+          ],
+          "33": [
+            "R"
+          ],
+          "34": [
+            "R"
+          ],
+          "35": [
+            "S"
+          ],
+          "36": [
+            "S"
+          ],
+          "37": [
+            "R"
+          ],
+          "38": [
+            "R"
+          ],
+          "39": [
+            "S"
+          ],
+          "40": [
+            "R"
+          ],
+          "41": [
+            "S"
+          ],
+          "42": [
+            "S"
+          ],
+          "43": [
+            "R"
+          ],
+          "44": [
+            "S"
+          ],
+          "45": [
+            "R"
+          ],
+          "46": [
+            "R"
+          ],
+          "48": [
+            "R"
+          ],
+          "49": [
+            "R"
+          ],
+          "50": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "vancomycin",
+      "file": "conformers/vancomycin.mol",
+      "status": 200,
+      "found": false,
+      "source": null,
+      "cid": null,
+      "pubchem": "none",
+      "reason": "too_big",
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "100": [
+            "S"
+          ],
+          "83": [
+            "S"
+          ],
+          "84": [
+            "R"
+          ],
+          "85": [
+            "S"
+          ],
+          "86": [
+            "R"
+          ],
+          "87": [
+            "R"
+          ],
+          "88": [
+            "S"
+          ],
+          "89": [
+            "S"
+          ],
+          "90": [
+            "R"
+          ],
+          "91": [
+            "S"
+          ],
+          "92": [
+            "R"
+          ],
+          "93": [
+            "S"
+          ],
+          "94": [
+            "R"
+          ],
+          "95": [
+            "R"
+          ],
+          "96": [
+            "S"
+          ],
+          "97": [
+            "S"
+          ],
+          "98": [
+            "R"
+          ],
+          "99": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "sodium acetate",
+      "file": "conformers/sodium-acetate.mol",
+      "status": 400,
+      "error": "one_structure"
+    },
+    {
+      "name": "(R)-2-butanol, stereo not drawn",
+      "file": "conformers/r-2-butanol-stereo-not-drawn.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 6568,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 1,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 4,
+        "H": 10,
+        "O": 1
+      },
+      "model_labels": {
+        "atoms": {
+          "4": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "cocaine, stereo not drawn",
+      "file": "conformers/cocaine-stereo-not-drawn.mol",
+      "status": 200,
+      "found": true,
+      "source": "pubchem",
+      "cid": 2826,
+      "pubchem": "found",
+      "reason": null,
+      "undefined_stereo": 4,
+      "drawing_labels": {
+        "atoms": {},
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 17,
+        "H": 21,
+        "N": 1,
+        "O": 4
+      },
+      "model_labels": {
+        "atoms": {
+          "17": [
+            "S"
+          ],
+          "18": [
+            "S"
+          ],
+          "19": [
+            "S"
+          ],
+          "20": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "camphor, a stereoisomer that can't exist",
+      "file": "conformers/camphor-a-stereoisomer-that-can-t-exist.mol",
+      "status": 200,
+      "found": false,
+      "source": null,
+      "cid": null,
+      "pubchem": "none",
+      "reason": "no_model",
+      "undefined_stereo": 0,
+      "drawing_labels": {
+        "atoms": {
+          "8": [
+            "R"
+          ],
+          "9": [
+            "S"
+          ]
+        },
+        "bonds": {}
+      }
+    },
+    {
+      "name": "invented: cholesterol + caffeine",
+      "file": "conformers/invented-cholesterol-caffeine.mol",
+      "status": 200,
+      "found": true,
+      "source": "rdkit",
+      "cid": null,
+      "pubchem": "none",
+      "reason": null,
+      "undefined_stereo": 1,
+      "drawing_labels": {
+        "atoms": {
+          "31": [
+            "S"
+          ],
+          "32": [
+            "R"
+          ],
+          "33": [
+            "S"
+          ],
+          "34": [
+            "S"
+          ],
+          "35": [
+            "R"
+          ],
+          "36": [
+            "S"
+          ],
+          "40": [
+            "R"
+          ],
+          "41": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      },
+      "atoms": {
+        "C": 35,
+        "H": 54,
+        "N": 4,
+        "O": 3
+      },
+      "model_labels": {
+        "atoms": {
+          "30": [
+            "R"
+          ],
+          "31": [
+            "S"
+          ],
+          "32": [
+            "R"
+          ],
+          "33": [
+            "S"
+          ],
+          "34": [
+            "S"
+          ],
+          "35": [
+            "R"
+          ],
+          "36": [
+            "S"
+          ],
+          "40": [
+            "R"
+          ],
+          "41": [
+            "R"
+          ]
+        },
+        "bonds": {}
+      }
+    }
+  ]
+}

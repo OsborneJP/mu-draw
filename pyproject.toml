@@ -34,4 +34,6 @@ known-first-party = [
   "gen_templates",
   "test_reference_fixtures",
   "render_server_config",
+  "threed",
+  "record_conformers",
 ]

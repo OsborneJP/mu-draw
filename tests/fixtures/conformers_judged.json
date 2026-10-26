@@ -1,0 +1,27 @@
+{
+  "status": "provisional",
+  "chosen_by": "Claude, 2026-10-26, for Jeff to check (docs/plans/v2-3d-view.md, bar A.3)",
+  "how": "Written by reading each structure and PubChem's published rules for its 3D records (at most 50 non-hydrogen atoms, one covalent unit, common organic elements), before the generator was run; never generated. 'answer' is what the 3D view should give: 'pubchem' (PubChem's 3D record), 'rdkit' (PubChem has none, so RDKit's model), 'too_big', 'no_model' (RDKit can't build it: it can't exist) or 'one_structure'. 'note' is whether the drawing leaves stereo undefined, so the panel says the model shows one arrangement (null: not judged). A test compares the generated tests/fixtures/conformers_expected.json with this file.",
+  "compounds": {
+    "aspirin": {"answer": "pubchem", "note": false},
+    "(R)-2-butanol": {"answer": "pubchem", "note": false},
+    "(S)-2-butanol": {"answer": "pubchem", "note": false},
+    "trans-2-butene": {"answer": "pubchem", "note": false},
+    "cis-2-butene": {"answer": "pubchem", "note": false},
+    "cyclohexane": {"answer": "pubchem", "note": false},
+    "beta-D-glucose": {"answer": "pubchem", "note": false},
+    "cholesterol": {"answer": "pubchem", "note": false},
+    "cocaine": {"answer": "pubchem", "note": false},
+    "menthol": {"answer": "pubchem", "note": true},
+    "camphor": {"answer": "pubchem", "note": true},
+    "adamantane": {"answer": "pubchem", "note": false},
+    "2,2'-dimethylbiphenyl": {"answer": "pubchem", "note": false},
+    "erythromycin": {"answer": "rdkit", "note": false},
+    "vancomycin": {"answer": "too_big", "note": false},
+    "sodium acetate": {"answer": "one_structure", "note": null},
+    "(R)-2-butanol, stereo not drawn": {"answer": "pubchem", "note": true},
+    "cocaine, stereo not drawn": {"answer": "pubchem", "note": true},
+    "camphor, a stereoisomer that can't exist": {"answer": "no_model", "note": false},
+    "invented: cholesterol + caffeine": {"answer": "rdkit", "note": null}
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/beta-D-glucose/property/SMILES,Title/JSON"
+  },
+  "recorded_at": "2026-10-26T12:32:29Z",
+  "status": 200,
+  "body": {
+    "PropertyTable": {
+      "Properties": [
+        {
+          "CID": 64689,
+          "SMILES": "C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)O",
+          "Title": "Beta-D-Glucose"
+        }
+      ]
+    }
+  }
+}
