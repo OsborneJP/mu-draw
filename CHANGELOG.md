@@ -129,6 +129,13 @@ All notable changes to this project. The format follows
   relaunch, but files, copies and exports don't carry them. Opening another drawing or
   Clear Canvas ends them, as do Clean Up and Layout where they move a group's items apart;
   Undo brings them back.
+- Formula text (version 2): the Text Editor has a Formula button. While it is on, numbers
+  come out as subscripts and charges as superscripts as the student types, like ChemDraw's
+  Formula style: H₂SO₄, (NH₄)₂SO₄, CuSO₄·5H₂O, Cu²⁺, SO₄²⁻, [Fe(CN)₆]³⁻. A leading number
+  (5H₂O) stays on the line. It covers the whole text box, and Ketcher's superscript and
+  subscript buttons are greyed while it is on. Turning it off leaves the text as it is, so
+  an isotope (¹³C) is still made by hand. A text formatted this way reopens with Formula
+  on. The note under the buttons adds "Formula formats all of the text as you type."
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."
@@ -162,6 +169,9 @@ All notable changes to this project. The format follows
 - The source is public under the MIT licence (LICENSE); THIRD-PARTY-NOTICES.md lists the
   parts under their own. NMRShiftDB2's data requires prediction software built on it to be
   open source.
+- Pictures of the drawing (Export, Copy image, and Ketcher's Save as SVG or PNG) draw a
+  text's subscripts and superscripts at 75% of its size, as ChemDraw does. Indigo drew them
+  at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
 - The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds

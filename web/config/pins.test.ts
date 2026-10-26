@@ -61,7 +61,19 @@ describe('pin check', () => {
 
   it('covers every pinned engine', () => {
     expect(Object.keys(PINNED)).toEqual(
-      expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit']),
+      expect.arrayContaining(['ketcher-react', 'ketcher-standalone', 'ketcher-core', '@rdkit/rdkit', 'lexical']),
     );
+  });
+
+  it('rejects a second copy of lexical, or another version of it', () => {
+    const lexical = { lexical: PINNED.lexical };
+    const real = readPinInputs(['lexical']);
+    expect(checkPins(real, lexical)).toEqual([]);
+    const nested = structuredClone(real);
+    nested.lock.packages['node_modules/ketcher-react/node_modules/lexical'] = { version: '0.41.0' };
+    expect(checkPins(nested, lexical).join('\n')).toMatch(/lexical: expected one lockfile entry, found 2/);
+    const upgraded = structuredClone(real);
+    upgraded.installed.lexical = '0.41.0';
+    expect(checkPins(upgraded, lexical).join('\n')).toMatch(/lexical: node_modules has 0.41.0, not 0.40.0/);
   });
 });

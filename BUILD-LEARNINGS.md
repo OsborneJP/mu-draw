@@ -1288,3 +1288,50 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   `onNeedRefresh`, it never appeared after two failed installs and a good build; an uncaught
   `update()` rejection offline reaches Playwright as a pageerror ("Failed to update a
   ServiceWorker ... An unknown error occurred when fetching the script").
+
+## Formula text (version 2, 2026-10-26)
+
+Acceptance bar, sources and measurements: docs/plans/v2-formula-text.md.
+- Ketcher 3.18's Text Editor is a Lexical 0.40 editor, and ketcher-react imports `lexical` as
+  a package (one copy in node_modules). So app code that imports `lexical` gets the dialog's
+  own module: `getNearestEditorFromDOMNode` on `[data-testid=text-editor]` finds the editor,
+  and a TextNode transform registered there formats as the student types. lexical is pinned
+  (web/config/pins.ts); a second copy would make the transforms a different module's.
+- KET keeps a text as KET 2.0 `paragraphs` of `parts` (`{ text, subscript: true }`). Ketcher
+  reads the older Draft.js form too and converts it; Indigo's KET output is the old form.
+- Lexical transforms don't run on Undo and Redo (they set an earlier state). Formula
+  reformats after an update tagged `historic`, merged into that history step.
+- `setEditorState` with an update still pending commits that one first, and the restored
+  state's update then lacks the tag (the tag set it captured was replaced). Ketcher's history
+  never hits this (each key's update commits before the next event); a headless test must
+  flush first (`editor.read()` does).
+- Ketcher mounts Lexical's HistoryPlugin with its default delay, so typing within 1 s of the
+  last key joins one history step (Lexical's own HistoryExtension default, 300 ms, is not
+  used). How much one Ctrl+Z takes back depends on typing speed, so the browser test checks
+  the text after each Undo, not how much it removed; a new line is always a step of its own.
+- Removing a run marks its neighbours dirty (Lexical relinks them), so the TextNode transform
+  alone covers deletions; a ParagraphNode transform added nothing (a test showed it).
+- Ketcher's toolbar buttons format on mousedown (preventDefault keeps the selection), and the
+  toolbar's click handler refocuses the text, so an added button that does the same fits in.
+  The toolbar turns Enter and Space into "focus the text"; the Formula button stops them.
+  Ketcher's text-button CSS already greys a `[disabled]` button (opacity 0.4).
+- In Playwright, a highlight made with Shift and the arrows, or a caret moved with the arrows,
+  reaches Lexical only on the browser's selectionchange, which Chrome may run after the next
+  click or key that Lexical handles on keydown (Delete, Enter, a toolbar button): it then
+  acts on the old selection (the full check run caught it once). Typing is safe (Lexical reads
+  the browser's selection on beforeinput), and so is Ctrl+A (Lexical's own command). The tests
+  use only those, and an HTML paste for hand formatting.
+- Copying a node_modules with hard links: the main checkout's web/node_modules held a
+  `node_modules -> …/web/node_modules` symlink (made 2026-10-26 02:14). Copied along, it made
+  Vite bundle a second React ("reading 'useSyncExternalStore'") and Playwright load the other
+  checkout's copy ("No tests found"). Leave it out. `npm install --package-lock-only` still
+  rewrites node_modules/.package-lock.json, so give a linked copy its own file first.
+- Indigo 1.46 draws a text's subscript or superscript at full size, moved half its height
+  down or up (render_context.cpp), unlike Ketcher's canvas and ChemDraw. Given a smaller size
+  on those runs it draws them smaller, but it ignores a fractional size (9.75 px drew at full
+  size), applies a line's or a text's size only up to the first run with a size of its own
+  (then 13 px), and sizes text from the bond length, not Ketcher's render-font-size. So each
+  picture gets a copy with those runs at a whole 75% of their own size (src/editor/pictureScripts.ts).
+- ketcher-react binds the struct service's methods once (createApi), so wrapping
+  `generateImageAsBase64` in the provider's createStructService, as imageQueue does, reaches
+  every picture: Export, Copy image, Ketcher's Save preview, Save and Copy Image, Practice.

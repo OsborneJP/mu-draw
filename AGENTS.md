@@ -33,7 +33,7 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    web/scripts/verify-dist.ts in every check.sh and deploy build, not by a bare
    `npm run build`) and the two "offline:" smoke tests.
 5. ketcher-react, ketcher-standalone, and @rdkit/rdkit are pinned to exact versions.
-   Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
+   Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core and lexical.
 6. Build only "Version 1 features", the NMR proof of concept, and the "After v1" features
    Jeff has started, each with his approved plan in docs/plans/v2-*.md. Nothing else.
    Enforced by: review. Ketcher's 3D viewer, macromolecules mode, create-monomer and
@@ -64,8 +64,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
 
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
-- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug keys, image queue, instance.ts
-  (ready Ketcher), drawing.ts, stereoHighlight.ts, placeInHand.ts, templates.json, groups*.ts.
+- `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug keys, image queue, instance.ts (ready
+  Ketcher), drawing, stereoHighlight, placeInHand, templates.json, groups*, formula* + pictureScripts.
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values),
   properties.ts (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS,
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
