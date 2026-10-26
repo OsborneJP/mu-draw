@@ -626,4 +626,28 @@ export function ketcherSettings(page: Page): Promise<Record<string, unknown>> {
   return page.evaluate(() => ({ ...window.ketcher!.settingsService!.getSettings() }));
 }
 
+/** A length set in Ketcher's settings, in CSS pixels at print size (1 in is 96 CSS px, 72 pt). */
+export function cssPixels(value: number, unit: string): number {
+  const perUnit: Record<string, number> = { px: 1, pt: 96 / 72, inch: 96, cm: 96 / 2.54 };
+  if (!(unit in perUnit)) throw new Error(`unknown unit ${unit}`);
+  return value * perUnit[unit];
+}
+
+/** The longest bond line in an Indigo SVG, in the SVG's pixels. Indigo draws each bond line
+ * as a stroked path "M x y L x y" in drawing units, scaled by its transform; a bond between
+ * two unlabelled carbons is drawn full length, so the longest line is the bond length. */
+export function bondLengthInSvg(svg: string): number {
+  let longest = 0;
+  for (const [path] of svg.matchAll(/<path fill="none"[^>]*>/g)) {
+    const line = / d="M ([-\d.]+) ([-\d.]+) L ([-\d.]+) ([-\d.]+) "/.exec(path);
+    const scale = / transform="matrix\(([-\d.]+), 0, 0, ([-\d.]+),/.exec(path);
+    if (!line || !scale) continue;
+    expect(scale[1]).toBe(scale[2]);
+    const [x1, y1, x2, y2] = line.slice(1).map(Number);
+    longest = Math.max(longest, Math.hypot(x2 - x1, y2 - y1) * Number(scale[1]));
+  }
+  expect(longest, 'the SVG has bond lines').toBeGreaterThan(0);
+  return longest;
+}
+
 export { expect };

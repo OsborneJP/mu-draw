@@ -3,11 +3,15 @@
 import type { Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { crc32 } from 'node:zlib';
+import { AT_CSS_PIXELS } from '../src/panels/exportImage.ts';
 import {
+  bondLengthInSvg,
   clearCanvas,
+  cssPixels,
   expect,
   fixture,
   goOffline,
+  ketcherSettings,
   openEditor,
   referenceCompound,
   test,
@@ -23,12 +27,21 @@ async function loadCompound(page: Page, typedName: string): Promise<void> {
   await page.evaluate((mol) => window.ketcher!.setMolecule(mol), molfile(typedName));
 }
 
-/** Indigo's SVG of the current drawing, asked for directly through Ketcher's API. */
+/** Indigo's SVG of the current drawing at CSS pixels, asked for directly through Ketcher's API. */
 async function indigoSvg(page: Page): Promise<string> {
-  return page.evaluate(async () => {
+  return page.evaluate(async (atCssPixels) => {
     const ketcher = window.ketcher!;
-    return (await ketcher.generateImage(await ketcher.getKet(), { outputFormat: 'svg' })).text();
-  });
+    return (await ketcher.generateImage(await ketcher.getKet(), { outputFormat: 'svg', ...atCssPixels })).text();
+  }, AT_CSS_PIXELS);
+}
+
+/** A bond in an SVG is as long as Ketcher's bond length setting at print size: ACS's
+ * 14.4 pt is 0.2 in, 19.2 CSS px. (Ketcher's own ACS image resolution, 600 dpi, would draw
+ * it 6.25 times that.) */
+async function expectPrintSize(page: Page, svg: string): Promise<void> {
+  const { bondLength, bondLengthUnit } = await ketcherSettings(page);
+  expect(bondLengthUnit).toBe('pt');
+  expect(bondLengthInSvg(svg)).toBeCloseTo(cssPixels(bondLength as number, bondLengthUnit as string), 0);
 }
 
 function exportDialog(page: Page) {
@@ -177,6 +190,7 @@ test('Export: PNG at 1x, 2x and 4x is exactly scale × the SVG, white unless tra
   const svgFile = await downloadVia(app, 'Download SVG');
   expect(svgFile.name).toBe('structure.svg');
   const svgText = svgFile.bytes.toString('utf8');
+  await expectPrintSize(page, svgText);
   // Indigo's rendering of the drawing on the canvas, unchanged.
   expect(svgText).toBe(expectedSvg);
   const svg = await svgFacts(page, svgText);

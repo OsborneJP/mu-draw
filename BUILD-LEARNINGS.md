@@ -1276,3 +1276,10 @@ Plan and measurements: docs/plans/acs-style-default.md.
   the label's edge, so Practice's wedge test, which clicked the middle, drew a new wedge
   fragment ("query"). It now clicks a third of the way along the drawn line from the label
   (`halfBonds.get(id).p`, the label-clipped end, in canvas pixels).
+- **Points in Indigo's pictures** are drawn at `image-resolution` dots per inch; pixels
+  ignore it. At ACS's 600, caffeine's SVG was 705 × 521 px (7.3 in wide in Word); at 96
+  it is 116 × 87 px, ACS print size. `generateImage` spreads its options over the editor's
+  `serverSettings`, so Export, Copy image and Show answer pass `AT_CSS_PIXELS`.
+- Indigo's SVG draws each bond line as a stroked path `M x y L x y` in drawing units (a
+  bond is 1 unit), with `transform="matrix(s, 0, 0, s, …)"`, so the longest line times `s`
+  is the bond length in pixels (`bondLengthInSvg` in e2e/fixtures.ts).

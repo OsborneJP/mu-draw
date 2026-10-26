@@ -9,11 +9,14 @@ import { resolveBase } from '../config/app.ts';
 import { autosaveKey } from '../src/editor/autosave.ts';
 import { PRACTICE_FILE, type PracticeList } from '../src/panels/practiceFile.ts';
 import {
+  bondLengthInSvg,
+  cssPixels,
   expect,
   fixture,
   goOffline,
   holdableIndigoReplies,
   inchiKey,
+  ketcherSettings,
   openEditor,
   referenceCompound,
   test,
@@ -351,8 +354,14 @@ test('Show answer: a picture of the answer after a wrong Check; the canvas is un
   await page.getByTestId('practice-show-answer').click();
   const picture = page.getByTestId('practice-answer').locator('img');
   await expect(picture).toBeVisible();
-  expect(await picture.getAttribute('src')).toMatch(/^data:image\/svg\+xml;base64,/);
+  const src = (await picture.getAttribute('src'))!;
+  expect(src).toMatch(/^data:image\/svg\+xml;base64,/);
   expect(await picture.evaluate((img: HTMLImageElement) => img.decode().then(() => img.naturalWidth))).toBeGreaterThan(0);
+  // Drawn like Export: a bond at print size, so the answer is the size of the canvas's drawing at 100%.
+  const { bondLength, bondLengthUnit } = await ketcherSettings(page);
+  expect(bondLengthUnit).toBe('pt');
+  const answerSvg = Buffer.from(src.slice(src.indexOf(',') + 1), 'base64').toString('utf8');
+  expect(bondLengthInSvg(answerSvg)).toBeCloseTo(cssPixels(bondLength as number, bondLengthUnit as string), 0);
   // The canvas view has made up for the height the panel takes, the picture included
   // (Docked, as for the NMR preview), so the drawing isn't pushed behind the panel.
   const panel = page.getByTestId('practice-panel');
