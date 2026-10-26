@@ -1,6 +1,7 @@
 // Invariant: the chemistry engines are pinned to exact versions. ketcher-core is included
 // because ketcher-react and ketcher-standalone depend on it as "*". @rdkit/rdkit must also
-// match the server's rdkit release (tests/test_versions.py).
+// match the server's rdkit release (tests/test_versions.py). 3dmol draws the 3D view, the
+// same release as ProteinFirst's (docs/plans/v2-3d-view.md).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +13,7 @@ export const PINNED: Record<string, string> = {
   'ketcher-standalone': '3.18.0',
   'ketcher-core': '3.18.0',
   '@rdkit/rdkit': '2026.9.1',
+  '3dmol': '2.5.5',
 };
 // The Ketcher packages must move together.
 export const SAME_VERSION = ['ketcher-react', 'ketcher-standalone', 'ketcher-core'] as const;

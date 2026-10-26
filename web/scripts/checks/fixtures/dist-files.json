@@ -1,19 +1,23 @@
 [
   {
-    "path": "assets/index-DiUFACdc.css",
-    "size": 193929
+    "path": "assets/3Dmol-Dbby3ERY.js",
+    "size": 574085
   },
   {
-    "path": "assets/index-RtopH5h2.js",
-    "size": 7964201
+    "path": "assets/index-Bv8g8Ii1.js",
+    "size": 8052718
   },
   {
-    "path": "assets/index.modern-55d8e3ef-M0dtVDOE.js",
-    "size": 425354
+    "path": "assets/index-Dlt1pWMW.css",
+    "size": 194721
   },
   {
-    "path": "assets/index.modern-DKFtyn1s.js",
-    "size": 1220456
+    "path": "assets/index.modern-55d8e3ef-BdVKDfD4.js",
+    "size": 425330
+  },
+  {
+    "path": "assets/index.modern-msdDXS3V.js",
+    "size": 1220506
   },
   {
     "path": "assets/indigo-ketcher-1.46.0-f_xBxuuS.wasm",
@@ -24,8 +28,8 @@
     "size": 73996
   },
   {
-    "path": "assets/lodash-BvBZBh6l.js",
-    "size": 80318
+    "path": "assets/rolldown-runtime-BCiCTKAo.js",
+    "size": 1301
   },
   {
     "path": "assets/workbox-window.prod.es5-Bd17z0YL.js",
@@ -49,7 +53,7 @@
   },
   {
     "path": "index.html",
-    "size": 1191
+    "size": 1201
   },
   {
     "path": "ir-bands.json",
@@ -81,7 +85,7 @@
   },
   {
     "path": "sw.js",
-    "size": 2211
+    "size": 2268
   },
   {
     "path": "workbox-2fbc6a65.js",

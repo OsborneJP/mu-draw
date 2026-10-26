@@ -205,6 +205,19 @@ AGENTS.md stays at 149 lines or fewer. The About box adds "3Dmol.js (BSD 3-Claus
 RDKit"; 5's pins add 3dmol. The API service must be restarted after the deploy that adds the
 endpoint (Jeff runs `sudo systemctl restart mu-draw-api-staging`, then production's).
 
+## As built (2026-10-26)
+
+Small differences from the text above, none of them a decision:
+- The button is **Show in 3D**, under a "3D view" heading below Predict ¹³C NMR; offline it is
+  greyed with "Needs an internet connection" under it.
+- The stereo note counts undefined stereocentres and double bonds together, as Get name does:
+  "Your drawing leaves the stereochemistry undefined at 2 places. This model shows one
+  arrangement."
+- Invariant 3 needed no change: PubChem and RDKit are already its sources. Invariants 4 and 5
+  changed as in bar D.
+- PubChem's record of another structure or configuration is "unusable" (bar A.2): RDKit's model
+  is shown, and the source line says "PubChem's model didn't match the drawing".
+
 ## Known limits
 
 - One conformer: PubChem's first, or one RDKit embedding. Not the lowest in energy, and not
@@ -216,5 +229,7 @@ endpoint (Jeff runs `sudo systemctl restart mu-draw-api-staging`, then productio
 - Undefined stereo is shown as one arrangement, with the note.
 - A class drawing new structures at once waits for one embedding at a time; past four waiting
   it gets "busy".
+- RDKit counts the bridgeheads of cages such as adamantane as undefined stereocentres (as the
+  properties panel and Get name do), so the stereo note shows for them.
 - Large flexible molecules come near the 2 s cap (cyclosporin, 85 atoms: 1.6 s to embed on
   this machine), so some under 100 atoms will get "could not build".

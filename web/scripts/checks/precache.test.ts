@@ -82,6 +82,19 @@ describe('checkPrecache', () => {
     expect(checkPrecache(files, urls)).toEqual([`${what} missing: ${path}`]);
   });
 
+  it("fails when 3Dmol.js's chunk is missing (the 3D view)", () => {
+    const chunk = FILES.find((f) => /^assets\/3Dmol-/.test(f.path))!.path;
+    const files = FILES.filter((f) => f.path !== chunk);
+    const urls = parseSwManifest(SW).filter((url) => url !== chunk);
+    expect(checkPrecache(files, urls)).toEqual(['expected one 3Dmol.js chunk (the 3D view), found 0']);
+  });
+
+  it("names 3Dmol.js's chunk when it is left out of the precache", () => {
+    const chunk = FILES.find((f) => /^assets\/3Dmol-/.test(f.path))!.path;
+    const errors = checkPrecache(FILES, parseSwManifest(SW).filter((url) => url !== chunk));
+    expect(errors).toEqual([expect.stringContaining(`file not precached (it would be missing offline): ${chunk}`)]);
+  });
+
   it('fails when Indigo is missing (e.g. the base64 build was used)', () => {
     const files = FILES.filter((f) => f.path !== INDIGO);
     const urls = parseSwManifest(SW).filter((url) => url !== INDIGO);

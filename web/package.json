@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@rdkit/rdkit": "2026.9.1",
+    "3dmol": "2.5.5",
     "events": "3.3.0",
     "ketcher-core": "3.18.0",
     "ketcher-react": "3.18.0",

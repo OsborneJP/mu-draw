@@ -28,11 +28,11 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
    Enforced by: generated fixtures with drift tests (tests/fixtures/; the ¹³C table's header names
    its SD file's SHA-256), web/src/chem/irBands.test.ts, and scripts/checks/chem_literals.py (no
    Molfile/CDXML/InChI text in source). SMILES and numeric literals in source: review only.
-4. Everything except the naming endpoints works offline.
+4. Everything except the naming endpoints and the 3D view works offline.
    Enforced by: the precache guard (web/scripts/checks/precache.ts, run by
    web/scripts/verify-dist.ts in every check.sh and deploy build, not by a bare
    `npm run build`) and the two "offline:" smoke tests.
-5. ketcher-react, ketcher-standalone, and @rdkit/rdkit are pinned to exact versions.
+5. ketcher-react, ketcher-standalone, @rdkit/rdkit and 3dmol are pinned to exact versions.
    Enforced by: the pin test (web/config/pins.ts), which also covers ketcher-core.
 6. Build only "Version 1 features", the NMR proof of concept, and the "After v1" features
    Jeff has started, each with his approved plan in docs/plans/v2-*.md. Nothing else.
@@ -71,8 +71,8 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   overlap rule), hose.ts, carbonTable.ts, nmr.ts (¹³C), stereoElements/-isomers/-Pictures.ts.
 - `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts), Get name,
   Name to structure (naming.ts; NamePanel floats), Templates menu; Practice (practice.ts), NMR
-  preview and stereoisomers dock below the canvas (Docked.tsx), one at a time (belowCanvas.ts);
-  nmr.ts/stereo.ts state, *Store.ts wiring, panelWorker.ts their RDKit copy.
+  preview, stereoisomers and 3D view (threeD.ts; viewer3d.ts loads 3Dmol) dock below the canvas
+  (Docked.tsx), one at a time (belowCanvas.ts); *Store.ts wiring, panelWorker.ts RDKit copy.
 - `web/src/api.ts`: `<base>api/*` calls, 8 s deadline. `web/src/pwa/`: SW registration, Reload.
 - `web/src/shell/`: header, offline badge, About box, update banner.
 - `web/public/`: icons; functional-groups.json (patterns); ir-bands.json; nmr/ (¹³C table); practice.json.
@@ -81,9 +81,9 @@ browser; a small FastAPI service on osbornelab does the two naming lookups. Spec
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
   export.spec.ts reads PNG headers, pixels and the clipboard back; `holdableRdkitReplies()` and
   `holdableIndigoReplies()` (fixtures.ts) hold workers' replies; naming specs hold API answers.
-- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure` (`create_app()` takes
-  test fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `cache.py` (SQLite in
-  `$STATE_DIRECTORY`), `opsin.py` runs `opsin/` (pinned jar + OpsinLines.java) on the env's Java.
+- `server/main.py`: FastAPI `/api/health`, `/api/name`, `/api/structure`, `/api/conformer`
+  (`create_app()` takes fakes); `chem.py`, `threed.py` (3D models: RDKit.js can't embed),
+  `pubchem.py` (rate limit, retry), `cache.py` (SQLite in `$STATE_DIRECTORY`), `opsin.py` (jar).
 - `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators.
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
   replays), `functional_group*` and `nmr*` (test sets; judgement provisional), `chemdraw/`.

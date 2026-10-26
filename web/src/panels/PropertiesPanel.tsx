@@ -8,6 +8,7 @@ import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { addColoured, addHighlight, removeHighlight } from '../editor/stereoHighlight';
 import FunctionalGroups from './FunctionalGroups';
 import NmrButton from './NmrButton';
+import ThreeDButton from './ThreeDButton';
 import { makeRoomFor } from './belowCanvas';
 import { showStereoisomers } from './stereoStore';
 import './properties.css';
@@ -304,6 +305,7 @@ export default function PropertiesPanel() {
           <Stereo stereo={state.values.stereo} fragments={state.values.fragments} current={current} highlighted={highlighted} onToggle={toggle} />
           <FunctionalGroups groups={state.groups} shown={groupsShown} onShow={showGroups} />
           <NmrButton />
+          <ThreeDButton />
         </Values>
       )}
     </aside>

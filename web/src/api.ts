@@ -1,6 +1,6 @@
-// Calls to the app's own API under <base>api/, the only server the app talks to. Get name
-// sends just the drawing's SMILES and Name to structure just the typed name, each in a POST
-// body, so neither appears in a URL or a log line.
+// Calls to the app's own API under <base>api/, the only server the app talks to. Get name and
+// the 3D view send just the drawing's SMILES and Name to structure just the typed name, each
+// in a POST body, so neither appears in a URL or a log line.
 
 /** With no answer after this long, the naming service counts as not responding (spec). */
 export const NAMING_DEADLINE_MS = 8000;
@@ -133,4 +133,55 @@ export function structureOutcome(status: number, body: unknown): StructureOutcom
 export async function requestStructure(name: string, signal: AbortSignal): Promise<StructureOutcome> {
   const answer = await post('structure', { name }, signal);
   return answer ? structureOutcome(answer.status, answer.body) : NOT_RESPONDING;
+}
+
+/** What PubChem said about the structure (server/threed.py's Model.pubchem). */
+export type PubChemSaid = 'found' | 'none' | 'unusable' | 'no_answer';
+
+export type ConformerOutcome =
+  | {
+      kind: 'model';
+      /** A 3D Molfile with every H. */
+      molblock: string;
+      source: 'pubchem' | 'rdkit';
+      /** PubChem's compound, when the model is PubChem's. */
+      cid: number | null;
+      pubchem: PubChemSaid;
+      /** Stereo elements the drawing leaves undefined (the model shows one arrangement). */
+      undefinedStereo: number;
+    }
+  | { kind: 'no-model'; reason: 'too_big' | 'no_model' }
+  | { kind: 'one-structure' }
+  | { kind: 'invalid' }
+  | { kind: 'busy' }
+  | { kind: 'not-responding' };
+
+const SAID: readonly unknown[] = ['found', 'none', 'unusable', 'no_answer'];
+
+/** What the 3D view shows, from the server's status and answer. Anything unexpected counts
+ * as not responding: PubChem's model always has its CID, RDKit's never has one. */
+export function conformerOutcome(status: number, body: unknown): ConformerOutcome {
+  const answer = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
+  if (status === 503 && answer.error === 'busy') return { kind: 'busy' };
+  if (status === 400 && answer.error === 'one_structure') return { kind: 'one-structure' };
+  if (status === 400 && answer.error === 'invalid_structure') return { kind: 'invalid' };
+  if (status !== 200) return NOT_RESPONDING;
+  const { found, source, cid, molblock, pubchem, reason, undefined_stereo: undefinedStereo } = answer;
+  if (!SAID.includes(pubchem) || !isCount(undefinedStereo)) return NOT_RESPONDING;
+  const said = pubchem as PubChemSaid;
+  if (found === false) {
+    const empty = source === null && cid === null && molblock === null;
+    return empty && (reason === 'too_big' || reason === 'no_model') ? { kind: 'no-model', reason } : NOT_RESPONDING;
+  }
+  if (found !== true || reason !== null || typeof molblock !== 'string' || !molblock) return NOT_RESPONDING;
+  const fromPubchem = source === 'pubchem' && said === 'found' && isCount(cid) && cid > 0;
+  const fromRdkit = source === 'rdkit' && said !== 'found' && cid === null;
+  if (!fromPubchem && !fromRdkit) return NOT_RESPONDING;
+  return { kind: 'model', molblock, source, cid: fromPubchem ? (cid as number) : null, pubchem: said, undefinedStereo };
+}
+
+/** Ask the server for a 3D model of a structure. Same deadline as requestName. */
+export async function requestConformer(smiles: string, signal: AbortSignal): Promise<ConformerOutcome> {
+  const answer = await post('conformer', { smiles }, signal);
+  return answer ? conformerOutcome(answer.status, answer.body) : NOT_RESPONDING;
 }

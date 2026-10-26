@@ -1237,3 +1237,37 @@ after the stereoisomer panel, one at a time, each with check.sh passing on the m
   the templates bar's "picking a template puts Add's compound away" is tested against Name
   to structure's Add only, not the stereoisomer panel's.
 
+
+## 3D view (version 2, 2026-10-26)
+
+- RDKit.js 2026.9.1 has no 3D embedding (no ETKDG, no force field in its API or wasm), so the
+  3D view's fallback runs on the server (server/threed.py, Python RDKit of the same release).
+  `EmbedMolecule` and `MMFFOptimizeMolecule` release Python's lock, so names are answered
+  meanwhile; one embedding runs at a time anyway, at most 4 wait.
+- PubChem's 3D record: POST `compound/smiles/SDF?record_type=3d`. Its "none" answers are
+  text/plain whatever the Accept header: 404 `PUGREST.NotFound` (no 3D record: over 50 heavy
+  atoms, salts, metals) and 501 `PUGREST.Unimplemented` (no record at all). A drawing with
+  undefined stereo gets one arrangement (flat 2-butanol: PubChem's model is (S)).
+- RDKit marks a Molfile 3D from its coordinates, not its header ("2D" with z ≠ 0 reads as
+  3D), so a flat record is made in the test by zeroing z.
+- ETKDG's `timeout` is wall-clock. It never changes a model that finishes (same coordinates
+  with and without it), so the fixture generator runs without it and can't depend on how
+  busy the machine is. Camphor's impossible stereoisomer fails by running out of iterations
+  (1.5 s), the same with or without the 2 s cap.
+- Checking a model's stereo: comparing full InChIKeys fails on cages (InChI reads
+  bridgehead parities from 3D coordinates that it doesn't give the 2D adamantane). RDKit's
+  chirality-aware substructure match, after `AssignStereochemistryFrom3D`, gets cages,
+  symmetric molecules and undefined elements right; the fixtures check it independently
+  with CIP labels keyed by canonical rank.
+- RDKit counts adamantane's four bridgeheads as undefined stereo (as the properties panel
+  and Get name do), so the 3D view's stereo note shows for it: an accepted limit.
+- 3Dmol.js 2.5.5 draws into one shared offscreen WebGL2 context and copies each frame to its
+  canvas with a `bitmaprenderer` context, so many viewers don't use up WebGL contexts, and
+  `getContext('webgl2')` on its canvas returns null. Without WebGL it only logs an error;
+  the app asks the browser first. Its one `eval` (string callbacks, for py3Dmol) is never
+  reached, and Rolldown warns about it at build time. Its `autoload` acts only on elements
+  with class `viewer_3Dmoljs`. Vite puts it in its own chunk, `assets/3Dmol-*.js` (574 kB).
+- A test that waited for a queue to fill hung, rather than failed, when the queue's limit
+  was taken out; it now races the extra request against "it joined the queue".
+- The shared heavy-command lock: a queued `flock … check.sh` was killed while waiting (exit
+  143) and never started, and .check.log still held the run before. Read the exit status.

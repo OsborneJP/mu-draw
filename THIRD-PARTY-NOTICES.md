@@ -19,4 +19,10 @@ own licences:
   which is CC BY-NC-SA 4.0: values only, no text copied. The app shows this credit, in plain
   text, wherever it shows the hints.
 - tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
+- 3Dmol.js 2.5.5 (npm package 3dmol, bundled into the app's 3Dmol chunk for the 3D view):
+  BSD 3-Clause License, Copyright (c) 2014, University of Pittsburgh and contributors; it
+  incorporates GLmol (biochem_fan), Three.js (three.js Authors) and jQuery (John Resig),
+  under the terms in its LICENSE (web/node_modules/3dmol/LICENSE). Its bundle carries pako
+  2.2.0 (MIT and Zlib licences), iobuffer 5.4.0, netcdfjs 3.0.0 and upng-js 2.1.0 (MIT
+  licence each). The About box credits it.
 - Packages installed by npm and conda are under their own licences.

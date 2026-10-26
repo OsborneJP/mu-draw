@@ -17,6 +17,9 @@ export interface DistFile {
 const NOT_PRECACHED = [/^sw\.js$/, /^workbox-[\w-]+\.js$/, /\.map$/];
 // Indigo with rendering (Ketcher's PNG/SVG export needs it), not the norender build.
 const INDIGO_WASM = /^assets\/indigo-ketcher-\d[\d.]*-[\w-]+\.wasm$/;
+// The 3D view's viewer, 3Dmol.js, in its own chunk: loaded when a model is first shown
+// (src/panels/viewer3d.ts), so it must be there, apart from the main chunk.
+const THREEDMOL_CHUNK = /^assets\/3Dmol-[\w-]+\.js$/;
 const MARKER = 'precacheAndRoute(';
 
 /** The URLs in sw.js's precache manifest. Evaluates only the bracket-matched array literal
@@ -78,6 +81,8 @@ export function checkPrecache(files: DistFile[], precached: string[]): string[] 
   for (const file of files) {
     if (/indigo-ketcher-norender/.test(file.path)) errors.push(`norender Indigo shipped: ${file.path}`);
   }
+  const threeDmol = files.filter((f) => THREEDMOL_CHUNK.test(f.path));
+  if (threeDmol.length !== 1) errors.push(`expected one 3Dmol.js chunk (the 3D view), found ${threeDmol.length}`);
   if (!paths.has(RDKIT_WASM_FILE)) errors.push(`RDKit wasm missing: ${RDKIT_WASM_FILE}`);
   if (!paths.has(RDKIT_WORKER_FILE)) errors.push(`RDKit worker missing: ${RDKIT_WORKER_FILE}`);
   if (!paths.has(PATTERNS_FILE)) errors.push(`functional-group patterns missing: ${PATTERNS_FILE}`);

@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  conformerOutcome,
   NAMING_DEADLINE_MS,
   nameOutcome,
   pubchemCompoundPage,
+  requestConformer,
   requestName,
   requestStructure,
   structureOutcome,
@@ -224,6 +226,99 @@ describe('requestStructure', () => {
     expect(requests[0].url).toBe(`${import.meta.env.BASE_URL}api/structure`);
     expect(requests[0].init.method).toBe('POST');
     expect(requests[0].init.body).toBe(JSON.stringify({ name: 'a name' }));
+    await vi.advanceTimersByTimeAsync(NAMING_DEADLINE_MS);
+    expect(await outcome).toEqual(NOT_RESPONDING);
+    expect(requests[0].init.signal!.aborted).toBe(true);
+  });
+});
+
+const MODEL_ANSWER = {
+  found: true,
+  pubchem: 'found',
+  source: 'pubchem',
+  cid: 7,
+  molblock: 'a model',
+  reason: null,
+  undefined_stereo: 1,
+};
+const MODEL = { kind: 'model', molblock: 'a model', source: 'pubchem', cid: 7, pubchem: 'found', undefinedStereo: 1 };
+const RDKIT_ANSWER = { ...MODEL_ANSWER, pubchem: 'none', source: 'rdkit', cid: null };
+const NO_MODEL = { found: false, pubchem: 'none', source: null, cid: null, molblock: null, undefined_stereo: 0 };
+
+describe('conformerOutcome', () => {
+  it("PubChem's model", () => {
+    expect(conformerOutcome(200, MODEL_ANSWER)).toEqual(MODEL);
+  });
+
+  it.each(['none', 'unusable', 'no_answer'])("RDKit's model, PubChem having said %s", (pubchem) => {
+    expect(conformerOutcome(200, { ...RDKIT_ANSWER, pubchem })).toEqual({ ...MODEL, source: 'rdkit', cid: null, pubchem });
+  });
+
+  it.each(['too_big', 'no_model'])('no model: %s', (reason) => {
+    expect(conformerOutcome(200, { ...NO_MODEL, reason })).toEqual({ kind: 'no-model', reason });
+  });
+
+  it.each([
+    [503, { error: 'busy' }, 'busy'],
+    [400, { error: 'one_structure' }, 'one-structure'],
+    [400, { error: 'invalid_structure' }, 'invalid'],
+    [503, {}, 'not-responding'],
+    [502, null, 'not-responding'],
+    [422, null, 'not-responding'],
+    [200, null, 'not-responding'],
+    [200, {}, 'not-responding'],
+  ])('HTTP %i %j -> %s', (status, body, kind) => {
+    expect(conformerOutcome(status, body)).toEqual({ kind });
+  });
+
+  it.each([
+    ["PubChem's model without its CID", { cid: null }],
+    ['CID 0', { cid: 0 }],
+    ['a CID that is text', { cid: '7' }],
+    ['PubChem said it has none', { pubchem: 'none' }],
+    ['PubChem said something unknown', { pubchem: 'maybe' }],
+    ['an unknown source', { source: 'somewhere' }],
+    ['no model', { molblock: '' }],
+    ['a model that is not text', { molblock: 5 }],
+    ['a reason beside a model', { reason: 'too_big' }],
+    ['a negative stereo count', { undefined_stereo: -1 }],
+  ])('%s is not trusted', (_, change) => {
+    expect(conformerOutcome(200, { ...MODEL_ANSWER, ...change })).toEqual(NOT_RESPONDING);
+  });
+
+  it.each([
+    ["RDKit's model with a CID", { ...RDKIT_ANSWER, cid: 7 }],
+    ["RDKit's model when PubChem had one", { ...RDKIT_ANSWER, pubchem: 'found' }],
+    ['an unknown reason', { ...NO_MODEL, reason: 'tired' }],
+    ['no model, but a model', { ...NO_MODEL, reason: 'no_model', molblock: 'a model' }],
+  ])('%s is not trusted', (_, answer) => {
+    expect(conformerOutcome(200, answer)).toEqual(NOT_RESPONDING);
+  });
+});
+
+describe('requestConformer', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("posts only the SMILES, as JSON, to the app's own API", async () => {
+    const requests = holdFetch();
+    const outcome = requestConformer('the smiles', new AbortController().signal);
+    expect(requests[0].url).toBe(`${import.meta.env.BASE_URL}api/conformer`);
+    expect(requests[0].init.method).toBe('POST');
+    expect(requests[0].init.body).toBe(JSON.stringify({ smiles: 'the smiles' }));
+    requests[0].answer(200, MODEL_ANSWER);
+    expect(await outcome).toEqual(MODEL);
+  });
+
+  it('gives up at the naming deadline', async () => {
+    const requests = holdFetch();
+    const outcome = requestConformer('s', new AbortController().signal);
     await vi.advanceTimersByTimeAsync(NAMING_DEADLINE_MS);
     expect(await outcome).toEqual(NOT_RESPONDING);
     expect(requests[0].init.signal!.aborted).toBe(true);

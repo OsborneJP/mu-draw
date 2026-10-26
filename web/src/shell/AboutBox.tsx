@@ -20,7 +20,8 @@ export default function AboutBox({ title }: { title: string }) {
         <p>Draw chemical structures and reactions. Works offline.</p>
         <p>Your drawing is saved only in this browser, on this device.</p>
         <p className="about-credits">
-          Built with Ketcher (EPAM Systems, Apache License 2.0) and RDKit (BSD 3-Clause License).
+          Built with Ketcher (EPAM Systems, Apache License 2.0), RDKit (BSD 3-Clause License) and
+          3Dmol.js (University of Pittsburgh and contributors, BSD 3-Clause License).
         </p>
         <button type="button" onClick={() => dialog.current?.close()}>
           Close
