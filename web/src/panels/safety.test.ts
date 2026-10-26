@@ -4,7 +4,7 @@ import { pubchemCompoundPage } from '../api';
 import { makeRoomFor } from './belowCanvas';
 import { GHS_PICTOGRAMS } from './ghsPictograms';
 import { closeSafety, getSafetyState, isAsking, lookUpSafety } from './safety';
-import { credit, ECHA_ACKNOWLEDGEMENT, othersLine, safetyOutcome, type GhsClassification } from './safetyAnswer';
+import { CC_BY, credit, ECHA_ACKNOWLEDGEMENT, othersLine, safetyOutcome, type GhsClassification } from './safetyAnswer';
 
 // The server's answers for Safety's test compounds (server/scripts/record_ghs.py), and the
 // recordings they were built from: no hazard is typed here.
@@ -125,17 +125,20 @@ describe('credit', () => {
     const asked = new Set(notes.map((x) => /"(Source: European Chemicals Agency, [^"]+)"/.exec(String(x.LicenseNote))![1]));
     expect([...asked]).toEqual([ECHA_ACKNOWLEDGEMENT]);
     const [classification, cid] = read(ECHA);
-    expect(credit(classification, cid)).toContain(ECHA_ACKNOWLEDGEMENT);
-    expect(credit(classification, cid)).toContain(`CID ${cid}`);
+    // Decision 5's wording, with the acknowledgement exactly as ECHA asks.
+    expect(credit(classification, cid)).toBe(
+      `${ECHA_ACKNOWLEDGEMENT}. Notified classification (C&L Inventory) of ${classification.entry}, aggregated by PubChem, CID ${cid}.`,
+    );
   });
 
   it("names the EU regulation, its entry and licence, and PubChem's CID", () => {
     const [classification, cid] = read(EU);
     const text = credit(classification, cid);
-    expect(text).toContain(`entry ${classification.indexNo}`);
-    expect(text).toContain(classification.sourceUrl!);
-    expect(text).toContain('CC BY 4.0');
-    expect(text).toContain(`via PubChem, CID ${cid}`);
+    // CC BY 4.0 §3(a)(1): the source, the copyright notice, the licence and its URI.
+    expect(CC_BY).toBe('CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)');
+    expect(text).toBe(
+      `Source: Regulation (EC) No 1272/2008 (CLP), Annex VI, entry ${classification.indexNo}, EUR-Lex (${classification.sourceUrl}), © European Union, ${CC_BY}; via PubChem, CID ${cid}.`,
+    );
   });
 
   it('names any other source with its entry and address, and says NITE-CMC is shown in part', () => {
@@ -150,7 +153,9 @@ describe('credit', () => {
 describe('othersLine', () => {
   it('counts one or many', () => {
     expect(othersLine(1, ['a'])).toBe('PubChem lists 1 more classification for this compound (a). They may differ.');
-    expect(othersLine(3, ['a', 'b'])).toBe('PubChem lists 3 more classifications for this compound (a, b). They may differ.');
+    expect(othersLine(3, ['a', 'b, c'])).toBe(
+      'PubChem lists 3 more classifications for this compound (a; b, c). They may differ.',
+    );
   });
 });
 

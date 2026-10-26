@@ -149,6 +149,10 @@ BROKEN_CHOSEN = {
         ghs.STATEMENTS,
         lambda i: i["Value"].update(Number=[1]),
     ),
+    "precautionary codes that aren't text": (
+        ghs.PRECAUTIONS,
+        lambda i: parts(i)[0].update(String=None),
+    ),
 }
 
 
@@ -238,3 +242,79 @@ def test_without_an_eu_entry_echas_first_wins_and_without_either_the_first_liste
     assert [s.text for s in chosen.statements] == [
         p["String"] for p in parts(item(neither, first, ghs.STATEMENTS))
     ]
+
+
+def test_not_classified_followed_by_a_hazard_statement_is_unavailable():
+    echa = first_of(GLUCOSE, ghs.ECHA)
+    statement = parts(item(ETHANOL, first_of(ETHANOL, ghs.EU), ghs.STATEMENTS))[0]
+    body = copy.deepcopy(GLUCOSE)
+    parts(item(body, echa, ghs.STATEMENTS)).append(copy.deepcopy(statement))
+    ghs.snapshot(GLUCOSE)  # the recording itself reads
+    with pytest.raises(Unavailable):
+        ghs.snapshot(body)
+
+
+def test_an_entry_with_an_item_twice_is_unavailable_when_chosen():
+    for name in (ghs.STATEMENTS, ghs.PICTOGRAMS, ghs.SIGNAL):
+        eu = item(ETHANOL, first_of(ETHANOL, ghs.EU), name)
+        body = copy.deepcopy(ETHANOL)
+        section(body)["Information"].append(copy.deepcopy(eu))
+        with pytest.raises(Unavailable):
+            ghs.snapshot(body)
+    # The same in an entry not chosen changes nothing.
+    sources = [r["SourceName"] for r in ETHANOL["Record"]["Reference"]]
+    nite = first_of(ETHANOL, next(s for s in sources if "NITE" in s))
+    body = copy.deepcopy(ETHANOL)
+    section(body)["Information"].append(copy.deepcopy(item(body, nite, ghs.STATEMENTS)))
+    assert ghs.snapshot(body) == ghs.snapshot(ETHANOL)
+
+
+@pytest.mark.parametrize("value", [[1], {"n": 1}, True, "1", None])
+def test_a_reference_number_or_item_name_of_another_kind_is_unavailable(value):
+    # On the last item, from an entry that isn't chosen: these break the grouping itself.
+    for key in ("ReferenceNumber", "Name"):
+        if key == "Name" and isinstance(value, str):
+            continue  # any text is a name (an unknown one only matters in the chosen entry)
+        body = copy.deepcopy(ETHANOL)
+        section(body)["Information"][-1][key] = value
+        with pytest.raises(Unavailable):
+            ghs.snapshot(body)
+    body = copy.deepcopy(ETHANOL)
+    body["Record"]["Reference"][-1]["ReferenceNumber"] = value
+    with pytest.raises(Unavailable):
+        ghs.snapshot(body)
+
+
+def test_a_reference_without_its_source_name_or_a_section_of_another_kind_is_unavailable():
+    no_source = copy.deepcopy(ETHANOL)
+    del no_source["Record"]["Reference"][-1]["SourceName"]
+    odd_section = copy.deepcopy(ETHANOL)
+    odd_section["Record"]["Section"].insert(0, "not a section")
+    for body in (no_source, odd_section):
+        with pytest.raises(Unavailable):
+            ghs.snapshot(body)
+
+
+def test_echa_wins_over_a_source_listed_before_it_when_there_is_no_eu_entry():
+    no_eu = without(ETHANOL, lambda b, i: source_of(b, i["ReferenceNumber"]) != ghs.EU)
+    echa = first_of(no_eu, ghs.ECHA)
+    reordered = copy.deepcopy(no_eu)
+    info = section(reordered)["Information"]
+    info.sort(key=lambda i: source_of(reordered, i["ReferenceNumber"]) == ghs.ECHA)  # ECHA last
+    assert source_of(reordered, items(reordered)[0]["ReferenceNumber"]) != ghs.ECHA
+    chosen = ghs.snapshot(reordered).classification
+    assert chosen.source == "echa"
+    assert [s.text for s in chosen.statements] == [
+        p["String"] for p in parts(item(reordered, echa, ghs.STATEMENTS))
+    ]
+
+
+def test_the_index_number_drops_pubchems_suffix_and_must_look_like_one():
+    eu = first_of(ETHANOL, ghs.EU)
+    sid = next(r for r in ETHANOL["Record"]["Reference"] if r["ReferenceNumber"] == eu)["SourceID"]
+    assert ghs.snapshot(ETHANOL).classification.index_no == sid
+    for changed_id, expected in ((f"{sid}[2]", sid), ("x" + sid, None), (f"{sid}[a]", None)):
+        body = copy.deepcopy(ETHANOL)
+        ref = next(r for r in body["Record"]["Reference"] if r["ReferenceNumber"] == eu)
+        ref["SourceID"] = changed_id
+        assert ghs.snapshot(body).classification.index_no == expected

@@ -6,7 +6,7 @@ Confirms what docs/server-setup.md promises: the API answers through Apache, nam
 reference compound (aspirin) as recorded, which needs PubChem or the server's cache, and
 draws a systematic name as recorded, which needs OPSIN (Java) on the server; Safety finds
 ethanol's classification from the recorded source (PubChem's GHS data, which changes, is not
-compared); the GHS pictograms are served as SVG;
+compared); the GHS pictograms are served as SVG under the page's CSP;
 index.html, sw.js, the manifest, the RDKit files, the functional-group patterns and the ¹³C
 shift table (with its licence) revalidate (no-cache), and the patterns are this commit's;
 hashed assets are immutable;
@@ -145,7 +145,8 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         ir_bands_check(),
         Expect("nmr/carbon-shifts.bin", cache="no-cache", content_type="application/octet-stream"),
         Expect("nmr/LICENSE-nmrshiftdb2.txt", cache="no-cache", content_type="text/plain"),
-        Expect("ghs/GHS07.svg", content_type="image/svg+xml"),
+        # Opened on its own, a pictogram runs under the page's CSP (svg.ts checks the file).
+        Expect("ghs/GHS07.svg", cache="no-cache", content_type="image/svg+xml", csp=True),
         Expect("api/health", body_json={"ok": True}),
         name_check(),
         structure_check(),

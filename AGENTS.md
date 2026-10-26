@@ -15,8 +15,8 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
    web/scripts/checks/csp.ts allows only listed sources; the RDKit worker alone adds
    'unsafe-eval', web/csp-workers.json, and nothing else); the request guard and the link
    guard on every smoke test (web/e2e/fixtures.ts; links per web/config/requestPolicy.ts);
-   the built-HTML link check (web/scripts/checks/html.ts, incl. the relative icon link,
-   since Playwright can't see /favicon.ico); Help/About hidden.
+   the built-HTML link check (web/scripts/checks/html.ts, incl. the relative icon link, since
+   Playwright can't see /favicon.ico); the GHS pictograms' allowlist (checks/svg.ts); Help/About hidden.
 2. No accounts, student identifiers, analytics, or logging of request bodies.
    Enforced by: server/tests/test_privacy.py (a sentinel body never reaches logs), uvicorn
    `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked

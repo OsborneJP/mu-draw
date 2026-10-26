@@ -313,3 +313,48 @@ the SMILES reaches PubChem only in a POST body, in the same request as Get name'
   part of a list.
 - **HCIS** gives no licence through PubChem. It is credited, and shown only when there is no EU or
   ECHA entry.
+
+## Done (2026-10-26, branch claude/v2-safety-snapshot, not merged or deployed)
+
+- 7175688 is this plan. 663a0bc adds the server: `/api/safety`, server/ghs.py, the cache table,
+  the recordings and the server tests. e7aa13e adds the Safety button and panel, the nine
+  pictograms, the precache and SVG guards, the live checks and the docs. The last commit fixes the
+  review's findings (below).
+- Differences from the bar and the decisions, for Jeff to confirm:
+  - Decision 5, the EU credit: it also gives the licence's URI, "CC BY 4.0
+    (https://creativecommons.org/licenses/by/4.0/)", because CC BY 4.0 §3(a)(1)(C) asks for it.
+    The entry is the Annex VI index number without the "[2]" PubChem adds to tell two entries
+    apart.
+  - The "N more classifications" line separates the sources with semicolons: one source's name
+    has a comma in it ("Hazardous Chemical Information System (HCIS), Safe Work Australia").
+  - C.3, the live check: it also requires the page's CSP and no-cache on `ghs/GHS07.svg`.
+- Left for Jeff:
+  - restart the API service after the deploy (deploy.sh prints the `sudo systemctl restart` line);
+  - read the reminder (decision 4) and the credits on staging, and say if the wording should change;
+  - say when the main session may merge, deploy to staging and promote.
+
+## Review (2026-10-26)
+
+A capped review: three reviewers (server, web, bar coverage and docs), then two skeptics who
+tried to refute each finding. All were confirmed. Fixed, each with a test that fails without the
+fix (shown by undoing the fix):
+- high: tests/fixtures/safety_responses.json holds ECHA's data, but THIRD-PARTY-NOTICES.md gave
+  ECHA's terms only for the recordings (docs only: the notice now names it, and the figures the
+  plan and BUILD-LEARNINGS quote);
+- medium: a hazard statement after "Not Classified" passed as a note; an entry with an item twice
+  had no negative test; no test for a timeout on the GET, for the GET's rate limit, for ECHA
+  winning over a source listed before it, for Safety's place after Get name, or for the EU
+  credit's required parts (now with the licence URI); three strictness rules had no negative test;
+- low, fixed anyway: an unhashable reference number gave a 500; a cached row written by another
+  version gave a 500 (now a miss); the cache read-back was tested on three compounds (now every
+  recorded entry); PubChem's "[2]" in the index number; the comma-separated sources; the ECHA
+  credit's punctuation against decision 5; the Close test released its answer without waiting
+  for the abort; the pictograms are pinned to their Commons files by SHA-256; the notice gives
+  HCIS's and HSDB's terms; the SVG check is now an allowlist (a denylist missed prefixed elements,
+  CDATA, CSS escapes and SMIL); a guard that could never fail (the statement round trip) is gone.
+
+Accepted limits (low):
+- AGENTS.md's Layout doesn't name src/pubchemPage.ts or panels/ghsPictograms.ts (149 of 149
+  lines).
+- The SVG check runs on the nine pictograms only, not on every SVG in the build: other features
+  may ship SVGs that aren't plain shapes.

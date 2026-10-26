@@ -219,9 +219,11 @@ test('Safety: nothing shows until the answer comes, and only for the drawing it 
   // Closing it does the same.
   await button.click();
   const third = await guarded(app, safety.next());
+  const closed = page.waitForEvent('requestfailed', (r) => r === third.request);
   await page.getByTestId('safety-close').click();
+  await guarded(app, closed);
   await expect(panel).toHaveCount(0);
-  await third.answer(RESPONSES.aspirin).catch(() => {});
+  await third.answer(RESPONSES.aspirin).catch(() => {}); // already aborted
   await expect(panel).toHaveCount(0);
   expect(safety.count()).toBe(3);
 });
@@ -289,6 +291,8 @@ test('Safety: a reaction is not sent; an empty canvas and offline grey the butto
   const { page, context } = app;
   const { button, message } = ui(page);
   await openEditor(app);
+  // The button sits right after Get name (bar B.1).
+  await expect(page.locator('[data-testid="app-get-name-button"] + [data-testid="app-safety-button"]')).toHaveCount(1);
   const safety = await holdSafety(page);
   const reaction = `${compound('ethanol').smiles}>>${compound('acetone').smiles}`;
   await page.evaluate((r) => window.ketcher!.setMolecule(r), reaction);

@@ -176,7 +176,7 @@
         "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
         "entry": "boric acid",
         "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
-        "index_no": "005-007-00-2[2]",
+        "index_no": "005-007-00-2",
         "not_classified": false,
         "signal": "Danger",
         "pictograms": [
@@ -282,7 +282,7 @@
         "source_name": "Regulation (EC) No 1272/2008 of the European Parliament and of the Council",
         "entry": "(R)-butan-2-ol",
         "source_url": "https://eur-lex.europa.eu/eli/reg/2008/1272/oj",
-        "index_no": "603-127-00-5[3]",
+        "index_no": "603-127-00-5",
         "not_classified": false,
         "signal": "Warning",
         "pictograms": [

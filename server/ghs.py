@@ -32,8 +32,8 @@ SIGNAL_WORDS = frozenset({"Danger", "Warning"})
 NOT_CLASSIFIED = "Not Classified"
 PICTOGRAM_URL = re.compile(r"https://pubchem\.ncbi\.nlm\.nih\.gov/images/ghs/(GHS0[1-9])\.svg")
 _CODE = r"(?:EU)?H\d{3}[A-Za-z]*"
-# "H225: words [class]", "H319 (37.7%): …", "H373 **: …", "H301+H311 (100%): …"; joining the
-# parts back must give the string exactly (Statement.text).
+# "H225: words [class]", "H319 (37.7%): …", "H373 **: …", "H301+H311 (100%): …". A full match
+# means the parts, joined back (Statement.text), are PubChem's string exactly.
 STATEMENT = re.compile(
     rf"(?P<code>{_CODE}(?:\+{_CODE})*)"
     r"(?: (?P<annex_note>\*{1,3}))?"
@@ -41,6 +41,8 @@ STATEMENT = re.compile(
     r": (?P<words>[^\[\]\s](?:[^\[\]]*[^\[\]\s])?)"
     r"(?: \[(?P<hazard_class>[^\[\]]+)\])?"
 )
+# An Annex VI index number; PubChem may add "[2]" to tell two entries apart.
+INDEX_NO = re.compile(r"(\d{3}-\d{3}-\d{2}-\d)(?:\[\d+\])?")
 
 
 @dataclass(frozen=True)
@@ -124,6 +126,10 @@ def _find_section(sections: list) -> dict | None:
     return None
 
 
+def _is_number(value: object) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 @dataclass(frozen=True)
 class _Entry:
     reference: dict
@@ -145,14 +151,17 @@ def entries(body: object) -> list[_Entry]:
     for reference in _list(record.get("Reference", []), "references"):
         if not isinstance(reference, dict) or not isinstance(reference.get("SourceName"), str):
             raise _unexpected("reference")
-        references[reference.get("ReferenceNumber")] = reference
-    grouped: dict[object, dict[str, list[dict]]] = {}
+        if not _is_number(reference.get("ReferenceNumber")):
+            raise _unexpected("reference number")
+        references[reference["ReferenceNumber"]] = reference
+    grouped: dict[int, dict[str, list[dict]]] = {}
     for item in _list(section.get("Information", []), "information"):
-        if not isinstance(item, dict) or item.get("ReferenceNumber") not in references:
+        if not isinstance(item, dict) or not isinstance(item.get("Name"), str):
+            raise _unexpected("information")
+        number = item.get("ReferenceNumber")
+        if not _is_number(number) or number not in references:
             raise _unexpected("information without its reference")
-        grouped.setdefault(item["ReferenceNumber"], {}).setdefault(item.get("Name"), []).append(
-            item.get("Value")
-        )
+        grouped.setdefault(number, {}).setdefault(item["Name"], []).append(item.get("Value"))
     if not grouped:
         raise _unexpected("empty GHS section")
     return [_Entry(references[number], items) for number, items in grouped.items()]
@@ -201,10 +210,7 @@ def _statement(text: str) -> Statement:
     match = STATEMENT.fullmatch(text)
     if match is None:
         raise _unexpected("hazard statement")
-    statement = Statement(**match.groupdict())
-    if statement.text != text:
-        raise _unexpected("hazard statement")
-    return statement
+    return Statement(**match.groupdict())
 
 
 def _optional(reference: dict, key: str) -> str | None:
@@ -212,6 +218,11 @@ def _optional(reference: dict, key: str) -> str | None:
     if value is not None and not isinstance(value, str):
         raise _unexpected(f"reference {key}")
     return value
+
+
+def _index_no(source_id: str | None) -> str | None:
+    match = INDEX_NO.fullmatch(source_id) if source_id else None
+    return match[1] if match else None
 
 
 def read(entry: _Entry) -> Classification:
@@ -230,6 +241,8 @@ def read(entry: _Entry) -> Classification:
     if not_classified:
         if signals or pictograms:
             raise _unexpected("not classified, with a signal word or pictogram")
+        if any(STATEMENT.fullmatch(t) for t in texts[1:]):
+            raise _unexpected("not classified, with a hazard statement")
         statements, notes = (), tuple(_texts(entry, NOTE) + texts[1:])
     else:
         statements, notes = tuple(_statement(t) for t in texts), tuple(_texts(entry, NOTE))
@@ -242,7 +255,7 @@ def read(entry: _Entry) -> Classification:
         source_name=source_name,
         entry=_optional(reference, "Name"),
         source_url=_optional(reference, "URL"),
-        index_no=_optional(reference, "SourceID") if source == "eu" else None,
+        index_no=_index_no(_optional(reference, "SourceID")) if source == "eu" else None,
         not_classified=not_classified,
         signal=signals[0] if signals else None,
         pictograms=pictograms,

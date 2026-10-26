@@ -1285,3 +1285,20 @@ Acceptance bar: docs/plans/v2-safety-snapshot.md (measurements, decisions, known
   unchanged.
 - **Deploy**: the API service must be restarted for `/api/safety`; deploy.sh prints the
   `sudo systemctl restart` line. Apache already proxies all of `<base>api/`.
+- **Known limits** (the plan's, restated): the EU harmonised list, not GB's mandatory list
+  (they may differ for substances changed since 2021); ECHA's entries are companies' own
+  classifications, codes above 10% only; per PubChem record (a salt, hydrate or other
+  stereoisomer may differ or have none); pure substances only, not solutions or mixtures; no
+  precautionary statements; two PubChem requests, each with one retry, can outlast the
+  browser's 8 s deadline ("not responding"); a PubChem format change reads as
+  "unavailable"; HCIS gives no licence through PubChem (credited, shown only without an EU or
+  ECHA entry, which no probed record lacked).
+- **Review** (capped: three reviewers, a skeptic verifying each finding; plan, "Review"). Every
+  finding was confirmed. Fixed, each with a test that fails without the fix: the replayed
+  fixture holds ECHA's data but the notice named only the recordings (high); a hazard line
+  after "Not Classified", a repeated item in the chosen entry, and an unhashable reference
+  number now read as "unavailable"; the GET's timeouts and its rate limit, ECHA winning over a
+  source listed before it, every recorded entry's cache round trip, and the header order are
+  tested; the EU credit gives the licence's URI (CC BY 4.0 §3(a)(1)(C)) and the index number
+  without PubChem's "[2]"; a cached row another version wrote is a miss, not a 500; the SVG
+  check is an allowlist (a denylist missed prefixed elements, CDATA, CSS escapes and SMIL).

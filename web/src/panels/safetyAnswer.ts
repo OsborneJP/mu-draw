@@ -184,11 +184,15 @@ export const NOT_CLASSIFIED = 'Not classified as hazardous by this source.';
 
 export function othersLine(count: number, sources: string[]): string {
   const more = count === 1 ? '1 more classification' : `${count} more classifications`;
-  return `PubChem lists ${more} for this compound (${sources.join(', ')}). They may differ.`;
+  // Semicolons: a source's own name may hold a comma ("…(HCIS), Safe Work Australia").
+  return `PubChem lists ${more} for this compound (${sources.join('; ')}). They may differ.`;
 }
 
 /** ECHA's terms require this acknowledgement, exactly, in each copy of its data. */
 export const ECHA_ACKNOWLEDGEMENT = 'Source: European Chemicals Agency, http://echa.europa.eu/';
+
+/** CC BY 4.0 §3(a)(1)(C): the licence's URI, as plain text (invariant 1). */
+export const CC_BY = 'CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)';
 
 /** The credit line for the shown source (decision 5): plain text, never a link. */
 export function credit(c: GhsClassification, cid: number): string {
@@ -196,11 +200,11 @@ export function credit(c: GhsClassification, cid: number): string {
   if (c.source === 'eu') {
     const entry = c.indexNo ? `, entry ${c.indexNo}` : '';
     const where = c.sourceUrl ? `, EUR-Lex (${c.sourceUrl})` : ', EUR-Lex';
-    return `Source: Regulation (EC) No 1272/2008 (CLP), Annex VI${entry}${where}, © European Union, CC BY 4.0; ${via}.`;
+    return `Source: Regulation (EC) No 1272/2008 (CLP), Annex VI${entry}${where}, © European Union, ${CC_BY}; ${via}.`;
   }
   if (c.source === 'echa') {
     const of = c.entry ?? 'this substance';
-    return `${ECHA_ACKNOWLEDGEMENT}; notified classification (C&L Inventory) of ${of}, aggregated by PubChem, CID ${cid}.`;
+    return `${ECHA_ACKNOWLEDGEMENT}. Notified classification (C&L Inventory) of ${of}, aggregated by PubChem, CID ${cid}.`;
   }
   const parts = [c.sourceName, c.entry, c.sourceUrl].filter((p): p is string => p !== null);
   const inPart = c.sourceName === 'NITE-CMC' ? ', shown in part' : '';

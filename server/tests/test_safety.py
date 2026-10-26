@@ -3,6 +3,7 @@ answers and forced failures."""
 
 import json
 import logging
+import sqlite3
 import uuid
 
 import httpx
@@ -10,6 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from rdkit import Chem
 
+import main
 import record_ghs as ghs_rec
 from cache import MAX_AGE_S
 from pubchem import GHS_PARAMS, GHS_URL
@@ -169,3 +171,29 @@ def test_a_drawing_never_reaches_logs_or_urls(tmp_path, fake_time, caplog, capfd
         assert f"[{isotope}" not in text
     assert "PubChem safety lookup failed: HTTP 500" in caplog.text
     assert "PubChem safety lookup failed: unexpected GHS data: record" in caplog.text
+
+
+@pytest.mark.parametrize("error", [httpx.ReadTimeout("t"), httpx.ConnectError("c")])
+def test_a_ghs_request_that_times_out_or_fails_is_502_and_not_cached(tmp_path, fake_time, error):
+    recorded = answers("ethanol")
+    server, app = app_with(tmp_path, fake_time, [recorded[0], (0, error), recorded[1]])
+    with TestClient(app) as client:
+        first = ask(client, "ethanol")
+        again = ask(client, "ethanol")
+    assert (first.status_code, first.json()) == (502, {"error": "unavailable"})
+    assert again.json() == RESPONSES["ethanol"]
+    assert len(server.requests) == 3
+
+
+def test_a_cached_answer_another_version_wrote_is_asked_for_again(tmp_path, fake_time):
+    recorded = answers("ethanol")
+    server, app = app_with(tmp_path, fake_time, recorded + recorded[1:])
+    with TestClient(app) as client:
+        assert ask(client, "ethanol").json() == RESPONSES["ethanol"]
+        db = sqlite3.connect(tmp_path / main.CACHE_FILE)
+        (stored,) = db.execute("SELECT classification FROM hazards").fetchone()
+        db.execute("UPDATE hazards SET classification = ?", (stored.replace('"signal"', '"word"'),))
+        db.commit()
+        db.close()
+        assert ask(client, "ethanol").json() == RESPONSES["ethanol"]
+    assert len(server.requests) == 3  # the name once, the GHS section twice

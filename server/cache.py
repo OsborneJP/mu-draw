@@ -117,10 +117,13 @@ class NameCache:
         if row is None:
             return None
         classification, others = row
-        return Snapshot(
-            None if classification is None else _classification(json.loads(classification)),
-            _others(json.loads(others)),
-        )
+        try:
+            return Snapshot(
+                None if classification is None else _classification(json.loads(classification)),
+                _others(json.loads(others)),
+            )
+        except (ValueError, TypeError, KeyError):
+            return None  # written by another version of the app: ask PubChem again
 
     def put_hazards(self, cid: int, snapshot: Snapshot) -> None:
         now = self._clock()

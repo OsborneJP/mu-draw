@@ -38,8 +38,9 @@ Rules:
   PubChem client: PUG View's GHS section (GET
   `pug_view/data/compound/<CID>/JSON?heading=GHS+Classification`, only the CID in the URL; a
   compound with no GHS section is a 404 `PUGVIEW.NotFound`) for each name in
-  tests/fixtures/safety_names.txt. Those are Get name's test compounds, so their
-  `smiles-*.json` give the CIDs. The script rebuilds tests/fixtures/safety_responses.json,
+  tests/fixtures/safety_names.txt that PubChem has a record of. Those are Get name's test
+  compounds, so their `smiles-*.json` give the CIDs (the invented one's is `CID 0`, so the
+  server never asks PUG View for it). The script rebuilds tests/fixtures/safety_responses.json,
   the server's answers that the browser tests replay. These recordings contain ECHA's data,
   under its terms (THIRD-PARTY-NOTICES.md).
 - Practice mode's names (practice/*.txt and tests/fixtures/practice_test_names.txt) share the

@@ -24,7 +24,9 @@ own licences:
   and so on), which Commons marks public domain ("ineligible for copyright … contains no
   original authorship"), converted from UNECE's EPS files. Read 2026-10-26.
 - tests/fixtures/recorded/: answers recorded from PubChem (pubchem.ncbi.nlm.nih.gov).
-  The `ghs-*.json` recordings are PubChem's GHS sections, which contain data from:
+  The `ghs-*.json` recordings are PubChem's GHS sections, and tests/fixtures/safety_responses.json
+  is built from them (the server's answers, holding parts of that data); docs/plans/v2-safety-snapshot.md
+  and BUILD-LEARNINGS.md quote a few of their figures. They contain data from:
   - the European Chemicals Agency (C&L Inventory), which may be reproduced for
     non-commercial purposes provided that ECHA is acknowledged as the source: "Source:
     European Chemicals Agency, http://echa.europa.eu/" (https://echa.europa.eu/web/guest/legal-notice);
@@ -32,6 +34,9 @@ own licences:
     (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html);
   - NITE-CMC (Japan), which asks that the source be cited
     (https://www.chem-info.nite.go.jp/en/chem/chrip/chrip_search/html/condUse.html);
-  - HCIS, Safe Work Australia, and HSDB (US National Library of Medicine).
+  - HCIS, Safe Work Australia: PubChem gives no licence for it; Safe Work Australia's own
+    documents are CC BY-NC (https://www.safeworkaustralia.gov.au/copyright);
+  - HSDB, US National Library of Medicine: no restrictions; NLM asks to be acknowledged
+    (https://www.nlm.nih.gov/web_policies.html).
   The app shows each source's credit, in plain text, wherever it shows its data (Safety).
 - Packages installed by npm and conda are under their own licences.

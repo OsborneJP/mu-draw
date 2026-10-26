@@ -159,11 +159,13 @@ def test_safety_must_find_the_recorded_record_and_source():
     assert cl.check(results, expected, POLICY, WORKERS)[0] == "api/safety: found is None, want True"
 
 
-def test_the_pictograms_must_be_served_as_svg():
+def test_the_pictograms_must_be_served_as_svg_under_the_pages_csp():
     results = good_results()
     results["ghs/GHS07.svg"].headers["content-type"] = ["text/plain"]
+    del results["ghs/GHS07.svg"].headers["content-security-policy"]
     assert cl.check(results, cl.expectations(FILES), POLICY, WORKERS) == [
-        "ghs/GHS07.svg: Content-Type ['text/plain'], want image/svg+xml"
+        "ghs/GHS07.svg: Content-Type ['text/plain'], want image/svg+xml",
+        "ghs/GHS07.svg: Content-Security-Policy differs from web/csp.json",
     ]
 
 
