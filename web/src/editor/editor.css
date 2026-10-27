@@ -39,6 +39,25 @@
   display: none !important;
 }
 
+/* The Structure Library button, at the end of Ketcher's bottom toolbar: its icon draws "SL"
+   a few pixels high, which students didn't recognise (Jeff, 2026-10-27;
+   docs/plans/structure-library-label.md). Its name instead, in the app's font; the button
+   widens to fit, and keeps Ketcher's click, shortcut, tooltip and highlight. */
+button[data-testid='template-lib'] {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  padding: 0 8px;
+}
+button[data-testid='template-lib'] > svg {
+  display: none;
+}
+button[data-testid='template-lib']::before {
+  content: 'Structure Library';
+  font: 600 13px system-ui, sans-serif;
+  white-space: nowrap;
+}
+
 /* Ketcher's Text Editor (the Text tool): its bold, italic, subscript, superscript and size
    buttons apply to the highlighted text, which students miss (Jeff, 2026-10-26). A note on
    its own line under the formatting toolbar, before the "Text:" label (its next sibling). */

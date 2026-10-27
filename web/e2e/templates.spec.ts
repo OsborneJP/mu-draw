@@ -387,3 +387,43 @@ test("Ketcher's own Haworth sugars (its Structure Library's Sugars group) are hi
   await expect(sugars).toBeAttached();
   await expect(sugars).toBeHidden();
 });
+
+test('the Structure Library button says "Structure Library", readably and whole, and still opens the library', async ({
+  app,
+}) => {
+  // docs/plans/structure-library-label.md: Ketcher's icon drew "SL" a few pixels high.
+  const { page } = app;
+  await openEditor(app);
+  const library = page.getByTestId('template-lib').filter({ visible: true });
+  for (const [width, height] of [
+    [1280, 800],
+    [1024, 700],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect(library).toHaveAccessibleName('Structure Library');
+    const shown = await library.evaluate((button) => {
+      const label = getComputedStyle(button, '::before');
+      const box = button.getBoundingClientRect();
+      const toolbar = button.closest('[data-testid="bottom-toolbar"]')!.getBoundingClientRect();
+      return {
+        text: label.content,
+        fontSize: parseFloat(label.fontSize),
+        icon: getComputedStyle(button.querySelector('svg')!).display,
+        clipped: button.scrollWidth > button.clientWidth,
+        inToolbar: box.left >= toolbar.left && box.right <= toolbar.right && box.bottom <= toolbar.bottom,
+        onScreen: box.right <= innerWidth && box.bottom <= innerHeight,
+      };
+    });
+    const { fontSize, ...rest } = shown;
+    expect(rest, `${width} × ${height}`).toEqual({
+      text: '"Structure Library"',
+      icon: 'none',
+      clipped: false,
+      inToolbar: true,
+      onScreen: true,
+    });
+    expect(fontSize).toBeGreaterThanOrEqual(12);
+  }
+  await library.click();
+  await expect(page.getByTestId('Rings-accordion-item')).toBeVisible();
+});

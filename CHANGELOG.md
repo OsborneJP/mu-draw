@@ -215,6 +215,8 @@ All notable changes to this project. The format follows
   student's own changes in Settings stay after that. Export and Copy image come out at ACS
   print size (caffeine is about 1.2 in wide in Word); 2x and 4x are sharper, not bigger.
   Practice's Show answer is drawn the same way.
+- The Structure Library button, at the end of the ring templates under the canvas, now says
+  "Structure Library" instead of a tiny "SL" icon.
 - Hydrogens show on heteroatoms only (OH, NH), and terminal carbons are plain line ends
   instead of CH3, on the canvas and in Export, Copy image and Practice's Show answer. A
   browser that used the app before switches once; "Show hydrogen labels" in Ketcher's
