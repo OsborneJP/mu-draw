@@ -1,7 +1,8 @@
-// Students start in Ketcher's ACS Document 1996 style (src/editor/acsStyle.ts; acceptance
-// bar in docs/plans/acs-style-default.md, A and B).
+// Students start in Ketcher's ACS Document 1996 style, with hydrogens shown on heteroatoms
+// only (src/editor/acsStyle.ts; acceptance bars in docs/plans/acs-style-default.md and
+// docs/plans/hetero-hydrogens.md, A and B).
 import type { Page } from '@playwright/test';
-import { ACS_APPLIED_KEY } from '../src/editor/acsStyle.ts';
+import { ACS_APPLIED_KEY, HETERO_H_APPLIED_KEY } from '../src/editor/acsStyle.ts';
 import {
   expect,
   expectDrawing,
@@ -25,10 +26,15 @@ async function changedByAcsButton(page: Page): Promise<string[]> {
   return Object.keys(after).filter((key) => JSON.stringify(before[key]) !== JSON.stringify(after[key]));
 }
 
-/** The settings ACS sets that the canvas draws with, by name. (Ketcher's render options
+/** Ketcher's "Show hydrogen labels" setting that labels heteroatoms with their hydrogens
+ * (OH, NH) and draws terminal carbons as plain line ends. */
+const HETERO = 'Hetero';
+
+/** The settings the app sets that the canvas draws with, by name. (Ketcher's render options
  * hold others in another spelling: its stereo label style is 'Iupac' there, 'IUPAC' in
  * its settings.) */
 const DRAWN_WITH = [
+  'showHydrogenLabels',
   'atomColoring',
   'bondLength',
   'bondLengthUnit',
@@ -63,7 +69,7 @@ async function recordFirstCanvas(page: Page): Promise<void> {
   });
 }
 
-test('a new browser starts in ACS: what "Set ACS Settings" gives but image resolution, on the first canvas, with nothing to undo', async ({
+test('a new browser starts in ACS: what "Set ACS Settings" gives but image resolution, hydrogens on heteroatoms only, on the first canvas, with nothing to undo', async ({
   app,
 }) => {
   const { page } = app;
@@ -77,6 +83,7 @@ test('a new browser starts in ACS: what "Set ACS Settings" gives but image resol
   // redraw goes into the undo history.)
   expect(await history(page)).toEqual({ undo: 0, redo: 0 });
   const settings = await ketcherSettings(page);
+  expect(settings.showHydrogenLabels).toBe(HETERO);
   const firstCanvas = await page.evaluate(() => (window as unknown as { __firstCanvas: Record<string, unknown> }).__firstCanvas);
   for (const key of DRAWN_WITH) expect(firstCanvas[key], key).toEqual(settings[key]);
 
@@ -84,20 +91,23 @@ test('a new browser starts in ACS: what "Set ACS Settings" gives but image resol
   expect(await changedByAcsButton(page)).toEqual(['imageResolution']);
 });
 
-test('an existing browser: switched to ACS once, with its drawing and the student\'s other settings kept', async ({
+test('a browser from before ACS: switched to ACS and to hydrogens on heteroatoms once, with its drawing and the student\'s other settings kept', async ({
   app,
 }) => {
   const { page } = app;
   await openEditor(app);
-  // Make this browser what the live version leaves: Ketcher's own defaults saved (Ketcher
+  // Make this browser what a version before ACS left: Ketcher's own defaults saved (Ketcher
   // writes all its settings at every start), one the student changed, a saved drawing, and
-  // ACS never applied.
-  await page.evaluate(async (applied) => {
-    const service = window.ketcher!.settingsService!;
-    await service.resetToDefaults();
-    await service.updateSettings({ carbonExplicitly: true });
-    localStorage.removeItem(applied);
-  }, ACS_APPLIED_KEY);
+  // neither default ever applied.
+  await page.evaluate(
+    async (applied) => {
+      const service = window.ketcher!.settingsService!;
+      await service.resetToDefaults();
+      await service.updateSettings({ carbonExplicitly: true });
+      for (const key of applied) localStorage.removeItem(key);
+    },
+    [ACS_APPLIED_KEY, HETERO_H_APPLIED_KEY],
+  );
   expect((await ketcherSettings(page)).bondLengthUnit).toBe('px'); // Ketcher's defaults, not ACS
   const saved = await nextAutosave(page);
   const caffeine = referenceCompound('caffeine');
@@ -110,19 +120,53 @@ test('an existing browser: switched to ACS once, with its drawing and the studen
   await expectDrawing(page, drawn);
   expect(await history(page)).toEqual({ undo: 0, redo: 0 }); // Undo can't take the drawing away
   expect((await ketcherSettings(page)).carbonExplicitly).toBe(true);
-  expect(await page.evaluate((applied) => localStorage.getItem(applied), ACS_APPLIED_KEY)).not.toBeNull();
+  expect((await ketcherSettings(page)).showHydrogenLabels).toBe(HETERO);
+  for (const key of [ACS_APPLIED_KEY, HETERO_H_APPLIED_KEY]) {
+    expect(await page.evaluate((applied) => localStorage.getItem(applied), key), key).not.toBeNull();
+  }
   expect(await changedByAcsButton(page)).toEqual(['imageResolution']);
 });
 
-test("ACS is applied once: a student's own change in Settings stays after a reload", async ({ app }) => {
+test('a browser that has ACS already: switched to hydrogens on heteroatoms once; only that setting changes, and the drawing stays', async ({
+  app,
+}) => {
   const { page } = app;
   await openEditor(app);
-  // Atom colours back on, as Settings' Apply does it (through Ketcher's settings service).
-  await page.evaluate(() => window.ketcher!.settingsService!.updateSettings({ atomColoring: true }));
+  // Make this browser what the version before this default leaves: ACS applied, Ketcher's
+  // own hydrogen labels saved, one setting the student changed, and a saved drawing.
+  await page.evaluate(async (applied) => {
+    await window.ketcher!.settingsService!.updateSettings({ showHydrogenLabels: 'Terminal and Hetero', atomColoring: true });
+    localStorage.removeItem(applied);
+  }, HETERO_H_APPLIED_KEY);
+  const before = await ketcherSettings(page);
+  expect(before.showHydrogenLabels).not.toBe(HETERO);
+  const saved = await nextAutosave(page);
+  const caffeine = referenceCompound('caffeine');
+  await page.evaluate((mol) => window.ketcher!.setMolecule(mol), fixture(caffeine.files.find((f) => f.endsWith('.mol'))!));
+  const drawn = { inchikey: await inchiKey(page), ket: await saved() };
+
+  await page.reload();
+  await waitForEditor(app);
+  await expectDrawing(page, drawn);
+  expect(await history(page)).toEqual({ undo: 0, redo: 0 });
+  expect(await ketcherSettings(page)).toEqual({ ...before, showHydrogenLabels: HETERO });
+});
+
+test("ACS and the hydrogen labels are applied once: a student's own changes in Settings stay after a reload", async ({
+  app,
+}) => {
+  const { page } = app;
+  await openEditor(app);
+  // Atom colours back on and Ketcher's own hydrogen labels, as Settings' Apply does it
+  // (through Ketcher's settings service).
+  await page.evaluate(() =>
+    window.ketcher!.settingsService!.updateSettings({ atomColoring: true, showHydrogenLabels: 'Terminal and Hetero' }),
+  );
 
   await page.reload();
   await waitForEditor(app);
   expect((await ketcherSettings(page)).atomColoring).toBe(true);
+  expect((await ketcherSettings(page)).showHydrogenLabels).toBe('Terminal and Hetero');
   // Everything else is still ACS.
   expect((await changedByAcsButton(page)).sort()).toEqual(['atomColoring', 'imageResolution']);
 });

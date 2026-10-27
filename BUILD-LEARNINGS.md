@@ -1742,3 +1742,14 @@ Plan and measurements: docs/plans/acs-style-default.md.
   same count (reference sets 5 to 7) merged cleanly to a wrong 7, which only pytest caught. A
   capped merge review (resolutions, interactions, deploy) found nothing high or medium.
 
+## Hydrogens on heteroatoms only (2026-10-27)
+- Ketcher's "Show hydrogen labels" default is "Terminal and Hetero" (CH3 and OH both
+  labelled); its ACS preset doesn't touch it. "Hetero" labels heteroatoms with their
+  hydrogens and leaves terminal carbons as line ends. Both settings readers accept the
+  spelling, so written before Ketcher loads it is drawn from the start with no redraw.
+- Ketcher passes the setting to Indigo (`render-label-mode`, via
+  `getLabelRenderModeForIndigo`), so pictures follow the canvas, with one difference: a
+  carbon Ketcher labels anyway (a lone carbon, a charged terminal carbon) shows no
+  hydrogens on the canvas ("C", "C+") but keeps them in Indigo's pictures (CH4, CH2+).
+- One-time defaults each get their own record (`applyOnce` in src/editor/acsStyle.ts), so
+  a browser that already has an earlier default still gets a later one.

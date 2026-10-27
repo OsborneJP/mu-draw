@@ -226,6 +226,35 @@ test('Export: PNG at 1x, 2x and 4x is exactly scale × the SVG, white unless tra
   await expect(dialog.getByTestId('export-message')).toHaveText('');
 });
 
+test('pictures label what the canvas labels: heteroatoms with their hydrogens, no carbon labels', async ({ app }) => {
+  // Hydrogens on heteroatoms only is the app's default (docs/plans/hetero-hydrogens.md, C);
+  // Ketcher's own default also labels terminal carbons (CH3).
+  const { page } = app;
+  await openEditor(app);
+  await loadCompound(page, 'paracetamol');
+  const canvas = await page.evaluate(() => {
+    const editor = window.ketcher!.editor;
+    const svg = (editor as unknown as { render: { paper: { canvas: SVGSVGElement } } }).render.paper.canvas;
+    const atoms = [...editor.struct().atoms.values()];
+    return {
+      // Ketcher draws each part of a label as its own text: "N", then "H".
+      labels: [...svg.querySelectorAll('text')].map((text) => text.textContent ?? '').filter(Boolean),
+      heteroatomsWithH: atoms.filter((atom) => atom.label !== 'C' && atom.implicitH > 0).length,
+    };
+  });
+  expect(canvas.labels).not.toContain('C');
+  expect(canvas.heteroatomsWithH).toBeGreaterThan(0);
+  expect(canvas.labels.filter((text) => text === 'H')).toHaveLength(canvas.heteroatomsWithH);
+
+  // Indigo draws a label's characters as uses of glyph outlines, one each. (Export's SVG is
+  // this SVG, unchanged: the first test.)
+  const glyphs = await page.evaluate((svg) => {
+    const root = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
+    return [...root.querySelectorAll('use')].filter((use) => !use.closest('defs')).length;
+  }, await indigoSvg(page));
+  expect(glyphs).toBe(canvas.labels.join('').length);
+});
+
 test('offline: Copy image puts a 2x PNG on the clipboard, and both downloads work', async ({ app }) => {
   const { context, page } = app;
   await grantClipboard(app);

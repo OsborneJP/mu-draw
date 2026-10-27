@@ -1,6 +1,6 @@
-import { KETCHER_SAVED_OPTIONS_KEY, PRESETS } from 'ketcher-core';
+import { KETCHER_SAVED_OPTIONS_KEY, PRESETS, ShowHydrogenLabels } from 'ketcher-core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ACS_APPLIED_KEY, acsSettings, applyAcsOnce, KETCHER_SETTINGS_KEY } from './acsStyle';
+import { ACS_APPLIED_KEY, acsSettings, applyOnce, HETERO_H_APPLIED_KEY, KETCHER_SETTINGS_KEY } from './acsStyle';
 
 /** A Map behind the Storage methods acsStyle uses; setItem can be made to fail. */
 class FakeStorage {
@@ -25,10 +25,10 @@ class FakeStorage {
 // values will do here; 'the start-up module writes Ketcher's own preset' checks the real ones.
 const ACS = { bondLength: 1, bondLengthUnit: 'pt', atomColoring: false };
 
-describe('applyAcsOnce', () => {
+describe('applyOnce', () => {
   it('a new browser: writes the ACS settings and marks them applied', () => {
     const storage = new FakeStorage();
-    applyAcsOnce(storage.asStorage(), ACS);
+    applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
     expect(storage.settings()).toEqual(ACS);
     expect(storage.getItem(ACS_APPLIED_KEY)).not.toBeNull();
   });
@@ -37,16 +37,16 @@ describe('applyAcsOnce', () => {
     const storage = new FakeStorage();
     const saved = { bondLength: 2, bondLengthUnit: 'px', atomColoring: true, carbonExplicitly: true };
     storage.items.set(KETCHER_SETTINGS_KEY, JSON.stringify(saved));
-    applyAcsOnce(storage.asStorage(), ACS);
+    applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
     expect(storage.settings()).toEqual({ ...ACS, carbonExplicitly: true });
   });
 
   it('applied already: a student\'s own settings are left alone', () => {
     const storage = new FakeStorage();
-    applyAcsOnce(storage.asStorage(), ACS);
+    applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
     const own = JSON.stringify({ ...ACS, atomColoring: true });
     storage.items.set(KETCHER_SETTINGS_KEY, own);
-    applyAcsOnce(storage.asStorage(), ACS);
+    applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
     expect(storage.getItem(KETCHER_SETTINGS_KEY)).toBe(own);
   });
 
@@ -54,7 +54,7 @@ describe('applyAcsOnce', () => {
     for (const text of ['{not json', 'null', '[1,2]', '"text"']) {
       const storage = new FakeStorage();
       storage.items.set(KETCHER_SETTINGS_KEY, text);
-      applyAcsOnce(storage.asStorage(), ACS);
+      applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
       expect(storage.settings()).toEqual(ACS);
     }
   });
@@ -63,16 +63,27 @@ describe('applyAcsOnce', () => {
     const blocked = () => {
       throw new DOMException('blocked', 'SecurityError');
     };
-    expect(() => applyAcsOnce(blocked, ACS)).not.toThrow();
+    expect(() => applyOnce(blocked, ACS_APPLIED_KEY, ACS)).not.toThrow();
+  });
+
+  it('each record is its own: a browser with ACS applied still gets a later step, once', () => {
+    const storage = new FakeStorage();
+    applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
+    applyOnce(storage.asStorage(), HETERO_H_APPLIED_KEY, { showHydrogenLabels: 'Hetero' });
+    expect(storage.settings()).toEqual({ ...ACS, showHydrogenLabels: 'Hetero' });
+    const own = JSON.stringify({ ...ACS, showHydrogenLabels: 'Terminal' });
+    storage.items.set(KETCHER_SETTINGS_KEY, own);
+    applyOnce(storage.asStorage(), HETERO_H_APPLIED_KEY, { showHydrogenLabels: 'Hetero' });
+    expect(storage.getItem(KETCHER_SETTINGS_KEY)).toBe(own);
   });
 
   it('storage full: nothing is thrown, nothing is marked, and the next start tries again', () => {
     const storage = new FakeStorage();
     storage.refuse = true;
-    expect(() => applyAcsOnce(storage.asStorage(), ACS)).not.toThrow();
+    expect(() => applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS)).not.toThrow();
     expect(storage.getItem(ACS_APPLIED_KEY)).toBeNull();
     storage.refuse = false;
-    applyAcsOnce(storage.asStorage(), ACS);
+    applyOnce(storage.asStorage(), ACS_APPLIED_KEY, ACS);
     expect(storage.settings()).toEqual(ACS);
   });
 });
@@ -95,11 +106,25 @@ describe('the start-up module', () => {
     vi.resetModules();
   });
 
-  it("writes Ketcher's own preset (minus image resolution) into the page's storage when imported", async () => {
-    const storage = new FakeStorage();
+  async function start(storage: FakeStorage): Promise<void> {
     vi.stubGlobal('window', { localStorage: storage });
     vi.resetModules();
     await import('./acsStart');
-    expect(storage.settings()).toEqual(acsSettings(PRESETS.acs));
+  }
+
+  it("a new browser: Ketcher's own ACS preset (minus image resolution) and hydrogens on heteroatoms only", async () => {
+    const storage = new FakeStorage();
+    await start(storage);
+    expect(storage.settings()).toEqual({ ...acsSettings(PRESETS.acs), showHydrogenLabels: ShowHydrogenLabels.Hetero });
+  });
+
+  it('a browser that has ACS already: only the hydrogen labels change, once', async () => {
+    const storage = new FakeStorage();
+    const before = { ...acsSettings(PRESETS.acs), atomColoring: true, showHydrogenLabels: ShowHydrogenLabels.TerminalAndHetero };
+    storage.items.set(KETCHER_SETTINGS_KEY, JSON.stringify(before));
+    storage.items.set(ACS_APPLIED_KEY, '1');
+    await start(storage);
+    expect(storage.settings()).toEqual({ ...before, showHydrogenLabels: ShowHydrogenLabels.Hetero });
+    expect(storage.getItem(HETERO_H_APPLIED_KEY)).not.toBeNull();
   });
 });
