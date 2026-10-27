@@ -247,8 +247,8 @@ Status, 2026-10-25: Jeff has checked the Windows 11 side by hand (marked "Window
 **Install and offline**
 
 - [x] Installs from Chrome and from Edge on Windows 11; Start menu and taskbar icon appear
-- [ ] Installs from Chrome on macOS; Dock icon appears
-- [ ] With Wi-Fi off, the installed app launches and draws
+- [x] Installs from Chrome on macOS; Dock icon appears
+- [x] With Wi-Fi off, the installed app launches and draws
 - [ ] Offline: properties, functional groups and export all work; naming buttons show the offline message
 - [ ] Publishing a new build shows the update banner on next launch, and in an open app when the student returns to it or it comes back online
 
@@ -264,9 +264,9 @@ Status, 2026-10-25: Jeff has checked the Windows 11 side by hand (marked "Window
 
 **Output**
 
-- [ ] Copy as image pastes into Word and Google Docs on both platforms (Windows ✓)
-- [ ] PNG at 4x is sharp on a printed page; SVG opens in a browser and in PowerPoint (Windows ✓)
-- [ ] 10 ChemDraw files (CDX and CDXML, including reactions) open correctly, and files saved from the app open correctly in ChemDraw (Windows ✓)
+- [x] Copy as image pastes into Word and Google Docs on both platforms (Windows ✓, macOS ✓)
+- [x] PNG at 4x is sharp on a printed page; SVG opens in a browser and in PowerPoint (Windows ✓, macOS ✓)
+- [x] 10 ChemDraw files (CDX and CDXML, including reactions) open correctly, and files saved from the app open correctly in ChemDraw (Windows ✓, macOS ✓)
 
 **Load**
 
@@ -274,8 +274,8 @@ Status, 2026-10-25: Jeff has checked the Windows 11 side by hand (marked "Window
 
 **Privacy**
 
-- [ ] Browser network tab shows no requests to any host except osbornelab
-- [ ] FastAPI logs contain no request bodies
+- [x] Browser network tab shows no requests to any host except osbornelab
+- [x] FastAPI logs contain no request bodies
 
 ## NMR prediction proof of concept (alongside v1)
 
@@ -314,8 +314,8 @@ Students will compare the number of peaks with what they expect, so equivalent c
 
 - [x] 15 compounds from CHEM-312 (you choose, mixing aromatics, carbonyls, alcohols and amines) give the correct number of signals (Jeff, 2026-10-25)
 - [x] Predicted shifts sit within a tolerance you set (suggest ±3 ppm) of literature values for most signals; outliers are recorded, not hidden (Jeff, 2026-10-25)
-- [ ] Peak-to-atom highlighting works both directions
-- [ ] Prediction for a 30-heavy-atom molecule returns in under 2 seconds
+- [x] Peak-to-atom highlighting works both directions
+- [x] Prediction for a 30-heavy-atom molecule returns in under 2 seconds
 - [ ] Option A only: offline shows the standard "Needs an internet connection" message
 
 ### Later: ¹H prediction
