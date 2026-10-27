@@ -1,6 +1,8 @@
 // First of all: ketcher-react (which App brings in) reads its saved settings as soon as its
 // code loads, so the ACS style must already be in storage (editor/acsStart.ts).
 import './editor/acsStart';
+// Listening for the browser's offer to install the app before anything is drawn.
+import './pwa/install';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { blockDebugHotkeys } from './editor/debugHotkeys';

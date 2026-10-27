@@ -10,6 +10,7 @@ import SafetyPanel from './panels/SafetyPanel';
 import StereoPanel from './panels/StereoPanel';
 import ThreeDPanel from './panels/ThreeDPanel';
 import Header from './shell/Header';
+import InstallStrip from './shell/InstallStrip';
 import UpdateBanner from './shell/UpdateBanner';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
     <div className="app">
       <Header />
       <UpdateBanner />
+      <InstallStrip />
       <main className="workspace">
         {/* The canvas, with Get name's answer over it, and one panel docked below it:
             Practice, an NMR preview (¹³C or ¹H), the stereoisomers, the tautomers, the

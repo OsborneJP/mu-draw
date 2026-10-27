@@ -73,7 +73,7 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
   glassware.ts); Practice, NMR previews, stereoisomers, tautomers/resonance (FormsPanel.tsx), Safety
   (ghsPictograms.ts) and 3D view (viewer3d.ts loads 3Dmol) dock below the canvas (Docked.tsx), one at a time
   (belowCanvas.ts): state in nmr/protonNmr/stereo/forms/safety/threeD.ts, *Store.ts wiring, panelWorker.ts.
-- `web/src/`: api.ts (`<base>api/*`, 8 s), pubchemPage.ts; pwa/ (SW, updates, Reload); shell/ (header, badge, About, banner).
+- `web/src/`: api.ts (`<base>api/*`, 8 s), pubchemPage.ts; pwa/ (SW, updates, Reload, install offer); shell/ (header, badge, About, banners).
 - `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H); practice.json; glassware/; ghs/.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`

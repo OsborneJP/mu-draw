@@ -100,7 +100,9 @@
   font-size: 13px;
 }
 
-.update-banner {
+/* The update banner, and the install strip under it (InstallStrip.tsx), look alike. */
+.update-banner,
+.install-strip {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,7 +113,8 @@
   font-size: 14px;
 }
 
-.update-banner button {
+.update-banner button,
+.install-strip button {
   padding: 3px 14px;
   border: 1px solid var(--mu-black);
   border-radius: 4px;
@@ -121,12 +124,25 @@
   cursor: pointer;
 }
 
-.update-banner button:hover {
+.update-banner button:hover,
+.install-strip button:hover {
   color: var(--mu-gold);
 }
 
+/* Not now: the quieter of the strip's two buttons. */
+.install-strip button.secondary {
+  background: #fff;
+  color: var(--mu-black);
+}
+
+.install-strip button.secondary:hover {
+  background: #f2f2f2;
+  color: var(--mu-black);
+}
+
 /* A gold ring inside, a black one outside: visible on the banner's pale yellow too. */
-.update-banner button:focus-visible {
+.update-banner button:focus-visible,
+.install-strip button:focus-visible {
   outline: 2px solid var(--mu-black);
   outline-offset: 2px;
   box-shadow: inset 0 0 0 2px var(--mu-gold);

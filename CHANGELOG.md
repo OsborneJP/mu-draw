@@ -200,6 +200,10 @@ All notable changes to this project. The format follows
   time). It says where the model came from, that a molecule takes many shapes, and when the
   drawing leaves stereo undefined. Needs an internet connection. Shown with 3Dmol.js 2.5.5,
   as ProteinFirst does. Needs the API service restarted (new endpoint `/api/conformer`).
+- An offer to install the app: in Chrome and Edge, while the browser can install it, a strip
+  under the header says "Install MU Draw as an app: it opens in its own window, like your other
+  apps, and works offline." Install opens the browser's own install dialog; Not now hides the
+  strip for good in that browser, and About keeps an "Install as an app" button.
 
 ### Changed
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."

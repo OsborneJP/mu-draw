@@ -1773,3 +1773,23 @@ Plan and measurements: docs/plans/acs-style-default.md.
   atom centre reaches over the label, so the app's skips bonds into an abbreviation. With a
   functional group in hand, the tool's findItems is atoms only, but its preview still asks
   for atoms and bonds.
+
+## Install offer (2026-10-27)
+- Chrome and Edge fire `beforeinstallprompt` only when the app can be installed there, isn't
+  installed there already and isn't running as the installed app. `preventDefault()` keeps
+  it; its `prompt()` must be called inside the click (user activation) and works once per
+  event. Safari and Firefox fire nothing. The app's listener is registered by an import in
+  main.tsx, before the app is drawn; module scripts run before the load event, and the offer
+  comes after it.
+- Chrome for Testing fires the real event in the smoke tests' browser (full Chromium,
+  headless) with `--bypass-app-banner-engagement-checks`, and may fire it without that switch
+  after some use of the site. So the fixture stops Chrome's (trusted) offers in every test
+  unless a test sets `browserInstallOffers`, and counts what it stops; a test's own
+  (untrusted) offers pass. A capture listener on window, added by an init script, runs ahead
+  of the app's own listener on the same target.
+- After the student cancels the dialog, Chrome fires `beforeinstallprompt` again at once; the
+  app keeps it for About but keeps the strip away for the visit. `navigator.userActivation
+  .isActive` at `prompt()` shows the call came from the click; Chrome's own prompt() can be
+  watched by wrapping `BeforeInstallPromptEvent.prototype.prompt` in an init script.
+- A browser tab's `display-mode` is `browser`; an installed app's is standalone, minimal-ui,
+  window-controls-overlay or tabbed, so "not browser" is the test for the installed app.

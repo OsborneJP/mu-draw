@@ -260,12 +260,16 @@ export interface App {
   newPage(): Promise<Page>;
 }
 
-export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: string[] }>({
+export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: string[]; browserInstallOffers: boolean }>({
   /** Serve a copy of the build that the test may change (publishSecondBuild). */
   buildCopy: [false, { option: true }],
   /** Chromium's command-line switches, such as WebGL turned off (the 3D view). */
   browserArgs: [[], { option: true }],
-  app: async ({ buildCopy, browserArgs }, use, testInfo) => {
+  /** Let Chrome's own offers to install the app reach it. Off, every test sees no install
+   * strip unless it sends its own offer, so the strip can't push the canvas down mid-test
+   * (docs/plans/v2-install-prompt.md). */
+  browserInstallOffers: [false, { option: true }],
+  app: async ({ buildCopy, browserArgs, browserInstallOffers }, use, testInfo) => {
     const server = await startServer(buildCopy ? testInfo.outputPath('dist') : undefined);
     const problems: string[] = [];
     let failNow: (error: Error) => void = () => {};
@@ -317,6 +321,24 @@ export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: str
         if (problem) addProblem(`image source (${problem}) ${where}: ${url.slice(0, 80)}`);
       });
       await context.addInitScript(installPageGuards, { reloadButtonTestId: RELOAD_BUTTON_TEST_ID, appUrl: server.url });
+      if (!browserInstallOffers) {
+        // Ahead of the app's own listener: Chrome's offers (trusted events) stop here; a test's
+        // own (untrusted) offers go through.
+        await context.addInitScript(() => {
+          const w = window as unknown as { __browserOfferStopped: Promise<true> };
+          let stopped: (value: true) => void = () => {};
+          w.__browserOfferStopped = new Promise((resolve) => (stopped = resolve));
+          addEventListener(
+            'beforeinstallprompt',
+            (event) => {
+              if (!event.isTrusted) return;
+              event.stopImmediatePropagation();
+              stopped(true);
+            },
+            { capture: true },
+          );
+        });
+      }
       context.on('request', (request) => {
         requests.push(request);
         const problem = requestProblem(request.url(), server.url);
