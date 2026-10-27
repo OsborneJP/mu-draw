@@ -23,12 +23,16 @@ DOC = ROOT / "docs" / "server-setup.md"
 CSP_FILE = ROOT / "web" / "csp.json"
 CSP_WORKERS_FILE = ROOT / "web" / "csp-workers.json"
 VHOST = "/etc/apache2/sites-enabled/osbornelab.conf"
+# The vhost's access log (its CustomLog line); scripts/check_live.py reads it.
+ACCESS_LOG = "/var/log/apache2/osbornelab_access.log"
 CAMPUS = "10.0.0.0/8"
 # Production is public like /chemtutor, so CHEM-311 students can use it at home (Jeff,
 # 2026-10-25; it was campus and VPN only from 2026-10-23). True restricts it to campus and
 # VPN again: re-render, then re-apply the production block.
 PRODUCTION_CAMPUS_ONLY = False
 IMMUTABLE = "public, max-age=31536000, immutable"
+# The anonymous usage counts' largest body (server/main.py's MAX_COUNT_BODY).
+COUNT_BODY_LIMIT = 2048
 
 
 def serialise(directives: dict[str, list[str]]) -> str:
@@ -112,6 +116,11 @@ def worker_sections(t: Target, workers: dict[str, str]) -> list[str]:
     return lines
 
 
+def count_log_skip(config: AppConfig) -> str:
+    """The environment variable that keeps count requests out of the access log."""
+    return f"{config.name.replace('-', '_')}_count"
+
+
 def apache_block(t: Target, policy: str, workers: dict[str, str] | None = None) -> str:
     p = t.path
     lines = [
@@ -137,6 +146,14 @@ def apache_block(t: Target, policy: str, workers: dict[str, str] | None = None) 
         f'    Header set Cache-Control "{IMMUTABLE}"',
         "</Directory>",
         *worker_sections(t, workers or {}),
+        "# Anonymous usage counts (docs/plans/v2-usage-counts.md): never in the access log",
+        f"# (the vhost's CustomLog line ends env=!{count_log_skip(t.config)}), never over 2 KB.",
+        "# The API takes a count only with the header, so none is stored until this is applied.",
+        f'SetEnvIf Request_URI "^/{p}/api/count$" {count_log_skip(t.config)}',
+        f'RequestHeader set X-Unlogged-Count "1" env={count_log_skip(t.config)}',
+        f'<Location "/{p}/api/count">',
+        f"    LimitRequestBody {COUNT_BODY_LIMIT}",
+        "</Location>",
     ]
     if t.name == "staging":
         lines += [
@@ -333,7 +350,30 @@ Only after staging has passed (`scripts/deploy.sh --production` refuses otherwis
 
 {unit_install(production, uvicorn)}
 
-## (c) Later
+## (c) Anonymous usage counts: apply before deploying them
+
+The counts (docs/plans/v2-usage-counts.md) promise that a count request is never in Apache's
+access log and never over {COUNT_BODY_LIMIT} bytes. The API takes a count only when Apache has
+marked it as kept out of the log (the `X-Unlogged-Count` header the blocks set), so until this
+is applied it stores nothing, and the live checks fail. Apply it before deploying the counts.
+
+1. Back up the vhost as in (a) step 2.
+2. Replace the staging and the production blocks (from their `BEGIN` line to their `END`
+   line) with the blocks in (a) step 3 and in (b). Each now ends with the count settings.
+3. In `{VHOST}`, inside `<VirtualHost *:443>`, add ` env=!{count_log_skip(config)}` to the end
+   of the `CustomLog` line, so it reads like
+   `CustomLog ${{APACHE_LOG_DIR}}/{Path(ACCESS_LOG).name} combined env=!{count_log_skip(config)}`.
+   It applies only to requests the blocks mark; everything else is logged as before.
+4. Run `sudo apache2ctl configtest && sudo systemctl reload apache2` (restore `$BAK` if
+   configtest fails, as in (a) step 4).
+5. Deploy as usual: `scripts/deploy.sh staging`. The API code changed, so it stops and prints
+   `sudo systemctl restart {staging.unit}`; run that, then `scripts/deploy.sh --smoke-only
+   staging`. Production the same way when promoting. The live checks send a deliberately
+   wrong count and an oversized one, which count nothing; the wrong one gets the API's own
+   refusal only through a marked request (steps 1 and 2), and the checks then read
+   `{ACCESS_LOG}` to see that neither was logged (step 3).
+
+## (d) Later
 
 - **Restarting after server changes.** deploy.sh can't restart services (no sudo). When
   the code the service runs changed (`server/`, but not its tests or fixture scripts,
@@ -353,6 +393,10 @@ Only after staging has passed (`scripts/deploy.sh --production` refuses otherwis
 - **Name cache.** Get name keeps PubChem's answers for 30 days in
   `/var/lib/<unit>/name-cache.sqlite` (outside the deployed code, which deploys replace).
   Chemistry only: canonical SMILES, CID, names, time looked up. Deleting it is harmless.
+- **Usage totals.** `/var/lib/<unit>/usage.sqlite` holds the anonymous weekly totals: week,
+  item and count, nothing else. `python scripts/usage_report.py` prints them (add
+  `--target staging` for staging's). Deleting the file deletes the totals; there is nothing
+  per student to delete.
 - **Renaming the app.** Edit `app.config.json`, re-render this file, create the new conda
   env (`conda env create -n <new name> -f environment.yml`), redeploy to the new folders,
   apply the new Apache blocks and units, then remove the old ones.

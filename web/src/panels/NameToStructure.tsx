@@ -4,6 +4,7 @@ import { placeInHand } from '../editor/placeInHand';
 import { useOnline } from '../shell/useOnline';
 import { drawName, isBusy, subscribeNameState } from './naming';
 import { useHasAtoms } from './useHasAtoms';
+import { countUse } from '../usage/start';
 
 const OFFLINE = 'Needs an internet connection';
 
@@ -22,7 +23,9 @@ export default function NameToStructure() {
   const canDraw = usable && typed !== '';
 
   function draw(mode: 'add' | 'replace') {
-    if (ketcher && canDraw) void drawName(ketcher, typed, mode, placeInHand);
+    if (!ketcher || !canDraw) return;
+    countUse('name-to-structure');
+    void drawName(ketcher, typed, mode, placeInHand);
   }
 
   return (

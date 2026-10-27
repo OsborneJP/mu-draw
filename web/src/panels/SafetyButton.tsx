@@ -4,6 +4,7 @@ import { useOnline } from '../shell/useOnline';
 import { makeRoomFor } from './belowCanvas';
 import { drawingChanged, getSafetyState, isAsking, lookUpSafety, subscribeSafetyState } from './safety';
 import { useHasAtoms } from './useHasAtoms';
+import { countUse } from '../usage/start';
 
 // Safety (header, after Get name): greyed while offline (it needs the server and PubChem),
 // while the canvas has no atoms, and while a lookup is on its way. The drawing goes to the
@@ -31,6 +32,7 @@ export default function SafetyButton() {
       title={reason ?? 'Look up GHS hazards for this structure in PubChem'}
       onClick={() => {
         if (!ketcher) return;
+        countUse('safety');
         makeRoomFor('safety'); // one panel below the canvas at a time
         void lookUpSafety(ketcher);
       }}

@@ -1793,3 +1793,29 @@ Plan and measurements: docs/plans/acs-style-default.md.
   watched by wrapping `BeforeInstallPromptEvent.prototype.prompt` in an init script.
 - A browser tab's `display-mode` is `browser`; an installed app's is standalone, minimal-ui,
   window-controls-overlay or tabbed, so "not browser" is the test for the installed app.
+
+## Anonymous usage counts (2026-10-27)
+- Playwright's clock (`page.clock.install({ time })`, then `setSystemTime` and a reload) sets
+  the device's date across reloads with time still running, so week boundaries are tested
+  without waiting. `runFor(8000)` fires the request's deadline timer.
+- `navigator.locks` is shared by every tab of a profile in the test browser, so two tabs'
+  races are forced: hold the count stub's answer, open the second tab, then release.
+- A context route sees the page's fetch to api/count (the service worker has no route for
+  it). `request.headers()` omits cookies; `allHeaders()` shows them. A plain `fetch` sends a
+  referrer, which the count guard reports; the app sends with `credentials: 'omit'` and
+  `referrerPolicy: 'no-referrer'`.
+- `context.setOffline(false)` fires the page's `online` event, which the app uses to send a
+  waiting summary.
+- The vhost's single CustomLog line can't be scoped from inside the app's block; the block
+  marks the path (SetEnvIf) and the CustomLog line skips the mark (`env=!…`), a one-line edit a
+  person applies (docs/server-setup.md (c)).
+- SQLite keeps a page's rows in the order they were written, even in a WITHOUT ROWID table,
+  and a freed row's bytes stay in the file. `PRAGMA secure_delete = ON` plus `VACUUM` after each
+  write makes the file depend only on its contents (server/usage.py; a test compares bytes).
+- `navigator.locks.request` rejects when the site's data is blocked; the app must still
+  settle. In tests, `page.clock.pauseAt(date)` stops timers (such as the request deadline)
+  while promises and the network go on, which forces orderings without a time budget.
+- Apache's `RequestHeader set … env=<var>` lets the API see that a request was marked (here,
+  kept out of the access log), so the API can refuse work until a person has applied the
+  Apache change, and a live check proves the change is there.
+

@@ -2,19 +2,23 @@
 
 POST /api/name names a structure from PubChem (Get name). POST /api/structure draws a name
 (Name to structure): OPSIN first (server/opsin.py, local), then PubChem's name lookup. POST
-/api/safety gives a structure's GHS hazard classification from PubChem (server/ghs.py), and
-/api/conformer gives the 3D view its model (server/threed.py). Rules
+/api/safety gives a structure's GHS hazard classification from PubChem (server/ghs.py),
+/api/conformer gives the 3D view its model (server/threed.py), and POST /api/count adds a
+browser's anonymous weekly summary to the usage totals (server/usage.py). Rules
 for every endpoint here (see AGENTS.md): SMILES and names travel in POST bodies only, request
 bodies are never logged, and user input never goes into exception or log messages.
 
-The name cache lives in $STATE_DIRECTORY (systemd's StateDirectory=); the service refuses to
-start without it. Importing this module needs no configuration (deploy.sh checks the import).
+The name cache and the usage totals live in $STATE_DIRECTORY (systemd's StateDirectory=); the
+service refuses to start without it. Importing this module needs no configuration (deploy.sh
+checks the import).
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import logging
 import os
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
@@ -23,13 +27,14 @@ from typing import Annotated
 
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, StringConstraints
+from fastapi.responses import JSONResponse, Response
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 from rdkit import Chem
 
 import chem
 import ghs
 import threed
+import usage
 from cache import NameCache
 from opsin import COMMAND as OPSIN_COMMAND
 from opsin import Opsin, OpsinUnavailable
@@ -48,6 +53,11 @@ log = logging.getLogger("naming")
 CACHE_FILE = "name-cache.sqlite"
 MAX_SMILES = 10_000
 MAX_NAME = 300
+# A browser's summary is a few hundred bytes; Apache refuses more than this too.
+MAX_COUNT_BODY = 2048
+# Apache sets this on count requests it keeps out of its access log (docs/server-setup.md (c)).
+# Without it, counts would sit in that log beside an address, so none is taken.
+UNLOGGED = "x-unlogged-count"
 
 
 class NameRequest(BaseModel):
@@ -62,6 +72,24 @@ class StructureRequest(BaseModel):
             strip_whitespace=True, min_length=1, max_length=MAX_NAME, pattern=r"^[^\x00-\x1f\x7f]*$"
         ),
     ]
+
+
+class WeekSummary(BaseModel):
+    """One browser's week (web/src/usage/usage.ts). Exactly these fields, nothing else."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+    week: Annotated[str, StringConstraints(pattern=r"^\d{4}-W\d{2}$")]
+    days: int = Field(ge=1, le=7)
+    installed: bool
+    first: bool
+    tools: list[Annotated[str, StringConstraints(pattern=r"^[a-z0-9-]{1,40}$")]] = Field(
+        max_length=40
+    )
+
+
+class CountRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    weeks: list[WeekSummary] = Field(min_length=1, max_length=usage.MAX_WEEKS)
 
 
 @dataclass
@@ -152,6 +180,7 @@ def create_app(
                 "(StateDirectory= in the systemd unit; see docs/server-setup.md)"
             )
         cache = NameCache(Path(folder) / CACHE_FILE, **({"clock": clock} if clock else {}))
+        app.state.counts = usage.UsageCounts(Path(folder) / usage.USAGE_FILE)
         retry_sleep = {"sleep": sleep} if sleep else {}
         opsin = Opsin(opsin_command)
         try:
@@ -167,6 +196,7 @@ def create_app(
         finally:
             await opsin.close()
             cache.close()
+            app.state.counts.close()
 
     app = FastAPI(
         title="Structure naming API",
@@ -185,6 +215,35 @@ def create_app(
             "auto_configure": False,
         },
     )
+
+    known_tools = usage.tool_names()
+    now = clock or time.time
+
+    @app.post("/api/count")
+    async def count(request: Request):
+        # Never reads the client's address: nothing here could tell one browser from another.
+        # A browser that asks not to be tracked (Global Privacy Control) is never counted.
+        if request.headers.get("sec-gpc") == "1":
+            return Response(status_code=204)
+        if request.headers.get(UNLOGGED) != "1":
+            return JSONResponse({"error": "not_ready"}, status_code=503)
+        body = bytearray()
+        async for chunk in request.stream():
+            body += chunk
+            if len(body) > MAX_COUNT_BODY:
+                return JSONResponse({"error": "too_large"}, status_code=413)
+        try:
+            weeks = CountRequest.model_validate_json(bytes(body)).weeks
+        except ValidationError:
+            return JSONResponse({"error": "invalid_count"}, status_code=400)
+        today = dt.date.fromtimestamp(now())
+        if not all(usage.week_in_window(week.week, today) for week in weeks):
+            return JSONResponse({"error": "invalid_count"}, status_code=400)
+        summaries = [
+            usage.Summary(w.week, w.days, w.installed, w.first, tuple(w.tools)) for w in weeks
+        ]
+        request.app.state.counts.add(summaries, known_tools)
+        return Response(status_code=204)
 
     @app.get("/api/health")
     def health() -> dict[str, bool]:

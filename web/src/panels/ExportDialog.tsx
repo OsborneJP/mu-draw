@@ -2,6 +2,7 @@ import { useRef, useState, useSyncExternalStore } from 'react';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { SCALES, savePng, saveSvg, type Outcome, type Scale } from './exportImage';
 import './export.css';
+import { countUse } from '../usage/start';
 
 const EXPORT_EMPTY = 'Nothing to export: the drawing is empty.';
 const EXPORT_FAILED = "Couldn't make the image. If the drawing is very large, try a smaller size.";
@@ -16,6 +17,7 @@ export default function ExportDialog() {
   const [message, setMessage] = useState('');
 
   async function run(save: () => Promise<Outcome>) {
+    countUse('export');
     setMessage('');
     try {
       if ((await save()) === 'empty') setMessage(EXPORT_EMPTY);

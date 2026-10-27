@@ -200,6 +200,12 @@ All notable changes to this project. The format follows
   time). It says where the model came from, that a molecule takes many shapes, and when the
   drawing leaves stereo undefined. Needs an internet connection. Shown with 3Dmol.js 2.5.5,
   as ProteinFirst does. Needs the API service restarted (new endpoint `/api/conformer`).
+- Anonymous weekly usage counts: once a week each browser sends a summary of the week before
+  (on how many days the app was open, whether as the installed app, whether it was new, and
+  which tools were used, Practice apart), with no identifier or cookie; the server keeps only
+  weekly totals, and `scripts/usage_report.py` prints them. About says so and has a switch to
+  turn it off; Global Privacy Control turns it off too. Needs the API services restarted and
+  the Apache change in docs/server-setup.md section (c).
 - An offer to install the app: in Chrome and Edge, while the browser can install it, a strip
   under the header says "Install MU Draw as an app: it opens in its own window, like your other
   apps, and works offline." Install opens the browser's own install dialog; Not now hides the

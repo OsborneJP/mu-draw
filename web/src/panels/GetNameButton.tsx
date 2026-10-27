@@ -3,6 +3,7 @@ import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { useOnline } from '../shell/useOnline';
 import { drawingChanged, getNameState, isBusy, nameDrawing, subscribeNameState } from './naming';
 import { useHasAtoms } from './useHasAtoms';
+import { countUse } from '../usage/start';
 
 // Get name (header): greyed while offline (it needs the server and PubChem), while the canvas
 // has no atoms, and while a request is on its way. Any change to the drawing closes the panel
@@ -28,7 +29,11 @@ export default function GetNameButton() {
       data-testid="app-get-name-button"
       disabled={!ketcher || reason !== null || busy}
       title={reason ?? "Look up this structure's name in PubChem"}
-      onClick={() => ketcher && void nameDrawing(ketcher)}
+      onClick={() => {
+        if (!ketcher) return;
+        countUse('get-name');
+        void nameDrawing(ketcher);
+      }}
     >
       {naming ? 'Naming…' : 'Get name'}
     </button>

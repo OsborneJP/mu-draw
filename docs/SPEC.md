@@ -180,9 +180,10 @@ The app collects no education records: there are no accounts, no per-student log
 
 - **No sign-in.** Anyone with the URL can install and use it.
 - **Drawings stay local.** Autosave uses the browser's own storage on that device; nothing is uploaded unless the student presses a naming button.
-- **What leaves the device:** only a SMILES string or a typed chemical name, sent to osbornelab, and from there to PubChem or EBI. No name, email, student ID, or course is attached.
+- **What leaves the device:** only a SMILES string or a typed chemical name, sent to osbornelab, and from there to PubChem or EBI, and once a week the anonymous usage summary below. No name, email, student ID, or course is attached.
 - **Server logs.** FastAPI does not log request bodies. Apache access logs still record IP addresses and paths; since lookups are POSTs, the paths are just `/api/name` and `/api/structure`. Rotate logs on the normal schedule.
-- **No analytics or third-party scripts.** All JavaScript and WebAssembly is served from osbornelab, so no CDN or tracker sees student traffic.
+- **No third-party scripts or trackers.** All JavaScript and WebAssembly is served from osbornelab, so no CDN or tracker sees student traffic.
+- **Anonymous weekly usage counts** (added 2026-10-27; docs/plans/v2-usage-counts.md). Once a week, each browser sends a summary of the week before: on how many days the app was open, whether as the installed app, whether it was that browser's first week, and which tools were used. It has no identifier and no cookie, and Apache doesn't log it. The server keeps only weekly totals: week, item and count. Practice is not counted. Global Privacy Control, or the switch in About, turns counting off.
 - **Practice mode (v2)** must follow the same rule as chem-tutor: no per-student records unless it moves into Canvas, where Manchester already governs grade data.
 
 ## Build and deployment

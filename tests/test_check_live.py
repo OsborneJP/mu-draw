@@ -40,7 +40,7 @@ def good_results() -> dict[str, cl.Fetched]:
         body = json.dumps(e.body_json).encode() if e.body_json is not None else b""
         if e.body_fields is not None:
             body = json.dumps(nested(e.body_fields)).encode()
-        results[e.path] = cl.Fetched(200, headers, body)
+        results[e.path] = cl.Fetched(e.status, headers, body)
     return results
 
 
@@ -198,3 +198,45 @@ def test_ir_hint_table_must_be_this_commits():
     results = good_results()
     results[cl.IR_BANDS].body = json.dumps(edited).encode()
     assert f"{cl.IR_BANDS}: body" in cl.check(results, expected, POLICY, WORKERS)[0]
+
+
+def test_the_count_endpoint_must_be_live_and_refuse_a_wrong_summary():
+    expected = cl.expectations(FILES)
+    results = good_results()
+    assert results["api/count?live-check-shape"].status == 400
+    results["api/count?live-check-shape"] = cl.Fetched(404, {}, b"")  # the API not restarted yet
+    assert cl.check(results, expected, POLICY, WORKERS) == ["api/count?live-check-shape: HTTP 404"]
+    results = good_results()
+    results["api/count?live-check-shape"] = cl.Fetched(204, {}, b"")  # counted it
+    assert cl.check(results, expected, POLICY, WORKERS) == ["api/count?live-check-shape: HTTP 204"]
+    results = good_results()
+    results["api/count?live-check-shape"] = cl.Fetched(400, {}, b'{"detail": "other"}')
+    assert "api/count?live-check-shape: body" in cl.check(results, expected, POLICY, WORKERS)[0]
+
+
+def test_an_oversized_count_must_be_refused():
+    expected = cl.expectations(FILES)
+    results = good_results()
+    results["api/count?live-check-size"] = cl.Fetched(204, {}, b"")
+    assert cl.check(results, expected, POLICY, WORKERS) == ["api/count?live-check-size: HTTP 204"]
+
+
+def test_count_checks_go_first_so_their_log_lines_are_written_by_the_end():
+    paths = [e.path for e in cl.expectations(FILES, "live-abc")]
+    assert paths[:2] == ["api/count?live-abc-shape", "api/count?live-abc-size"]
+
+
+def test_a_count_request_of_this_run_in_apaches_log_is_a_problem():
+    line = '10.95.20.32 - - [27/Oct/2026] "POST /app/api/count?live-abc-shape HTTP/1.1" 400 31'
+    other = '10.0.0.9 - - [27/Oct/2026] "POST /app/api/count?live-xyz-size HTTP/1.1" 413 0'
+    assert cl.logged_counts(f"{other}\n{line}\n", "live-abc") == [
+        "Apache logged 1 count request(s): apply docs/server-setup.md (c) step 3"
+    ]
+    assert cl.logged_counts(f"{other}\n", "live-abc") == []
+
+
+def test_the_log_is_read_from_its_end(tmp_path):
+    log = tmp_path / "access.log"
+    log.write_text("old line\n" * 100 + "new line\n")
+    assert cl.log_tail(log, size=20).endswith("new line\n")
+    assert "old line\nold line" not in cl.log_tail(log, size=12)

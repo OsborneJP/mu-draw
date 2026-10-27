@@ -431,7 +431,11 @@ test('practising stores nothing and sends nothing', async ({ app }) => {
   expect(await check(page)).toBe('correct');
   await page.getByTestId('practice-close').click();
   expect(await storage()).toEqual(before);
-  const uploads = app.requests.filter((r) => r.method() !== 'GET').map((r) => `${r.method()} ${r.url()}`);
+  // Apart from an anonymous weekly count (a run that crosses Monday midnight may send one),
+  // whose body the fixture checks holds nothing else.
+  const uploads = app.requests
+    .filter((r) => r.method() !== 'GET' && !r.url().endsWith('/api/count'))
+    .map((r) => `${r.method()} ${r.url()}`);
   expect(uploads).toEqual([]);
 });
 

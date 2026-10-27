@@ -41,4 +41,6 @@ known-first-party = [
   "render_server_config",
   "threed",
   "record_conformers",
+  "usage",
+  "usage_report",
 ]

@@ -6,6 +6,7 @@ import { placeInHand } from '../editor/placeInHand';
 import { GLASSWARE, GLASSWARE_CREDIT, GLASSWARE_GROUPS, pickGlassware, pieceUrl, type Piece } from './glassware';
 import { GROUPS, heldTemplate, pickTemplate, subscribeTemplates, TEMPLATES, type Template } from './templates';
 import './templates.css';
+import { countUse } from '../usage/start';
 
 const PLACING = 'Click on the canvas to place it. Esc cancels.';
 // Decision 5: what Ketcher's other formats do with glassware, said where students pick it.
@@ -80,11 +81,13 @@ export default function TemplatesMenu() {
 
   function pick(template: Template) {
     setOpen(false);
+    countUse('templates');
     if (ketcher) void pickTemplate(ketcher, template, placeInHand);
   }
 
   function pickPiece(piece: Piece) {
     setOpen(false);
+    countUse('glassware');
     if (ketcher) void pickGlassware(ketcher, piece, placeInHand);
   }
 

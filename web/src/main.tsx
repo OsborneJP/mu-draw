@@ -9,6 +9,7 @@ import { blockDebugHotkeys } from './editor/debugHotkeys';
 import { addFormulaButton } from './editor/formulaText';
 import './index.css';
 import { registerServiceWorker } from './pwa/register';
+import { startUsage } from './usage/start';
 
 // Before the editor exists, so this listener runs ahead of Ketcher's.
 blockDebugHotkeys();
@@ -19,3 +20,5 @@ const root = document.getElementById('root');
 if (!root) throw new Error('index.html is missing #root');
 createRoot(root).render(<App />);
 registerServiceWorker();
+// Anonymous weekly usage counts (docs/plans/v2-usage-counts.md).
+startUsage();

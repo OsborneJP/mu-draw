@@ -1,6 +1,7 @@
 import type { FormsKind } from '../chem/formPictures';
 import { makeRoomFor } from './belowCanvas';
 import { showForms } from './formsStore';
+import { countUse } from '../usage/start';
 
 // The properties panel's "Tautomers and resonance" section (docs/plans/v2-tautomers-
 // resonance.md): two buttons for one structure; for more, a note instead. The lists show in
@@ -19,10 +20,16 @@ export default function FormsButtons({ fragments }: { fragments: number }) {
         </p>
       ) : (
         <div className="forms-buttons">
-          <button type="button" data-testid="tautomers-show" onClick={() => open('tautomers')}>
+          <button type="button" data-testid="tautomers-show" onClick={() => {
+            countUse('tautomers');
+            open('tautomers');
+          }}>
             Show tautomers
           </button>
-          <button type="button" data-testid="resonance-show" onClick={() => open('resonance')}>
+          <button type="button" data-testid="resonance-show" onClick={() => {
+            countUse('resonance');
+            open('resonance');
+          }}>
             Show resonance structures
           </button>
         </div>

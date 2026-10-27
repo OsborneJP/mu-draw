@@ -131,11 +131,11 @@ test('once the app is installed, the strip goes', async ({ app }) => {
 
 test('running as the installed app, an offer is not taken and nothing shows', async ({ app }) => {
   const { page } = app;
-  // A browser tab matches display-mode browser; the installed app's window doesn't.
+  // The installed app's window matches display-mode standalone (this app's manifest).
   await page.addInitScript(() => {
     const matchMedia = window.matchMedia.bind(window);
     window.matchMedia = (query: string) =>
-      query === '(display-mode: browser)' ? ({ ...matchMedia(query), matches: false } as MediaQueryList) : matchMedia(query);
+      query === '(display-mode: standalone)' ? ({ ...matchMedia(query), matches: true } as MediaQueryList) : matchMedia(query);
   });
   await openEditor(app);
   expect(await offer(page)).toBe(false);

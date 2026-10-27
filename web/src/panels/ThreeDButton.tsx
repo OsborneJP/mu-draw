@@ -3,6 +3,7 @@ import { useOnline } from '../shell/useOnline';
 import { makeRoomFor } from './belowCanvas';
 import { OFFLINE } from './threeD';
 import { getThreeDState, openThreeD, subscribeThreeDState } from './threeDStore';
+import { countUse } from '../usage/start';
 
 // The properties panel's "Show in 3D" (docs/plans/v2-3d-view.md): the model comes from the
 // server (PubChem's, or RDKit's), so it is greyed offline, with the reason in view. The model
@@ -19,6 +20,7 @@ export default function ThreeDButton() {
         data-testid="threed-open"
         disabled={!online || loading}
         onClick={() => {
+          countUse('3d-view');
           makeRoomFor('threeD'); // one panel below the canvas at a time
           openThreeD();
         }}

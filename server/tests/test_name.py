@@ -13,6 +13,7 @@ import chem
 import main
 from fakes import FAKE_OPSIN, FakePubChem
 from pubchem import COMPOUND_PAGE, RateLimit
+from usage import USAGE_FILE
 
 SERVER = Path(main.__file__).parent
 NOT_FOUND = {"PropertyTable": {"Properties": [{"CID": 0}]}}
@@ -171,11 +172,11 @@ def test_the_service_needs_a_state_directory(monkeypatch):
         pass
 
 
-def test_the_cache_lives_in_the_state_directory(monkeypatch, tmp_path):
+def test_the_cache_and_the_usage_totals_live_in_the_state_directory(monkeypatch, tmp_path):
     monkeypatch.setenv("STATE_DIRECTORY", str(tmp_path))
     with TestClient(main.create_app()):
         pass
-    assert [p.name for p in tmp_path.iterdir()] == [main.CACHE_FILE]
+    assert sorted(p.name for p in tmp_path.iterdir()) == sorted([main.CACHE_FILE, USAGE_FILE])
 
 
 def test_importing_main_needs_no_state_directory():

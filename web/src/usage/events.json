@@ -1,0 +1,19 @@
+{
+  "about": "The tools that anonymous usage counts can name (docs/plans/v2-usage-counts.md). Append-only: never reuse or remove a name, so older copies of the app are still counted. server/usage_events.json must be an exact copy.",
+  "tools": [
+    "name-to-structure",
+    "get-name",
+    "safety",
+    "copy-image",
+    "export",
+    "templates",
+    "glassware",
+    "nmr-13c",
+    "nmr-1h",
+    "stereoisomers",
+    "tautomers",
+    "resonance",
+    "3d-view",
+    "group"
+  ]
+}

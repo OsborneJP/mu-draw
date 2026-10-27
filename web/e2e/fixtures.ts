@@ -3,9 +3,12 @@
 // violations, popups, websockets, same-origin HTTP errors, any request outside the
 // app's own origin and base path (invariant 1), any link that leads outside it except to a
 // PubChem compound page (the one way out, which only the student's click takes), any SVG
-// image drawn from anything but a base64 PNG or SVG or the app's own files, and the
+// image drawn from anything but a base64 PNG or SVG or the app's own files, the
 // app reloading itself or letting a new build take over without the student clicking the
-// update banner.
+// update banner, and an anonymous usage count that isn't exactly a weekly summary
+// (docs/plans/v2-usage-counts.md; api/count is answered here in every test, live runs
+// included, so no test ever counts itself). Chrome's own offers to install the app are kept
+// away unless a test lets them through (browserInstallOffers).
 //
 // Local runs serve DIST_DIR (default dist) at BASE (default staging) with Vite's preview
 // server. With SMOKE_URL set, the tests run against that deployed URL instead.
@@ -16,6 +19,7 @@ import {
   type BrowserContext,
   type Page,
   type Request,
+  type Route,
 } from '@playwright/test';
 import { cpSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -238,8 +242,50 @@ function installPageGuards({ reloadButtonTestId, appUrl }: { reloadButtonTestId:
     __editorReady: once('editor-ready'),
     __indigoReady: once('struct-service-initialized'),
     __swRegistered: once('sw-registered'),
+    __usageSettled: once('usage-settled'),
   });
 }
+
+/** The tools a count may name (src/usage/events.json). */
+const COUNTED_TOOLS: readonly string[] = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../src/usage/events.json', import.meta.url)), 'utf8'),
+).tools;
+const SUMMARY_KEYS = ['days', 'first', 'installed', 'tools', 'week'];
+
+/** Why a count request is not exactly an anonymous weekly summary, or null if it is: a POST to
+ * the app's own api/count with nothing in the URL, no cookie and no referrer, and a body of
+ * exactly the summary's fields (server/main.py's CountRequest). */
+export function countProblem(method: string, url: string, headers: Record<string, string>, body: string, appUrl: string): string | null {
+  if (method !== 'POST') return `method ${method}`;
+  if (url !== new URL('api/count', appUrl).href) return `url ${url}`;
+  if ('cookie' in headers) return 'a cookie';
+  if ('referer' in headers) return 'a referrer';
+  let value: unknown;
+  try {
+    value = JSON.parse(body);
+  } catch {
+    return 'a body that is not JSON';
+  }
+  const weeks = (value as { weeks?: unknown } | null)?.weeks;
+  if (typeof value !== 'object' || value === null || Object.keys(value).join() !== 'weeks') return 'keys other than weeks';
+  if (!Array.isArray(weeks) || weeks.length < 1 || weeks.length > 3) return 'not one to three weeks';
+  for (const week of weeks as Record<string, unknown>[]) {
+    if (Object.keys(week).sort().join() !== SUMMARY_KEYS.join()) return `summary keys ${Object.keys(week)}`;
+    if (typeof week.week !== 'string' || !/^\d{4}-W\d{2}$/.test(week.week)) return 'a week that is not YYYY-Www';
+    if (!Number.isInteger(week.days) || (week.days as number) < 1 || (week.days as number) > 7) return 'days not 1 to 7';
+    if (typeof week.installed !== 'boolean' || typeof week.first !== 'boolean') return 'installed or first not true or false';
+    const tools = week.tools;
+    if (!Array.isArray(tools) || new Set(tools).size !== tools.length) return 'tools not a list without repeats';
+    const unknown = tools.filter((tool) => !COUNTED_TOOLS.includes(tool as string));
+    if (unknown.length > 0) return `tools not counted: ${unknown.join(', ')}`;
+  }
+  return null;
+}
+
+/** How the count stub answers a request: a status (204 taken, 4xx refused, 5xx failed),
+ * 'abort' (no answer: the network failed), or a promise of one, which holds the request
+ * until the test settles it. */
+export type CountAnswer = number | 'abort' | Promise<number | 'abort'>;
 
 export interface App {
   server: AppServer;
@@ -258,6 +304,10 @@ export interface App {
   relaunch(): Promise<void>;
   /** Open another tab in the same browser (the popup guard allows only these). */
   newPage(): Promise<Page>;
+  /** Every anonymous usage summary the app sent, in order: each body, parsed. */
+  counts: unknown[];
+  /** How the count stub answers the next requests, in turn; when empty, 204 (taken). */
+  countAnswers: CountAnswer[];
 }
 
 export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: string[]; browserInstallOffers: boolean }>({
@@ -283,6 +333,26 @@ export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: str
     };
     const requests: Request[] = [];
     const origin = new URL(server.url).origin;
+    const counts: unknown[] = [];
+    const countAnswers: CountAnswer[] = [];
+    // Count requests the test chose to refuse or fail: their 4xx and 5xx are expected.
+    const refusedCounts = new Set<Request>();
+    const countPath = new URL('api/count', server.url).pathname;
+    const answerCount = async (route: Route) => {
+      const request = route.request();
+      const body = request.postData() ?? '';
+      const problem = countProblem(request.method(), request.url(), await request.allHeaders(), body, server.url);
+      if (problem) addProblem(`count: ${problem}`);
+      try {
+        counts.push(JSON.parse(body));
+      } catch {
+        counts.push(body);
+      }
+      const answer = await (countAnswers.shift() ?? 204);
+      if (answer === 'abort') return route.abort('internetdisconnected');
+      if (answer >= 400) refusedCounts.add(request);
+      await route.fulfill({ status: answer, contentType: 'application/json', body: answer >= 400 ? '{"error":"test"}' : '' });
+    };
     const watch = (page: Page) => {
       page.on('pageerror', (error) => addProblem(`pageerror: ${error.message}`));
       page.on('websocket', (ws) => addProblem(`websocket: ${ws.url()}`));
@@ -321,6 +391,7 @@ export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: str
         if (problem) addProblem(`image source (${problem}) ${where}: ${url.slice(0, 80)}`);
       });
       await context.addInitScript(installPageGuards, { reloadButtonTestId: RELOAD_BUTTON_TEST_ID, appUrl: server.url });
+      await context.route((url) => url.pathname === countPath, answerCount);
       if (!browserInstallOffers) {
         // Ahead of the app's own listener: Chrome's offers (trusted events) stop here; a test's
         // own (untrusted) offers go through.
@@ -345,6 +416,7 @@ export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: str
         if (problem) addProblem(`request (${problem}): ${request.url()}`);
       });
       context.on('response', (response) => {
+        if (refusedCounts.has(response.request())) return;
         if (new URL(response.url()).origin === origin && response.status() >= 400) {
           addProblem(`HTTP ${response.status()}: ${response.url()}`);
         }
@@ -364,6 +436,8 @@ export const test = base.extend<{ app: App; buildCopy: boolean; browserArgs: str
       requests,
       problems,
       failed,
+      counts,
+      countAnswers,
       relaunch: async () => {
         await app.context.close();
         Object.assign(app, await launch());
@@ -388,8 +462,9 @@ export async function openEditor(app: App): Promise<void> {
 
 export async function waitForEditor(app: App, page: Page = app.page): Promise<void> {
   const ready = page.evaluate(() => {
-    const w = window as unknown as { __editorReady: Promise<true>; __indigoReady: Promise<true> };
-    return Promise.all([w.__editorReady, w.__indigoReady]);
+    const w = window as unknown as { __editorReady: Promise<true>; __indigoReady: Promise<true>; __usageSettled: Promise<true> };
+    // The opening's usage count decided too, so no test starts before it (src/usage/start.ts).
+    return Promise.all([w.__editorReady, w.__indigoReady, w.__usageSettled]);
   });
   await Promise.race([ready, app.failed]);
 }

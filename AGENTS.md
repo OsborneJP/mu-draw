@@ -16,11 +16,11 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
    and nothing else); the request and link guards on every smoke test (web/e2e/fixtures.ts; links per
    web/config/requestPolicy.ts); the built-HTML link check (checks/html.ts, incl. the relative icon
    link: Playwright can't see /favicon.ico); the GHS pictograms' allowlist (checks/svg.ts); Help/About hidden.
-2. No accounts, student identifiers, analytics, or logging of request bodies.
-   Enforced by: server/tests/test_privacy.py (a sentinel body never reaches logs), uvicorn
-   `--no-access-log`, FastAPI telemetry off, Ketcher's Alt+Shift+R debug shortcut blocked
-   (it put the drawing in the URL; web/src/editor/debugHotkeys.ts + online smoke test).
-   Accounts and analytics: review only.
+2. No accounts, student identifiers, or logging of request bodies; usage only as anonymous weekly
+   totals (docs/plans/v2-usage-counts.md). Enforced by: test_privacy.py (a sentinel body never reaches
+   logs), test_usage.py (week, item, count only), the fixture's count guard on every smoke test, Apache
+   kept off api/count (rendered), uvicorn `--no-access-log`, telemetry off, Ketcher's Alt+Shift+R blocked
+   (debugHotkeys.ts + online smoke test). Accounts: review only.
 3. Chemistry values come only from RDKit (and the tables in its source: chem/rdkitTables.json),
    Ketcher/Indigo, OPSIN, PubChem, NMRShiftDB2 (¹³C, ¹H shifts), Biopython (Bjellqvist pKa values)
    or the faculty-checked IR table web/public/ir-bands.json (every band cites its sources; one marked
@@ -73,17 +73,17 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
   glassware.ts); Practice, NMR previews, stereoisomers, tautomers/resonance (FormsPanel.tsx), Safety
   (ghsPictograms.ts) and 3D view (viewer3d.ts loads 3Dmol) dock below the canvas (Docked.tsx), one at a time
   (belowCanvas.ts): state in nmr/protonNmr/stereo/forms/safety/threeD.ts, *Store.ts wiring, panelWorker.ts.
-- `web/src/`: api.ts (`<base>api/*`, 8 s), pubchemPage.ts; pwa/ (SW, updates, Reload, install offer); shell/ (header, badge, About, banners).
+- `web/src/`: api.ts (`<base>api/*`, 8 s), pubchemPage.ts; pwa/ (SW, updates, install offer); shell/ (header, About, banners); usage/ (counts).
 - `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H); practice.json; glassware/; ghs/.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
   export.spec.ts reads PNG headers, pixels and the clipboard back; `holdable{Rdkit,Indigo,Biochem}Replies()`
   (fixtures.ts) hold workers' replies; naming specs hold API answers.
-- `server/main.py`: FastAPI `/api/health`, `name`, `structure`, `safety`, `conformer` (`create_app()` takes
+- `server/main.py`: FastAPI `/api/health`, `name`, `structure`, `safety`, `conformer`, `count` (`create_app()` takes
   fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py` (PubChem's GHS), `threed.py` (3D
-  models: RDKit.js can't embed), `cache.py` (SQLite in `$STATE_DIRECTORY`), `opsin.py` (pinned jar, Java).
-- `scripts/`: check.sh, deploy.sh, `lib/` (config, web, deploy), `checks/`, generators (build_glassware.py
+  models: RDKit.js can't embed), `cache.py` (SQLite in `$STATE_DIRECTORY`), `usage.py`, `opsin.py` (jar, Java).
+- `scripts/`: check.sh, deploy.sh, usage_report.py, `lib/`, `checks/`, generators (build_glassware.py
   cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json).
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
   replays), `functional_group*`, `nmr*`, `proton_nmr*`, `proton_rule*` (test sets; judgement provisional), `chemdraw/`.

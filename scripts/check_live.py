@@ -11,7 +11,9 @@ index.html, sw.js, the manifest, the RDKit files, the functional-group patterns 
 and ¹H shift tables (with their licence) revalidate (no-cache), and the patterns are this commit's;
 hashed assets are immutable;
 WebAssembly and the manifest have the right types; every page and worker script carries
-the build's CSP, exactly once, and the RDKit worker its own (web/csp-workers.json).
+the build's CSP, exactly once, and the RDKit worker its own (web/csp-workers.json); the usage
+count endpoint is live and refuses a wrong or oversized summary, counting nothing, and Apache
+kept both out of its access log (docs/server-setup.md (c)).
 """
 
 from __future__ import annotations
@@ -21,11 +23,12 @@ import re
 import sys
 import urllib.error
 import urllib.request
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from lib.appconfig import ROOT
-from render_server_config import IMMUTABLE, csp_policy, worker_policies
+from render_server_config import ACCESS_LOG, IMMUTABLE, csp_policy, worker_policies
 
 
 @dataclass
@@ -49,6 +52,7 @@ class Expect:
     post_json: object = None  # POST this as JSON instead of a GET
     # Only these parts of a JSON body, by dotted path ("classification.source").
     body_fields: dict[str, object] | None = None
+    status: int = 200
 
 
 FIXTURES = ROOT / "tests" / "fixtures"
@@ -115,13 +119,46 @@ def safety_check() -> Expect:
     )
 
 
+def count_checks(tag: str) -> list[Expect]:
+    """The usage count endpoint, live but counting nothing: a summary of the wrong shape gets
+    its own refusal (only through a request Apache marked as unlogged), and one over the size
+    limit is refused (docs/plans/v2-usage-counts.md). The query string, which Apache and the
+    API ignore, carries this run's tag, so the access log can be searched for them."""
+    return [
+        Expect(
+            f"api/count?{tag}-shape",
+            post_json={"weeks": []},
+            status=400,
+            body_json={"error": "invalid_count"},
+        ),
+        Expect(f"api/count?{tag}-size", post_json={"weeks": [], "pad": "x" * 3000}, status=413),
+    ]
+
+
+def logged_counts(log_tail: str, tag: str) -> list[str]:
+    """A problem for each of this run's count requests found in Apache's access log."""
+    found = [line for line in log_tail.splitlines() if f"api/count?{tag}" in line]
+    return (
+        [f"Apache logged {len(found)} count request(s): apply docs/server-setup.md (c) step 3"]
+        if found
+        else []
+    )
+
+
+def log_tail(path: Path, size: int = 4 << 20) -> str:
+    """The end of a log file: this run's lines are near it."""
+    with path.open("rb") as log:
+        log.seek(max(0, path.stat().st_size - size))
+        return log.read().decode("utf-8", "replace")
+
+
 def field_at(body: object, path: str) -> object:
     for key in path.split("."):
         body = body.get(key) if isinstance(body, dict) else None
     return body
 
 
-def expectations(dist_files: list[str]) -> list[Expect]:
+def expectations(dist_files: list[str], tag: str = "live-check") -> list[Expect]:
     def one(pattern: str) -> str:
         found = [f for f in dist_files if re.fullmatch(pattern, f)]
         if len(found) != 1:
@@ -129,6 +166,8 @@ def expectations(dist_files: list[str]) -> list[Expect]:
         return found[0]
 
     return [
+        # First, so Apache has long written their log lines when the log is read at the end.
+        *count_checks(tag),
         Expect("", cache="no-cache", content_type="text/html", csp=True),
         Expect("sw.js", cache="no-cache", csp=True),
         Expect(one(r"workbox-[\w-]+\.js")),
@@ -165,7 +204,7 @@ def check(
     for e in expected:
         got = results[e.path]
         where = e.path or "index.html"
-        if got.status != 200:
+        if got.status != e.status:
             problems.append(f"{where}: HTTP {got.status}")
             continue
         if e.cache is not None and got.header("cache-control") != [e.cache]:
@@ -210,7 +249,8 @@ def fetch(url: str, with_body: bool, post_json: object = None) -> Fetched:
             status, headers = response.status, response.headers
             body = response.read() if with_body else b""
     except urllib.error.HTTPError as error:
-        status, headers, body = error.code, error.headers, b""
+        status, headers = error.code, error.headers
+        body = error.read() if with_body else b""
     collected: dict[str, list[str]] = {}
     for name in set(headers.keys()):
         collected[name.lower()] = headers.get_all(name) or []
@@ -223,7 +263,8 @@ def main(argv: list[str]) -> int:
         return 2
     url, dist = argv[1].rstrip("/") + "/", Path(argv[2])
     files = [p.relative_to(dist).as_posix() for p in sorted(dist.rglob("*")) if p.is_file()]
-    expected = expectations(files)
+    tag = f"live-{uuid.uuid4().hex[:12]}"
+    expected = expectations(files, tag)
     results = {
         e.path: fetch(
             url + e.path,
@@ -233,6 +274,10 @@ def main(argv: list[str]) -> int:
         for e in expected
     }
     problems = check(results, expected, csp_policy(ROOT / "web" / "csp.json"), worker_policies())
+    try:
+        problems += logged_counts(log_tail(Path(ACCESS_LOG)), tag)
+    except OSError:
+        problems.append(f"can't read {ACCESS_LOG} to check that count requests aren't logged")
     for problem in problems:
         print(f"live: {problem}")
     if not problems:

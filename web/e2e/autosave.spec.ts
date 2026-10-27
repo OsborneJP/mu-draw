@@ -80,8 +80,12 @@ test('autosave: the drawing survives reloads offline, and Undo stops at the rest
   await waitForEditor(app);
   await expectDrawing(page, withRing);
 
-  // Nothing was uploaded: every request was a download of the app's own files.
-  const uploads = app.requests.filter((r) => r.method() !== 'GET').map((r) => `${r.method()} ${r.url()}`);
+  // Nothing was uploaded: every request was a download of the app's own files, apart from an
+  // anonymous weekly count (a run that crosses Monday midnight may send one), whose body the
+  // fixture checks holds nothing else.
+  const uploads = app.requests
+    .filter((r) => r.method() !== 'GET' && !r.url().endsWith('/api/count'))
+    .map((r) => `${r.method()} ${r.url()}`);
   expect(uploads).toEqual([]);
 });
 

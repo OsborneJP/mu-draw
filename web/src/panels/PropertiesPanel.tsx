@@ -15,6 +15,7 @@ import ThreeDButton from './ThreeDButton';
 import { makeRoomFor } from './belowCanvas';
 import { showStereoisomers } from './stereoStore';
 import './properties.css';
+import { countUse } from '../usage/start';
 
 // Properties panel (spec section 2): RDKit's values for the drawing as it changes, worked
 // out on the device in the RDKit worker (src/chem/rdkitWorker.ts). data-state lets tests
@@ -145,6 +146,7 @@ function Stereo({ stereo, fragments, current, highlighted, onToggle }: StereoPro
           data-testid="stereo-show"
           disabled={!current}
           onClick={() => {
+            countUse('stereoisomers');
             makeRoomFor('stereoisomers'); // one panel below the canvas at a time
             showStereoisomers();
           }}

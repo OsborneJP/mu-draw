@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+import main
 import render_server_config as rsc
 from conftest_sample import SAMPLE_CONFIG
 from lib.appconfig import parse
@@ -118,3 +119,33 @@ def test_rdkit_worker_gets_its_own_policy_and_only_it():
         assert section in rsc.apache_block(t, page, workers), name
     assert doc.count("'unsafe-eval'") == 2  # once per target, in the worker's section only
     assert f'Header set Content-Security-Policy "{page}"' in doc
+
+
+@pytest.mark.parametrize("name", ["staging", "production"])
+def test_count_requests_are_kept_out_of_the_access_log_and_capped(name):
+    # docs/plans/v2-usage-counts.md: the block marks count requests; the vhost's CustomLog
+    # line (section (c) of the doc) skips what is marked.
+    t = target(name)
+    block = rsc.apache_block(t, POLICY).splitlines()
+    skip = rsc.count_log_skip(t.config)
+    assert re.fullmatch(r"[a-z][a-z0-9_]*_count", skip)
+    assert f'SetEnvIf Request_URI "^/{t.path}/api/count$" {skip}' in block
+    start = block.index(f'<Location "/{t.path}/api/count">')
+    assert block[start + 1 : start + 3] == ["    LimitRequestBody 2048", "</Location>"]
+    assert rsc.COUNT_BODY_LIMIT == main.MAX_COUNT_BODY
+
+
+def test_the_doc_says_how_to_keep_counts_out_of_the_access_log():
+    doc = rsc.current()
+    skip = rsc.count_log_skip(rsc.load())
+    assert f"combined env=!{skip}`" in doc
+    assert "## (c) Anonymous usage counts: apply before deploying them" in doc
+
+
+@pytest.mark.parametrize("name", ["staging", "production"])
+def test_marked_count_requests_tell_the_api_they_are_kept_out_of_the_log(name):
+    # The API takes a count only with this header (server/main.py UNLOGGED).
+    t = target(name)
+    skip = rsc.count_log_skip(t.config)
+    assert f'RequestHeader set X-Unlogged-Count "1" env={skip}' in rsc.apache_block(t, POLICY)
+    assert main.UNLOGGED == "x-unlogged-count"

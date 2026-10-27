@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { Ketcher } from 'ketcher-core';
 import { getKetcher, subscribeKetcher } from '../editor/instance';
 import { copyDrawing, type Outcome } from './exportImage';
+import { countUse } from '../usage/start';
 
 type CopyState = 'idle' | 'copying' | Outcome | 'failed';
 
@@ -70,7 +71,11 @@ export default function CopyImageButton() {
         className="header-button"
         data-testid="app-copy-image-button"
         disabled={!ketcher}
-        onClick={() => ketcher && void copy(ketcher)}
+        onClick={() => {
+          if (!ketcher) return;
+          countUse('copy-image');
+          void copy(ketcher);
+        }}
       >
         Copy image
       </button>

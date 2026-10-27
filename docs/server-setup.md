@@ -72,6 +72,14 @@ Alias /draw-staging /home/webadmin/srv/mu-draw/staging/web
         Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
     </Files>
 </Directory>
+# Anonymous usage counts (docs/plans/v2-usage-counts.md): never in the access log
+# (the vhost's CustomLog line ends env=!mu_draw_count), never over 2 KB.
+# The API takes a count only with the header, so none is stored until this is applied.
+SetEnvIf Request_URI "^/draw-staging/api/count$" mu_draw_count
+RequestHeader set X-Unlogged-Count "1" env=mu_draw_count
+<Location "/draw-staging/api/count">
+    LimitRequestBody 2048
+</Location>
 # Staging is for campus and VPN only (covers the static files and the API).
 <LocationMatch "^/draw-staging(/|$)">
     Require ip 10.0.0.0/8
@@ -188,6 +196,14 @@ Alias /draw /home/webadmin/srv/mu-draw/production/web
         Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
     </Files>
 </Directory>
+# Anonymous usage counts (docs/plans/v2-usage-counts.md): never in the access log
+# (the vhost's CustomLog line ends env=!mu_draw_count), never over 2 KB.
+# The API takes a count only with the header, so none is stored until this is applied.
+SetEnvIf Request_URI "^/draw/api/count$" mu_draw_count
+RequestHeader set X-Unlogged-Count "1" env=mu_draw_count
+<Location "/draw/api/count">
+    LimitRequestBody 2048
+</Location>
 # Production is public, like /chemtutor. For campus and VPN only, uncomment:
 # <LocationMatch "^/draw(/|$)">
 #     Require ip 10.0.0.0/8
@@ -234,7 +250,30 @@ sudo systemctl enable --now mu-draw-api
 systemctl status mu-draw-api --no-pager
 ```
 
-## (c) Later
+## (c) Anonymous usage counts: apply before deploying them
+
+The counts (docs/plans/v2-usage-counts.md) promise that a count request is never in Apache's
+access log and never over 2048 bytes. The API takes a count only when Apache has
+marked it as kept out of the log (the `X-Unlogged-Count` header the blocks set), so until this
+is applied it stores nothing, and the live checks fail. Apply it before deploying the counts.
+
+1. Back up the vhost as in (a) step 2.
+2. Replace the staging and the production blocks (from their `BEGIN` line to their `END`
+   line) with the blocks in (a) step 3 and in (b). Each now ends with the count settings.
+3. In `/etc/apache2/sites-enabled/osbornelab.conf`, inside `<VirtualHost *:443>`, add ` env=!mu_draw_count` to the end
+   of the `CustomLog` line, so it reads like
+   `CustomLog ${APACHE_LOG_DIR}/osbornelab_access.log combined env=!mu_draw_count`.
+   It applies only to requests the blocks mark; everything else is logged as before.
+4. Run `sudo apache2ctl configtest && sudo systemctl reload apache2` (restore `$BAK` if
+   configtest fails, as in (a) step 4).
+5. Deploy as usual: `scripts/deploy.sh staging`. The API code changed, so it stops and prints
+   `sudo systemctl restart mu-draw-api-staging`; run that, then `scripts/deploy.sh --smoke-only
+   staging`. Production the same way when promoting. The live checks send a deliberately
+   wrong count and an oversized one, which count nothing; the wrong one gets the API's own
+   refusal only through a marked request (steps 1 and 2), and the checks then read
+   `/var/log/apache2/osbornelab_access.log` to see that neither was logged (step 3).
+
+## (d) Later
 
 - **Restarting after server changes.** deploy.sh can't restart services (no sudo). When
   the code the service runs changed (`server/`, but not its tests or fixture scripts,
@@ -254,6 +293,10 @@ systemctl status mu-draw-api --no-pager
 - **Name cache.** Get name keeps PubChem's answers for 30 days in
   `/var/lib/<unit>/name-cache.sqlite` (outside the deployed code, which deploys replace).
   Chemistry only: canonical SMILES, CID, names, time looked up. Deleting it is harmless.
+- **Usage totals.** `/var/lib/<unit>/usage.sqlite` holds the anonymous weekly totals: week,
+  item and count, nothing else. `python scripts/usage_report.py` prints them (add
+  `--target staging` for staging's). Deleting the file deletes the totals; there is nothing
+  per student to delete.
 - **Renaming the app.** Edit `app.config.json`, re-render this file, create the new conda
   env (`conda env create -n <new name> -f environment.yml`), redeploy to the new folders,
   apply the new Apache blocks and units, then remove the old ones.
