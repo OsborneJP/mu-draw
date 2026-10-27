@@ -68,12 +68,12 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
   (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS, overlap rule), hose.ts, carbonTable.ts,
   nmr.ts (¹³C), protonNmr.ts (¹H), stereoElements/-isomers/-Pictures.ts; tautomers.ts, resonance.ts (RDKit's C++
   ported onto rdkitForm.ts), formPictures.ts; biochem.ts (sequences, charge, pI), indigoBiochem.ts (biochemWorker.ts).
-- `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts; at its foot
-  BiochemSection.tsx), Get name, Name to structure (naming.ts; NamePanel floats), Templates menu
-  (+ Glassware tab: glassware.ts); Practice, NMR previews (¹³C, ¹H), stereoisomers, tautomers, resonance
-  (FormsPanel.tsx), Safety (safety*.ts) and 3D view (threeD.ts; viewer3d.ts loads 3Dmol) dock below the
-  canvas (Docked.tsx), one at a time (belowCanvas.ts); *Store.ts wiring, panelWorker.ts (RDKit).
-- `web/src/`: api.ts (`<base>api/*`, 8 s); pwa/ (SW, update checks, Reload); shell/ (header, badge, About, banner).
+- `web/src/panels/`: Export, Copy image, properties panel (IR hints: chem/irBands.ts; BiochemSection.tsx,
+  state biochem.ts), Get name, Name to structure (naming.ts; NamePanel floats), Templates (+ Glassware tab:
+  glassware.ts); Practice, NMR previews, stereoisomers, tautomers/resonance (FormsPanel.tsx), Safety
+  (ghsPictograms.ts) and 3D view (viewer3d.ts loads 3Dmol) dock below the canvas (Docked.tsx), one at a time
+  (belowCanvas.ts): state in nmr/protonNmr/stereo/forms/safety/threeD.ts, *Store.ts wiring, panelWorker.ts.
+- `web/src/`: api.ts (`<base>api/*`, 8 s), pubchemPage.ts; pwa/ (SW, updates, Reload); shell/ (header, badge, About, banner).
 - `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H); practice.json; glassware/; ghs/.
 - `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
 - `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`

@@ -1735,3 +1735,10 @@ Plan and measurements: docs/plans/acs-style-default.md.
   the selection, wherever that falls: off the canvas when the selection reaches its top. Its
   updateFloatingTools event gives the handle's position relative to render.clientArea. At ACS
   size, setMolecule then addFragment (no position) leaves part of the drawing above the canvas.
+- The eight version 2 branches were merged one at a time, check.sh before each merge commit.
+  Their conflicts were additive (each panel, worker message kind, reference set, pin, precache
+  check, live-check file and cache table added to the same lists); the precache fixtures were
+  recaptured from each merged build (scripts/capture-sw-fixture.ts); two branches raising the
+  same count (reference sets 5 to 7) merged cleanly to a wrong 7, which only pytest caught. A
+  capped merge review (resolutions, interactions, deploy) found nothing high or medium.
+

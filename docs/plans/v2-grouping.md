@@ -157,6 +157,10 @@ test's comment gave the wrong reason (corrected); the rest are accepted below.
   can't tell them from the select tool.
 - A double-click on an atom right beside a grouped text, where Ketcher picks the text, leaves
   the group selected without its rotate frame until the next click.
+- A group holding glassware (an image), a shape or a multi-tail arrow doesn't turn or flip as
+  one: Ketcher can't rotate or flip those, so they stay put (Undo puts the rest back).
+- With the ¹H NMR preview open, as with ¹³C, a click on an atom of a grouped molecule selects
+  the whole group, so it no longer picks out that atom's signal.
 - In the test browser, Ketcher 3.18 can't turn a selection that holds a text with its rotate
   handle (it stops after moving the text), group or no group. The rotate test uses a group
   without text; worth checking in a real browser.
