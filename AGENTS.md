@@ -62,7 +62,7 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
 ## Layout (spec layout; "later" marks where future code goes)
 - `app.config.json`: the only place the repo name, URL path and host are written.
 - `web/src/editor/`: Ketcher wrapper, autosave, hidden UI, debug keys, image queue, instance.ts (ready
-  Ketcher), drawing, stereoHighlight, placeInHand, templates/glassware.json, groups*, formula*, pictureScripts,
+  Ketcher), drawing, stereoHighlight, placeInHand, templates/glassware.json, groups*, formula*, pictureScripts, templateReach,
   the ACS and hydrogen-label defaults (acsStyle.ts; acsStart.ts: main.tsx's first import).
 - `web/src/chem/`: rdkitWorker.ts (rdkitWorkers.ts starts copies), compute.ts (RDKit values), properties.ts
   (display rules), tracker.ts (request ordering), functionalGroups.ts (SMARTS, overlap rule), hose.ts, carbonTable.ts,

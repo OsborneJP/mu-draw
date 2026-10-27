@@ -10,6 +10,7 @@ import './editor.css';
 import { imageQueue } from './imageQueue';
 import { setKetcher } from './instance';
 import { DISABLE_MACROMOLECULES_EDITOR, HIDDEN_BUTTONS } from './ketcherUi';
+import { widenTemplateReach } from './templateReach';
 import { withSmallerScripts } from './pictureScripts';
 
 declare global {
@@ -61,6 +62,8 @@ function onInit(ketcher: Ketcher) {
   if (started.has(ketcher)) return;
   started.add(ketcher);
   window.ketcher = ketcher;
+  // Templates join an atom or bond from further away (docs/plans/template-reach.md).
+  widenTemplateReach(ketcher);
   // Ready once the last drawing is back on the canvas and changes are being saved.
   const key = autosaveKey(import.meta.env.BASE_URL);
   void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus).then(() => {

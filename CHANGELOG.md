@@ -215,6 +215,9 @@ All notable changes to this project. The format follows
   student's own changes in Settings stay after that. Export and Copy image come out at ACS
   print size (caffeine is about 1.2 in wide in Word); 2x and 4x are sharper, not bigger.
   Practice's Show answer is drawn the same way.
+- Ring templates (under the canvas) and the Structure Library's templates join an atom or a
+  bond from up to 12 px away on screen, where before the pointer had to be within about 7 px
+  at 100% zoom: the highlight shows sooner, and the click joins the template there.
 - The Structure Library button, at the end of the ring templates under the canvas, now says
   "Structure Library" instead of a tiny "SL" icon.
 - Hydrogens show on heteroatoms only (OH, NH), and terminal carbons are plain line ends

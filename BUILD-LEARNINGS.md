@@ -1753,3 +1753,23 @@ Plan and measurements: docs/plans/acs-style-default.md.
   hydrogens on the canvas ("C", "C+") but keeps them in Indigo's pictures (CH4, CH2+).
 - One-time defaults each get their own record (`applyOnce` in src/editor/acsStyle.ts), so
   a browser that already has an earlier default still gets a later one.
+
+## Template reach (2026-10-27)
+- Ketcher's template tool finds an atom within 0.4 bond lengths (SELECTION_DISTANCE_COEFFICIENT)
+  and a bond only inside its drawn line's selection box in screen pixels (its stripe search
+  never returns: it requires a distance in bond lengths above 0.4 × the bond's pixel length).
+  At ACS size and 100% zoom both are about 7 px. Its hover highlight, its joined preview
+  (after 300 ms) and the drop all call `editor.findItem`, so wrapping that one method on the
+  editor instance changes all three (src/editor/templateReach.ts).
+- `editor.tool()` with no arguments returns the tool in use; the template tool is told apart
+  by its `templatePreview` (class names don't survive the build). The tool keeps its hovered
+  item as `tool.ci`, which the browser tests read.
+- The template's floating preview is in the drawing (atoms and bonds with `isPreview`) while
+  the mouse is over the canvas; any search must skip it. Preview updates skip the undo history,
+  so they fire no change event and no autosave.
+- A contracted abbreviation's label ("Ph", "CO2Et") sits on its hidden attachment atom
+  (SGroup.getContractedPosition), and Ketcher's bond hitbox stops at the label's edge (it is
+  built from the half-bonds' clipped ends). A search that measures a bond from atom centre to
+  atom centre reaches over the label, so the app's skips bonds into an abbreviation. With a
+  functional group in hand, the tool's findItems is atoms only, but its preview still asks
+  for atoms and bonds.
