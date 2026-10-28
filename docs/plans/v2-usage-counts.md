@@ -35,7 +35,7 @@ This changes invariant 2 and the spec's privacy section ("No analytics", "no per
 - **Two tabs at once:** the browser lock API (`navigator.locks`) lets only one tab record or send at a time, so a week is sent once.
 - **Opting out:**
   - A browser that sends Global Privacy Control sends nothing and records nothing. The server also ignores any count carrying the `Sec-GPC` header.
-  - About has a switch, "Count my use anonymously". Turning it off forgets any summary and stops counting in that browser.
+  - About has a switch, "Include this browser in the anonymous weekly counts" (first "Count my use anonymously", renamed on 2026-10-28 at Jeff's request: unchecked, it could read as "count me, but not anonymously"). Turning it off forgets any summary and stops counting in that browser.
 - **Event names are append-only.** A name is never reused or removed, so an older copy of the app (a student who hasn't clicked Reload) is still counted. Names the server doesn't know are ignored, never an error.
   - The list is web/src/usage/events.json. server/usage_events.json is an exact copy, kept so by a drift test.
   - tests/fixtures/usage_tools_shipped.json names every tool ever shipped. The server must still take each one.

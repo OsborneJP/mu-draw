@@ -63,7 +63,7 @@ export default function AboutBox({ title }: { title: string }) {
                 show(usage.setOn(on).then(() => usage.isOn()));
               }}
             />{' '}
-            Count my use anonymously
+            Include this browser in the anonymous weekly counts
           </label>
           {gpc && (
             <span data-testid="about-usage-gpc">

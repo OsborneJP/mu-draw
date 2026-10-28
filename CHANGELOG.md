@@ -203,8 +203,8 @@ All notable changes to this project. The format follows
 - Anonymous weekly usage counts: once a week each browser sends a summary of the week before
   (on how many days the app was open, whether as the installed app, whether it was new, and
   which tools were used, Practice apart), with no identifier or cookie; the server keeps only
-  weekly totals, and `scripts/usage_report.py` prints them. About says so and has a switch to
-  turn it off; Global Privacy Control turns it off too. Needs the API services restarted and
+  weekly totals, and `scripts/usage_report.py` prints them. About says so and has a checkbox,
+  "Include this browser in the anonymous weekly counts", to turn it off; Global Privacy Control turns it off too. Needs the API services restarted and
   the Apache change in docs/server-setup.md section (c). The browser keeps its summary in
   IndexedDB, so two tabs can't both send the same week (localStorage let them, rarely); an
   "off" set in the first build still holds.

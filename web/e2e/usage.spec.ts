@@ -225,6 +225,8 @@ test("About says what is counted; its switch off forgets the week and stops coun
     'This app counts, each week, how many browsers open it and which tools are used. The counts are kept without names, IDs or IP addresses.',
   );
   const toggle = page.getByTestId('about-usage-switch');
+  // Off reads as "not included", not as "counted, but not anonymously" (Jeff, 2026-10-28).
+  await expect(toggle).toHaveAccessibleName('Include this browser in the anonymous weekly counts');
   await expect(toggle).toHaveAttribute('aria-busy', 'false'); // read
   await expect(toggle).toBeChecked();
   await toggle.uncheck();
