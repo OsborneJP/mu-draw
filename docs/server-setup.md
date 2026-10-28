@@ -73,13 +73,11 @@ Alias /draw-staging /home/webadmin/srv/mu-draw/staging/web
     </Files>
 </Directory>
 # Anonymous usage counts (docs/plans/v2-usage-counts.md): never in the access log
-# (the vhost's CustomLog line ends env=!mu_draw_count), never over 2 KB.
+# (the vhost's CustomLog line ends env=!mu_draw_count).
 # The API takes a count only with the header, so none is stored until this is applied.
+# The API refuses bodies over 2 KB itself: LimitRequestBody skips proxied requests.
 SetEnvIf Request_URI "^/draw-staging/api/count$" mu_draw_count
 RequestHeader set X-Unlogged-Count "1" env=mu_draw_count
-<Location "/draw-staging/api/count">
-    LimitRequestBody 2048
-</Location>
 # Staging is for campus and VPN only (covers the static files and the API).
 <LocationMatch "^/draw-staging(/|$)">
     Require ip 10.0.0.0/8
@@ -197,13 +195,11 @@ Alias /draw /home/webadmin/srv/mu-draw/production/web
     </Files>
 </Directory>
 # Anonymous usage counts (docs/plans/v2-usage-counts.md): never in the access log
-# (the vhost's CustomLog line ends env=!mu_draw_count), never over 2 KB.
+# (the vhost's CustomLog line ends env=!mu_draw_count).
 # The API takes a count only with the header, so none is stored until this is applied.
+# The API refuses bodies over 2 KB itself: LimitRequestBody skips proxied requests.
 SetEnvIf Request_URI "^/draw/api/count$" mu_draw_count
 RequestHeader set X-Unlogged-Count "1" env=mu_draw_count
-<Location "/draw/api/count">
-    LimitRequestBody 2048
-</Location>
 # Production is public, like /chemtutor. For campus and VPN only, uncomment:
 # <LocationMatch "^/draw(/|$)">
 #     Require ip 10.0.0.0/8
@@ -253,9 +249,11 @@ systemctl status mu-draw-api --no-pager
 ## (c) Anonymous usage counts: apply before deploying them
 
 The counts (docs/plans/v2-usage-counts.md) promise that a count request is never in Apache's
-access log and never over 2048 bytes. The API takes a count only when Apache has
-marked it as kept out of the log (the `X-Unlogged-Count` header the blocks set), so until this
-is applied it stores nothing, and the live checks fail. Apply it before deploying the counts.
+access log. (The API refuses a body over 2 KB itself; Apache 2.4's `LimitRequestBody` doesn't
+apply to proxied requests, so the blocks don't set it.) The API takes a count only when
+Apache has marked it as kept out of the log (the `X-Unlogged-Count` header the blocks set), so
+until this is applied it stores nothing, and the live checks fail. Apply it before deploying
+the counts.
 
 1. Back up the vhost as in (a) step 2.
 2. Replace the staging and the production blocks (from their `BEGIN` line to their `END`
@@ -269,8 +267,8 @@ is applied it stores nothing, and the live checks fail. Apply it before deployin
 5. Deploy as usual: `scripts/deploy.sh staging`. The API code changed, so it stops and prints
    `sudo systemctl restart mu-draw-api-staging`; run that, then `scripts/deploy.sh --smoke-only
    staging`. Production the same way when promoting. The live checks send a deliberately
-   wrong count and an oversized one, which count nothing; the wrong one gets the API's own
-   refusal only through a marked request (steps 1 and 2), and the checks then read
+   wrong count and an oversized one, which count nothing; each gets the API's own refusal,
+   the wrong one only through a marked request (steps 1 and 2), and the checks then read
    `/var/log/apache2/osbornelab_access.log` to see that neither was logged (step 3).
 
 ## (d) Later

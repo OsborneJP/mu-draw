@@ -122,7 +122,7 @@ def test_rdkit_worker_gets_its_own_policy_and_only_it():
 
 
 @pytest.mark.parametrize("name", ["staging", "production"])
-def test_count_requests_are_kept_out_of_the_access_log_and_capped(name):
+def test_count_requests_are_kept_out_of_the_access_log(name):
     # docs/plans/v2-usage-counts.md: the block marks count requests; the vhost's CustomLog
     # line (section (c) of the doc) skips what is marked.
     t = target(name)
@@ -130,9 +130,11 @@ def test_count_requests_are_kept_out_of_the_access_log_and_capped(name):
     skip = rsc.count_log_skip(t.config)
     assert re.fullmatch(r"[a-z][a-z0-9_]*_count", skip)
     assert f'SetEnvIf Request_URI "^/{t.path}/api/count$" {skip}' in block
-    start = block.index(f'<Location "/{t.path}/api/count">')
-    assert block[start + 1 : start + 3] == ["    LimitRequestBody 2048", "</Location>"]
-    assert rsc.COUNT_BODY_LIMIT == main.MAX_COUNT_BODY
+    # No body limit here: Apache 2.4's LimitRequestBody skips proxied requests (a 3000-byte
+    # count reached the API live, 2026-10-28), so it would only claim a limit it doesn't keep.
+    # The API's own MAX_COUNT_BODY is the limit (test_usage.py; the live check's too_large).
+    assert f'<Location "/{t.path}/api/count">' not in block
+    assert not [line for line in block if line.strip().startswith("LimitRequestBody")]
 
 
 def test_the_doc_says_how_to_keep_counts_out_of_the_access_log():

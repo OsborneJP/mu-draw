@@ -31,8 +31,6 @@ CAMPUS = "10.0.0.0/8"
 # VPN again: re-render, then re-apply the production block.
 PRODUCTION_CAMPUS_ONLY = False
 IMMUTABLE = "public, max-age=31536000, immutable"
-# The anonymous usage counts' largest body (server/main.py's MAX_COUNT_BODY).
-COUNT_BODY_LIMIT = 2048
 
 
 def serialise(directives: dict[str, list[str]]) -> str:
@@ -147,13 +145,11 @@ def apache_block(t: Target, policy: str, workers: dict[str, str] | None = None) 
         "</Directory>",
         *worker_sections(t, workers or {}),
         "# Anonymous usage counts (docs/plans/v2-usage-counts.md): never in the access log",
-        f"# (the vhost's CustomLog line ends env=!{count_log_skip(t.config)}), never over 2 KB.",
+        f"# (the vhost's CustomLog line ends env=!{count_log_skip(t.config)}).",
         "# The API takes a count only with the header, so none is stored until this is applied.",
+        "# The API refuses bodies over 2 KB itself: LimitRequestBody skips proxied requests.",
         f'SetEnvIf Request_URI "^/{p}/api/count$" {count_log_skip(t.config)}',
         f'RequestHeader set X-Unlogged-Count "1" env={count_log_skip(t.config)}',
-        f'<Location "/{p}/api/count">',
-        f"    LimitRequestBody {COUNT_BODY_LIMIT}",
-        "</Location>",
     ]
     if t.name == "staging":
         lines += [
@@ -353,9 +349,11 @@ Only after staging has passed (`scripts/deploy.sh --production` refuses otherwis
 ## (c) Anonymous usage counts: apply before deploying them
 
 The counts (docs/plans/v2-usage-counts.md) promise that a count request is never in Apache's
-access log and never over {COUNT_BODY_LIMIT} bytes. The API takes a count only when Apache has
-marked it as kept out of the log (the `X-Unlogged-Count` header the blocks set), so until this
-is applied it stores nothing, and the live checks fail. Apply it before deploying the counts.
+access log. (The API refuses a body over 2 KB itself; Apache 2.4's `LimitRequestBody` doesn't
+apply to proxied requests, so the blocks don't set it.) The API takes a count only when
+Apache has marked it as kept out of the log (the `X-Unlogged-Count` header the blocks set), so
+until this is applied it stores nothing, and the live checks fail. Apply it before deploying
+the counts.
 
 1. Back up the vhost as in (a) step 2.
 2. Replace the staging and the production blocks (from their `BEGIN` line to their `END`
@@ -369,8 +367,8 @@ is applied it stores nothing, and the live checks fail. Apply it before deployin
 5. Deploy as usual: `scripts/deploy.sh staging`. The API code changed, so it stops and prints
    `sudo systemctl restart {staging.unit}`; run that, then `scripts/deploy.sh --smoke-only
    staging`. Production the same way when promoting. The live checks send a deliberately
-   wrong count and an oversized one, which count nothing; the wrong one gets the API's own
-   refusal only through a marked request (steps 1 and 2), and the checks then read
+   wrong count and an oversized one, which count nothing; each gets the API's own refusal,
+   the wrong one only through a marked request (steps 1 and 2), and the checks then read
    `{ACCESS_LOG}` to see that neither was logged (step 3).
 
 ## (d) Later

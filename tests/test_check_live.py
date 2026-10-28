@@ -214,11 +214,16 @@ def test_the_count_endpoint_must_be_live_and_refuse_a_wrong_summary():
     assert "api/count?live-check-shape: body" in cl.check(results, expected, POLICY, WORKERS)[0]
 
 
-def test_an_oversized_count_must_be_refused():
+def test_an_oversized_count_must_be_refused_by_the_api():
     expected = cl.expectations(FILES)
     results = good_results()
     results["api/count?live-check-size"] = cl.Fetched(204, {}, b"")
     assert cl.check(results, expected, POLICY, WORKERS) == ["api/count?live-check-size: HTTP 204"]
+    # A 413 from anything but the API (an Apache error page) proves nothing about its limit.
+    results["api/count?live-check-size"] = cl.Fetched(413, {}, b"<html>Too Large</html>")
+    assert cl.check(results, expected, POLICY, WORKERS) == [
+        "api/count?live-check-size: body b'<html>Too Large</html>', want {'error': 'too_large'}"
+    ]
 
 
 def test_count_checks_go_first_so_their_log_lines_are_written_by_the_end():

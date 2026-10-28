@@ -26,7 +26,7 @@ This changes invariant 2 and the spec's privacy section ("No analytics", "no per
   - one total per tool.
 
   It keeps no IP address, time or request body, and never reads the client's address. The totals live in their own database file (`usage.sqlite`), apart from the name cache.
-- **Apache** stops logging `<base>api/count` and refuses bodies over 2 KB there. This is rendered into section (c) of docs/server-setup.md for Jeff to apply, like the other server settings. The server refuses bodies over 2 KB too.
+- **Apache** stops logging `<base>api/count`. This is rendered into section (c) of docs/server-setup.md for Jeff to apply, like the other server settings. The server refuses bodies over 2 KB. (Apache can't: its `LimitRequestBody` skips proxied requests, found when (c) was applied on 2026-10-28, so the blocks no longer set it.)
   - Apache also marks those requests with an `X-Unlogged-Count` header, and the API takes a count only with it (otherwise a 503, which the browser treats as "try later").
   - So nothing is stored until the Apache blocks are in place.
   - The live checks also read Apache's access log for their own tagged count requests, so they fail if the log exclusion (the CustomLog edit) is missing.
@@ -74,8 +74,8 @@ This changes invariant 2 and the spec's privacy section ("No analytics", "no per
 4. **What is stored.** The database file's raw bytes, with its journal, hold only week, item and count, in a table with no row order (`WITHOUT ROWID`). test_privacy's sentinel, put in every field of a count body, never reaches the logs.
 5. **Event names.** Every event name ever shipped is accepted. The list is append-only, in one file the web and the server share, with a drift test.
 6. **Report.** The report script prints the table for a recorded database, with a drift test.
-7. **Apache.** The rendered Apache block marks `<base>api/count` (SetEnvIf) for the vhost's access log to skip, and limits its body. A render test checks it. The doc's section (c) says how to apply it.
-8. **Live checks.** One posts a deliberately wrong body and expects the endpoint's own 400. Another posts one over 2 KB and expects a 413. They prove the route is live and count nothing.
+7. **Apache.** The rendered Apache block marks `<base>api/count` (SetEnvIf) for the vhost's access log to skip, and sets no body limit, which Apache wouldn't apply to a proxied request. A render test checks both. The doc's section (c) says how to apply it.
+8. **Live checks.** One posts a deliberately wrong body and expects the endpoint's own 400. Another posts one over 2 KB and expects the API's own 413 (`too_large`). They prove the route is live and count nothing.
 
 **C. Docs.**
 - Invariant 2 in AGENTS.md and the spec's privacy section say what is counted, what is never kept, and the guards that enforce it.

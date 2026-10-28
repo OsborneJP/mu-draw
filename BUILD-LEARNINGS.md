@@ -1818,4 +1818,13 @@ Plan and measurements: docs/plans/acs-style-default.md.
 - Apache's `RequestHeader set … env=<var>` lets the API see that a request was marked (here,
   kept out of the access log), so the API can refuse work until a person has applied the
   Apache change, and a live check proves the change is there.
-
+- Apache 2.4's `LimitRequestBody` does nothing for a proxied request: `ap_http_filter` sets the
+  limit to 0 whenever `r->proxyreq` is set (modules/http/http_filters.c, 2.4.58), and
+  mod_proxy_http doesn't check it either. Found when section (c) was applied (2026-10-28): a
+  3000-byte count reached the API through a `<Location>` with `LimitRequestBody 2048`. The
+  API's own limit (MAX_COUNT_BODY) is the one that holds; the live check now requires its
+  `too_large` answer, since Apache's 413 page would look the same by status alone.
+- A client that sends `Expect: 100-continue` to a proxied route the backend answers without
+  reading the body (the old API's 404 for api/count) gets a 500 from Apache ("read less bytes
+  of request body than expected"), over HTTP/1.1 and HTTP/2 alike. Browsers' fetch doesn't
+  send it, and curl 8.9 didn't for a 3000-byte body, so it only matters for a probe that asks.

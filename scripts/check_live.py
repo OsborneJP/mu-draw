@@ -122,8 +122,9 @@ def safety_check() -> Expect:
 def count_checks(tag: str) -> list[Expect]:
     """The usage count endpoint, live but counting nothing: a summary of the wrong shape gets
     its own refusal (only through a request Apache marked as unlogged), and one over the size
-    limit is refused (docs/plans/v2-usage-counts.md). The query string, which Apache and the
-    API ignore, carries this run's tag, so the access log can be searched for them."""
+    limit gets the API's own refusal too: Apache can't limit a proxied body
+    (docs/plans/v2-usage-counts.md). The query string, which Apache and the API ignore,
+    carries this run's tag, so the access log can be searched for them."""
     return [
         Expect(
             f"api/count?{tag}-shape",
@@ -131,7 +132,12 @@ def count_checks(tag: str) -> list[Expect]:
             status=400,
             body_json={"error": "invalid_count"},
         ),
-        Expect(f"api/count?{tag}-size", post_json={"weeks": [], "pad": "x" * 3000}, status=413),
+        Expect(
+            f"api/count?{tag}-size",
+            post_json={"weeks": [], "pad": "x" * 3000},
+            status=413,
+            body_json={"error": "too_large"},
+        ),
     ]
 
 
