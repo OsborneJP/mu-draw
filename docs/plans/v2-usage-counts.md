@@ -7,7 +7,7 @@ Requested by Jeff on 2026-10-27, choosing "Option 2, anonymous counts from the a
 This changes invariant 2 and the spec's privacy section ("No analytics", "no per-student logging"). After the change the rule is: **weekly totals only, never identifiers.** The server keeps one number per week per item. Nothing it keeps can tell one browser, student or device from another.
 
 ## How it works
-- **The browser keeps a small summary of the current week** in local storage, under this build's own key, so staging and production stay apart. The summary holds:
+- **The browser keeps a small summary of the current week** in its own storage (IndexedDB since the revision below; localStorage before), under this build's own name, so staging and production stay apart. The summary holds:
   - on how many days the app was open (a count and the last day, not the dates);
   - whether it was opened as the installed app;
   - whether this is the browser's first week;
@@ -114,7 +114,96 @@ Its lows are accepted limits, below:
 - the staging error log;
 - the live check's reliance on Apache writing its log unbuffered.
 
+## Revision, 2026-10-28: the record moves to IndexedDB (approved by Jeff the same day)
+Production's live smoke test of bar A.5 (two tabs) failed once: the second tab sent the week
+again. Chromium caches localStorage in each tab and passes another tab's writes on later, so
+the lock doesn't make the next tab read what the last one wrote. A probe: after a lock handoff
+the next tab read stale localStorage in 15 of 300 tries, and IndexedDB, with each write's
+commit awaited, in none (BUILD-LEARNINGS). IndexedDB answers every tab from one place.
+
+**Bar R** (added to A and B, which stand):
+1. **Where.** The record lives in IndexedDB (database `usage:<base>`, one object store, one
+   key), read and written only in the lock's turn; every write waits for its transaction to
+   complete before the turn ends. Test: A.5 (two tabs), and every Playwright usage test reads
+   the record from IndexedDB.
+2. **The build before's record** (localStorage key `usage:<base>`, kept by c2f4683, on
+   production from 2026-10-28 11:32 until this build) is read in every turn, and its week is
+   **not carried over**. c2f4683 counted only from 2026-10-28, the first week of counting, so
+   this record holds the same for that week; only days and tool uses before the reload are lost
+   (all of that week, for a browser whose next opening after the update is in a later week).
+   One fact is kept: a record started here isn't a new browser's if c2f4683's record shows it
+   counted the browser in an earlier week (review round 4: otherwise every browser that used
+   c2f4683 would be "new" twice). (Carrying the whole record, as first planned, drew review
+   findings three rounds running, all in its interplay with that build's still-open tabs;
+   dropping it removed them.) Its "off"
+   counts as off here too, in every turn (nothing counted or sent, About shows off), and forgets
+   what is kept here, as that build's switch forgot. It stays in the old key, which that build's
+   tabs read; only the switch removes it (review round 1, high). Turning counting off writes
+   "off" to both places; turning it on removes both. Its record (not "off") is removed once its
+   week has passed, or if it isn't a record: until then a tab of that build may be counting
+   with it, and removing it could erase an "off" that tab had just written but this tab's
+   localStorage doesn't show yet (review round 2). An "off" kept only in IndexedDB holds as well
+   (the old key can lose it). Tests: Vitest for each rule; Playwright for an
+   old "off" (nothing recorded or sent, About's switch off, the old key kept) and an old week
+   (this build counts its own; the old record goes the next week).
+3. **Unreadable.** If the record can't be read (storage blocked or failing), nothing is
+   written, counted or sent, and About shows counting off. A failed read never overwrites an
+   "off", and a write that doesn't commit counts as not stored (nothing sent). Tests: Vitest;
+   Playwright with writes whose transaction aborts.
+4. **About.** The switch is read each time About opens, in the lock's turn (so behind a summary
+   on its way), and is disabled (and `aria-busy`) until the read comes back; after a change it
+   shows what was stored, the latest read winning. Tests: Vitest (the read waits its turn);
+   Playwright, holding the lock (the read queued, the switch disabled, then the stored state),
+   with another tab's change, and with a change the store refuses (the switch springs back).
+5. **Global Privacy Control** runs in the lock's turn too. An old "off" is kept; an old week is
+   removed whatever IndexedDB's state; anything in IndexedDB but "off" is forgotten. Reading or
+   removing never creates the database, so a browser with GPC gets none. Tests: Vitest
+   (including GPC waiting behind a summary's answer, and removing an old week while IndexedDB
+   can't be read), and A.6 in Playwright (no database).
+6. **After a send,** the record isn't written over an "off", or over a record it can't read
+   (without the lock API another tab can change it meanwhile). Tests: Vitest, with a lock that
+   doesn't serialise.
+7. **Nothing else changes:** the request, the server, the wording, and no new dependency.
+8. **Practice** still stores nothing: its test compares the usage record too.
+
+**Reviews of the revision** (three lenses each: concurrency, switch-over and privacy, tests;
+two skeptics on every high or medium):
+- Round 1: high, an old "off" removed from where c2f4683's tabs read it; mediums, an uncopied
+  old "off" didn't stop a turn, and About's re-read was untested. Fixed, with tests.
+- Round 2: mediums, removing an old week's key on a possibly stale read, and three untested
+  guards. Fixed, with tests.
+- Round 3: medium, an "off" set in a c2f4683 tab didn't forget this build's record. The design
+  then stepped back: the old week is no longer carried over at all.
+- Round 4: mediums, three untested guards, and browsers c2f4683 had counted being "new" twice
+  (newHere()). Fixed, with tests; each guard checked by a mutation the tests catch.
+- Round 5: nothing high or medium survived the skeptics, so reviewing stopped. Its lows are
+  below.
+
 ## Accepted limits
+- **Review round 5's lows:** a browser whose first opening of this build is in a week after
+  its c2f4683 week is never counted as new (that week is lost whole; R.2); the IndexedDB "off"
+  checks in open() and use() are also held by today() throwing on "off", so removing them
+  changes no outcome a test sees; without the lock API (Safari before 15.4), a c2f4683 tab's
+  switch-off during this build's send isn't seen by the write after it (the next turn sees it);
+  a failed first write after the old record's week has passed loses only its "not new" fact.
+- **The switch-over.** A tab still running c2f4683 (until its student clicks Reload) keeps its
+  record in localStorage. If such a tab and a tab of this build both act at a new week's first
+  opening, each can send that week. A student who turned counting off in this build and then
+  on in an old tab stays off in this build's tabs (it fails towards off). An "off" set in an old
+  tab at the very moment a
+  tab of this build takes the lock with a stale localStorage can still be erased when an old
+  week's key is removed, as c2f4683's own tabs could erase each other's; removing the key only
+  once its week has passed makes that need a new week's first move too. It lasts only until the
+  old tabs reload; an "off" stays in the old key after that, which is harmless.
+- **About's "latest read wins"** has no test of two reads finishing out of order (review round
+  2, low): the guard is one comparison in AboutBox.tsx.
+- **Review round 4's lows:** a failed IndexedDB open that reports AbortError reads as "no
+  record" (it then counts afresh, as with no database); use() checks Global Privacy Control
+  before its turn, as c2f4683 did; About's "disabled until read" is tested on the first open
+  only.
+- **No deadline on IndexedDB.** A store call that never settles (a WebKit bug in Safari 14.1)
+  would hold the lock's turn: nothing is counted and About's switch stays busy. It fails
+  towards off, and that Safari is all but gone (review round 3, low).
 - **The log check around midnight.** The live checks read the current access log. A run whose count requests land in the few seconds while logrotate swaps the file at midnight could miss a logged line. The manual check in docs/server-setup.md (c) step 5 is the backstop.
 - **The live check relies on unbuffered logs.** It sends its count requests first and reads the log last, which relies on Apache writing each line as the request ends. It does on this host (no `BufferedLogs`).
 - **Staging's error log.** An installed staging app opened off campus gets a 403, and Apache's error log records that with the address and the count path. Staging is for Jeff and testers, and production is public, so it has no such 403.

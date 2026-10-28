@@ -1828,3 +1828,25 @@ Plan and measurements: docs/plans/acs-style-default.md.
   reading the body (the old API's 404 for api/count) gets a 500 from Apache ("read less bytes
   of request body than expected"), over HTTP/1.1 and HTTP/2 alike. Browsers' fetch doesn't
   send it, and curl 8.9 didn't for a 3000-byte body, so it only matters for a probe that asks.
+
+## Usage record in IndexedDB (2026-10-28)
+- A Web Lock doesn't make tabs agree on localStorage in Chromium. Each tab's renderer caches
+  it and hears of another tab's writes later, so a tab given the lock can read what the last
+  holder had already changed. Production's live smoke test caught it (the second tab sent the
+  week again); a probe (two tabs, one writes then releases, the other reads once granted) read
+  stale localStorage in 15 of 300 handoffs, and IndexedDB, with each write's `complete`
+  awaited, in none. IndexedDB answers every tab from one place.
+- A test can read IndexedDB without creating the database: open it without a version and abort
+  the upgrade transaction if `upgradeneeded` fires (the open then fails with AbortError).
+- Holding the app's own Web Lock from the test (`navigator.locks.request(name, …)` in the page)
+  forces "a read waits its turn" without any timing.
+- To make an IndexedDB write fail at commit in a test, abort its transaction from the put
+  request's `success` listener: the request has succeeded but nothing is kept. Aborting right
+  after `put()` fails the request itself, which can't tell "resolved on success" from
+  "resolved on complete".
+- Moving a record between storages while tabs of the old build may still be open: an "off"
+  must stay where the old tabs read it, or removing it turns their counting back on; and an old
+  record they may still be writing can't safely be removed at all (this tab's localStorage may
+  not show their latest write), so it goes only once its week has passed (bar R.2). Carrying
+  the old record's data across drew a new edge case in each of three review rounds; dropping
+  it (it held only the first week, which the new record holds too) removed them all.

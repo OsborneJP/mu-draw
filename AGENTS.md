@@ -142,8 +142,7 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
 - Playwright's default headless shell always reports a page as installable; it never
   reports /favicon.ico requests; the `controllerchange` wait hangs in prompt mode;
   `navigator.serviceWorker.ready` never rejects (race it against `redundant`).
-- `eval "$(cmd)"` under `set -e` ignores cmd failing; assign first, then eval.
-- Calling `updateSW()` or posting SKIP_WAITING without the student clicking the banner.
-  Expecting `updateSW()` to reload: in vite-plugin-pwa 2.0 it only posts SKIP_WAITING.
-- Expecting a worker started once the service worker is active to reach the server (it can't).
-- `playwright uninstall --all`: other projects share ~/.cache/ms-playwright.
+- `eval "$(cmd)"` under `set -e` ignores cmd failing (assign first). `playwright uninstall --all` (shared cache).
+- Trusting a Web Lock to make tabs agree on localStorage (each tab caches it): use IndexedDB, awaiting commits.
+- Calling `updateSW()` or posting SKIP_WAITING without the student's click, or expecting `updateSW()`
+  to reload (2.0 only posts SKIP_WAITING). A worker started once the SW is active can't reach the server.

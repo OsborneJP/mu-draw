@@ -29,6 +29,7 @@ import { resolveBase } from '../config/app.ts';
 import { cspHeaders } from '../config/csp.ts';
 import { imageSourceProblem, linkProblem, requestProblem } from '../config/requestPolicy.ts';
 import { autosaveKey } from '../src/editor/autosave.ts';
+import { RECORD, RECORDS } from '../src/usage/idbStore.ts';
 
 const WEB_DIR = fileURLToPath(new URL('..', import.meta.url));
 const FIXTURES_DIR = fileURLToPath(new URL('../../tests/fixtures/', import.meta.url));
@@ -552,6 +553,27 @@ export async function nextAutosave(page: Page): Promise<() => Promise<string>> {
     });
   }, autosaveKey(resolveBase()));
   return () => page.evaluate(() => (window as unknown as { __nextSave: Promise<string> }).__nextSave);
+}
+
+/** The anonymous usage record as the app keeps it in IndexedDB (src/usage/idbStore.ts), or
+ * null. Reading never creates the database. */
+export function usageRecord(page: Page): Promise<unknown> {
+  return page.evaluate(
+    ({ name, records, record }) =>
+      new Promise((resolve, reject) => {
+        const opening = indexedDB.open(name);
+        opening.onupgradeneeded = () => opening.transaction!.abort(); // there is none yet
+        opening.onerror = () => (opening.error?.name === 'AbortError' ? resolve(null) : reject(opening.error));
+        opening.onsuccess = () => {
+          const db = opening.result;
+          const request = db.transaction(records).objectStore(records).get(record);
+          request.onsuccess = () => resolve(request.result ?? null);
+          request.onerror = () => reject(request.error);
+          db.close();
+        };
+      }),
+    { name: `usage:${resolveBase()}`, records: RECORDS, record: RECORD },
+  );
 }
 
 /** The whole drawing in Ketcher's own format (what autosave stores). */

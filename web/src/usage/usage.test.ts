@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { answerFor, createUsage, isoWeek, localDay, takeTurns, TOOLS, weeksBetween, type Answer, type Settled, type WeekSummary } from './usage';
+import { answerFor, createUsage, isoWeek, localDay, takeTurns, TOOLS, weeksBetween, type Answer, type Settled, type Store, type WeekSummary } from './usage';
 
 // docs/plans/v2-usage-counts.md, bar A (the browser's rules).
 
@@ -32,43 +32,54 @@ describe('weeks', () => {
   });
 });
 
-/** A Map behind the Storage methods used; it can refuse. */
-class FakeStorage {
-  items = new Map<string, string>();
+/** The record's store, keeping a copy of each value as IndexedDB does; it can refuse. */
+class FakeStore implements Store {
+  value: unknown = undefined;
   blocked = false;
-  getItem(key: string) {
-    if (this.blocked) throw new DOMException('blocked', 'SecurityError');
-    return this.items.get(key) ?? null;
+  failReads = false;
+  failWrites = false;
+  /** Fails only the next this many writes. */
+  failNextWrites = 0;
+  async get() {
+    if (this.blocked || this.failReads) throw new DOMException('blocked', 'UnknownError');
+    return structuredClone(this.value);
   }
-  setItem(key: string, value: string) {
-    if (this.blocked) throw new DOMException('blocked', 'SecurityError');
-    this.items.set(key, value);
+  async set(value: unknown) {
+    if (this.blocked || this.failWrites || this.failNextWrites-- > 0) throw new DOMException('full', 'QuotaExceededError');
+    this.value = structuredClone(value);
   }
-  removeItem(key: string) {
-    if (this.blocked) throw new DOMException('blocked', 'SecurityError');
-    this.items.delete(key);
+  async remove() {
+    if (this.blocked) throw new DOMException('blocked', 'UnknownError');
+    this.value = undefined;
   }
 }
 
-const KEY = 'usage:test';
 // Wednesdays of consecutive ISO weeks (2026-W43 to W47), at noon on the device.
 const WEEK = [new Date(2026, 9, 21, 12), new Date(2026, 9, 28, 12), new Date(2026, 10, 4, 12), new Date(2026, 10, 11, 12), new Date(2026, 10, 18, 12)];
 
 /** The browser's surroundings, every one set by the test. `answers` are given in turn; a
  * held answer waits until `release` is called. */
 function browser() {
-  const storage = new FakeStorage();
+  const store = new FakeStore();
+  // The record as the build before kept it, in localStorage (JSON), or null.
+  const old = { text: null as string | null, blocked: false };
+  const oldStorage = () => {
+    if (old.blocked) throw new DOMException('blocked', 'SecurityError');
+    return old;
+  };
   const sent: WeekSummary[][] = [];
   const settled: Settled[] = [];
-  const env = { now: WEEK[0], installed: false, gpc: false, online: true, answer: 'taken' as Answer, lockRefused: false };
+  const env = { now: WEEK[0], installed: false, gpc: false, online: true, answer: 'taken' as Answer, lockRefused: false, serialised: true };
   let release: (answer: Answer) => void = () => {};
   let hold = false;
   let heldSend: () => void = () => {};
   // One task at a time, in order, as the browser's lock API runs them.
   let queue = Promise.resolve();
   const usage = createUsage({
-    storage: () => storage as unknown as Storage,
-    key: KEY,
+    store,
+    oldRecord: () => oldStorage().text,
+    forgetOldRecord: () => void (oldStorage().text = null),
+    oldRecordOff: () => void (oldStorage().text = JSON.stringify({ off: true })),
     now: () => env.now,
     installed: () => env.installed,
     gpc: () => env.gpc,
@@ -81,19 +92,18 @@ function browser() {
     },
     lock: (task) => {
       if (env.lockRefused) return Promise.reject(new DOMException('site data blocked', 'SecurityError'));
+      if (!env.serialised) return task(); // a browser without the lock API, across tabs
       const run = queue.then(task);
       queue = run.catch(() => {});
       return run;
     },
     settled: (outcome) => settled.push(outcome),
   });
-  const kept = () => {
-    const text = storage.items.get(KEY);
-    return text === undefined ? undefined : JSON.parse(text);
-  };
+  const kept = () => structuredClone(store.value) as Record<string, unknown> & { pending: WeekSummary[] };
   return {
     usage,
-    storage,
+    store,
+    old,
     sent,
     settled,
     env,
@@ -269,10 +279,7 @@ describe('what the review found', () => {
     const b = browser();
     await b.usage.open();
     b.env.now = WEEK[1];
-    const store = b.storage as unknown as { setItem: (key: string, value: string) => void };
-    store.setItem = () => {
-      throw new DOMException('full', 'QuotaExceededError');
-    };
+    b.store.failWrites = true;
     await b.usage.open();
     await b.usage.open();
     expect(b.sent).toEqual([]);
@@ -316,7 +323,7 @@ describe('what the second review found', () => {
     await b.usage.open();
     expect(b.kept()).toEqual({ off: true });
     b.env.gpc = false;
-    expect(b.usage.isOn()).toBe(false);
+    await expect(b.usage.isOn()).resolves.toBe(false);
   });
 
   it('a record from a clock once set more than a week ahead starts again from this week', async () => {
@@ -378,8 +385,8 @@ describe('turning counting off', () => {
     await b.usage.use('export');
     expect(b.settled).toEqual(['nothing', 'off']);
     expect(b.sent).toEqual([]);
-    expect(b.storage.items.size).toBe(0);
-    expect(b.usage.isOn()).toBe(false);
+    expect(b.kept()).toBeUndefined();
+    await expect(b.usage.isOn()).resolves.toBe(false);
   });
 
   it("About's switch off: what was kept is forgotten, and nothing is counted or sent; on again, it starts afresh", async () => {
@@ -387,29 +394,276 @@ describe('turning counting off', () => {
     await b.usage.open();
     await b.usage.setOn(false);
     expect(b.kept()).toEqual({ off: true });
-    expect(b.usage.isOn()).toBe(false);
+    await expect(b.usage.isOn()).resolves.toBe(false);
     b.env.now = WEEK[1];
     await b.usage.open();
     await b.usage.use('export');
     expect(b.kept()).toEqual({ off: true });
     expect(b.settled).toEqual(['nothing', 'off']);
     await b.usage.setOn(true);
-    expect(b.usage.isOn()).toBe(true);
+    await expect(b.usage.isOn()).resolves.toBe(true);
     await b.usage.open();
     expect(b.kept()).toMatchObject({ week: '2026-W44', first: true, pending: [] });
     expect(b.sent).toEqual([]);
   });
 
-  it('storage blocked or unreadable: nothing is thrown, and an unreadable record starts afresh', async () => {
+  it('storage blocked: nothing is thrown or sent; a value that is not a record starts afresh', async () => {
     const b = browser();
-    b.storage.blocked = true;
+    b.store.blocked = true;
     await expect(b.usage.open()).resolves.toBeUndefined();
     await expect(b.usage.use('export')).resolves.toBeUndefined();
     await expect(b.usage.setOn(false)).resolves.toBeUndefined();
-    b.storage.blocked = false;
-    b.storage.items.set(KEY, '{"week": 3}');
+    await expect(b.usage.isOn()).resolves.toBe(false);
+    expect(b.settled).toEqual(['nothing']);
+    expect(b.old.text).toBe(JSON.stringify({ off: true })); // the switch-off held, in the old key
+    b.old.text = null;
+    b.store.blocked = false;
+    b.store.value = { week: 3 };
     await b.usage.open();
     expect(b.kept()).toMatchObject({ week: '2026-W43', first: true });
+    expect(b.sent).toEqual([]);
+  });
+});
+
+describe('the record in IndexedDB, and the build before\'s record in localStorage (bar R)', () => {
+  const OFF = JSON.stringify({ off: true });
+  const oldWeek = (tools: string[]) =>
+    JSON.stringify({ week: '2026-W43', days: 1, lastDay: '2026-10-21', installed: false, first: true, tools, pending: [] });
+
+  it('an old "off" counts here too: nothing recorded or sent, what is kept here is forgotten, and it stays in the old key', async () => {
+    const b = browser();
+    await b.usage.open();
+    await b.usage.use('export');
+    b.old.text = OFF; // switched off in a tab of the build before
+    await expect(b.usage.isOn()).resolves.toBe(false);
+    b.env.now = WEEK[1];
+    await b.usage.open();
+    await b.usage.use('get-name');
+    expect(b.settled).toEqual(['nothing', 'off']);
+    expect(b.sent).toEqual([]);
+    expect(b.kept()).toBeUndefined();
+    expect(b.old.text).toBe(OFF);
+    // Switched on again in that tab: nothing from before the off is sent.
+    b.old.text = null;
+    b.env.now = WEEK[2];
+    await b.usage.open();
+    expect(b.sent).toEqual([]);
+    expect(b.kept()).toMatchObject({ week: '2026-W45', first: true, pending: [] });
+  });
+
+  it("an old week isn't carried over: this build keeps its own, and the old record goes once its week has passed", async () => {
+    const b = browser();
+    b.old.text = oldWeek(['get-name']);
+    await b.usage.open();
+    await b.usage.use('export');
+    expect(b.kept()).toMatchObject({ week: '2026-W43', first: true, tools: ['export'] });
+    expect(b.old.text).toBe(oldWeek(['get-name'])); // that build's tabs may still use it this week
+    b.env.now = WEEK[1];
+    await b.usage.open();
+    expect(b.old.text).toBeNull();
+    expect(b.sent).toEqual([[{ week: '2026-W43', days: 1, installed: false, first: true, tools: ['export'] }]]);
+  });
+
+  it("a browser the build before counted in an earlier week isn't new here; one it counted only this week still is", async () => {
+    // At W44's first opening the build before sent W43 (new) and kept W44, not new.
+    const b = browser();
+    b.old.text = JSON.stringify({ week: '2026-W44', days: 1, lastDay: '2026-10-28', installed: false, first: false, tools: [], pending: [] });
+    b.env.now = WEEK[1];
+    await b.usage.open();
+    b.env.now = WEEK[2];
+    await b.usage.open();
+    expect(b.sent).toEqual([[{ week: '2026-W44', days: 1, installed: false, first: false, tools: [] }]]);
+    // Its record from an earlier week, new then: not new now (and the record goes).
+    const c = browser();
+    c.old.text = oldWeek([]);
+    c.env.now = WEEK[1];
+    await c.usage.use('export');
+    expect(c.kept()).toMatchObject({ week: '2026-W44', first: false });
+    expect(c.old.text).toBeNull();
+  });
+
+  it('an "off" kept only here holds in every turn (the old key can lose it)', async () => {
+    const b = browser();
+    await b.usage.open();
+    await b.usage.setOn(false);
+    b.old.text = null; // cleared, or switched on in a tab of the build before
+    b.env.now = WEEK[1];
+    await b.usage.open();
+    await b.usage.use('export');
+    expect(b.settled).toEqual(['nothing', 'off']);
+    expect(b.sent).toEqual([]);
+    expect(b.kept()).toEqual({ off: true });
+    await expect(b.usage.isOn()).resolves.toBe(false);
+  });
+
+  it('an old "off" doesn\'t forget a record here that can\'t be read', async () => {
+    const b = browser();
+    b.store.value = JSON.parse(oldWeek(['export']));
+    b.store.failReads = true;
+    b.old.text = OFF;
+    await b.usage.open();
+    expect(b.settled).toEqual(['off']);
+    expect(b.store.value).toEqual(JSON.parse(oldWeek(['export'])));
+  });
+
+  it("Global Privacy Control removes the build before's week, whatever IndexedDB's state", async () => {
+    const b = browser();
+    b.old.text = oldWeek(['export']);
+    b.store.failReads = true;
+    b.env.gpc = true;
+    await b.usage.open();
+    expect(b.settled).toEqual(['off']);
+    expect(b.old.text).toBeNull();
+  });
+
+  it('the switch waits its turn: nothing changes while a summary is on its way', async () => {
+    const b = browser();
+    await b.usage.open();
+    b.env.now = WEEK[1];
+    const onItsWay = b.holdAnswers();
+    const opening = b.usage.open();
+    await onItsWay;
+    const switchedOff = b.usage.setOn(false);
+    await new Promise((resolve) => setTimeout(resolve, 0)); // every pending microtask has run
+    expect(b.kept()).toMatchObject({ week: '2026-W44' });
+    expect(b.old.text).toBeNull();
+    b.release('taken');
+    await Promise.all([opening, switchedOff]);
+    expect(b.kept()).toEqual({ off: true });
+  });
+
+  it("an old record that isn't JSON, or isn't a record, is removed; blocked localStorage changes nothing", async () => {
+    const b = browser();
+    b.old.text = '{"week": 3}';
+    await b.usage.open();
+    expect(b.old.text).toBeNull();
+    expect(b.kept()).toMatchObject({ first: true }); // it says nothing about this browser
+    b.old.text = 'not json';
+    await b.usage.open();
+    expect(b.old.text).toBeNull();
+    b.old.blocked = true;
+    await b.usage.open();
+    await expect(b.usage.isOn()).resolves.toBe(true);
+    expect(b.settled).toEqual(['nothing', 'nothing', 'nothing']);
+  });
+
+  it('the switch on removes an old record; off writes "off" to both places, and either one holds it', async () => {
+    const b = browser();
+    b.old.text = OFF;
+    await b.usage.setOn(true);
+    expect(b.old.text).toBeNull();
+    await expect(b.usage.isOn()).resolves.toBe(true);
+    b.old.text = oldWeek([]);
+    await b.usage.setOn(false);
+    expect(b.old.text).toBe(OFF);
+    expect(b.kept()).toEqual({ off: true });
+    await b.usage.setOn(true);
+    b.store.failWrites = true; // only the old key takes it
+    await b.usage.setOn(false);
+    expect(b.old.text).toBe(OFF);
+    await expect(b.usage.isOn()).resolves.toBe(false);
+  });
+
+  it('Global Privacy Control keeps an old "off", so it outlasts GPC, and stores nothing', async () => {
+    const b = browser();
+    b.old.text = OFF;
+    b.env.gpc = true;
+    await b.usage.open();
+    expect(b.settled).toEqual(['off']);
+    expect(b.kept()).toBeUndefined();
+    expect(b.old.text).toBe(OFF);
+    b.env.gpc = false;
+    await expect(b.usage.isOn()).resolves.toBe(false);
+  });
+
+  it("Global Privacy Control waits its turn: a summary's answer can't leave a record behind it", async () => {
+    const b = browser();
+    await b.usage.open();
+    b.env.now = WEEK[1];
+    const onItsWay = b.holdAnswers();
+    const opening = b.usage.open();
+    await onItsWay;
+    b.env.gpc = true;
+    const withGpc = b.usage.open();
+    b.release('taken');
+    await Promise.all([opening, withGpc]);
+    expect(b.settled).toEqual(['nothing', 'sent', 'off']);
+    expect(b.kept()).toBeUndefined();
+  });
+
+  it('after a send, without the lock API, a switch-off from another tab is not written over', async () => {
+    const b = browser();
+    await b.usage.open();
+    b.env.now = WEEK[1];
+    b.env.serialised = false;
+    const onItsWay = b.holdAnswers();
+    const opening = b.usage.open();
+    await onItsWay;
+    await b.usage.setOn(false); // another tab, not waiting its turn
+    b.release('taken');
+    await opening;
+    expect(b.settled).toEqual(['nothing', 'sent']);
+    expect(b.kept()).toEqual({ off: true });
+  });
+
+  it("after a send, an old \"off\" that appears meanwhile doesn't keep the sent week waiting", async () => {
+    const b = browser();
+    await b.usage.open();
+    b.env.now = WEEK[1];
+    b.env.serialised = false;
+    const onItsWay = b.holdAnswers();
+    const opening = b.usage.open();
+    await onItsWay;
+    b.old.text = OFF; // a tab of the build before switches off meanwhile
+    b.release('taken');
+    await opening;
+    b.old.text = null; // and on again
+    await b.usage.open();
+    expect(b.sent).toHaveLength(1);
+  });
+
+  it("after a send, a record that can't be read isn't written over (it may be an \"off\")", async () => {
+    const b = browser();
+    await b.usage.open();
+    b.env.now = WEEK[1];
+    const onItsWay = b.holdAnswers();
+    const opening = b.usage.open();
+    await onItsWay;
+    b.store.value = { off: true }; // switched off meanwhile, by a tab without the lock API...
+    b.store.failReads = true; // ...and the record can't be read now
+    b.release('taken');
+    await opening;
+    expect(b.store.value).toEqual({ off: true });
+  });
+
+  it("About's read waits its turn: behind a summary on its way and a switch-off, it reads off", async () => {
+    const b = browser();
+    await b.usage.open();
+    b.env.now = WEEK[1];
+    const onItsWay = b.holdAnswers();
+    const opening = b.usage.open();
+    await onItsWay;
+    const switchedOff = b.usage.setOn(false);
+    const reading = b.usage.isOn();
+    b.release('taken');
+    await Promise.all([opening, switchedOff]);
+    await expect(reading).resolves.toBe(false);
+  });
+
+  it("a record that can't be read: nothing is written, counted or sent, an \"off\" isn't overwritten, and About shows off", async () => {
+    const b = browser();
+    b.store.value = { off: true };
+    b.store.failReads = true;
+    b.env.now = WEEK[1];
+    await b.usage.open();
+    await b.usage.use('export');
+    b.env.gpc = true;
+    await b.usage.open();
+    b.env.gpc = false;
+    expect(b.settled).toEqual(['nothing', 'off']);
+    expect(b.sent).toEqual([]);
+    expect(b.store.value).toEqual({ off: true });
+    await expect(b.usage.isOn()).resolves.toBe(false);
   });
 });
 

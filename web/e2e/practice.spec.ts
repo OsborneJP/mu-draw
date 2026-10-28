@@ -20,6 +20,7 @@ import {
   openEditor,
   referenceCompound,
   test,
+  usageRecord,
 } from './fixtures.ts';
 
 interface Lists {
@@ -409,15 +410,18 @@ test('practising stores nothing and sends nothing', async ({ app }) => {
   const { page } = app;
   await serveLists(page, testLists);
   await openEditor(app);
-  const storage = () =>
-    page.evaluate((autosave) => {
+  const storage = async () => ({
+    ...(await page.evaluate((autosave) => {
       const all = (s: Storage) => Object.fromEntries(Object.keys(s).filter((k) => k !== autosave).map((k) => [k, s.getItem(k)]));
       return indexedDB.databases().then((dbs) => ({
         local: all(localStorage),
         session: all(sessionStorage),
         indexedDB: dbs.map((d) => d.name).sort(),
       }));
-    }, autosaveKey(resolveBase()));
+    }, autosaveKey(resolveBase()))),
+    // The anonymous usage record (IndexedDB): Practice isn't counted.
+    usage: await usageRecord(page),
+  });
   // Ketcher writes its own settings when its second editor starts (src/editor/KetcherEditor.tsx).
   await page.evaluate(() => (window as unknown as { __secondInit: Promise<true> }).__secondInit);
   const before = await storage();

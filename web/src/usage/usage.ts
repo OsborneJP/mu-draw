@@ -4,8 +4,9 @@
 // tool only updates that summary. At the first opening in a new week, the summary of the week
 // before is sent, once, with no cookie and no referrer, and forgotten; the server only adds it
 // to weekly totals. Global Privacy Control, or About's switch, turns all of it off and
-// forgets what was kept. One tab at a time records or sends (the browser's lock API), so a
-// week is sent once however many tabs are open.
+// forgets what was kept. One tab at a time records or sends (the browser's lock API), and the
+// record is kept where every tab reads the last write (IndexedDB, idbStore.ts), so a week is
+// sent once however many tabs are open.
 import events from './events.json';
 
 /** The counted tools. Append-only: a name is never reused or removed (server/usage_events.json
@@ -61,9 +62,24 @@ export function takeTurns(): (task: () => Promise<void>) => Promise<void> {
   };
 }
 
+/** Where the record is kept: one value, read and written whole. A write resolves once it is
+ * committed, so the next tab to take the lock reads it; localStorage can't promise that
+ * (docs/plans/v2-usage-counts.md, revision of 2026-10-28). */
+export interface Store {
+  /** The value, or undefined if none. */
+  get(): Promise<unknown>;
+  set(value: unknown): Promise<void>;
+  remove(): Promise<void>;
+}
+
 export interface UsageDeps {
-  storage: () => Storage;
-  key: string;
+  store: Store;
+  /** The record as the build before kept it (localStorage, as JSON), or null. Its tabs read
+   * only that, so an "off" is kept there for them (docs/plans/v2-usage-counts.md, bar R.2). */
+  oldRecord: () => string | null;
+  forgetOldRecord: () => void;
+  /** Writes "off" where the build before's tabs read it. */
+  oldRecordOff: () => void;
   now: () => Date;
   /** Running as the installed app. */
   installed: () => boolean;
@@ -81,7 +97,9 @@ export interface Usage {
   open(): Promise<void>;
   /** Records that a counted tool was used (in this browser only). */
   use(tool: string): Promise<void>;
-  isOn(): boolean;
+  /** Whether counting is on, read in turn: false with Global Privacy Control, after About's
+   * switch, or if the record (or the lock) can't be had. */
+  isOn(): Promise<boolean>;
   /** About's switch. Off forgets everything kept; on starts afresh. It waits its turn behind a
    * summary on its way, so the summary's answer can't undo it. */
   setOn(on: boolean): Promise<void>;
@@ -115,45 +133,95 @@ export function localDay(date: Date): string {
 }
 
 export function createUsage(deps: UsageDeps): Usage {
-  /** The kept summaries, 'off' if the student turned counting off, or null if none. */
-  function read(): Kept | 'off' | null {
+  /** The kept summaries, 'off' if the student turned counting off, null if none (or not a
+   * record), or 'unreadable' if the store failed: then nothing may be written over it. */
+  async function read(): Promise<Kept | 'off' | null | 'unreadable'> {
+    let value: unknown;
     try {
-      const text = deps.storage().getItem(deps.key);
-      if (text === null) return null;
-      const value: unknown = JSON.parse(text);
-      if (isOff(value)) return 'off';
-      return isKept(value) ? value : null;
+      value = await deps.store.get();
     } catch {
-      return null;
+      return 'unreadable';
     }
+    if (isOff(value)) return 'off';
+    return isKept(value) ? value : null;
   }
 
-  /** Whether it was stored (storage can be blocked or full). */
-  function write(value: Kept | 'off'): boolean {
+  /** Whether it was stored and committed (storage can be blocked or full). */
+  async function write(value: Kept | 'off'): Promise<boolean> {
     try {
-      deps.storage().setItem(deps.key, JSON.stringify(value === 'off' ? { off: true } : value));
+      await deps.store.set(value === 'off' ? { off: true } : value);
       return true;
     } catch {
       return false;
     }
   }
 
-  function forget(): void {
+  async function forget(): Promise<void> {
     try {
-      deps.storage().removeItem(deps.key);
+      await deps.store.remove();
     } catch {
       // Storage blocked: nothing was kept.
     }
   }
 
+  /** The build before's record: undefined if there is none (or its storage is blocked), null
+   * if it isn't JSON, otherwise its value. */
+  function oldRecord(): unknown {
+    let text: string | null;
+    try {
+      text = deps.oldRecord();
+    } catch {
+      return undefined;
+    }
+    if (text === null) return undefined;
+    try {
+      return JSON.parse(text) as unknown;
+    } catch {
+      return null;
+    }
+  }
+
+  function forgetOldRecord(): void {
+    try {
+      deps.forgetOldRecord();
+    } catch {
+      // Storage blocked: nothing kept there.
+    }
+  }
+
+  /** The build before's record (`old`), in the lock's turn; true if counting is off there. Its
+   * week isn't carried over: that build counted only from its first week, which this record
+   * holds the same (newHere() keeps whether it was new). Its "off" counts here too, and forgets
+   * what is kept here, as its own switch forgot; only the switch removes it (that build's tabs
+   * read only that key). Its record goes once its week has passed: a tab of that build may be
+   * counting with it until then, and removing it sooner could erase an "off" that tab had just
+   * written but this tab's localStorage doesn't show yet. */
+  async function offInOldBuild(old: unknown): Promise<boolean> {
+    if (old === undefined) return false;
+    if (isOff(old)) {
+      const here = await read();
+      if (here !== null && here !== 'off' && here !== 'unreadable') await forget();
+      return true;
+    }
+    if (!isKept(old) || weeksBetween(old.week, isoWeek(deps.now())) > 0) forgetOldRecord();
+    return false;
+  }
+
+  /** Whether a record started here is a new browser's: not if the build before's record (`old`)
+   * shows it counted this browser in an earlier week. */
+  function newHere(old: unknown): boolean {
+    return !isKept(old) || (old.first && old.week === isoWeek(deps.now()));
+  }
+
   /** This week's summary, the week before moved to the waiting ones, today recorded. A clock
    * moved back into last week changes nothing: the week only moves on. A record from more than
-   * a week ahead came from a clock set wrong: it starts again from this week. */
-  function today(kept: Kept | null): Kept {
+   * a week ahead came from a clock set wrong: it starts again from this week. `first` is for a
+   * record started from nothing. */
+  function today(kept: Kept | null, first = true): Kept {
     const now = deps.now();
     const week = isoWeek(now);
     const day = localDay(now);
-    let current = kept ?? { week, days: 0, lastDay: '', installed: false, first: true, tools: [], pending: [] };
+    let current = kept ?? { week, days: 0, lastDay: '', installed: false, first, tools: [], pending: [] };
     if (weeksBetween(week, current.week) > 1) {
       current = { week, days: 0, lastDay: '', installed: false, first: false, tools: [], pending: [] };
     } else if (weeksBetween(current.week, week) > 0) {
@@ -181,26 +249,33 @@ export function createUsage(deps: UsageDeps): Usage {
 
   return {
     async open() {
-      if (deps.gpc()) {
-        // Forget what was counted, but not the student's own "off", which must outlast it.
-        if (read() !== 'off') forget();
-        deps.settled('off');
-        return;
-      }
       await inTurn(
         async () => {
-          const kept = read();
+          if (deps.gpc()) {
+            // Forget what was counted, but not the student's own "off", which must outlast it.
+            const old = oldRecord();
+            if (old !== undefined && !isOff(old)) forgetOldRecord();
+            const here = await read();
+            if (here !== 'off' && here !== 'unreadable') await forget();
+            return deps.settled('off');
+          }
+          const old = oldRecord();
+          if (await offInOldBuild(old)) return deps.settled('off');
+          const kept = await read();
+          if (kept === 'unreadable') return deps.settled('nothing');
           if (kept === 'off') return deps.settled('off');
-          const current = today(kept);
+          const current = today(kept, newHere(old));
           // Unless the browser holds this week, nothing can be sent: it couldn't remember that
           // it was, and would send it again at every opening.
-          if (!write(current)) return deps.settled('nothing');
+          if (!(await write(current))) return deps.settled('nothing');
           if (current.pending.length === 0) return deps.settled('nothing');
           if (!deps.online()) return deps.settled('kept');
           const answer = await deps.send(current.pending);
           if (answer === 'failed') return deps.settled('kept');
-          // Tool uses and the switch wait their turn, so nothing changed meanwhile.
-          write({ ...current, pending: [] });
+          // Tool uses and the switch wait their turn, so nothing changed meanwhile; without the
+          // lock API another tab may have turned counting off, which this mustn't undo.
+          const now = await read();
+          if (now !== 'off' && now !== 'unreadable') await write({ ...current, pending: [] });
           deps.settled(answer === 'taken' ? 'sent' : 'dropped');
         },
         () => deps.settled('off'),
@@ -210,22 +285,45 @@ export function createUsage(deps: UsageDeps): Usage {
       if (deps.gpc()) return;
       await inTurn(
         async () => {
-          const kept = read();
-          if (kept === 'off') return;
-          const current = today(kept);
-          write(current.tools.includes(tool) ? current : { ...current, tools: [...current.tools, tool] });
+          const old = oldRecord();
+          if (await offInOldBuild(old)) return;
+          const kept = await read();
+          if (kept === 'off' || kept === 'unreadable') return;
+          const current = today(kept, newHere(old));
+          await write(current.tools.includes(tool) ? current : { ...current, tools: [...current.tools, tool] });
         },
         () => {},
       );
     },
-    isOn() {
-      return !deps.gpc() && read() !== 'off';
+    async isOn() {
+      if (deps.gpc()) return false;
+      // In turn, so it reads what a summary on its way, or the switch, leaves.
+      let on = false;
+      await inTurn(
+        async () => {
+          if (isOff(oldRecord())) return;
+          const kept = await read();
+          on = kept !== 'off' && kept !== 'unreadable';
+        },
+        () => {},
+      );
+      return on;
     },
     async setOn(on) {
       await inTurn(
         async () => {
-          if (on) forget();
-          else write('off');
+          if (on) {
+            await forget();
+            forgetOldRecord();
+            return;
+          }
+          // Off in both places, so the build before's tabs stop too; either one holds it.
+          await write('off');
+          try {
+            deps.oldRecordOff();
+          } catch {
+            // Storage blocked: the build before's tabs can't count either.
+          }
         },
         () => {},
       );

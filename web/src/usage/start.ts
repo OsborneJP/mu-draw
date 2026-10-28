@@ -1,5 +1,6 @@
 import { NAMING_DEADLINE_MS } from '../api';
 import { runningInstalled } from '../pwa/displayMode';
+import { idbStore } from './idbStore';
 import { answerFor, createUsage, takeTurns, type Answer, type WeekSummary } from './usage';
 
 // The app's anonymous usage counts (usage.ts; docs/plans/v2-usage-counts.md), started from
@@ -38,9 +39,15 @@ async function send(weeks: WeekSummary[]): Promise<Answer> {
 // own turn-taking (so a send can't overlap another in the same tab).
 const thisTabInTurn = takeTurns();
 
+// The build before kept the record in localStorage under this key: its "off" still holds, and
+// stays there for that build's tabs (usage.ts offInOldBuild).
+const OLD_KEY = `usage:${BASE}`;
+
 export const usage = createUsage({
-  storage: () => window.localStorage,
-  key: `usage:${BASE}`,
+  store: idbStore(`usage:${BASE}`),
+  oldRecord: () => window.localStorage.getItem(OLD_KEY),
+  forgetOldRecord: () => window.localStorage.removeItem(OLD_KEY),
+  oldRecordOff: () => window.localStorage.setItem(OLD_KEY, JSON.stringify({ off: true })),
   now: () => new Date(),
   installed: runningInstalled,
   gpc: () => (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true,

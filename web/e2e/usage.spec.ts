@@ -4,20 +4,87 @@
 // own announcement of each decision (data-usage="<n> <outcome>"), never on time.
 import type { Page } from '@playwright/test';
 import { resolveBase } from '../config/app.ts';
-import { expect, goOffline, openEditor, test, waitForEditor, type App } from './fixtures.ts';
+import { RECORD, RECORDS } from '../src/usage/idbStore.ts';
+import { expect, goOffline, openEditor, test, usageRecord, waitForEditor, type App } from './fixtures.ts';
 
 // Wednesdays at noon, by the device's calendar, of 2026-W43, W44 and W45.
 const W43 = new Date(2026, 9, 21, 12);
 const W44 = new Date(2026, 9, 28, 12);
-const KEY = `usage:${resolveBase()}`;
+// The record's IndexedDB database, the lock's name, and the build before's localStorage key
+// (src/usage/start.ts).
+const NAME = `usage:${resolveBase()}`;
+const WHERE = { name: NAME, records: RECORDS, record: RECORD };
 
 /** The app's decision for the n-th time it counted on this page. */
 function decided(page: Page, n: number, outcome: string) {
   return expect(page.locator('html')).toHaveAttribute('data-usage', `${n} ${outcome}`);
 }
 
-function kept(page: Page): Promise<unknown> {
-  return page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? 'null'), KEY);
+const kept = usageRecord;
+
+function databases(page: Page): Promise<string[]> {
+  return page.evaluate(async () => (await indexedDB.databases()).map((db) => db.name ?? ''));
+}
+
+/** Holds the app's lock in the page, as a summary on its way would; returns the release. */
+async function holdTheLock(page: Page): Promise<() => Promise<void>> {
+  await page.evaluate(
+    (name) =>
+      new Promise<void>((held) =>
+        navigator.locks.request(name, () => new Promise<void>((release) => {
+          (window as unknown as { __release: () => void }).__release = release;
+          held();
+        })),
+      ),
+    NAME,
+  );
+  return () => page.evaluate(() => (window as unknown as { __release: () => void }).__release());
+}
+
+/** The app's lock requests waiting their turn. */
+function waiting(page: Page): Promise<number> {
+  return page.evaluate(async (name) => (await navigator.locks.query()).pending?.filter((lock) => lock.name === name).length ?? 0, NAME);
+}
+
+/** Stores a record as another tab of the app would. */
+function store(page: Page, value: unknown): Promise<void> {
+  return page.evaluate(
+    ({ name, records, record, value }) =>
+      new Promise<void>((resolve, reject) => {
+        const opening = indexedDB.open(name);
+        opening.onupgradeneeded = () => opening.transaction!.abort(); // the app hasn't made it yet
+        opening.onerror = () => reject(opening.error);
+        opening.onsuccess = () => {
+          const db = opening.result;
+          const transaction = db.transaction(records, 'readwrite');
+          transaction.objectStore(records).put(value, record);
+          transaction.oncomplete = () => resolve();
+          transaction.onerror = () => reject(transaction.error);
+          db.close();
+        };
+      }),
+    { ...WHERE, value },
+  );
+}
+
+/** Makes this browser what the build before left (c2f4683): its record in localStorage and
+ * none in IndexedDB. */
+function keptByTheBuildBefore(page: Page, value: unknown): Promise<void> {
+  return page.evaluate(
+    ({ name, text }) =>
+      new Promise<void>((resolve, reject) => {
+        localStorage.setItem(name, text);
+        const deleting = indexedDB.deleteDatabase(name);
+        deleting.onsuccess = () => resolve();
+        deleting.onerror = () => reject(deleting.error);
+        deleting.onblocked = () => reject(new Error('the app left its database open'));
+      }),
+    { name: NAME, text: JSON.stringify(value) },
+  );
+}
+
+function oldRecord(page: Page): Promise<string | null> {
+  return page.evaluate((name) => localStorage.getItem(name), NAME);
 }
 
 /** Opens the app on `date`, a new page load at that date. */
@@ -142,7 +209,9 @@ test('Global Privacy Control: nothing is recorded or sent, and About says why co
   await openOn(app, W44);
   await decided(page, 1, 'off');
   expect(app.counts).toEqual([]);
+  expect(await databases(page)).not.toContain(NAME); // nothing stored, not even an empty database
   await page.getByTestId('app-about-button').click();
+  await expect(page.getByTestId('about-usage-switch')).toHaveAttribute('aria-busy', 'false');
   await expect(page.getByTestId('about-usage-switch')).not.toBeChecked();
   await expect(page.getByTestId('about-usage-switch')).toBeDisabled();
   await expect(page.getByTestId('about-usage-gpc')).toBeVisible();
@@ -156,6 +225,7 @@ test("About says what is counted; its switch off forgets the week and stops coun
     'This app counts, each week, how many browsers open it and which tools are used. The counts are kept without names, IDs or IP addresses.',
   );
   const toggle = page.getByTestId('about-usage-switch');
+  await expect(toggle).toHaveAttribute('aria-busy', 'false'); // read
   await expect(toggle).toBeChecked();
   await toggle.uncheck();
   await expect.poll(() => kept(page)).toEqual({ off: true });
@@ -164,14 +234,105 @@ test("About says what is counted; its switch off forgets the week and stops coun
   await decided(page, 1, 'off');
   expect(app.counts).toEqual([]);
   await page.getByTestId('app-about-button').click();
+  await expect(toggle).toHaveAttribute('aria-busy', 'false');
   await expect(toggle).not.toBeChecked();
   await toggle.check();
   await expect.poll(() => kept(page)).toBeNull();
   // Turned off in another tab: About shows it the next time it opens.
   await page.keyboard.press('Escape');
-  await page.evaluate((key) => localStorage.setItem(key, JSON.stringify({ off: true })), KEY);
+  await store(page, { off: true });
   await page.getByTestId('app-about-button').click();
+  await expect(toggle).toHaveAttribute('aria-busy', 'false');
   await expect(toggle).not.toBeChecked();
+});
+
+test("About reads the switch in the lock's turn: disabled until the read comes back", async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  const release = await holdTheLock(page);
+  await page.getByTestId('app-about-button').click();
+  await expect.poll(() => waiting(page)).toBe(1); // About's read, queued behind the lock
+  const toggle = page.getByTestId('about-usage-switch');
+  await expect(toggle).toHaveAttribute('aria-busy', 'true');
+  await expect(toggle).toBeDisabled();
+  await release();
+  await expect(toggle).toHaveAttribute('aria-busy', 'false');
+  await expect(toggle).toBeEnabled();
+  await expect(toggle).toBeChecked();
+});
+
+test('About: a change the store refuses springs back to what is stored', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await page.getByTestId('app-about-button').click();
+  const toggle = page.getByTestId('about-usage-switch');
+  await expect(toggle).toHaveAttribute('aria-busy', 'false');
+  await toggle.uncheck();
+  await expect.poll(() => kept(page)).toEqual({ off: true });
+  // Turning it on again: the store refuses to remove the "off".
+  await page.evaluate(() => {
+    IDBObjectStore.prototype.delete = () => {
+      throw new DOMException('refused', 'UnknownError');
+    };
+  });
+  const release = await holdTheLock(page);
+  await toggle.click();
+  await expect(toggle).toBeChecked(); // as clicked, while the change waits its turn
+  await release();
+  await expect(toggle).not.toBeChecked(); // what is stored
+  expect(await kept(page)).toEqual({ off: true });
+});
+
+test("a write that doesn't commit counts as not kept: nothing is sent", async ({ app }) => {
+  const { page } = app;
+  await startOn(app, W43);
+  // From the next load on, every write succeeds and then its transaction aborts, so it never
+  // commits (as a full disk would): only the transaction's end says whether it was kept.
+  await page.addInitScript(() => {
+    const put = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (this: IDBObjectStore, ...args: Parameters<IDBObjectStore['put']>) {
+      const request = put.apply(this, args);
+      request.addEventListener('success', () => this.transaction.abort());
+      return request;
+    };
+  });
+  await openOn(app, W44);
+  await decided(page, 1, 'nothing');
+  await openOn(app, new Date(2026, 9, 29, 9));
+  await decided(page, 1, 'nothing');
+  expect(app.counts).toEqual([]);
+  expect(await kept(page)).toMatchObject({ week: '2026-W43' });
+});
+
+test('an "off" the build before kept in localStorage holds here, and stays there for that build\'s tabs', async ({ app }) => {
+  const { page } = app;
+  await startOn(app, W43);
+  await keptByTheBuildBefore(page, { off: true });
+  await openOn(app, W44);
+  await decided(page, 1, 'off');
+  expect(await kept(page)).toBeNull(); // nothing recorded
+  // It stays in the old key: that build's tabs, until they reload, read only that.
+  expect(await oldRecord(page)).toBe(JSON.stringify({ off: true }));
+  expect(app.counts).toEqual([]);
+  await page.getByTestId('app-about-button').click();
+  await expect(page.getByTestId('about-usage-switch')).toHaveAttribute('aria-busy', 'false');
+  await expect(page.getByTestId('about-usage-switch')).not.toBeChecked();
+});
+
+test("a week the build before kept isn't carried over: this build counts its own, and the old record goes once its week has passed", async ({
+  app,
+}) => {
+  const { page } = app;
+  await startOn(app, W43);
+  await keptByTheBuildBefore(page, { week: '2026-W43', days: 1, lastDay: '2026-10-21', installed: false, first: true, tools: ['export'], pending: [] });
+  await openOn(app, new Date(2026, 9, 22, 12)); // later the same week
+  await decided(page, 1, 'nothing');
+  expect(await oldRecord(page)).not.toBeNull(); // that build's tabs may still use it this week
+  expect(await kept(page)).toMatchObject({ week: '2026-W43', first: true, tools: [] });
+  await openOn(app, W44);
+  await decided(page, 1, 'sent');
+  expect(app.counts).toEqual([{ weeks: [lastWeek] }]);
+  expect(await oldRecord(page)).toBeNull();
 });
 
 test('the count guard is live: a body that is not a weekly summary, a referrer or a cookie is reported', async ({ app }) => {

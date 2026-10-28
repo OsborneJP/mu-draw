@@ -11,7 +11,16 @@ export default function AboutBox({ title }: { title: string }) {
   // While the browser offers to install the app, even after the strip's Not now.
   const { offered } = useSyncExternalStore(installOffer.subscribe, installOffer.getState);
   // Anonymous usage counts (docs/plans/v2-usage-counts.md): what is counted, and the switch.
-  const [counting, setCounting] = useState(() => usage.isOn());
+  // It is read from storage each time About opens (another tab may have changed it); null
+  // until that read comes back, and only the latest read is shown.
+  const [counting, setCounting] = useState<boolean | null>(null);
+  const reads = useRef(0);
+  const show = (read: Promise<boolean>) => {
+    const n = ++reads.current;
+    void read.then((on) => {
+      if (reads.current === n) setCounting(on);
+    });
+  };
   const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
   return (
     <>
@@ -20,7 +29,8 @@ export default function AboutBox({ title }: { title: string }) {
         className="header-button"
         data-testid="app-about-button"
         onClick={() => {
-          setCounting(usage.isOn()); // another tab may have changed it
+          setCounting(null);
+          show(usage.isOn());
           dialog.current?.showModal();
         }}
       >
@@ -43,12 +53,14 @@ export default function AboutBox({ title }: { title: string }) {
             <input
               type="checkbox"
               data-testid="about-usage-switch"
-              checked={counting}
-              disabled={gpc}
+              checked={counting === true}
+              disabled={gpc || counting === null}
+              aria-busy={counting === null}
               onChange={(event) => {
-                setCounting(event.target.checked);
+                const on = event.target.checked;
+                setCounting(on);
                 // In turn behind a summary on its way, which can't then undo it.
-                void usage.setOn(event.target.checked).then(() => setCounting(usage.isOn()));
+                show(usage.setOn(on).then(() => usage.isOn()));
               }}
             />{' '}
             Count my use anonymously

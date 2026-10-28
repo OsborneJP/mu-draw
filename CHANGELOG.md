@@ -205,7 +205,9 @@ All notable changes to this project. The format follows
   which tools were used, Practice apart), with no identifier or cookie; the server keeps only
   weekly totals, and `scripts/usage_report.py` prints them. About says so and has a switch to
   turn it off; Global Privacy Control turns it off too. Needs the API services restarted and
-  the Apache change in docs/server-setup.md section (c).
+  the Apache change in docs/server-setup.md section (c). The browser keeps its summary in
+  IndexedDB, so two tabs can't both send the same week (localStorage let them, rarely); an
+  "off" set in the first build still holds.
 - An offer to install the app: in Chrome and Edge, while the browser can install it, a strip
   under the header says "Install MU Draw as an app: it opens in its own window, like your other
   apps, and works offline." Install opens the browser's own install dialog; Not now hides the
