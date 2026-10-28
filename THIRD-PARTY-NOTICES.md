@@ -3,13 +3,29 @@
 LICENSE (MIT) covers this repository's own code and documents. These parts keep their
 own licences:
 
-- server/opsin/opsin.jar: OPSIN, under the MIT licence in server/opsin/LICENSE.txt.
-- web/public/nmr/carbon-shifts.bin and tests/fixtures/nmr/excerpt.sd and
-  reference_spectra.json: contain information from nmrshiftdb2 (www.nmrshiftdb.org),
-  which is made available here under the nmrshiftdb2 Database License
+- server/opsin/opsin.jar: OPSIN, under the MIT licence in server/opsin/LICENSE.txt. The jar
+  also packs the libraries OPSIN uses: dk.brics.automaton (BSD); Woodstox (Apache License
+  2.0), with the parts of MSV (BSD licences; a few files under the Apache Software License
+  1.1 or the Apache License 2.0), RELAX NG datatype (BSD) and ISO RELAX (MIT) that it carries
+  inside itself; Stax2 API (BSD 2-Clause); Apache Commons IO and Apache Log4j API (Apache
+  License 2.0). Their versions, copyright notices, licence texts and NOTICE files are in
+  third_party/opsin/LICENSES.txt. OPSIN runs only on the server, so none of this reaches a
+  student's device.
+- These files contain information from nmrshiftdb2 (www.nmrshiftdb.org), which is made
+  available here under the nmrshiftdb2 Database License
   (web/public/nmr/LICENSE-nmrshiftdb2.txt;
-  https://nmrshiftdb.nmr.uni-koeln.de/nmrshiftdbhtml/nmrshiftdb2datalicense.txt).
-  web/scripts/build-carbon-table.ts shows how the shift table is derived from it.
+  https://nmrshiftdb.nmr.uni-koeln.de/nmrshiftdbhtml/nmrshiftdb2datalicense.txt):
+  - the ¹³C and ¹H shift tables, web/public/nmr/carbon-shifts.bin and
+    web/public/nmr/proton-shifts.bin, derived from it by web/scripts/build-carbon-table.ts
+    and web/scripts/build-proton-table.ts;
+  - the test compounds' records and measured shifts, and the predictions' outliers against
+    them: tests/fixtures/nmr/excerpt.sd, tests/fixtures/nmr/reference_spectra.json,
+    tests/fixtures/nmr/outliers.json, tests/fixtures/proton_nmr/excerpt.sd,
+    tests/fixtures/proton_nmr/reference_spectra.json and tests/fixtures/proton_nmr/outliers.json;
+  - a few of those measured shifts, quoted in BUILD-LEARNINGS.md and
+    docs/plans/v2-proton-nmr.md.
+
+  Both NMR previews show this notice with every prediction.
 - web/public/ir-bands.json: the IR hint table, compiled by MU Draw contributors, under
   CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); changes to it stay under
   that licence. Its values are adapted in part from "Infrared spectroscopy correlation

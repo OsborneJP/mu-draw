@@ -281,3 +281,7 @@ All notable changes to this project. The format follows
   (its Save dialog preview, say); Indigo's conversions now take turns too.
 - A deploy asked for an API restart when only the server's tests or fixture scripts had
   changed. Now only a change to the code the service runs, or to its environment, does.
+- THIRD-PARTY-NOTICES.md missed the ¹H shift table and some NMR test files that hold
+  nmrshiftdb2 data, and the libraries packed inside opsin.jar. It now names them all. The
+  libraries' copyright notices and licence texts are in third_party/opsin/LICENSES.txt, and
+  check.sh fails if either list falls behind.
