@@ -11,6 +11,13 @@ own licences:
   License 2.0). Their versions, copyright notices, licence texts and NOTICE files are in
   third_party/opsin/LICENSES.txt. OPSIN runs only on the server, so none of this reaches a
   student's device.
+- third_party/indigo-source/: the source of InChI 1.06 (IUPAC/InChI-Trust InChI Licence No. 1.0,
+  third_party/inchi/LICENCE inside the archive) and cairo (upstream commit 06f405c7, which calls
+  itself 1.17.4; distributed here under the Mozilla Public License 1.1, which its authors let the
+  recipient choose instead of the LGPL 2.1)
+  as built into the app's Indigo, with Indigo's build files (Apache License 2.0), taken unchanged
+  from Indigo's commit b36d38f5 by scripts/build_indigo_source.py. Its README lists the files
+  that differ from the upstream releases. The app ships it.
 - These files contain information from nmrshiftdb2 (www.nmrshiftdb.org), which is made
   available here under the nmrshiftdb2 Database License
   (web/public/nmr/LICENSE-nmrshiftdb2.txt;

@@ -78,6 +78,7 @@ describe('checkPrecache', () => {
     ['¹H shift table', 'nmr/proton-shifts.bin'],
     ['IR hint table', 'ir-bands.json'],
     ['practice list file', 'practice.json'],
+    ['InChI and cairo source', 'third-party/indigo-b36d38f5-inchi-cairo.tar.xz'],
   ])('fails when the %s is missing from the build', (what, path) => {
     const files = FILES.filter((f) => f.path !== path);
     expect(files.length).toBe(FILES.length - 1);

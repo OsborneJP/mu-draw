@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { ports, resolveBase } from './config/app.ts';
 import { cspPlugin } from './config/csp.ts';
+import { indigoSource } from './config/indigoSource.ts';
 import { ketcherSaveFormats, MIEW_STAND_IN } from './config/ketcherTrim.ts';
 import { noticesLog } from './config/noticesLog.ts';
 import { appTitle, htmlTitle, pwaOptions } from './config/pwa.ts';
@@ -21,6 +22,7 @@ export default defineConfig({
     cspPlugin(),
     rdkitWasm(),
     ketcherSaveFormats(),
+    indigoSource(),
     log.main,
     VitePWA(pwaOptions(base)),
   ],

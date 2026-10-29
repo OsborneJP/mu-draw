@@ -11,7 +11,8 @@ import { checkHtmlLinks, checkTitle } from './checks/html.ts';
 import { checkNoMiew } from './checks/ketcherTrim.ts';
 import { checkInventory } from './notices/disk.ts';
 import { checkManifest, checkPromptMode } from './checks/manifest.ts';
-import { checkPrecache, parseSwManifest, type DistFile } from './checks/precache.ts';
+import { checkPrecache, INDIGO_WASM, parseSwManifest, type DistFile } from './checks/precache.ts';
+import { checkSourceMatchesWasm, INDIGO_SOURCE_README } from '../config/indigoSource.ts';
 import { checkSvg } from './checks/svg.ts';
 import { GHS_PICTOGRAMS, pictogramFile } from '../src/panels/ghsPictograms.ts';
 
@@ -38,6 +39,10 @@ const errors = [
   ...checkHtmlLinks(read('index.html'), base, files.map((f) => f.path)).map((e) => `index.html: ${e}`),
   ...checkTitle(read('index.html'), title).map((e) => `index.html: ${e}`),
   ...checkInventory(dist).map((e) => `licence notices: ${e}`),
+  ...files
+    .filter((f) => INDIGO_WASM.test(f.path))
+    .flatMap((f) => checkSourceMatchesWasm(readFileSync(join(dist, f.path)), readFileSync(INDIGO_SOURCE_README, 'utf8')))
+    .map((e) => `InChI and cairo source: ${e}`),
   ...checkNoMiew(files.filter((f) => f.path.endsWith('.js')).map((f) => ({ path: f.path, text: read(f.path) }))),
   ...GHS_PICTOGRAMS.map(pictogramFile)
     .filter((path) => files.some((f) => f.path === path)) // a missing one is the precache guard's

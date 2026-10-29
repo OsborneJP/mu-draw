@@ -8,20 +8,16 @@
     "size": 71118
   },
   {
-    "path": "assets/index-IlIQdueO.js",
-    "size": 8122385
+    "path": "assets/index-CiZ7_2Uo.css",
+    "size": 200598
   },
   {
-    "path": "assets/index-VqJed3cf.css",
-    "size": 200079
+    "path": "assets/index-Do2byclZ.js",
+    "size": 8133125
   },
   {
-    "path": "assets/index.modern-55d8e3ef-kctqBJVr.js",
-    "size": 425349
-  },
-  {
-    "path": "assets/index.modern-D8hrqyu3.js",
-    "size": 1220506
+    "path": "assets/index.modern-55d8e3ef-B5xQ9TWy.js",
+    "size": 425344
   },
   {
     "path": "assets/indigo-ketcher-1.46.0-f_xBxuuS.wasm",
@@ -30,6 +26,10 @@
   {
     "path": "assets/indigoWorker-d22340fa-CfkaByZ9.js",
     "size": 73996
+  },
+  {
+    "path": "assets/noMiew-CM8SK-g3.js",
+    "size": 287
   },
   {
     "path": "assets/rolldown-runtime-BCiCTKAo.js",
@@ -221,7 +221,11 @@
   },
   {
     "path": "sw.js",
-    "size": 4863
+    "size": 4956
+  },
+  {
+    "path": "third-party/indigo-b36d38f5-inchi-cairo.tar.xz",
+    "size": 1688336
   },
   {
     "path": "workbox-2fbc6a65.js",

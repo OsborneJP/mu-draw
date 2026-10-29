@@ -6,6 +6,7 @@ import { RDKIT_WASM_FILE, RDKIT_WORKER_FILE } from '../../config/rdkitWasm.ts';
 import { CARBON_TABLE_FILE, CARBON_TABLE_LICENCE_FILE, PATTERNS_FILE, PROTON_TABLE_FILE } from '../../src/chem/rdkitFiles.ts';
 import { IR_BANDS_FILE } from '../../src/chem/irBands.ts';
 import { PRACTICE_FILE } from '../../src/panels/practiceFile.ts';
+import { INDIGO_SOURCE_FILE } from '../../src/shell/thirdParty.ts';
 import glassware from '../../src/editor/glassware.json' with { type: 'json' };
 import { GHS_PICTOGRAMS, pictogramFile } from '../../src/panels/ghsPictograms.ts';
 
@@ -18,7 +19,7 @@ export interface DistFile {
 // and source maps (never deployed).
 const NOT_PRECACHED = [/^sw\.js$/, /^workbox-[\w-]+\.js$/, /\.map$/];
 // Indigo with rendering (Ketcher's PNG/SVG export needs it), not the norender build.
-const INDIGO_WASM = /^assets\/indigo-ketcher-\d[\d.]*-[\w-]+\.wasm$/;
+export const INDIGO_WASM = /^assets\/indigo-ketcher-\d[\d.]*-[\w-]+\.wasm$/;
 // The 3D view's viewer, 3Dmol.js, in its own chunk: loaded when a model is first shown
 // (src/panels/viewer3d.ts), so it must be there, apart from the main chunk.
 const THREEDMOL_CHUNK = /^assets\/3Dmol-[\w-]+\.js$/;
@@ -93,6 +94,7 @@ export function checkPrecache(files: DistFile[], precached: string[]): string[] 
   if (!paths.has(PROTON_TABLE_FILE)) errors.push(`¹H shift table missing: ${PROTON_TABLE_FILE}`);
   if (!paths.has(IR_BANDS_FILE)) errors.push(`IR hint table missing: ${IR_BANDS_FILE}`);
   if (!paths.has(PRACTICE_FILE)) errors.push(`practice list file missing: ${PRACTICE_FILE}`);
+  if (!paths.has(INDIGO_SOURCE_FILE)) errors.push(`InChI and cairo source missing: ${INDIGO_SOURCE_FILE}`);
   for (const piece of glassware.pieces) {
     if (!paths.has(piece.file)) errors.push(`glassware piece missing: ${piece.file}`);
   }

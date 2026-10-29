@@ -76,16 +76,16 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
   (belowCanvas.ts): state in nmr/protonNmr/stereo/forms/safety/threeD.ts, *Store.ts wiring, panelWorker.ts.
 - `web/src/`: api.ts (`<base>api/*`, 8 s), pubchemPage.ts; pwa/ (SW, updates, install offer); shell/ (header, About, banners); usage/ (counts).
 - `web/public/`: icons; functional-groups.json; ir-bands.json; nmr/ (¹³C, ¹H); practice.json; glassware/; ghs/.
-- `web/config/`: build-time config (base, PWA, CSP, pins). `web/scripts/`: post-build guards.
-- `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
+- `web/scripts/`: post-build guards. `web/e2e/`: Playwright smoke tests. `test.use({ buildCopy: true })` + `publishSecondBuild`
   for update tests (local only); `relaunch()`, `newPage()`, `nextAutosave()` in fixtures.ts.
-  export.spec.ts reads PNG headers, pixels and the clipboard back; `holdable{Rdkit,Indigo,Biochem}Replies()`
-  (fixtures.ts) hold workers' replies; naming specs hold API answers.
+  export.spec.ts reads PNG headers, pixels and the clipboard back; fixtures' `holdable{Rdkit,Indigo,Biochem}Replies()`
+  hold workers' replies; naming specs hold API answers. `web/config/`: build-time config (base, PWA, CSP, pins).
 - `server/main.py`: FastAPI `/api/health`, `name`, `structure`, `safety`, `conformer`, `count` (`create_app()` takes
   fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py` (PubChem's GHS), `threed.py` (3D
   models: RDKit.js can't embed), `cache.py` (SQLite in `$STATE_DIRECTORY`), `usage.py`, `opsin.py` (jar, Java).
 - `scripts/`: check.sh, deploy.sh, usage_report.py, `lib/`, `checks/`, generators (build_glassware.py
-  cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json).
+  cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json; build_indigo_source.py
+  makes third_party/indigo-source/, the InChI and cairo source the app ships: redo it when indigo-ketcher changes).
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
   replays), `functional_group*`, `nmr*`, `proton_nmr*`, `proton_rule*` (test sets; judgement provisional), `chemdraw/`.
 - `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit), plans/ (acceptance bars).

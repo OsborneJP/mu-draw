@@ -169,7 +169,7 @@ The "Third-party licences" button opens the panel.
 - recorded, with its SHA-256 and the commit, in the Indigo wasm's record, which is keyed to that wasm's SHA-256;
 - tied to the wasm that actually ships: a check reads the `-g<commit>` in the shipped wasm's version string, and the README inside the archive must name the same commit. The README beside it must be byte-identical to the one inside.
 
-To list EPAM's changes reliably, the script also commits a SHA-256 manifest of the pristine upstream sources (InChI v1.06 at commit a515b397; the cairo 1.17.4 release tarball). Finishing the cairo comparison is part of the work.
+To list EPAM's changes reliably, the script also commits a SHA-256 manifest of the pristine upstream sources: InChI v1.06 at commit a515b397, and cairo at upstream commit 06f405c7. Indigo's cairo turned out to be that 2021 git snapshot, which calls itself 1.17.4, not the 1.17.4 release (found while building).
 
 `xz` joins the precache patterns. NOTICES.txt and the archive join the precache guard's required files.
 

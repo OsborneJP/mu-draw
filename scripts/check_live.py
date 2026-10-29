@@ -27,6 +27,8 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from build_indigo_source import ARCHIVE
+
 from lib.appconfig import ROOT
 from render_server_config import ACCESS_LOG, IMMUTABLE, csp_policy, worker_policies
 
@@ -190,6 +192,7 @@ def expectations(dist_files: list[str], tag: str = "live-check") -> list[Expect]
         ir_bands_check(),
         Expect("nmr/carbon-shifts.bin", cache="no-cache", content_type="application/octet-stream"),
         Expect("nmr/LICENSE-nmrshiftdb2.txt", cache="no-cache", content_type="text/plain"),
+        Expect(f"third-party/{ARCHIVE.name}", cache="no-cache", content_type="application/x-xz"),
         Expect("nmr/proton-shifts.bin", cache="no-cache", content_type="application/octet-stream"),
         # Opened on its own, a pictogram runs under the page's CSP (svg.ts checks the file).
         Expect("ghs/GHS07.svg", cache="no-cache", content_type="image/svg+xml", csp=True),
