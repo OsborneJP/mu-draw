@@ -8,6 +8,7 @@ import { cspPolicy, WORKER_EXTRAS } from '../config/csp.ts';
 import { appTitle } from '../config/pwa.ts';
 import { checkBuiltHtml, checkCspPolicy, checkWorkerExtras } from './checks/csp.ts';
 import { checkHtmlLinks, checkTitle } from './checks/html.ts';
+import { checkNoMiew } from './checks/ketcherTrim.ts';
 import { checkManifest, checkPromptMode } from './checks/manifest.ts';
 import { checkPrecache, parseSwManifest, type DistFile } from './checks/precache.ts';
 import { checkSvg } from './checks/svg.ts';
@@ -35,6 +36,7 @@ const errors = [
   ...checkBuiltHtml(read('index.html'), cspPolicy()).map((e) => `index.html: ${e}`),
   ...checkHtmlLinks(read('index.html'), base, files.map((f) => f.path)).map((e) => `index.html: ${e}`),
   ...checkTitle(read('index.html'), title).map((e) => `index.html: ${e}`),
+  ...checkNoMiew(files.filter((f) => f.path.endsWith('.js')).map((f) => ({ path: f.path, text: read(f.path) }))),
   ...GHS_PICTOGRAMS.map(pictogramFile)
     .filter((path) => files.some((f) => f.path === path)) // a missing one is the precache guard's
     .flatMap((path) => checkSvg(read(path)).map((e) => `${path}: ${e}`)),

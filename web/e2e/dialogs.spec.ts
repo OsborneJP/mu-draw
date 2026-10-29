@@ -6,6 +6,7 @@ import type { Page } from '@playwright/test';
 import { expect, fixture, fixturePath, inchiKey, openEditor, referenceCompound, test, type App } from './fixtures.ts';
 
 const MOLFILE_MARKER = /V2000/; // chem-literal-ok: format marker
+const MOLFILE_OPTION = 'MDL Molfile V2000-option'; // chem-literal-ok: Ketcher's name for the format
 const CANVAS = '[data-testid="ketcher-canvas"][data-canvasmode="molecules-mode"]';
 
 function smiles(name: string): string {
@@ -102,6 +103,33 @@ test('Save shows the file name, the format and its buttons, but not the file', a
     await expect(format).toHaveText(option);
     await expect(preview).toHaveCount(1);
     await expect(preview).toBeHidden();
+  }
+});
+
+test('Save offers no InChI formats, in either toolbar (licence-notices plan, decision 5)', async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await load(page, 'aspirin');
+  for (const [width, height] of [
+    [1280, 720],
+    [640, 480],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    // The compact toolbar, after a resize, duplicates Save: the sign it has rendered.
+    if (width < 1280) await expect(page.getByTestId('save-file-button')).toHaveCount(2);
+    await page.getByTestId('save-file-button').filter({ visible: true }).click();
+    const dialog = page.getByTestId('save-dialog');
+    await dialog.getByRole('combobox').click();
+    // The list is open: the formats that stay are in it.
+    await expect(page.getByTestId(MOLFILE_OPTION)).toBeVisible();
+    await expect(page.getByTestId('Daylight SMILES-option')).toBeVisible();
+    for (const gone of ['InChI', 'InChI AuxInfo', 'InChIKey']) {
+      await expect(page.getByTestId(`${gone}-option`)).toHaveCount(0);
+    }
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId(MOLFILE_OPTION)).toBeHidden();
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(dialog).toHaveCount(0);
   }
 });
 

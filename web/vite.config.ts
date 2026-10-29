@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { ports, resolveBase } from './config/app.ts';
 import { cspPlugin } from './config/csp.ts';
+import { ketcherSaveFormats, MIEW_STAND_IN } from './config/ketcherTrim.ts';
 import { appTitle, htmlTitle, pwaOptions } from './config/pwa.ts';
 import { rdkitWasm, workerFileName } from './config/rdkitWasm.ts';
 import pkg from './package.json' with { type: 'json' };
@@ -11,7 +12,16 @@ const base = resolveBase();
 
 export default defineConfig({
   base,
-  plugins: [react(), htmlTitle(appTitle(base)), cspPlugin(), rdkitWasm(), VitePWA(pwaOptions(base))],
+  plugins: [
+    react(),
+    htmlTitle(appTitle(base)),
+    cspPlugin(),
+    rdkitWasm(),
+    ketcherSaveFormats(),
+    VitePWA(pwaOptions(base)),
+  ],
+  // Ketcher's Miew viewer stays out of the build, for its licence (config/ketcherTrim.ts).
+  resolve: { alias: [MIEW_STAND_IN] },
   define: {
     // ketcher-react's dist uses Node's bare `global` (its Redux root reducer writes
     // global.currentState on every dispatch) and its deps read process.env at load time.

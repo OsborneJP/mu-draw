@@ -2,7 +2,7 @@ import type { ButtonsConfig } from 'ketcher-react';
 
 // Stock Ketcher parts that stay hidden (decided 2026-10-23):
 // - help, about: open github.com / epam.com, breaking "no requests except our own files".
-// - miew: the 3D viewer ("3D view" is After v1).
+// - miew: the 3D viewer ("3D view" is After v1). Miew isn't even shipped (config/ketcherTrim.ts).
 // - recognize: structure from image ("Later version"; standalone Ketcher can't run it).
 // - create-monomer: macromolecule tooling ("Biochem tools" are After v1).
 export const HIDDEN_BUTTONS = {

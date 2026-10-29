@@ -214,6 +214,10 @@ All notable changes to this project. The format follows
   strip for good in that browser, and About keeps an "Install as an app" button.
 
 ### Changed
+- Ketcher's Save dialog no longer offers InChI, InChI AuxInfo or InChIKey: Indigo's InChI is
+  a modified InChI 1.06, whose licence forbids calling its output InChI. Ketcher's own 3D
+  viewer (Miew), hidden since launch, is no longer shipped either, so the app downloads
+  1.2 MB less. The 3D view (3Dmol.js) is unchanged.
 - About now says who made the app: "Made by Jeff Osborne with Claude Code."
 - An open app now finds a new version when the student comes back to it (from another tab
   or window, or after closing the lid) or when the device comes back online, and shows the

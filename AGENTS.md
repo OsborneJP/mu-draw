@@ -36,7 +36,8 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
    Jeff has started, each with his approved plan in docs/plans/v2-*.md. Nothing else.
    Enforced by: review. Ketcher's 3D viewer, macromolecules mode, create-monomer and
    structure-from-image are hidden (web/src/editor/ketcherUi.ts and editor.css); the smoke
-   tests check each is absent or display:none, in the compact toolbar too.
+   tests check each is absent or display:none, in the compact toolbar too. Miew and Save's
+   InChI formats are left out of the build, for their licences (web/config/ketcherTrim.ts).
 
 ## Commands
 `<env>` is the conda env name: `python3 -I scripts/lib/appconfig.py --get ENV_NAME`.
