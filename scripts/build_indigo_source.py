@@ -32,6 +32,10 @@ NAME = f"indigo-{INDIGO_COMMIT[:8]}-inchi-cairo"
 ARCHIVE = OUT / f"{NAME}.tar.xz"
 README = OUT / "README.md"
 MANIFEST = OUT / "upstream.sha256"
+# Every file of Indigo's trees at the commit, by git blob id, as `git ls-tree` lists them: an
+# archive missing a file or holding another can't pass, and anyone can check the list against
+# the public commit.
+INDIGO_MANIFEST = OUT / "indigo.git-blobs"
 
 # Indigo's files that go in, and where their untouched upstream copies sit.
 TREES = {"third_party/inchi/": "INCHI-1-SRC/", "third_party/cairo/": "cairo/"}
@@ -46,6 +50,11 @@ CAIRO_LICENCES = ["COPYING", "COPYING-LGPL-2.1", "COPYING-MPL-1.1"]
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def git_blob(data: bytes) -> str:
+    """The id git gives a file's bytes."""
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
 
 
 def sparse_clone(url: str, commit: str, paths: list[str], into: Path) -> Path:
@@ -145,6 +154,12 @@ def build() -> None:
         sparse_clone(CAIRO_REPO, CAIRO_COMMIT, ["src/", "boilerplate/", *CAIRO_LICENCES], cairo)
         show = ["git", "show", "-s", "--format=%ct", "HEAD"]
         mtime = int(subprocess.run(show, cwd=indigo, check=True, capture_output=True).stdout)
+        ls_tree = ["git", "ls-tree", "-r", "HEAD", "--", *TREES]
+        listing = subprocess.run(ls_tree, cwd=indigo, check=True, capture_output=True, text=True)
+        blobs = {}
+        for line in listing.stdout.splitlines():
+            meta, path = line.split("\t", 1)
+            blobs[path] = meta.split()[2]
 
         files: dict[str, bytes] = {}
         for tree in TREES:
@@ -175,11 +190,15 @@ def build() -> None:
     ARCHIVE.write_bytes(archive_bytes(files, mtime))
     README.write_text(text, encoding="utf-8")
     MANIFEST.write_text("".join(f"{h}  {p}\n" for p, h in sorted(kept.items())), encoding="utf-8")
+    INDIGO_MANIFEST.write_text(
+        "".join(f"{h}  {p}\n" for p, h in sorted(blobs.items())), encoding="utf-8"
+    )
     print(f"{ARCHIVE.relative_to(ROOT)}: {ARCHIVE.stat().st_size} bytes, {len(files)} files")
     print(f"differ from upstream: {len(changed)}; not upstream: {len(added)}")
 
 
 def read_manifest(path: Path = MANIFEST) -> dict[str, str]:
+    """A manifest's entries (upstream.sha256 by default, or indigo.git-blobs)."""
     entries = (line.split("  ", 1) for line in path.read_text(encoding="utf-8").splitlines())
     return {name: digest for digest, name in entries}
 
@@ -193,11 +212,22 @@ def archive_files(path: Path = ARCHIVE) -> dict[str, bytes]:
         }
 
 
-def check(files: dict[str, bytes], beside: bytes, manifest: dict[str, str]) -> list[str]:
-    """Problems with an archive's files, given the README beside it and the upstream manifest:
-    the README inside must be the one beside it, and must list exactly the files that differ
-    from (or are missing in) the untouched upstream sources."""
+def check(
+    files: dict[str, bytes], beside: bytes, manifest: dict[str, str], indigo: dict[str, str]
+) -> list[str]:
+    """Problems with an archive's files, given the README beside it, the upstream manifest and
+    Indigo's trees by git blob id: the archive must hold exactly Indigo's files, the README
+    inside must be the one beside it, and it must list exactly the files that differ from (or
+    are missing in) the untouched upstream sources."""
     problems = []
+    trees = {p: git_blob(d) for p, d in files.items() if any(p.startswith(t) for t in TREES)}
+    for path in sorted(set(indigo) - set(trees)):
+        problems.append(f"{path} is missing from the archive")
+    for path in sorted(set(trees) - set(indigo)):
+        problems.append(f"{path} is in the archive but not in Indigo's tree")
+    for path in sorted(set(trees) & set(indigo)):
+        if trees[path] != indigo[path]:
+            problems.append(f"{path} is not Indigo's file")
     inside = files.get("README.md")
     if inside != beside:
         problems.append("the README inside the archive is not the one beside it")

@@ -24,8 +24,9 @@ own licences:
   itself 1.17.4; distributed here under the Mozilla Public License 1.1, which its authors let the
   recipient choose instead of the LGPL 2.1)
   as built into the app's Indigo, with Indigo's build files (Apache License 2.0), taken unchanged
-  from Indigo's commit b36d38f5 by scripts/build_indigo_source.py. Its README lists the files
-  that differ from the upstream releases. The app ships it.
+  from Indigo's commit b36d38f5, and cairo's licence texts from its commit 06f405c7, by
+  scripts/build_indigo_source.py. Its README lists the files that differ from InChI v1.06 and
+  from cairo's commit 06f405c7. The app ships it.
 - These files contain information from nmrshiftdb2 (www.nmrshiftdb.org), which is made
   available here under the nmrshiftdb2 Database License
   (web/public/nmr/LICENSE-nmrshiftdb2.txt;
@@ -115,7 +116,7 @@ own licences:
 - 3Dmol.js 2.5.5 (npm package 3dmol, bundled into the app's 3Dmol chunk for the 3D view):
   BSD 3-Clause License, Copyright (c) 2014, University of Pittsburgh and contributors. Its
   bundle carries GLmol, Three.js and jQuery code, pako 2.1.0 and 1.0.11, iobuffer, netcdfjs,
-  upng-js, EDTSurf, mol* and mmtf code; web/public/third-party/NOTICES.txt gives each one's
-  notice. The About box credits it.
+  upng-js, EDTSurf, mol*, mmtf and NGL code and Rendu's FXAA shader, among others;
+  web/public/third-party/NOTICES.txt gives each one's notice. The About box credits it.
 - Packages installed by npm and conda are under their own licences; those whose code the app
   ships are listed, with their notices, in web/public/third-party/NOTICES.txt.

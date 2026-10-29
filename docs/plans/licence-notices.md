@@ -284,4 +284,14 @@ To list EPAM's changes reliably, the script also commits a SHA-256 manifest of t
   - **Medium:** Workbox's built markers (7.4.0) differ from its package versions (7.4.1); they are now compared with each package's own `_version.js`.
   - **Medium:** records were not keyed to the bytes they describe, so `--accept` could clear the guard over stale records.
   - The lows are folded in.
-- **Next review:** the implementation is reviewed against this bar. A further plan-only round would mostly re-check wording.
+- **The implementation** was reviewed twice against this bar while it was built: the generator and its output, then the whole release.
+  - **The generator review:** 2 high and 3 medium, all fixed:
+    - **High:** Workbox and the build tools' runtime had no entries.
+    - **Medium:** holders named mid-line were dropped.
+    - **Medium:** assert's narwhal.js notice was missing.
+  - **The release review:** 2 medium, both fixed:
+    - **Medium:** a late answer could reopen a closed licences panel. The panel and the Save now live in thirdPartyActions.ts, whose tests hold each answer to force each order.
+    - **Medium:** the archive's hash was recorded nowhere. It is now in the Indigo record, and verify-dist checks the shipped bytes against it. A list of Indigo's trees by git blob id (indigo.git-blobs, from `git ls-tree`) catches an archive missing a file.
+  - Their lows are fixed too.
+  - **A last capped round, on those fixes:** 1 medium, fixed with a test. Focusing Close on opening scrolled the now taller About to its end, hiding the title; focus now starts on the title. Its three lows are fixed: the licences button retries after an error, the tree list comes from git, and a missing negative test was added.
+  - **Stopped here.** That round's fixes are small, and each has a test that fails without it. Another round would review a few lines.

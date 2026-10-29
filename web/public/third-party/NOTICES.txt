@@ -13,8 +13,8 @@ against them.
   which EPAM Systems publishes Ketcher and Indigo, cover only their authors' own code. Every
   other part keeps the licence given for it below.
 - The source of InChI and cairo, as built into the app's copy of Indigo, comes with the app:
-  indigo-b36d38f5-inchi-cairo.tar.xz, beside this file. Its README lists what EPAM Systems
-  changed. cairo is distributed here under the Mozilla Public License 1.1 only.
+  indigo-b36d38f5-inchi-cairo.tar.xz, beside this file, which the About box offers to save. Its
+  README lists what EPAM Systems changed. cairo is distributed here under the Mozilla Public License 1.1 only.
 - Part 2 lists the app's code, part 3 what is inside its two WebAssembly files, and part 4
   the data and ported code in the app itself. The licence texts follow.
 

@@ -686,5 +686,10 @@
    "noCopyright": "public domain (CC0)"
   }
  ],
- "slug": "indigo-wasm"
+ "slug": "indigo-wasm",
+ "sourceArchive": {
+  "file": "third_party/indigo-source/indigo-b36d38f5-inchi-cairo.tar.xz",
+  "sha256": "cae3bb5b949e6b55dbf0ee79f6d8f917e4a0d62db5e94b873df7d362fbdc0068",
+  "indigoCommit": "b36d38f5293470721fe02ee570d9f0e6488a5b8d"
+ }
 }

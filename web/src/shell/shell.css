@@ -100,6 +100,25 @@
   font-size: 13px;
 }
 
+/* The third-party notices (AboutBox.tsx): long, so they scroll inside the dialog, which keeps
+   within the window. */
+.about-box {
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.about-licences {
+  max-height: 40vh;
+  overflow: auto;
+  margin: 0 0 10px;
+  padding: 8px;
+  background: #f6f6f6;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 /* The update banner, and the install strip under it (InstallStrip.tsx), look alike. */
 .update-banner,
 .install-strip {

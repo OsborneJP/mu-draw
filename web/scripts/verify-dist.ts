@@ -12,7 +12,8 @@ import { checkNoMiew } from './checks/ketcherTrim.ts';
 import { checkInventory } from './notices/disk.ts';
 import { checkManifest, checkPromptMode } from './checks/manifest.ts';
 import { checkPrecache, INDIGO_WASM, parseSwManifest, type DistFile } from './checks/precache.ts';
-import { checkSourceMatchesWasm, INDIGO_SOURCE_README } from '../config/indigoSource.ts';
+import { checkArchive, checkSourceMatchesWasm, INDIGO_SOURCE_README, recordedSource } from '../config/indigoSource.ts';
+import { INDIGO_SOURCE_FILE } from '../src/shell/thirdParty.ts';
 import { checkSvg } from './checks/svg.ts';
 import { GHS_PICTOGRAMS, pictogramFile } from '../src/panels/ghsPictograms.ts';
 
@@ -36,12 +37,21 @@ const errors = [
     .filter((path) => !files.some((f) => f.path === path))
     .map((path) => `csp-workers.json: ${path} is not in the build`),
   ...checkBuiltHtml(read('index.html'), cspPolicy()).map((e) => `index.html: ${e}`),
-  ...checkHtmlLinks(read('index.html'), base, files.map((f) => f.path)).map((e) => `index.html: ${e}`),
+  ...checkHtmlLinks(
+    read('index.html'),
+    base,
+    files.map((f) => f.path),
+  ).map((e) => `index.html: ${e}`),
   ...checkTitle(read('index.html'), title).map((e) => `index.html: ${e}`),
   ...checkInventory(dist).map((e) => `licence notices: ${e}`),
   ...files
     .filter((f) => INDIGO_WASM.test(f.path))
-    .flatMap((f) => checkSourceMatchesWasm(readFileSync(join(dist, f.path)), readFileSync(INDIGO_SOURCE_README, 'utf8')))
+    .flatMap((f) => [
+      ...checkSourceMatchesWasm(readFileSync(join(dist, f.path)), readFileSync(INDIGO_SOURCE_README, 'utf8')),
+      ...(files.some((g) => g.path === INDIGO_SOURCE_FILE)
+        ? checkArchive(readFileSync(join(dist, INDIGO_SOURCE_FILE)), recordedSource(), readFileSync(join(dist, f.path)))
+        : []),
+    ])
     .map((e) => `InChI and cairo source: ${e}`),
   ...checkNoMiew(files.filter((f) => f.path.endsWith('.js')).map((f) => ({ path: f.path, text: read(f.path) }))),
   ...GHS_PICTOGRAMS.map(pictogramFile)

@@ -15,6 +15,7 @@
 // The SVG reaches the canvas as a data: image, which img-src allows (web/csp.json); blob:
 // images are not allowed. Downloads use a blob: link, which the CSP doesn't govern.
 import type { Ketcher } from 'ketcher-core';
+import { download } from '../download';
 
 export type Scale = 1 | 2 | 4;
 export const SCALES: readonly Scale[] = [1, 2, 4];
@@ -100,15 +101,6 @@ async function drawingPng(ketcher: Ketcher, scale: Scale, transparent: boolean):
   return new Blob([withDpi(new Uint8Array(await png.arrayBuffer()), scale)], { type: 'image/png' });
 }
 
-function download(blob: Blob, fileName: string): void {
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = fileName;
-  link.click();
-  // The download has started from the link, and Chromium keeps a revoked blob: URL readable
-  // for a navigation already under way, so it can go now: no timer, nothing left behind.
-  URL.revokeObjectURL(link.href);
-}
 
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
 

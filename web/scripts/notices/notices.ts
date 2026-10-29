@@ -36,6 +36,9 @@ export interface NoticeRecord {
   keys: Key[];
   inlinesNothing?: boolean;
   components: Component[];
+  /** The Indigo wasm's record: the InChI and cairo source archive the app ships with it
+   * (checked by scripts/verify-dist.ts). */
+  sourceArchive?: { file: string; sha256: string; indigoCommit: string };
 }
 
 /** What the notices read; a test passes fixtures. */

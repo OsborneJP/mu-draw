@@ -6,6 +6,11 @@ All notable changes to this project. The format follows
 ## [Unreleased]
 
 ### Added
+- Third-party licences: About has a "Third-party licences" button that shows, offline too,
+  the licence and copyright notices of every library, font and dataset inside the app
+  (third-party/NOTICES.txt), and a button that saves the source of InChI and cairo as built
+  into Indigo, which their licences ask the app to offer. About also credits InChI (IUPAC and
+  InChI Trust) and the FreeType Project. The app downloads about 2.3 MB more for these.
 - Project skeleton: app.config.json (name and URL path in one place), conda env, and
   `scripts/check.sh` as the single gate before every commit and deploy.
 - Naming API skeleton (FastAPI) with `GET /api/health`; no request bodies are logged.
