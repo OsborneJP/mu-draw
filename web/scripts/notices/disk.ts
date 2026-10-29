@@ -4,7 +4,10 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from '
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildLogPath, type BuildLog } from '../../config/noticesLog.ts';
+import { NOTICES_FILE } from '../../src/shell/thirdParty.ts';
+import { ABOUT } from './about.ts';
 import { inventoryChanges, inventoryOf, type Disk, type Inventory } from './inventory.ts';
+import { buildNotices, sha256, type NoticeRecord, type Sources } from './notices.ts';
 
 const WEB = fileURLToPath(new URL('../../', import.meta.url));
 export const INVENTORY_FILE = fileURLToPath(new URL('../../../third_party/notices/inventory.json', import.meta.url));
@@ -73,4 +76,55 @@ export function checkInventory(dist: string): string[] {
       ? [`the licence notices were reviewed against a different build: review the changes, then ${ACCEPT}`]
       : []),
   ];
+}
+
+const NOTICES_DIR = fileURLToPath(new URL('../../../third_party/notices/', import.meta.url));
+/** The shipped notices, which web/public copies into every build. */
+export const NOTICES_OUT = join(WEB, 'public', NOTICES_FILE);
+
+/** The reviewed records, by file name. */
+export function readRecords(): NoticeRecord[] {
+  const dir = join(NOTICES_DIR, 'records');
+  return readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()
+    .map((f) => ({ ...(JSON.parse(readFileSync(join(dir, f), 'utf8')) as NoticeRecord), slug: f.slice(0, -5) }));
+}
+
+/** The canonical licence texts (SPDX's, at a pinned commit), each checked against its hash. */
+function canonicalLicences(): Record<string, string> {
+  const index = JSON.parse(readFileSync(join(NOTICES_DIR, 'licences', 'index.json'), 'utf8')) as Record<
+    string,
+    { file: string; sha256: string }
+  >;
+  return Object.fromEntries(
+    Object.entries(index).map(([id, { file, sha256: expected }]) => {
+      const bytes = readFileSync(join(NOTICES_DIR, file));
+      if (sha256(bytes) !== expected) throw new Error(`third_party/notices/${file} is not the reviewed text`);
+      return [id, bytes.toString('utf8')];
+    }),
+  );
+}
+
+export function noticesSources(): Sources {
+  const read = (path: string) => {
+    const file = join(WEB, path);
+    return existsSync(file) && statSync(file).isFile() ? readFileSync(file) : null;
+  };
+  return {
+    read,
+    list: (dir) => readdirSync(join(WEB, dir)),
+    readText: (file) => {
+      const path = join(NOTICES_DIR, file);
+      return existsSync(path) ? readFileSync(path) : null;
+    },
+    canonical: canonicalLicences(),
+  };
+}
+
+/** The notices as the reviewed inputs make them now. */
+export function currentNotices(): { text: string; problems: string[] } {
+  const inventory = readInventory();
+  if (!inventory) return { text: '', problems: ['there is no reviewed inventory yet'] };
+  return buildNotices(inventory, readRecords(), noticesSources(), ABOUT);
 }

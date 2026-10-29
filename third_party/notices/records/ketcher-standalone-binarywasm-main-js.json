@@ -1,0 +1,41 @@
+{
+ "title": "Copies inlined in ketcher-standalone 3.18.0, dist/binaryWasm/main.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/ketcher-standalone/dist/binaryWasm/main.js",
+   "sha256": "4aeabfa4f34f50ab423a4c624585331ddf39ef3298c24cbcccb09ee7944ae447"
+  },
+  {
+   "package": "ketcher-standalone@3.18.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Node.js events module, as ported in rollup-plugin-node-polyfills (polyfills/events.js)",
+   "version": "rollup-plugin-node-polyfills 0.2.1; port of Node.js lib/events.js (v6/v7)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2019 these people",
+    "Copyright Node.js contributors. All rights reserved.",
+    "Copyright Joyent, Inc. and other Node contributors. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/rollup-plugin-node-polyfills-0.2.1-LICENSE.md.txt",
+     "url": "https://registry.npmjs.org/rollup-plugin-node-polyfills/-/rollup-plugin-node-polyfills-0.2.1.tgz#package/LICENSE.md",
+     "sha256": "709b64830465e2071ddfeb45f2d62c8c82e037d8010f05f70aacf2e09e12031f"
+    },
+    {
+     "file": "texts/nodejs-v7.0.0-LICENSE-lines-1-50.txt",
+     "url": "https://raw.githubusercontent.com/nodejs/node/v7.0.0/LICENSE#L1-L50",
+     "sha256": "fbc04dcc36cecba7c042277274bbbd510ec34c496bd1ebbaf8d5febd1f403ac3"
+    }
+   ],
+   "statement": "The polyfill package is MIT \"except ES6 ports of browserify modules which are whatever the original library was\"; its events.js is a port of Node.js's lib/events.js, so Node.js's licence is given too.",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. Map source ../../../../node_modules/rollup-plugin-node-polyfills/polyfills/events.js, byte-identical to that file in the 0.2.1 tarball. Ketcher lockfile: node_modules/rollup-plugin-node-polyfills 0.2.1. The file is byte-identical to src/es6/events.js in rollup-plugin-node-builtins 2.1.2 (Calvin Metcalf; package.json says ISC; no licence file), which the polyfill package forked. It has no header; its code is Node.js's lib/events.js of the v6/v7 era turned into an ES module (45 differing lines against v7.0.0, 65 against v6.0.0). Node.js v7.0.0's lib/events.js has no per-file header, so the Node text is lines 1-50 of Node.js's LICENSE at tag v7.0.0 (the Node.js and Joyent MIT grants, up to the list of Node's own bundled libraries, which do not apply), copied byte for byte."
+  }
+ ],
+ "slug": "ketcher-standalone-binarywasm-main-js"
+}

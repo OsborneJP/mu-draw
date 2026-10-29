@@ -1,0 +1,30 @@
+{
+ "title": "indigo-ketcher 1.46.0 (EPAM's Indigo, the JS package): EPAM's copyright line and Indigo's licence at b36d38f5",
+ "part": 2,
+ "keys": [
+  {
+   "package": "indigo-ketcher@1.46.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Indigo (indigo-ketcher)",
+   "version": "1.46.0 (Indigo tag indigo-1.46.0 = commit b36d38f5293470721fe02ee570d9f0e6488a5b8d)",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright (C) from 2009 to Present EPAM Systems."
+   ],
+   "texts": [
+    {
+     "file": "texts/apache-2.0.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/LICENSE",
+     "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+   ],
+   "statement": "",
+   "evidence": "The package's LICENSE (sha256 cfc7749b…) is the bare Apache-2.0 text, appendix unfilled ('Copyright [yyyy] [name of copyright owner]'): byte-identical to Indigo's LICENSE at b36d38f5293470721fe02ee570d9f0e6488a5b8d and to https://www.apache.org/licenses/LICENSE-2.0.txt. So no copyright line is found by subtraction; EPAM's comes from Indigo's sources at that commit: api/c/indigo/src/indigo.cpp opens ' * Copyright (C) from 2009 to Present EPAM Systems.' (sha256 71fa352951fc9369ca3ffebda9fc6a4babb3a7855f745682f7d52939ad7ab6f2), the same header opens api/c/indigo/src/indigo_molecule.cpp and core/indigo-core/molecule/src/molecule.cpp; README.md says 'Copyright (c) 2009-2022 EPAM Systems, Inc.' (sha256 382f5d73…). No NOTICE: raw .../b36d38f5293470721fe02ee570d9f0e6488a5b8d/NOTICE is 404 and the root tree (api.github.com git/trees) has none. Tag indigo-1.46.0 -> tag object 75659b01b09900efc237915fdab06abaa44f7b1d -> commit b36d38f5293470721fe02ee570d9f0e6488a5b8d; the wasm's version string is '1.46.0.0-gb36d38f52-wasm32-wasm-clang-23.0.0'. The registry has no gitHead for this package; web/package-lock.json's integrity equals the registry's. Shipped: indigo-ketcher-separate-wasm.js (Emscripten glue, sha256 8824813b3a5a5f61f967b8047855ced297483db6ad744c58f9187aaeae052cf8, prebuilt: 'wasmBinary') in the biochem worker, and the wasm; the glue's Emscripten runtime and the wasm's contents are in the Indigo wasm records, not here."
+  }
+ ],
+ "slug": "indigo-ketcher-1.46.0"
+}

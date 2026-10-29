@@ -1,0 +1,30 @@
+{
+ "title": "font-face-observer 1.0.0: declared \"BSD\", its LICENSE is the 2-clause BSD text",
+ "part": 2,
+ "keys": [
+  {
+   "package": "font-face-observer@1.0.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "font-face-observer",
+   "version": "1.0.0",
+   "licence": "BSD-2-Clause",
+   "copyright": [
+    "Copyright (c) 2014 - Bram Stein"
+   ],
+   "texts": [
+    {
+     "file": "texts/font-face-observer-1.0.0-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/cymen/font-face-observer/3ded041e4cd97f91bcfbc0fe96e74e2db7363978/LICENSE",
+     "sha256": "4f9eb12ff4eb3ac9ef7088d9f3926dab1402669c1317f50fd72fa938874f958f"
+    }
+   ],
+   "statement": "",
+   "evidence": "package.json says \"license\": \"BSD\" (not an SPDX id). The package's LICENSE is a 2-clause BSD text ('Redistribution and use in source and binary forms ... 1. ... 2. ...', no endorsement clause) whose disclaimer says 'BY THE AUTHOR' / 'THE COPYRIGHT OWNER OR CONTRIBUTORS', so it will not match SPDX's BSD-2-Clause body exactly. It is byte-identical at cymen/font-face-observer, the npm gitHead 3ded041e4cd97f91bcfbc0fe96e74e2db7363978 (a modular repackaging of Bram Stein's Font Face Observer, per its README), and in the npm tarball (integrity = lockfile). Shipped modules: src/dom.js, src/observer.js, src/ruler.js."
+  }
+ ],
+ "slug": "font-face-observer-1.0.0"
+}

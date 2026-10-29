@@ -1,0 +1,330 @@
+{
+ "title": "Copies inlined in ketcher-react 3.18.0, dist/index.modern-55d8e3ef.js (the macromolecules chunk)",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/ketcher-react/dist/index.modern-55d8e3ef.js",
+   "sha256": "768d72a3d465a13764a32d0a8e257aee895d5f93962740a84f69781f81bb73a5"
+  },
+  {
+   "package": "ketcher-react@3.18.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "ketcher-macromolecules",
+   "version": "3.18.0",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright (C) 2018 EPAM Systems",
+    "Copyright 2021 EPAM Systems"
+   ],
+   "texts": [
+    {
+     "file": "texts/ketcher-v3.18.0-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/ketcher/f4f013e1855b71b0cbd37fc79d55b0cbe51c2371/LICENSE",
+     "sha256": "3d54b234fa88c11d1d96380ff5fe29f3c5d8e1078ef914dfe8185ce4b1fbeac7"
+    },
+    {
+     "file": "texts/ketcher-v3.18.0-NOTICE.txt",
+     "url": "https://raw.githubusercontent.com/epam/ketcher/f4f013e1855b71b0cbd37fc79d55b0cbe51c2371/NOTICE",
+     "sha256": "ab82986438fc66fa2b40836415b734ff018b1e42ee3a18434b27bdf1c42eb368"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. Map source ../../ketcher-macromolecules/dist/index.modern.js; its sourcesContent equals the npm ketcher-macromolecules 3.18.0 tarball's dist/index.modern.js except the buildDate string (13:06:26 vs 13:12:18 on 2026-09-02; same gitHead f4f013e1). Ketcher tag v3.18.0 = commit f4f013e1 = npm gitHead of every Ketcher package. The dist file has no banner; \"Copyright (C) 2018 EPAM Systems\" is from Ketcher's NOTICE, \"Copyright 2021 EPAM Systems\" from Ketcher's source headers (e.g. ketcher-standalone's indigoWorker-d22340fa.js line 2). ketcher-macromolecules is not installed in web/node_modules: only this copy ships."
+  },
+  {
+   "name": "immer",
+   "version": "10.1.1",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2017 Michel Weststrate"
+   ],
+   "texts": [
+    {
+     "file": "texts/immer-10.1.1-LICENSE.txt",
+     "url": "https://registry.npmjs.org/immer/-/immer-10.1.1.tgz#package/LICENSE",
+     "sha256": "99cf22f6960a6fe228ec84ea9aefb0d75b27999ece83a3a9801e1c2081fa270b"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. Map source ../../ketcher-macromolecules/node_modules/immer/dist/immer.legacy-esm.js, byte-identical to that file in the immer 10.1.1 tarball. Ketcher lockfile https://raw.githubusercontent.com/epam/ketcher/f4f013e1855b71b0cbd37fc79d55b0cbe51c2371/package-lock.json (sha256 bdcb29ba27ef4d4824ef665014b6a7323d0325bac3bc4090f0bd02fcf2fd4a26): packages/ketcher-macromolecules/node_modules/immer 10.1.1."
+  },
+  {
+   "name": "@reduxjs/toolkit",
+   "version": "2.8.2",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2018 Mark Erikson"
+   ],
+   "texts": [
+    {
+     "file": "texts/reduxjs-toolkit-2.8.2-LICENSE.txt",
+     "url": "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.8.2.tgz#package/LICENSE",
+     "sha256": "661ea76e75dd1bbaa23d0166de7acc15f4a58011adb2d57acc42116b5fe8a4a1"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. Map source ../../ketcher-macromolecules/node_modules/@reduxjs/toolkit/dist/redux-toolkit.legacy-esm.js, byte-identical to that file in the 2.8.2 tarball (it imports redux, redux-thunk, reselect and immer, which are not inlined). Ketcher lockfile: packages/ketcher-macromolecules/node_modules/@reduxjs/toolkit 2.8.2."
+  },
+  {
+   "name": "d3-array",
+   "version": "3.2.4",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2023 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-array-3.2.4-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz#package/LICENSE",
+     "sha256": "3e6849627f74ff73c257a3ae1efb574015d94fc1035c05ec3c15805165efcbc4"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 6 map source(s) ../../../node_modules/d3-array/src/*.js, each byte-identical to the file in the d3-array 3.2.4 tarball. Ketcher lockfile: node_modules/d3-array 3.2.4. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-axis",
+   "version": "3.0.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-axis/-/d3-axis-3.0.0.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 2 map source(s) ../../../node_modules/d3-axis/src/*.js, each byte-identical to the file in the d3-axis 3.0.0 tarball. Ketcher lockfile: node_modules/d3-axis 3.0.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-color",
+   "version": "3.1.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2022 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2022-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.0.tgz#package/LICENSE",
+     "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 2 map source(s) ../../../node_modules/d3-color/src/*.js, each byte-identical to the file in the d3-color 3.1.0 tarball. Ketcher lockfile: node_modules/d3-color 3.1.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-dispatch",
+   "version": "3.0.1",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-dispatch/-/d3-dispatch-3.0.1.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 1 map source(s) ../../../node_modules/d3-dispatch/src/*.js, each byte-identical to the file in the d3-dispatch 3.0.1 tarball. Ketcher lockfile: node_modules/d3-dispatch 3.0.1. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-drag",
+   "version": "3.0.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-drag/-/d3-drag-3.0.0.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 5 map source(s) ../../../node_modules/d3-drag/src/*.js, each byte-identical to the file in the d3-drag 3.0.0 tarball. Ketcher lockfile: node_modules/d3-drag 3.0.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-ease",
+   "version": "3.0.1",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock",
+    "Copyright 2001 Robert Penner"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-ease-3.0.1-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-ease/-/d3-ease-3.0.1.tgz#package/LICENSE",
+     "sha256": "b989d9085148d21ff64a75e14462aefa06b2589a55553b07b1460c70081c7d08"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 1 map source(s) ../../../node_modules/d3-ease/src/*.js, each byte-identical to the file in the d3-ease 3.0.1 tarball. Ketcher lockfile: node_modules/d3-ease 3.0.1. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-format",
+   "version": "3.1.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-format/-/d3-format-3.1.0.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 15 map source(s) ../../../node_modules/d3-format/src/*.js, each byte-identical to the file in the d3-format 3.1.0 tarball. Ketcher lockfile: node_modules/d3-format 3.1.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-interpolate",
+   "version": "3.0.1",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 14 map source(s) ../../../node_modules/d3-interpolate/src/*.js, each byte-identical to the file in the d3-interpolate 3.0.1 tarball. Ketcher lockfile: node_modules/d3-interpolate 3.0.1. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-path",
+   "version": "3.1.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2015-2022 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-path-3.1.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.0.tgz#package/LICENSE",
+     "sha256": "a09b0d6d76e768fca2085fad05743ee81ddd11946bcda160a3cf5e1081a479aa"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 1 map source(s) ../../../node_modules/d3-path/src/*.js, each byte-identical to the file in the d3-path 3.1.0 tarball. Ketcher lockfile: node_modules/d3-path 3.1.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-scale",
+   "version": "4.0.2",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 6 map source(s) ../../../node_modules/d3-scale/src/*.js, each byte-identical to the file in the d3-scale 4.0.2 tarball. Ketcher lockfile: node_modules/d3-scale 4.0.2. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-selection",
+   "version": "3.0.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-selection/-/d3-selection-3.0.0.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 48 map source(s) ../../../node_modules/d3-selection/src/*.js, each byte-identical to the file in the d3-selection 3.0.0 tarball. Ketcher lockfile: node_modules/d3-selection 3.0.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-shape",
+   "version": "3.2.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2022 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2022-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-shape/-/d3-shape-3.2.0.tgz#package/LICENSE",
+     "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 6 map source(s) ../../../node_modules/d3-shape/src/*.js, each byte-identical to the file in the d3-shape 3.2.0 tarball. Ketcher lockfile: node_modules/d3-shape 3.2.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-timer",
+   "version": "3.0.1",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 2 map source(s) ../../../node_modules/d3-timer/src/*.js, each byte-identical to the file in the d3-timer 3.0.1 tarball. Ketcher lockfile: node_modules/d3-timer 3.0.1. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-transition",
+   "version": "3.0.1",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-transition/-/d3-transition-3.0.1.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 27 map source(s) ../../../node_modules/d3-transition/src/*.js, each byte-identical to the file in the d3-transition 3.0.1 tarball. Ketcher lockfile: node_modules/d3-transition 3.0.1. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  },
+  {
+   "name": "d3-zoom",
+   "version": "3.0.0",
+   "licence": "ISC",
+   "copyright": [
+    "Copyright 2010-2021 Mike Bostock"
+   ],
+   "texts": [
+    {
+     "file": "texts/d3-isc-2010-2021-LICENSE.txt",
+     "url": "https://registry.npmjs.org/d3-zoom/-/d3-zoom-3.0.0.tgz#package/LICENSE",
+     "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. 1 map source(s) ../../../node_modules/d3-zoom/src/*.js, each byte-identical to the file in the d3-zoom 3.0.0 tarball. Ketcher lockfile: node_modules/d3-zoom 3.0.0. A second copy, separate from the installed web/node_modules d3 packages in the main chunk."
+  }
+ ],
+ "slug": "ketcher-react-dist-index-modern-55d8e3ef-js"
+}

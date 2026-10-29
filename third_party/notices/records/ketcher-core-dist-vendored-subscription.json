@@ -1,0 +1,34 @@
+{
+ "title": "Copy vendored in ketcher-core 3.18.0, dist/node_modules/subscription/index.modern.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/ketcher-core/dist/node_modules/subscription/index.modern.js",
+   "sha256": "4f7e81f56cb07dd08145ee2e43f0626414f7fe77ed6c174d8ba96298c96bb221"
+  },
+  {
+   "package": "ketcher-core@3.18.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "subscription",
+   "version": "3.0.0",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (C) 2016 by Marijn Haverbeke <marijnh@gmail.com>"
+   ],
+   "texts": [
+    {
+     "file": "texts/subscription-3.0.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/subscription/-/subscription-3.0.0.tgz#package/LICENSE",
+     "sha256": "4e961838f6a3d8397aac7c5822bd6a9de3efe92ab8147b86fe96eb53a187c768"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. ketcher-core's rollup build writes this dependency into its own dist; the sibling map lists ../../../../../node_modules/subscription/index.js, whose sourcesContent is byte-identical to index.js in the subscription 3.0.0 tarball. Ketcher lockfile: node_modules/subscription 3.0.0. The installed web/node_modules/subscription (also 3.0.0) ships separately in the main chunk."
+  }
+ ],
+ "slug": "ketcher-core-dist-vendored-subscription"
+}

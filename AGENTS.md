@@ -49,7 +49,7 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
 - Dev server: API `STATE_DIRECTORY=<dir> uvicorn main:app --app-dir server --port <port>`
   (ports.dev); web `cd web && npm run dev` (proxies `<base>api/`); build `npm run build` (staging base unless `BASE`).
 - Licence notices (docs/plans/licence-notices.md): after a dependency upgrade verify-dist lists what ships differently;
-  review it, then `DIST_DIR=dist node scripts/build-notices.ts --accept` (in web/) records it in third_party/notices/.
+  review it, record what's new in third_party/notices/records/, then `DIST_DIR=dist node scripts/build-notices.ts --accept`.
 - Deploy: `scripts/deploy.sh staging`, `scripts/deploy.sh --production`,
   `scripts/deploy.sh --smoke-only <staging|production>`. Production promotes only the
   commit that passed the live staging checks; live checks run from that commit.

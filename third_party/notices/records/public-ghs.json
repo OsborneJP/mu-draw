@@ -1,0 +1,47 @@
+{
+ "title": "web/public/ghs/: the nine GHS hazard pictograms, public domain",
+ "part": 4,
+ "keys": [
+  {
+   "public": "ghs/GHS01.svg"
+  },
+  {
+   "public": "ghs/GHS02.svg"
+  },
+  {
+   "public": "ghs/GHS03.svg"
+  },
+  {
+   "public": "ghs/GHS04.svg"
+  },
+  {
+   "public": "ghs/GHS05.svg"
+  },
+  {
+   "public": "ghs/GHS06.svg"
+  },
+  {
+   "public": "ghs/GHS07.svg"
+  },
+  {
+   "public": "ghs/GHS08.svg"
+  },
+  {
+   "public": "ghs/GHS09.svg"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "GHS hazard pictograms (UNECE), Wikimedia Commons' SVG copies",
+   "version": "GHS-pictogram-explos, -flamme, -rondflam, -bottle, -acid, -skull, -exclam, -silhouette, -pollu .svg, current Commons versions (2026-10-29)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "GHS01.svg to GHS09.svg are unedited copies of Wikimedia Commons' GHS-pictogram-*.svg files (converted from UNECE's EPS files), which Commons marks public domain as ineligible for copyright.",
+   "evidence": "Commons API, 2026-10-29: each of the nine pages has the licence template {{PD-ineligible}} (wikitext) and extmetadata LicenseShortName 'Public domain', License 'pd', Copyrighted 'False', AttributionRequired 'false'; Credit 'EPS file <name>.eps from UNECE web site converted with ImageMagick convert and with potrace, edited in inkscape'. The SHA-1 of each shipped GHS0n.svg equals the current Commons version's SHA-1 (explos 49deeaed…, flamme 47a26281…, rondflam a09ecfa7…, bottle 5bb4e2ce…, acid 8bcb729f…, skull c1eac17d…, exclam a6e24513…, silhouette 12a0d526…, pollu f38551d2…), so they are unedited. THIRD-PARTY-NOTICES.md and src/panels/ghsPictograms.ts say the same. No notice is required.",
+   "noCopyright": "public domain"
+  }
+ ],
+ "slug": "public-ghs"
+}

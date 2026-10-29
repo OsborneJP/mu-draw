@@ -1,0 +1,52 @@
+{
+ "title": "Copies inlined in paper 0.12.20, dist/paper-full.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/paper/dist/paper-full.js",
+   "sha256": "fa00d93f1abb420b905f73c3ce83724e9171e0588a99c29373e6bc545c341fbe"
+  },
+  {
+   "package": "paper@0.12.20"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Acorn (PaperScript's parser)",
+   "version": "0.5.0",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (C) 2012 by Marijn Haverbeke <marijnh@gmail.com>"
+   ],
+   "texts": [
+    {
+     "file": "texts/acorn-0.5.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/acorn/-/acorn-0.5.0.tgz#package/LICENSE",
+     "sha256": "ac8c2d7724613151f5874fb48365c6a29ad43e8f8efa12413499625955b6c8c5"
+    }
+   ],
+   "statement": "",
+   "evidence": "paper-full.js's banner names \"Acorn.js ... created by Marijn Haverbeke and released under an MIT license\"; the inlined copy (line 15746) says exports.version = \"0.5.0\". paper's yarn.lock at its npm gitHead 5198c4497df5e27a106674eddcf331fe8e99c6ce resolves acorn@~0.5.0 to 0.5.0; 912 of 963 longer non-comment lines of the acorn 0.5.0 tarball's acorn.js occur in paper-full.js. The LICENSE's last paragraph mentions CodeMirror; it is acorn's file as published."
+  },
+  {
+   "name": "Straps.js (same author as Paper.js)",
+   "version": "3.0.1",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2008 - 2016, Juerg Lehni",
+    "Copyright (c) 2006 - 2020 Jürg Lehni"
+   ],
+   "texts": [
+    {
+     "file": "texts/straps-3.0.1-LICENSE.txt",
+     "url": "https://registry.npmjs.org/straps/-/straps-3.0.1.tgz#package/LICENSE.txt",
+     "sha256": "24d455af6e878040157f11910a6c3411bd3cc9f4112f3dab970a00269711a71c"
+    }
+   ],
+   "statement": "",
+   "evidence": "paper-full.js's banner: \"Straps.js - Class inheritance library ... Copyright (c) 2006 - 2020 Jürg Lehni ... Distributed under the MIT license.\" paper's yarn.lock at 5198c449 resolves straps@^3.0.1 to 3.0.1; 128 of 132 longer lines of the tarball's straps.js occur in paper-full.js."
+  }
+ ],
+ "slug": "paper-dist-paper-full-js"
+}

@@ -1,0 +1,28 @@
+{
+ "title": "Code taken into assert 2.1.0's build/assert.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/assert/build/assert.js",
+   "sha256": "bb31fcb698582cfc7655363c3d9b4f4bc98279f6a3046b1a5c2b4a5321a85dcd"
+  }
+ ],
+ "components": [
+  {
+   "name": "narwhal.js assert module",
+   "version": "(as taken into assert 2.1.0)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2009 Thomas Robinson <280north.com>"
+   ],
+   "texts": [
+    {
+     "file": "texts/assert-2.1.0-narwhal-header-L4-L22.txt",
+     "url": "https://registry.npmjs.org/assert/-/assert-2.1.0.tgz#package/build/assert.js:L4-L22",
+     "sha256": "edcd2ac8860cf31a4c7ff0b51501cffd33dbe17f02c1749ea7c6ceccb31f00b6"
+    }
+   ],
+   "evidence": "build/assert.js lines 4-22 say the module is 'Originally from narwhal.js (http://narwhaljs.org)' and carry Thomas Robinson's MIT notice; assert's own LICENSE names only Joyent. Tarball integrity sha512-eLHpSK/Y4nhMJ07gDaAzoX/XAKS8PSaojml3M0DM4JpV1LAi5JOJ/p6H/XWrl8L+DzVEvVCW1z3vWAaB9oTsQw==."
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+ "title": "cfb 1.2.2 (SheetJS): Apache-2.0 whose only holder line is in the appendix, plus its inlined crc32.js",
+ "part": 2,
+ "keys": [
+  {
+   "package": "cfb@1.2.2"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "cfb",
+   "version": "1.2.2",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "cfb.js (C) 2013-present SheetJS -- http://sheetjs.com",
+    "Copyright (C) 2013-present   SheetJS LLC"
+   ],
+   "texts": [
+    {
+     "file": "texts/cfb-1.2.2-LICENSE.txt",
+     "url": "https://registry.npmjs.org/cfb/-/cfb-1.2.2.tgz",
+     "sha256": "279ce5f639ecd1767f96948f9fbe6f0aa8145cb280cf98473fb366eab5e6de26"
+    }
+   ],
+   "statement": "",
+   "evidence": "The package's LICENSE is Apache-2.0 whose only copyright line is the filled-in appendix 'Copyright (C) 2013-present   SheetJS LLC' (inside the licence body, so subtraction finds none); the shipped module cfb.js (sha256 239f7fb9d74b0cb8856e0b1a182bdf310f9fcf5b75a958e84edc158cd387dab2) opens with '/* cfb.js (C) 2013-present SheetJS -- http://sheetjs.com */' (comment markers dropped above). No NOTICE file in the package. The npm tarball (integrity = lockfile) unpacks identical to node_modules; registry gitHead ad93f76a36f893362efe96f738a327c290c1f2a9. Only cfb.js ships (research module log; third_party/notices/inventory.json at 1c2c92c, recorded from the current build, after the Miew and InChI trim, lists only node_modules/cfb/cfb.js for cfb@1.2.2, with this sha256); its require('fs') is behind get_fs() and the package's browser field maps fs to false."
+  },
+  {
+   "name": "crc32.js (SheetJS crc-32), inlined in cfb.js",
+   "version": "1.2.1 (the copy's own CRC32.version)",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "crc32.js (C) 2014-present SheetJS -- http://sheetjs.com",
+    "Copyright (C) 2014-present   SheetJS LLC"
+   ],
+   "texts": [
+    {
+     "file": "texts/crc-32-1.2.1-LICENSE.txt",
+     "url": "https://registry.npmjs.org/crc-32/-/crc-32-1.2.1.tgz",
+     "sha256": "c542ba7851b5d39a5face477e47a27cb7c00a9759e321b66824e79718bffe1ac"
+    }
+   ],
+   "statement": "",
+   "evidence": "cfb.js line 171 opens '/*! crc32.js (C) 2014-present SheetJS -- http://sheetjs.com */' and the copy sets CRC32.version = '1.2.1'. The crc-32 package itself is installed (1.2.2) but not shipped. Text: crc-32 1.2.1's LICENSE from its npm tarball (registry gitHead d64513c9525ff50dda0eeb538ed0535a61ae7243), byte-identical to the installed crc-32 1.2.2's; Apache-2.0 with appendix 'Copyright (C) 2014-present   SheetJS LLC'. Not in the plan's list of inlined copies; found here because cfb has no holder line outside its licence body."
+  }
+ ],
+ "slug": "cfb-1.2.2"
+}

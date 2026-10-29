@@ -1,0 +1,33 @@
+{
+ "title": "src/chem/biochemData.json: values read from Biopython 1.88",
+ "part": 4,
+ "keys": [
+  {
+   "module": "src/chem/biochemData.json"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Biopython (Bio.SeqUtils.IsoelectricPoint, Bio.Data.IUPACData)",
+   "version": "1.88",
+   "licence": "Biopython License Agreement or BSD-3-Clause, at the user's choice (both modules)",
+   "copyright": [
+    "Copyright 2003 Yair Benita.  All rights reserved.",
+    "Revisions copyright 2020 by Tianyi Shi.  All rights reserved.",
+    "Copyright 2000 Andrew Dalke.  All rights reserved.",
+    "Copyright (c) 1999-2025, The Biopython Contributors"
+   ],
+   "texts": [
+    {
+     "file": "texts/biopython-1.88-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/biopython/biopython/d7e4b8b19399668b09442a5b35765d9186b5f665/LICENSE.rst",
+     "sha256": "11d1ebcaad2eb9f0f09a3df1deb4aca99a4da366ae9ae70f828c7447a24de453"
+    }
+   ],
+   "statement": "Bjellqvist's pKa values, the 20 amino acids' three-letter codes and the base complements are taken from Biopython 1.88, whose modules are offered under the Biopython License Agreement or the BSD 3-Clause License; both are given below.",
+   "evidence": "server/scripts/gen_biochem_expected.py writes biochemData.json ('_generated' names Biopython 1.88) from Bio.SeqUtils.IsoelectricPoint (positive_pKs, negative_pKs, pKnterminal, pKcterminal) and Bio.Data.IUPACData (protein_letters_1to3, ambiguous_dna/rna_complement). Their headers, from the conda env (biopython-1.88 conda-forge build py312h5cc1888_1) and byte-identical at tag biopython-188 (commit d7e4b8b19399668b09442a5b35765d9186b5f665): IsoelectricPoint.py (sha256 93a0d329…) '# Copyright 2003 Yair Benita.  All rights reserved.' / '# Revisions copyright 2020 by Tianyi Shi.  All rights reserved.'; IUPACData.py (sha256 897fb42f…) '# Copyright 2000 Andrew Dalke.  All rights reserved.'; both '... governed by your choice of the \"Biopython License Agreement\" or the \"BSD 3-Clause License\"'. Comment markers '# ' dropped in the copyright lines. LICENSE.rst holds both licences and the BSD holder line (it equals the env's dist-info/licenses/LICENSE.rst, whose RECORD hash matches). The pKa values cite Bjellqvist et al. 1993 and 1994 (biochemData.json 'citations'): published measurements, no licence of their own."
+  }
+ ],
+ "slug": "derived-biochem-data-json"
+}

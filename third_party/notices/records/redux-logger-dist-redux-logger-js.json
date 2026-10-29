@@ -1,0 +1,34 @@
+{
+ "title": "Copies inlined in redux-logger 3.0.6, dist/redux-logger.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/redux-logger/dist/redux-logger.js",
+   "sha256": "fb20abf6f0b286e6fb0986f04bf1504a5fd03495592074f2628305893642f9de"
+  },
+  {
+   "package": "redux-logger@3.0.6"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "deep-diff",
+   "version": "0.3.8",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2011-2013 Phillip Clark"
+   ],
+   "texts": [
+    {
+     "file": "texts/deep-diff-0.3.8-LICENSE.txt",
+     "url": "https://registry.npmjs.org/deep-diff/-/deep-diff-0.3.8.tgz#package/LICENSE",
+     "sha256": "e0895a432114028a515ecd06b4583caf570b017bb17e83d400c706d2204dd4c6"
+    }
+   ],
+   "statement": "",
+   "evidence": "dist/redux-logger.js is a minified rollup UMD bundle (define.amd) whose first functions are deep-diff's Diff classes (kinds \"E\",\"N\",\"D\",\"A\", observableDiff, DeepDiff noConflict). redux-logger 3.0.6 depends on deep-diff ^0.3.5 and its repo has no lockfile at tag 3.0.6; the version comes from the code. Of 0.3.5-0.3.8, only 0.3.7 and 0.3.8 have the stack logic (\"stack.filter(...)\", \"stack.push({ lhs: lhs, rhs: rhs })\", \"...lhs.hasOwnProperty(key)\"), and only 0.3.8 guards it as \"stack[stack.length - 1].lhs && stack[stack.length - 1].lhs.hasOwnProperty(key)\" (0.3.7 has no \"lhs &&\"); the bundle has the guard, minified as \"p[p.length-1].lhs&&p[p.length-1].lhs.hasOwnProperty(d)\". deep-diff 0.3.8 was the latest 0.3.x when redux-logger 3.0.6 was published (2017-05-03 vs 2017-05-17; the next release, 1.0.0, is from 2018). LICENSE is byte-identical across 0.3.5-0.3.8."
+  }
+ ],
+ "slug": "redux-logger-dist-redux-logger-js"
+}

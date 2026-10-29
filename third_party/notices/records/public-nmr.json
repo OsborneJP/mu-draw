@@ -1,0 +1,35 @@
+{
+ "title": "web/public/nmr/: the ¹³C and ¹H shift tables built from nmrshiftdb2, and its licence",
+ "part": 4,
+ "keys": [
+  {
+   "public": "nmr/carbon-shifts.bin"
+  },
+  {
+   "public": "nmr/proton-shifts.bin"
+  },
+  {
+   "public": "nmr/LICENSE-nmrshiftdb2.txt"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "nmrshiftdb2 (www.nmrshiftdb.org), its 'nmrshiftdb2withsignals.sd' data file",
+   "version": "nmrshiftdb2withsignals.sd, sha256 0e86688360e23c88ccf0eb82a1251315fa57ec6f5b376dc8886f3311793a0afe (58,187 records)",
+   "licence": "nmrshiftdb2 Database License",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/nmrshiftdb2-database-license.txt",
+     "url": "https://svn.code.sf.net/p/nmrshiftdb2/code/!svn/bc/2672/trunk/nmrshiftdb2/src/html/nmrshiftdb2datalicense.txt",
+     "sha256": "00322cc450c2e53e305c082e1ab7454f108b7df51c0dbee0a07932666b245516"
+    }
+   ],
+   "statement": "Contains information from nmrshiftdb2 (www.nmrshiftdb.org), which is made available here under the nmrshiftdb2 Database License (https://nmrshiftdb.nmr.uni-koeln.de/nmrshiftdbhtml/nmrshiftdb2datalicense.txt).",
+   "evidence": "Statement: the notice the app shows with every prediction (web/src/panels/NmrNotice.tsx, the licence's §4.3 example notice plus the licence URI, which §4.3 asks for when there is no hyperlink); THIRD-PARTY-NOTICES.md uses the same words. Both tables' headers name the source file and its sha256, their generators (web/scripts/build-carbon-table.ts, build-proton-table.ts; the SD file is downloaded from https://sourceforge.net/projects/nmrshiftdb2/files/data/) and carry the notice in a 'licence' field. Text: web/public/nmr/LICENSE-nmrshiftdb2.txt (committed in bdca9e1, 2026-10-24), byte-identical on 2026-10-29 to the licensor's URL (https://nmrshiftdb.nmr.uni-koeln.de/nmrshiftdbhtml/nmrshiftdb2datalicense.txt, not versioned) and to the file in nmrshiftdb2's own SVN repository pinned to revision 2672 (trunk/nmrshiftdb2/src/html/nmrshiftdb2datalicense.txt; the text's URL, which uses SVN's !svn/bc/<revision> form; https://sourceforge.net/p/nmrshiftdb2/code/2672/tree/trunk/nmrshiftdb2/src/html/nmrshiftdb2datalicense.txt?format=raw gives the same bytes). The Wayback Machine's captures of the licensor's URL carry the same content digest from 2015-09-10 to 2026-08-30 (CDX digest SDEP4M4JEWBTHY4QU3QF4ZYGTBUFISHQ). nmrshiftdb2 names no copyright holder in the licence.",
+   "noCopyright": "the database licence names no holder; the notice it asks for is given"
+  }
+ ],
+ "slug": "public-nmr"
+}

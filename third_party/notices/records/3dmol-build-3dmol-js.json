@@ -1,0 +1,273 @@
+{
+ "title": "Copies inlined in 3dmol 2.5.5, build/3Dmol.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/3dmol/build/3Dmol.js",
+   "sha256": "553ea0ab68182aafd520e598396d3903a354d22d3d02426b09cbc93ea0d28297"
+  },
+  {
+   "package": "3dmol@2.5.5"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "iobuffer",
+   "version": "5.4.0",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2015 Michaël Zasso"
+   ],
+   "texts": [
+    {
+     "file": "texts/iobuffer-5.4.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/iobuffer/-/iobuffer-5.4.0.tgz#package/LICENSE",
+     "sha256": "1c22118fd112e8c394a5ec0598d2e2dfcdc19b3e1055ac3eaccdb2522b777335"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Modules ./node_modules/iobuffer/lib-esm/IOBuffer.js and text.js. 3Dmol.js package-lock.json at tag 2.5.5 (c26e390544b6388f86e50387cd4565759b4da0df): node_modules/iobuffer 5.4.0, integrity equal to the npm tarball fetched. 621 of 624 compared lines (non-blank, imports/exports excluded) of the tarball's lib-esm files occur in the webpack modules (the rest are rewritten imports)."
+  },
+  {
+   "name": "netcdfjs",
+   "version": "3.0.0",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2016 cheminfo"
+   ],
+   "texts": [
+    {
+     "file": "texts/netcdfjs-3.0.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/netcdfjs/-/netcdfjs-3.0.0.tgz#package/LICENSE",
+     "sha256": "a0176285793b5de2daeb0b3d2e2b41e550f089446e64583f3133d0840c79b1ed"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Seven modules ./node_modules/netcdfjs/lib-esm/*.js. Lockfile at tag 2.5.5: netcdfjs 3.0.0, integrity equal to the tarball. 524 of 553 tarball lines found (the rest are rewritten imports/exports)."
+  },
+  {
+   "name": "pako",
+   "version": "2.1.0",
+   "licence": "(MIT AND Zlib)",
+   "copyright": [
+    "Copyright (C) 2014-2017 by Vitaly Puzrin and Andrei Tuputcyn",
+    "(C) 1995-2013 Jean-loup Gailly and Mark Adler",
+    "(C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin"
+   ],
+   "texts": [
+    {
+     "file": "texts/pako-LICENSE.txt",
+     "url": "https://registry.npmjs.org/pako/-/pako-2.1.0.tgz#package/LICENSE",
+     "sha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539"
+    },
+    {
+     "file": "texts/pako-zlib-notice-deflate.js-lines-3-20.txt",
+     "url": "https://registry.npmjs.org/pako/-/pako-2.1.0.tgz#package/lib/zlib/deflate.js:L3-L20",
+     "sha256": "170d7d544d380b38d5f76ab5eda29475b44ef537f4564163d6d9bece85c51c13"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Module ./node_modules/pako/dist/pako.esm.mjs with banner \"/*! pako 2.1.0 https://github.com/nodeca/pako @license (MIT AND Zlib) */\" (3Dmol.js line 1375). Lockfile at tag 2.5.5: pako 2.1.0. All 5982 compared lines (non-blank, imports/exports excluded) of the 2.1.0 tarball's dist/pako.esm.mjs occur (2.2.0, the version installed in web/node_modules, matches only 98.3%). The Zlib text is pako's per-file notice (lib/zlib/deflate.js lines 3-20, comment markers kept); pako has no separate Zlib licence file."
+  },
+  {
+   "name": "upng-js",
+   "version": "2.1.0",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2017 Photopea"
+   ],
+   "texts": [
+    {
+     "file": "texts/upng-js-2.1.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/upng-js/-/upng-js-2.1.0.tgz#package/LICENSE",
+     "sha256": "c1fb8861eca211bf5aea574358aba7039396c0c1824c2a1477cc126d398efd89"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Module ./node_modules/upng-js/UPNG.js. Lockfile at tag 2.5.5: upng-js 2.1.0, integrity equal. 713 of 716 lines found."
+  },
+  {
+   "name": "pako (dependency of upng-js)",
+   "version": "1.0.11",
+   "licence": "(MIT AND Zlib)",
+   "copyright": [
+    "Copyright (C) 2014-2017 by Vitaly Puzrin and Andrei Tuputcyn",
+    "(C) 1995-2013 Jean-loup Gailly and Mark Adler",
+    "(C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin"
+   ],
+   "texts": [
+    {
+     "file": "texts/pako-LICENSE.txt",
+     "url": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz#package/LICENSE",
+     "sha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539"
+    },
+    {
+     "file": "texts/pako-zlib-notice-deflate.js-lines-3-20.txt",
+     "url": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz#package/lib/zlib/deflate.js:L3-L20",
+     "sha256": "170d7d544d380b38d5f76ab5eda29475b44ef537f4564163d6d9bece85c51c13"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Sixteen modules ./node_modules/upng-js/node_modules/pako/{index.js,lib/**}. Lockfile at tag 2.5.5: node_modules/upng-js/node_modules/pako 1.0.11, integrity equal. 5880 of 5925 tarball lines found (2.1.0: 80%). LICENSE and the zlib notice lines are byte-identical to 2.1.0's, so the same text files serve both."
+  },
+  {
+   "name": "EDTSurf (ported to JavaScript as ProteinSurface.js by biochem_fan)",
+   "version": "not stated",
+   "licence": "EDTSurf permission notice (custom, permissive)",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/edtsurf-notice-3dmol-2.5.5-ProteinSurface4.ts-lines-1-16.txt",
+     "url": "https://raw.githubusercontent.com/3dmol/3Dmol.js/c26e390544b6388f86e50387cd4565759b4da0df/src/ProteinSurface4.ts#L1-L16",
+     "sha256": "4a57d892eeaa59ec6af1a0e212ce5c5082634dc03254deb3092fb1ca8fbb1d53"
+    }
+   ],
+   "statement": "EDTSurf: D. Xu, Y. Zhang (2009) Generating Triangulated Macromolecular Surfaces by Euclidean Distance Transform. PLoS ONE 4(12): e8140. The notice requires this reference information to appear with copies.",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Module ./src/ProteinSurface4.ts opens with this notice (3Dmol.js line 27025). The text is lines 1-16 of src/ProteinSurface4.ts at tag 2.5.5 (byte-identical in web/node_modules/3dmol/src). EDTSurf's own page (https://zhanggroup.org/EDTSurf/, read 2026-10-29) carries the same permission text, credits Dong Xu and Yang Zhang, and names no copyright holder; the original EDTSurf source was not fetched. The notice is a comment, so the minified chunk drops it: it must come from NOTICES.",
+   "noCopyright": "none in the upstream notice, which asks for its reference instead"
+  },
+  {
+   "name": "Mol* (CIFTools.js-derived BinaryCIF decoding, src/parsers/cifutils)",
+   "version": "not stated (headers say 2017-2024)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2017-2024 mol* contributors, licensed under MIT, See LICENSE file for more info.",
+    "Copyright (c) 2017 mol* contributors, licensed under MIT, See LICENSE file for more info.",
+    "Copyright (c) 2017 - now, Mol* contributors"
+   ],
+   "texts": [
+    {
+     "file": "texts/molstar-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/molstar/molstar/v4.18.0/LICENSE",
+     "sha256": "aa42900c6ea7bfcf22d25a4c369025e01a526c66501fd9193f9a8aecee7a0753"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Modules ./src/parsers/cifutils/{decoder,encoding,category}.ts; headers at 3Dmol.js lines 41456 (decoder.ts: \"Copyright (c) 2017-2024 mol* contributors ... From CIFTools.js @author David Sehnal\") and 41660 (encoding.ts: \"Copyright (c) 2017 mol* contributors ... Note: all files in this directory are adapted from molstar - dkoes\"). The header points to mol*'s LICENSE, which is byte-identical at mol* tags v4.0.0, v4.18.0 and v5.0.0; v4.18.0 is cited. Which mol* commit was copied is not known."
+  },
+  {
+   "name": "mmtf-javascript (vendored as src/vendor/mmtf.js; its integer decodings are also adopted in cifutils/decoder.ts)",
+   "version": "1.0.1",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2015-2016, Alexander S. Rose <alexander.rose@weirdbyte.de>"
+   ],
+   "texts": [
+    {
+     "file": "texts/mmtf-javascript-v1.0.1-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/rcsb/mmtf-javascript/v1.0.1/LICENSE",
+     "sha256": "92fae30bc0c58965788ccc81f4e04ab8bc5d3c3ace7a60068d5b171bc83156c5"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Module ./src/vendor/mmtf.js. 3Dmol's src/vendor/mmtf.js (sha256 fee8488f97c36f9bb2e3e750cfde394886eb361c7ea5b7a496455b2353721b39) is byte-identical to rcsb/mmtf-javascript dist/mmtf.js at tag v1.0.1, and carries the string \"v1.0.1\". cifutils/decoder.ts (3Dmol.js line 41474) says \"Fixed point, delta, RLE, integer packing adopted from https://github.com/rcsb/mmtf-javascript/ by Alexander Rose ..., MIT License, Copyright (c) 2016\"."
+  },
+  {
+   "name": "FXAA anti-aliasing shader (from Rendu by Simon Rodriguez, by way of Mol*)",
+   "version": "not stated",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2017 Simon Rodriguez"
+   ],
+   "texts": [
+    {
+     "file": "texts/rendu-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/kosua20/Rendu/da0033f6b9cda7850e0140c7e60f46e94a5b85c9/LICENSE",
+     "sha256": "74b77f8114a204e1b8702f1aeef83985f6738c30fd24e6f25d7d54d4b7501d3f"
+    },
+    {
+     "file": "texts/molstar-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/molstar/molstar/v4.18.0/LICENSE",
+     "sha256": "aa42900c6ea7bfcf22d25a4c369025e01a526c66501fd9193f9a8aecee7a0753"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Module ./src/WebGL/shaders/lib/screenaa/screenaa.frag (3Dmol.js line 35762) is a string that contains \"// adapted from https://github.com/kosua20/Rendu // MIT License Copyright (c) 2017 Simon Rodriguez // by way of molstar (.../src/mol-gl/shader/fxaa.frag.ts)\"; being a string, this credit survives minifying. mol*'s fxaa.frag.ts at v4.18.0 carries the same Rendu credit. Rendu's LICENSE was created in commit da0033f6 (2017-07-26) and is byte-identical at the latest commit 31dfb8a1."
+  },
+  {
+   "name": "NGL (CCP4 map parser and its transformation matrix)",
+   "version": "NGL js/ngl/parser.js, tags v0.5 to v0.7.1",
+   "licence": "MIT",
+   "copyright": [
+    "The MIT License, Copyright &copy; 2013-2015 Alexander S. Rose"
+   ],
+   "texts": [
+    {
+     "file": "texts/ngl-v0.7.1-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/nglviewer/ngl/v0.7.1/LICENSE",
+     "sha256": "3e27b525a531a34f4ce7fddc821b687ddfb6151bfe46239e105f8d043fdc2d04"
+    }
+   ],
+   "statement": "Only the NGL section of this LICENSE applies here; the other projects it lists are not in MU Draw.",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Module ./src/VolumeData.ts: \"//code from ngl: https://github.com/arose/ngl/blob/master/js/ngl/parser.js\" (3Dmol.js line 28728) and \"//create transformation matrix, code mostly copied from ngl\" (line 28814). js/ngl/parser.js exists at NGL tags v0.5 to v0.7.1 (404 from v0.8); 67 of the 112 longer lines of 3Dmol's ccp4() occur in parser.js at v0.6 to v0.7.1. LICENSE is identical at v0.6, v0.7 and v0.7.1; the latest of these tags is cited. NOT in the plan's list: found here."
+  },
+  {
+   "name": "GLmol",
+   "version": "0.47",
+   "licence": "MIT OR LGPL-3.0 (dual); taken under MIT",
+   "copyright": [
+    "(C) Copyright 2011-2012, biochem_fan"
+   ],
+   "texts": [
+    {
+     "file": "texts/3dmol-2.5.5-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/3dmol/3Dmol.js/c26e390544b6388f86e50387cd4565759b4da0df/LICENSE",
+     "sha256": "4c6eaaed856f3f28a3b1a98e74f4a8a71618de7d51ea4155c29f6f793bcef861"
+    },
+    {
+     "file": "texts/spdx-v3.27.0-MIT.txt",
+     "url": "https://raw.githubusercontent.com/spdx/license-list-data/v3.27.0/text/MIT.txt",
+     "sha256": "b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5"
+    }
+   ],
+   "statement": "GLmol is offered under the MIT licence or LGPL 3; MU Draw takes it under the MIT licence.",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). 3Dmol's LICENSE (tag 2.5.5, byte-identical to web/node_modules/3dmol/LICENSE) says \"3Dmol.js incorporates code from GLmol, Three.js, and jQuery\" and quotes GLmol's header with \"License: dual license of MIT or LGPL3\"; GLViewer.ts says \"a molecular viewer based on GLMol\" (line 21614) and ProteinSurface.js is \"by biochem_fan\" (GLmol's author). GLmol states no MIT text of its own, so the canonical MIT text (SPDX license-list-data v3.27.0) is given with GLmol's line."
+  },
+  {
+   "name": "three.js (code incorporated in 3Dmol.js's WebGL layer)",
+   "version": "not stated (notice says 2010-2012)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2010-2012 three.js Authors. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/3dmol-2.5.5-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/3dmol/3Dmol.js/c26e390544b6388f86e50387cd4565759b4da0df/LICENSE",
+     "sha256": "4c6eaaed856f3f28a3b1a98e74f4a8a71618de7d51ea4155c29f6f793bcef861"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Named in 3Dmol's LICENSE with its full MIT text; ./src/WebGL/** (math, core, renderer) is the three.js-derived layer (e.g. \"input: THREE.Matrix4\" in math.ts). No three.js package is bundled."
+  },
+  {
+   "name": "jQuery (code incorporated in 3Dmol.js)",
+   "version": "not stated (notice says 2011)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2011 John Resig"
+   ],
+   "texts": [
+    {
+     "file": "texts/3dmol-2.5.5-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/3dmol/3Dmol.js/c26e390544b6388f86e50387cd4565759b4da0df/LICENSE",
+     "sha256": "4c6eaaed856f3f28a3b1a98e74f4a8a71618de7d51ea4155c29f6f793bcef861"
+    }
+   ],
+   "statement": "",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Named in 3Dmol's LICENSE with its full MIT text; src/utilities.ts has \"//simplified version of jquery extend\". No jQuery package is bundled."
+  },
+  {
+   "name": "Small cited snippets in 3Dmol.js",
+   "version": "as in the keyed file",
+   "licence": "not determined; credited by name only",
+   "copyright": [],
+   "texts": [],
+   "statement": "Credited by name: the Three.js text sprite example by Lee Stemkoski (stemkoski.github.io/Three.js), from which 3Dmol's labels are adapted; chg2cube.pl from the VTST Tools (theory.cm.utexas.edu/vtsttools), from which the VASP volume parser is adapted; Stack Overflow answers 3969475 (pausable timer, adapted), 1661197 and 9595300 (cited); the marching-cubes tables, based on those by Paul Bourke and Geoffrey Heller (\"Polygonising a scalar field\", paulbourke.net).",
+   "evidence": "3Dmol.js is a webpack 5 bundle (950 __webpack_require__, 1 define.amd); its module ids are printed in its \"!*** ./path ***!\" comments (198 modules). Comments at 3Dmol.js lines 26782 (stemkoski), 28470 (chg2cube.pl), 43296 (SO 3969475 \"adapted from\"), 28391 (SO 1661197 \"See:\"), 36167 (SO 9595300 \"also useful\", inside a shader string), 27097-27099 (\"These tables are based off those by Paul Bourke and Geoffrey Heller\", with the two paulbourke.net links). Licences of these snippets were not determined (Stack Overflow content is CC BY-SA); the plan treats them as too small to matter and credits them by name (Accepted limits).",
+   "noCopyright": "credited by name only"
+  }
+ ],
+ "slug": "3dmol-build-3dmol-js"
+}

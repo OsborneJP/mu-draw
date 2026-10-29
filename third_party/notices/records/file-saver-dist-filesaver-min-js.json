@@ -1,0 +1,17 @@
+{
+ "title": "file-saver 2.0.5, dist/FileSaver.min.js (inlines nothing)",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/file-saver/dist/FileSaver.min.js",
+   "sha256": "c68874cbaa2fd1650b7d770b328680ea765fb3376023cc3608427fde4f0d0481"
+  },
+  {
+   "package": "file-saver@2.0.5"
+  }
+ ],
+ "inlinesNothing": true,
+ "components": [],
+ "evidence": "Prebuilt only by its UMD wrapper (define.amd). Its sibling FileSaver.min.js.map lists one source, ../src/FileSaver.js (the package's own).",
+ "slug": "file-saver-dist-filesaver-min-js"
+}

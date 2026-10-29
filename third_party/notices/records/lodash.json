@@ -1,0 +1,35 @@
+{
+ "title": "Copies inlined in lodash 4.18.1, lodash.js and lodash.min.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/lodash/lodash.js",
+   "sha256": "f5465f55566bf544aad0a31c6135889ca1ed81eea8f53ec61c6cbe86926f07cf"
+  },
+  {
+   "file": "node_modules/lodash/lodash.min.js",
+   "sha256": "a8d7e6291ad80256f976ace90824a71018d2f706992c9107b20bdced97bee27b"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Underscore.js (lodash is based on it)",
+   "version": "1.8.3",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative\nReporters & Editors"
+   ],
+   "texts": [
+    {
+     "file": "texts/underscore-1.8.3-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/jashkenas/underscore/1.8.3/LICENSE",
+     "sha256": "57c78146cd350e9c88c82d4fa0c8a5369e7a8c4ae9fa47e80fe13e13aa9ff00e"
+    }
+   ],
+   "statement": "",
+   "evidence": "lodash.js is lodash's own UMD build (define.amd); it inlines no other package. Its banner says \"Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>\" (lodash.js line 6, with \"Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors\"; lodash.min.js line 3 names the same), so Underscore's LICENSE at tag 1.8.3 is given. lodash's own LICENSE (in its package) also credits Underscore. || For lodash.min.js: lodash.min.js is lodash's own UMD build (define.amd); it inlines no other package. Its banner says \"Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>\" (lodash.js line 6, with \"Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors\"; lodash.min.js line 3 names the same), so Underscore's LICENSE at tag 1.8.3 is given. lodash's own LICENSE (in its package) also credits Underscore."
+  }
+ ],
+ "slug": "lodash-lodash-js"
+}

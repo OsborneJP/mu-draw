@@ -1,0 +1,48 @@
+{
+ "title": "src/chem/tautomers.ts: a port of RDKit's tautomer enumerator (Tautomer.cpp), which descends from MolVS",
+ "part": 4,
+ "keys": [
+  {
+   "module": "src/chem/tautomers.ts"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "RDKit TautomerEnumerator (MolStandardize/Tautomer.cpp), ported to TypeScript",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2018-2021 Susan H. Leung and other RDKit contributors",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Code/GraphMol/MolStandardize/Tautomer.cpp at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 30a17c53a467248dc3270c05977746e20fd357b86090de452fc4414945066a9b; Tautomer.h has the same holder line). tautomers.ts's own header says it ports TautomerEnumerator::enumerate from Tautomer.cpp (RDKit 2026.09.1) and names this holder line. Its transforms come from rdkitTables.json (own record). Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  },
+  {
+   "name": "MolVS (lineage of RDKit's MolStandardize tautomer code)",
+   "version": "0.1.1 (tag v0.1.1, commit 0e6027a0a8bc8b3e91e24e7fe96e7545503aa5d3, 2018-04-11)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright 2016 Matt Swain"
+   ],
+   "texts": [
+    {
+     "file": "texts/molvs-0.1.1-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/mcs07/MolVS/0e6027a0a8bc8b3e91e24e7fe96e7545503aa5d3/LICENSE",
+     "sha256": "4a2cb96e36e08570f135a6ad44ce5a588d66698d629d4b4938fb55a752ad4b06"
+    }
+   ],
+   "statement": "",
+   "evidence": "RDKit's ReleaseNotes.md at Release_2018.09.1 (as at fece8caa860bdf6c9c82bdb9253f22a0cf87150c, sha256 7d5c160c…, line 6100) lists 'An integration/port of MolVS to the core RDKit' (GSoC 2018, 'Dev/GSOC2018_MolVS_Integration'); Release_2020.03.1 adds 'MolVS tautomer canonicalization'; testTautomer.cpp lines 902-903 cite 'tests from the molvs repo: https://github.com/mcs07/MolVS/blob/456f2fe723acfedbf634a8bcfe943b83ea7d4c20/tests/test_tautomer.py'. The text is MolVS's LICENSE at v0.1.1, the last release before the 2018 port; molvs/tautomer.py there says ':copyright: Copyright 2016 by Matt Swain.' / ':license: MIT'. At 456f2fe7 (2019-03-24, the commit RDKit's tests cite) the LICENSE reads 'Copyright 2019 Matt Swain' and is otherwise identical (sha256 d2e30303…). Lineage only: Tautomer.cpp at Release_2026_09_1 names neither MolVS nor Matt Swain, and how much MolVS-derived code survives in it (its transforms are now Greg Landrum's 2021 Sitzmann-derived set) was not traced."
+  }
+ ],
+ "slug": "derived-tautomers-ts"
+}

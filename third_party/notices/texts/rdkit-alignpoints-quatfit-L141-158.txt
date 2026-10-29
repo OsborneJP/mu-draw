@@ -1,0 +1,18 @@
+  <b>Reference:</b>
+  This is essentailly a copy of the jacobi routine taken from the program
+  quatfit.c available from the Computational Chemistry Archives.
+  http://www.ccl.net/cca/software/SOURCES/C/quaternion-mol-fit/index.shtml
+  E-mail jkl@osc.edu for details.
+  It was written by:
+
+  David J. Heisterberg
+  The Ohio Supercomputer Center
+  1224 Kinnear Rd.
+  Columbus, OH  43212-1163
+  (614)292-6036
+  djh@osc.edu    djh@ohstpy.bitnet    ohstpy::djh
+  Copyright: Ohio Supercomputer Center, David J. Heisterberg, 1990.
+  The program can be copied and distributed freely, provided that
+  this copyright in not removed. You may acknowledge the use of the
+  program in published material as:
+  David J. Heisterberg, 1990, unpublished results.

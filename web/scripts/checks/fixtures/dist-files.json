@@ -221,7 +221,11 @@
   },
   {
     "path": "sw.js",
-    "size": 4956
+    "size": 5032
+  },
+  {
+    "path": "third-party/NOTICES.txt",
+    "size": 601573
   },
   {
     "path": "third-party/indigo-b36d38f5-inchi-cairo.tar.xz",

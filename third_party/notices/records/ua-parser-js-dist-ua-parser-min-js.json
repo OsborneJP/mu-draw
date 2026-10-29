@@ -1,0 +1,17 @@
+{
+ "title": "ua-parser-js 1.0.41, dist/ua-parser.min.js (inlines nothing)",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/ua-parser-js/dist/ua-parser.min.js",
+   "sha256": "506462f545eb810192aa0cd26fd880d7234c62d0878969cc079981481d9fa2ea"
+  },
+  {
+   "package": "ua-parser-js@1.0.41"
+  }
+ ],
+ "inlinesNothing": true,
+ "components": [],
+ "evidence": "Prebuilt only by its UMD wrapper (define.amd). A minified copy of the package's own src/ua-parser.js with its banner \"UAParser.js v1.0.41 Copyright © 2012-2025 Faisal Salman <f@faisalman.com> MIT License\"; no other banner, version string or bundled module.",
+ "slug": "ua-parser-js-dist-ua-parser-min-js"
+}

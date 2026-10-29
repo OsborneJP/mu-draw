@@ -1,0 +1,7 @@
+/*
+    InChIKey: calculation of hash for InChI string
+
+    Uses truncated SHA-256 function.
+    SHA-256 implementation: Copyright (C) Brainspark B.V.,
+                            see files sha2.c, sha2.h.
+*/

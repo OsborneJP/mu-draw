@@ -1,0 +1,29 @@
+{
+ "title": "web/public/ir-bands.json: the IR hint table, CC BY-SA 4.0",
+ "part": 4,
+ "keys": [
+  {
+   "public": "ir-bands.json"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "IR hint table (compiled by MU Draw contributors, adapted in part from Wikipedia)",
+   "version": "0.1-draft",
+   "licence": "CC-BY-SA-4.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc-by-sa-4.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/licenses/by-sa/4.0/legalcode.txt",
+     "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5"
+    }
+   ],
+   "statement": "IR hint table, compiled by MU Draw contributors, under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Values adapted in part from \"Infrared spectroscopy correlation table\", Wikipedia, CC BY-SA 4.0 (https://en.wikipedia.org/wiki/Infrared_spectroscopy_correlation_table). Values cross-checked against OpenStax Organic Chemistry, section 12.7, Table 12.1 (values only; no text copied) (https://openstax.org/books/organic-chemistry/pages/12-7-interpreting-infrared-spectra).",
+   "evidence": "ir-bands.json: 'license': 'CC BY-SA 4.0', 'compiled_by': 'MU Draw contributors', 'version': '0.1-draft', 'title': 'IR hint table'; its 'attribution' list gives the Wikipedia and OpenStax lines quoted in the statement (with their URLs) and a 'textbook' key for unconfirmed values (those are 'verify' and never shown). The app shows '{title}, version {version}, compiled by {compiledBy}. Licence: {licence} ({licenceUri}).' and the cited attributions (src/panels/IrHints.tsx; LICENCES in src/chem/irBands.ts gives the URI). THIRD-PARTY-NOTICES.md says the same and that OpenStax is CC BY-NC-SA 4.0, used for values only. Wikipedia's article is not versioned here (no revision id recorded). Legal code: cc-legal-tools-data a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030 docs/licenses/by-sa/4.0/legalcode.txt, byte-identical to https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt.",
+   "noCopyright": "MU Draw contributors' own compilation; its sources are credited in the statement"
+  }
+ ],
+ "slug": "public-ir-bands"
+}

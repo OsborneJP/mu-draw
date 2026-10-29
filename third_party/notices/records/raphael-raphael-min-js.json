@@ -1,0 +1,44 @@
+{
+ "title": "Copies inlined in raphael 2.3.0, raphael.min.js",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/raphael/raphael.min.js",
+   "sha256": "4da6e9aca75e3576d27ac0962ccadc6d6483cd486901d70d3dee50e77ae7f588"
+  },
+  {
+   "package": "raphael@2.3.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Eve (eve-raphael)",
+   "version": "0.5.0",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright (c) 2013 Adobe Systems Incorporated. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/eve-raphael-0.5.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/eve-raphael/-/eve-raphael-0.5.0.tgz#package/LICENSE",
+     "sha256": "277b9ae7fa1d2acd7f708b859f9f771cf71e785091b6f82caa473cac241853c4"
+    }
+   ],
+   "statement": "",
+   "evidence": "raphael.min.js is raphael's webpack 4 UMD build (define.amd; minified webpack runtime). Its unminified twin raphael.js names the module \"./node_modules/eve-raphael/eve.js\" (line 8001) with the Adobe Apache-2.0 header and \"Eve 0.5.0\"; raphael.min.js holds x.version=\"0.5.0\" and \"You are running Eve \". raphael 2.3.0 depends on eve-raphael 0.5.0 exactly; 242 of 243 longer lines of the tarball's eve.js occur in raphael.js. The tarball has no NOTICE file. Its LICENSE is the Apache text with \"Copyright 2013 Adobe Systems Incorporated\" filled into the appendix."
+  },
+  {
+   "name": "Small cited snippets in Raphaël",
+   "version": "as in the keyed file",
+   "licence": "not determined; credited by name only",
+   "copyright": [],
+   "texts": [],
+   "statement": "Credited by name: the touch test taken from Modernizr; Dean Edwards's colour-to-hex method for old Internet Explorer; Doug Schepers's Catmull-Rom to Bézier conversion (\"Getting to the point\"); the renderfix method credited to Mariusz Nowak.",
+   "evidence": "raphael.js lines 255 (\"taken from Modernizr touch test: .../Modernizr/blob/master/feature-detects/touchevents.js\"), 654 (dean.edwards.name), 1150 (schepers.cc/getting-to-the-point), 6917 (\"Special thanks to Mariusz Nowak\"). The same modules are minified into raphael.min.js (comments dropped). Modernizr is MIT, but its version is not stated; the others state no licence. Each is a few lines; same treatment as the plan's cited snippets.",
+   "noCopyright": "credited by name only"
+  }
+ ],
+ "slug": "raphael-raphael-min-js"
+}

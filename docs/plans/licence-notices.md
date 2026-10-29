@@ -112,7 +112,7 @@ nmrshiftdb2, the IR table and the glassware are credited where they show. The GH
   - the service worker's Workbox modules by name, with versions read from their package.json, plus workbox-build's template. Each Workbox package's own `_version.js` marker is recorded beside its version: 7.4.1 packages carry a 7.4.0 marker, so built markers are compared with those, not with package.json;
 - the SHA-256 of every shipped file that comes from node_modules (bundled modules, wasm files, glue).
 
-  A file is **prebuilt** if it is a .wasm, or if it contains a bundler runtime or wrapper (`__webpack_require__`, `define.amd`, Emscripten's `wasmBinary`). Each prebuilt file needs a reviewed record for its current hash, even one that says "inlines nothing from other authors";
+  A file is **prebuilt** if it is a .wasm, if it contains a bundler runtime or wrapper (`__webpack_require__`, `define.amd`, Emscripten's `wasmBinary`), or if its source map names sources outside its package. The last case was added while building: four bundles, Ketcher's macromolecules chunk among them, inline other packages with no marker. A copy vendored in a `node_modules` folder without its own package.json counts too. Each such file needs a reviewed record for its current hash, even one that says "inlines nothing from other authors";
 - every file copied from `web/public`;
 - the app's own modules that copy others' work (the RDKit ports, the Biopython values).
 
@@ -128,7 +128,7 @@ Texts are copied from primary sources, never typed. For the Noto fonts the recor
 
 The build records its module log in `<outDir>.notices-build.json`, beside the output folder, never inside it, so it isn't deployed or precached. That file is gitignored and its paths are relative to `web/`. `rdkitWasm.ts` passes the wasm's source path to `emitFile` so the log can place it.
 
-**The notices file.** `web/public/third-party/NOTICES.txt` is committed and precached. A script, `web/scripts/build-notices.ts`, writes it offline from the inventory, node_modules and the records. It is UTF-8 with a byte-order mark, so browsers that don't guess the encoding still show ©. Expected size: 130 to 150 kB, about 40 kB gzipped. It has four parts:
+**The notices file.** `web/public/third-party/NOTICES.txt` is committed and precached. A script, `web/scripts/build-notices.ts`, writes it offline from the inventory, node_modules and the records. It is UTF-8 with a byte-order mark, so browsers that don't guess the encoding still show ©. Measured size: about 500 kB, about 100 kB gzipped. Most of it is licence texts that differ in small ways (eight LLVM copies, several Apache ones), each kept as copied. The panel loads it only when opened. It has four parts:
 1. **About this file:**
    - where the source archive is;
    - that MU Draw's MIT licence and EPAM's Apache-2.0 cover only their own code;
@@ -140,7 +140,7 @@ The build records its module log in `<outDir>.notices-build.json`, beside the ou
 
 Every entry in parts 2 to 4 gives its version, licence, copyright lines, any NOTICE text, and its licence text.
 
-**Copyright lines are found by subtraction.** Each licence file is matched against the canonical body of its licence, a pinned text from a primary source. The copyright lines are the lines outside the matched body that start with Copyright, (c) or ©; lines inside the body, Apache's appendix included, never count. A licence body appears in full once, under a label, and entries with the same matched body share it.
+**Copyright lines are found by subtraction.** Each licence file is matched against the canonical body of its licence, a pinned text from a primary source. Every line above the matched body except a bare title is kept as the package's notice, so a holder named mid-line isn't lost. At least one of those lines must mention a copyright. Lines inside the body, Apache's appendix included, never count. The build tools' and Workbox's packages get entries the same way. A licence body appears in full once, under a label, and entries whose bodies are identical apart from line breaks and spacing share it. A record's component has at least one copyright line, or a `noCopyright` reason (public domain, CC0, none named upstream). A part-2 record that no package's entry would print is refused.
 
 **The one main guard.** After every build, a check rebuilds the inventory from that build and compares it with the committed one. Any difference fails the build and names what changed:
 - a new or removed package or version;
@@ -243,7 +243,19 @@ To list EPAM's changes reliably, the script also commits a SHA-256 manifest of t
 - **Ketcher's own data:** its templates, monomer library and icons are treated as its own, under Apache-2.0.
 - **Indigo's ChemDraw constants header:** marked "all rights reserved" by CambridgeSoft, it holds a published file format's constants. NOTICES carries its copyright line; ask EPAM if challenged.
 - **Versions of inlined code:** they come from the lockfile at the published commit (Ketcher, Miew) or at the release tag (3Dmol, whose published commit isn't public). Two are confirmed by banners. Miew's mmtf.js has no known version and goes with Miew.
-- **Unverified RDKit origins:** RDKit's built-in font widths (Adobe AFM) and isotope data (BODR) were not traced.
+- **Unverified RDKit origins:** these were not traced:
+  - RDKit's built-in font widths (Adobe AFM) and isotope data (BODR);
+  - its Conrec contouring code, the Daylight-derived a2b code and a Stack Overflow endianness snippet;
+  - the PNG details credited to OpenBabel, which read as format knowledge rather than copied code.
+- **VFLib:** RDKit's substructure matcher is "an extensive modification … of pieces from several files in the vflib-2.0 distribution". VFLib's terms ask for a note of the change and a pointer to the original source. Its site is gone, so NOTICES points to an Internet Archive copy (decided while building; Jeff can change it).
+- **Credited copies inside packages' own files:** short adapted code that a package credits in a comment is covered by that package's entry, not listed separately. These are:
+  - Facebook's regenerator banner in @babel/runtime;
+  - assert's function from feross/buffer;
+  - @emotion/hash's MurmurHash2 port;
+  - get-intrinsic's lodash snippet;
+  - svgpath's code from Esprima and Raphaël;
+  - MUI's copy of a W3C combobox example and material-components-web shadow values.
+- **Bundler runtimes inside prebuilt files:** webpack's runtime in 3Dmol.js and raphael.min.js is not listed. MIT, a few hundred bytes each.
 - **InChI §8 (decision 5):** whether shipping without §6's notices since launch ended MU Draw's InChI licence stays open. Jeff chose not to write to the InChI Trust.
 - **Runtime objects:** which few libc and libc++ objects the wasm files link can't be seen in the binaries, so the full runtime notices are shipped.
 

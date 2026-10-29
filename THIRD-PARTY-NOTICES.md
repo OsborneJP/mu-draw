@@ -3,6 +3,14 @@
 LICENSE (MIT) covers this repository's own code and documents. These parts keep their
 own licences:
 
+- The app as built: web/public/third-party/NOTICES.txt, which ships with it, names every
+  third-party part the browser receives, with its licence texts and copyright notices. It is
+  written by web/scripts/build-notices.ts from third_party/notices/: inventory.json (what each
+  build ships), records/ and texts/ (verbatim texts from pinned primary sources, among them
+  nmrshiftdb2's notice and licence in third_party/notices/records/public-nmr.json and
+  third_party/notices/texts/nmrshiftdb2-database-license.txt) and licences/ (SPDX's canonical
+  texts).
+
 - server/opsin/opsin.jar: OPSIN, under the MIT licence in server/opsin/LICENSE.txt. The jar
   also packs the libraries OPSIN uses: dk.brics.automaton (BSD); Woodstox (Apache License
   2.0), with the parts of MSV (BSD licences; a few files under the Apache Software License
@@ -105,9 +113,9 @@ own licences:
     (https://www.nlm.nih.gov/web_policies.html).
   The app shows each source's credit, in plain text, wherever it shows its data (Safety).
 - 3Dmol.js 2.5.5 (npm package 3dmol, bundled into the app's 3Dmol chunk for the 3D view):
-  BSD 3-Clause License, Copyright (c) 2014, University of Pittsburgh and contributors; it
-  incorporates GLmol (biochem_fan), Three.js (three.js Authors) and jQuery (John Resig),
-  under the terms in its LICENSE (web/node_modules/3dmol/LICENSE). Its bundle carries pako
-  2.2.0 (MIT and Zlib licences), iobuffer 5.4.0, netcdfjs 3.0.0 and upng-js 2.1.0 (MIT
-  licence each). The About box credits it.
-- Packages installed by npm and conda are under their own licences.
+  BSD 3-Clause License, Copyright (c) 2014, University of Pittsburgh and contributors. Its
+  bundle carries GLmol, Three.js and jQuery code, pako 2.1.0 and 1.0.11, iobuffer, netcdfjs,
+  upng-js, EDTSurf, mol* and mmtf code; web/public/third-party/NOTICES.txt gives each one's
+  notice. The About box credits it.
+- Packages installed by npm and conda are under their own licences; those whose code the app
+  ships are listed, with their notices, in web/public/third-party/NOTICES.txt.

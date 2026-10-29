@@ -1,0 +1,30 @@
+{
+ "title": "@rdkit/rdkit 2026.9.1 (the JS package): RDKit's licence, which the npm package leaves out",
+ "part": 2,
+ "keys": [
+  {
+   "package": "@rdkit/rdkit@2026.9.1"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "RDKit (RDKit.js, MinimalLib)",
+   "version": "2026.9.1 (tag Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "package.json \"license\": \"BSD-3-Clause\"; the package folder holds only dist/ (RDKit_minimal.js, .d.ts, .wasm), package.json and README.md, no licence file. The registry's gitHead for 2026.9.1 is fece8caa860bdf6c9c82bdb9253f22a0cf87150c, the commit tag Release_2026_09_1 points to; license.txt there (= tests/fixtures/recorded/rdkit/license.txt). Shipped: dist/RDKit_minimal.js in rdkit/worker.js (sha256 ea427db9cc39be245065603de0df10c3053cb49af3b63fdf6bc2bf73d6fc17da, Emscripten glue: prebuilt, 'wasmBinary') and RDKit_minimal.wasm. This record gives only the package's missing licence; the glue's Emscripten runtime and the wasm's contents (Novartis text, quatfit, InChI, FreeType, fonts …) belong to the RDKit wasm records. If the rdkit area also keys a record to this package, merge them."
+  }
+ ],
+ "slug": "rdkit-rdkit-2026.9.1"
+}

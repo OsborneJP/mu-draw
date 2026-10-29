@@ -1,0 +1,454 @@
+{
+ "title": "RDKit.js WebAssembly and JS glue, as shipped by @rdkit/rdkit 2026.9.1",
+ "part": 3,
+ "keys": [
+  {
+   "file": "node_modules/@rdkit/rdkit/dist/RDKit_minimal.wasm",
+   "sha256": "594ceaed387adc70ea13bfbb2e8eace916f6c782254ed5a6f0f0a0a7a4fe4061"
+  },
+  {
+   "file": "node_modules/@rdkit/rdkit/dist/RDKit_minimal.js",
+   "sha256": "ea427db9cc39be245065603de0df10c3053cb49af3b63fdf6bc2bf73d6fc17da"
+  },
+  {
+   "package": "@rdkit/rdkit@2026.9.1"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "RDKit",
+   "version": "2026.9.1 (tag Release_2026_09_1, commit fece8caa860bdf6c9c82bdb9253f22a0cf87150c): MinimalLib (RDKit_minimal) and the RDKit libraries it links",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Provenance: node_modules/@rdkit/rdkit/dist/RDKit_minimal.wasm and node_modules/@rdkit/rdkit/dist/RDKit_minimal.js are byte-identical to dist/ in the npm tarball https://registry.npmjs.org/@rdkit/rdkit/-/rdkit-2026.9.1.tgz, whose sha512 (nbdi5yEw...xjzEA==) equals package-lock.json's integrity and the subject of the npm SLSA provenance (https://registry.npmjs.org/-/npm/v1/attestations/@rdkit%2frdkit@2026.9.1): workflow .github/workflows/minimallib-publish.yml at refs/tags/Release_2026_09_1, gitCommit fece8caa860bdf6c9c82bdb9253f22a0cf87150c, run https://github.com/rdkit/rdkit/actions/runs/37104484827 (job 111150237761, 2026-10-03; its log prints the same integrity). The attestation signature itself was not verified cryptographically. Offsets below are byte offsets in the .wasm file; \"memory\" addresses are in the linear memory rebuilt from the wasm's 1395 active data segments. RDKit source paths compiled into assertion strings, e.g. \"/src/rdkit/Code/GraphMol/MolDraw2D/MolDraw2DSVG.cpp\" at offset 6608282 and \"/src/rdkit/Code/GraphMol/MolAlign/AlignMolecules.cpp\" at 6604327. The build ran Code/MinimalLib/docker/03_build.Dockerfile (\"make -j2 RDKit_minimal\", log line 18797 \"Linking CXX executable RDKit_minimal.js\"). The same licence.txt is already embedded as data in web/src/chem/rdkitTables.json (sha256 daeb8d19...), but not shown to users. Inside RDKit's tree and covered by its licence: the Bison 3.8.2 parser skeleton in the generated SMILES/SMARTS parsers (Code/GraphMol/SmilesParse/smiles.tab.cpp.cmake carries the Bison special exception allowing distribution \"under terms of your choice\"), the superatom table adapted from openbabel/superatoms (Code/GraphMol/Abbreviations/AbbreviationsUtils.cpp line 36; that repo is Unlicense per the GitHub API), and RDKit's copy of boost hash (Code/RDGeneral/hash, BSL-1.0, see the Boost entry). RDKit origins not traced, each claimed by RDKit's headers only under RDKit's licence: Conrec (Paul Bourke; Code/Numerics/Conrec.h, used by MolDraw2DUtils.cpp), the Daylight a2b code, the Stack Overflow endian snippet (Code/RDGeneral/StreamOps.h line 25-26), PNGParser.cpp's \"details of how to handle the PNG file taken from OpenBabel's PNG handling code\" (wording suggests format details, not code), the Helvetica AFM widths and the BODR data. vflib-2.0 (vf2.hpp) and MolVS (Tautomer.cpp) have their own entries."
+  },
+  {
+   "name": "RDKit ChemReactions (Novartis code)",
+   "version": "as in RDKit Release_2026_09_1 (Code/GraphMol/ChemReactions)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (c) 2007, Novartis Institutes for BioMedical Research Inc."
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-chemreactions-novartis-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/Code/GraphMol/ChemReactions/license.txt",
+     "sha256": "1a0b40e6322683d8844a10fa7649bdbaab3338afcbed9d2158179d9ecc330434"
+    }
+   ],
+   "statement": "",
+   "evidence": "ChemReactions is in RDKit_minimal's link list (Code/MinimalLib/CMakeLists.txt adds it when RDK_BUILD_MINIMAL_LIB_RXN is on, the default); the build log shows \"Built target ChemReactions\". The wasm holds \"/src/rdkit/Code/GraphMol/ChemReactions/Reaction.cpp\" at offset 6605998, \".../ReactionRunner.cpp\" at 6605279, \".../SanitizeRxn.cpp\" at 6605869 and \"$RXN header not found\" at 6629154. The licence file says it covers all files in that directory unless otherwise noted."
+  },
+  {
+   "name": "quatfit jacobi routine (copied into RDKit's Code/Numerics/Alignment/AlignPoints.cpp)",
+   "version": "as in RDKit Release_2026_09_1",
+   "licence": "quatfit notice: \"can be copied and distributed freely, provided that this copyright in not removed\"; RDKit distributes the file under its BSD-3-Clause licence",
+   "copyright": [
+    "Copyright: Ohio Supercomputer Center, David J. Heisterberg, 1990."
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-alignpoints-quatfit-L141-158.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/Code/Numerics/Alignment/AlignPoints.cpp",
+     "sha256": "763862e42926385ba4ee45c4ca36b65a16dd08c907fe15c1221ed88ed7ddc556"
+    }
+   ],
+   "statement": "",
+   "evidence": "The text is lines 141-158 of AlignPoints.cpp at the RDKit commit (the \"Reference\" block of the doc comment above jacobi()), saved verbatim; the notice exists only there. The wasm holds \"/src/rdkit/Code/Numerics/Alignment/AlignPoints.cpp\" at offset 6603050 (assertion strings from that file), so code from it is linked; jacobi() is called by AlignPoints() in the same file. The binary has no names section, so jacobi itself cannot be seen."
+  },
+  {
+   "name": "VFLib graph matching library (pieces modified into RDKit's Code/GraphMol/Substruct/vf2.hpp)",
+   "version": "vflib-2.0 (the distribution was VFLib 2.0.6 from 2003 on, per its README); modified by Greg Landrum for RDKit from April 2009",
+   "licence": "VFLib 2.0 licence: MIT-style, with two added conditions (a prominent notice of modifications stating how, when and by whom; and the standard distribution's source included or where to obtain it)",
+   "copyright": [
+    "Copyright (c) 2001 by\nDipartimento di Informatica e Sistemistica\nUniversità degli studi di Napoli ``Federico II''"
+   ],
+   "texts": [
+    {
+     "file": "texts/vflib-2.0.6-doc-vflib-2.html-L15-49.txt",
+     "url": "http://web.archive.org/web/20090217102717id_/http://amalfi.dis.unina.it:80/graph/db/vflib-2.0/doc/vflib-2.html",
+     "sha256": "8b87b569a7f7d5f7552af8121c8cd722b35668d2f054ecd9752424835cd0db54"
+    }
+   ],
+   "statement": "RDKit's Code/GraphMol/Substruct/vf2.hpp is, in its own words, \"an extensive modification by Greg Landrum of pieces from several files in the vflib-2.0 distribution\", first completed in April 2009 and changed in RDKit since. The standard VFLib 2.0.6 distribution was published at http://amalfi.dis.unina.it/graph/db/vflib-2.0/vflib2.tgz, which is no longer online; an archived copy is at https://web.archive.org/web/20060511113454/http://amalfi.dis.unina.it/graph/db/vflib-2.0/vflib2.tgz.",
+   "evidence": "Added by the checker; the statement is our wording and needs Jeff's review. vf2.hpp at the RDKit commit (sha256 14470d6efbd7fe17de3ab1b43d77dbd8edd59eae6b170ce3f006db4a94b20517) lines 1-11: \"This is an extensive modification by Greg Landrum of pieces from several files in the vflib-2.0 distribution ... The initial version of the modifications was completed in April 2009 ... the original author of the vflib files is: Author: P. Foggia http://amalfi.dis.unina.it/graph/db/vflib-2.0/doc/vflib.html\". SubstructMatch.cpp line 34 #includes vf2.hpp and calls boost::vf2_all (lines 525, 564, 673); the wasm holds \"/src/rdkit/Code/GraphMol/Substruct/SubstructMatch.cpp\" at offset 6606778. The original site is gone; the terms come from the standard distribution itself: vflib2.tgz as captured by the Internet Archive on 2006-05-11 (http://web.archive.org/web/20060511113454id_/http://amalfi.dis.unina.it/graph/db/vflib-2.0/vflib2.tgz, sha256 851d260ef72ee62b3e589f4238a5ef25d51c66cc1f13156a7ee75e0319e0ee3e; its SHA-1 equals the archive's CDX digest 5I5MEIHKZ44QNFHCQTKS7MV5VZCCILCP, the same digest as the 2003-06 and 2006-02 captures). Its README says \"This is VFLIB, version 2.0.6.\"; its doc/vflib-2.html is byte-identical to the site's own page as captured on 2009-02-17 (the URL above, served raw via id_), and doc/vflib.sgml carries the same terms. The saved text is lines 15-49 of that page (the section, through the disclaimer), HTML markup kept; in the copyright entry the <BR> tags are dropped and \"Universit&agrave;\" is written \"Università\". The terms ask for the copyright and permission notice with the disclaimers in all copies or substantial portions, a prominent notice in the documentation of how, when and by whom the software was modified, and either the standard distribution's full source or instructions on where to obtain it; the statement is meant to meet the last two. The URL is a Wayback capture pinned by timestamp, not a git commit. MiviaLab/vf2lib on GitHub (2019, LGPL) is a later release by the same group and is not what RDKit took in 2009."
+  },
+  {
+   "name": "MolVS (lineage of RDKit's MolStandardize tautomer code)",
+   "version": "0.1.1 (tag v0.1.1, commit 0e6027a0a8bc8b3e91e24e7fe96e7545503aa5d3, 2018-04-11), the last release before the 2018 port into RDKit",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright 2016 Matt Swain"
+   ],
+   "texts": [
+    {
+     "file": "texts/molvs-0.1.1-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/mcs07/MolVS/0e6027a0a8bc8b3e91e24e7fe96e7545503aa5d3/LICENSE",
+     "sha256": "4a2cb96e36e08570f135a6ad44ce5a588d66698d629d4b4938fb55a752ad4b06"
+    }
+   ],
+   "statement": "",
+   "evidence": "Added by the checker for consistency with packages-and-derived/records/derived-tautomers-ts.json, which carries MolVS for src/chem/tautomers.ts, a port of the same Tautomer.cpp (plan, acceptance bar A4: the RDKit ports with MolVS's MIT notice). The wasm holds \"/src/rdkit/Code/GraphMol/MolStandardize/Tautomer.cpp\" at offset 6605376 and \".../MolStandardize/TautomerCatalog/TautomerCatalogParams.cpp\" at 6603904; no Normalizer, Uncharger, fragment or validation strings were found, so only the tautomer code is claimed. Lineage only, as in that record: RDKit's ReleaseNotes for 2018.09.1 list \"An integration/port of MolVS to the core RDKit\"; Tautomer.cpp names neither MolVS nor Matt Swain, and how much MolVS-derived code survives was not traced. The text is byte-identical to that record's molvs-0.1.1-LICENSE.txt."
+  },
+  {
+   "name": "InChI (IUPAC / InChI Trust) API library",
+   "version": "1.07.3 (INCHI-1-SRC.zip from https://github.com/IUPAC-InChI/InChI/releases/download/v1.07.3/, MD5 b761f37a7d3a3ff8574daf6906993759 as pinned in RDKit's Code/cmake/Modules/FindInchi.cmake); RDKit's build edits INCHI_BASE/src/util.c with sed 's/&& defined(__APPLE__)//'",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2024 IUPAC and InChI Trust",
+    "Copyright (c) 2024 InChI Project",
+    "Copyright (C) 2010 Paul Bakker.",
+    "SHA-256 implementation: Copyright (C) Brainspark B.V.,"
+   ],
+   "texts": [
+    {
+     "file": "texts/inchi-1.07.3-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/IUPAC-InChI/InChI/0b3e941d29289f3e5024c9ecfd45186285319420/LICENSE",
+     "sha256": "86ed3c36c70eb57826374cc14b199cae09fec201d07cd369a50fcaa9905244af"
+    },
+    {
+     "file": "texts/inchi-1.07.3-ichican2.c-header-L1-39.txt",
+     "url": "https://raw.githubusercontent.com/IUPAC-InChI/InChI/0b3e941d29289f3e5024c9ecfd45186285319420/INCHI-1-SRC/INCHI_BASE/src/ichican2.c",
+     "sha256": "ae6de94cd340d8e5588e6ee5533a87b775d7629921f086675ec93a53d5672387"
+    },
+    {
+     "file": "texts/inchi-1.07.3-sha2.c-header-L1-14.txt",
+     "url": "https://raw.githubusercontent.com/IUPAC-InChI/InChI/0b3e941d29289f3e5024c9ecfd45186285319420/INCHI-1-SRC/INCHI_BASE/src/sha2.c",
+     "sha256": "71a493cd30e208b56315efd260ff016565c7ff6d41b6e75f7d08ad5d7e1c8704"
+    },
+    {
+     "file": "texts/inchi-1.07.3-ikey_dll.c-L42-48.txt",
+     "url": "https://raw.githubusercontent.com/IUPAC-InChI/InChI/0b3e941d29289f3e5024c9ecfd45186285319420/INCHI-1-SRC/INCHI_BASE/src/ikey_dll.c",
+     "sha256": "15ccadaf713156375ef07a2b1398269759b411104064efcd40f88558b9e799d0"
+    }
+   ],
+   "statement": "",
+   "evidence": "Tag v1.07.3 is commit 0b3e941d29289f3e5024c9ecfd45186285319420 (annotated tag 3ed91b80). The release zip (sha256 b42d828b5d645bd60bc43df7e0516215808d92e5a46c28e12b1f4f75dfaae333) holds no LICENSE file, so the LICENSE comes from the repo at the tag; ichican2.c, sha2.c and ikey_dll.c at that commit are byte-identical to the zip's. Saved excerpts: ichican2.c lines 1-39 (the MIT header, identical in 56 of the 57 files RDKit compiles per External/INCHI-API/CMakeLists.txt), sha2.c lines 1-14 (the one file without that header: MIT \"only valid in combination with the InChI software package\"), ikey_dll.c lines 42-48 (the Brainspark B.V. line). The build log line 18301 downloads that zip; the wasm holds \"InChI version 1, Software 1.07.3 (API Library)\" at offset 6684572."
+  },
+  {
+   "name": "coordgenlibs (Schrödinger 2D coordinate generation)",
+   "version": "3.0.2 (tag v3.0.2, commit c4dd5b0e1f1971c06c7ab85725c185e47211814e; archive MD5 bc9dabbbb2b99ae426f3a1bf16c4d3cc as pinned in RDKit's External/CoordGen/CMakeLists.txt)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (c) 2017, Schrödinger, Inc.",
+    "Copyright Schrodinger, LLC. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/coordgenlibs-3.0.2-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/schrodinger/coordgenlibs/c4dd5b0e1f1971c06c7ab85725c185e47211814e/LICENSE",
+     "sha256": "b123b11566a0194a1a6bd8eeaaa9acd47cd6846e3df17ecba572a43a0665ba28"
+    }
+   ],
+   "statement": "",
+   "evidence": "Build flag -DRDK_BUILD_COORDGEN_SUPPORT=ON; log line 18321 downloads coordgenlibs/archive/v3.0.2.tar.gz (same MD5). The wasm holds coordgen RTTI names such as \"21CoordgenScaleAtomsDOF\" at offset 7291312 and \"33sketcherMinimizerClashInteraction\" at 7268907. Source files carry \"Copyright Schrodinger, LLC. All rights reserved\" (with or without the final period). maeparser 1.3.3 is downloaded too but not built (RDK_BUILD_MAEPARSER_SUPPORT=OFF)."
+  },
+  {
+   "name": "RingDecomposerLib (University of Hamburg, ZBH)",
+   "version": "1.1.3_rdkit (tag v1.1.3_rdkit, commit 7b1629781cfb7fda29716d1af14a6110bb553892; archive MD5 e9a0bcdda8b921a35e812b9888a9a874 as pinned in RDKit's External/RingFamilies/CMakeLists.txt); RDKit's CMake replaces qsort( with stable_sort( in RDLcycleFams.c and RDLdimacs.c",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (c) 2016\nUniversity of Hamburg, ZBH - Center for Bioinformatics\nNiek Andresen, Florian Flachsenberg, Matthias Rarey"
+   ],
+   "texts": [
+    {
+     "file": "texts/ringdecomposerlib-1.1.3_rdkit-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/rareylab/RingDecomposerLib/7b1629781cfb7fda29716d1af14a6110bb553892/LICENSE",
+     "sha256": "510d2b0c6b68597ac15f227b3aa22ebe7041dbaf0d5a703efa33069e8bb35762"
+    }
+   ],
+   "statement": "",
+   "evidence": "Log line 18322 downloads RingDecomposerLib/archive/v1.1.3_rdkit.tar.gz (same MD5). The wasm holds \"RDL_data is NULL!\" at offset 6814999 and the RTTI name \"N5boost6detail18sp_counted_impl_pdIP8RDL_dataPFvS3_EEE\" at 7178114."
+  },
+  {
+   "name": "FreeType",
+   "version": "2.13.3 (tag VER-2-13-3, commit 42608f77f20749dd6ddc9e0536788eaad70ea4b5; built with FT_DISABLE_ZLIB/BZIP2/PNG/HARFBUZZ/BROTLI=TRUE and the default module list)",
+   "licence": "FTL (the FreeType License, chosen of FreeType's FTL or GPL-2.0-or-later); the BDF and PCF drivers and fthash.c under MIT-style (X11) terms, and the PCF driver's pcfutil.c under The Open Group's X11 notice; its bundled gzip/zlib code under the Zlib licence",
+   "copyright": [
+    "Copyright (C) 1996-2024 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright 2006-2013 Adobe Systems Incorporated.",
+    "Copyright 2007-2013 Adobe Systems Incorporated.",
+    "Copyright 2007-2014 Adobe Systems Incorporated.",
+    "Copyright 2003 Huw D M Davies for Codeweavers",
+    "Copyright 2007 Dmitry Timoshkov for Codeweavers",
+    "Copyright (C) 2001-2002 by Francesco Zappa Nardelli",
+    "Copyright 2000 Computing Research Labs, New Mexico State University",
+    "Copyright 2001-2002, 2011 Francesco Zappa Nardelli",
+    "Copyright (C) 2000 by Francesco Zappa Nardelli",
+    "Copyright 2001-2015\nFrancesco Zappa Nardelli",
+    "Copyright (C) 1995-2023 Jean-loup Gailly and Mark Adler",
+    "Copyright (C) 1996-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and Dominik Röttsches.",
+    "Copyright (C) 1996-2024 by\nJust van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2000, 2001, 2002, 2003, 2006, 2010 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2000-2004, 2006-2011, 2013, 2014 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2001, 2002 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2001, 2002, 2003, 2004 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2001-2008, 2011, 2013, 2014 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2002-2024 by\nRoberto Alameda.",
+    "Copyright (C) 2003-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and Dominik Röttsches.",
+    "Copyright (C) 2003-2024 by\nMasatake YAMATO, Redhat K.K.,\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2004-2024 by\nAlbert Chin-A-Young.",
+    "Copyright (C) 2004-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg and George Williams.",
+    "Copyright (C) 2004-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and George Williams.",
+    "Copyright (C) 2004-2024 by\nMasatake YAMATO and Redhat K.K.",
+    "Copyright (C) 2004-2024 by\nMasatake YAMATO, Red Hat K.K.,\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2004-2024 by\nMasatake YAMATO, Redhat K.K,\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2005-2024 by\nDavid Turner.",
+    "Copyright (C) 2007-2024 by\nDavid Turner.",
+    "Copyright (C) 2007-2024 by\nDereg Clegg and Michael Toftdal.",
+    "Copyright (C) 2007-2024 by\nDerek Clegg and Michael Toftdal.",
+    "Copyright (C) 2007-2024 by\nRahul Bhalerao <rahul.bhalerao@redhat.com>, <b.rahul.pm@gmail.com>.",
+    "Copyright (C) 2008-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and suzuki toshiya.",
+    "Copyright (C) 2009-2024 by\nOran Agra and Mickey Gabel.",
+    "Copyright (C) 2010-2024 by\nJoel Klinghed.",
+    "Copyright (C) 2013-2024 by\nGoogle, Inc.",
+    "Copyright (C) 2018-2024 by\nArmin Hasitzka, David Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2018-2024 by\nDavid Turner, Robert Wilhelm, Dominik Röttsches, and Werner Lemberg.",
+    "Copyright (C) 2019-2024 by\nNikhil Ramakrishnan, David Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2022-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, George Williams, and\nDominik Röttsches.",
+    "Copyright (C) 2022-2024 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and Moazin Khatti.",
+    "Copyright (C) 2024 by\nDavid Saltzman",
+    "Copyright 1990, 1994, 1998  The Open Group",
+    "Copyright 2000, 2001, 2004 by\nFrancesco Zappa Nardelli",
+    "Copyright 2000-2001, 2002 by\nFrancesco Zappa Nardelli",
+    "Copyright 2000-2001, 2003 by\nFrancesco Zappa Nardelli",
+    "Copyright 2000-2010, 2012-2014 by\nFrancesco Zappa Nardelli",
+    "Copyright 2001, 2002, 2012 Francesco Zappa Nardelli",
+    "Copyright 2001-2004, 2011 Francesco Zappa Nardelli",
+    "Copyright 2001-2014\nFrancesco Zappa Nardelli",
+    "Copyright 2003 by\nFrancesco Zappa Nardelli",
+    "Copyright 2009-2013 Adobe Systems Incorporated.",
+    "Copyright 2009-2014 Adobe Systems Incorporated.",
+    "Copyright 2011-2013 Adobe Systems Incorporated.",
+    "Copyright 2013 Adobe Systems Incorporated.",
+    "Copyright 2013 by Google, Inc.",
+    "Copyright 2013-2014 Adobe Systems Incorporated."
+   ],
+   "texts": [
+    {
+     "file": "texts/freetype-2.13.3-LICENSE.TXT.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/LICENSE.TXT",
+     "sha256": "2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b"
+    },
+    {
+     "file": "texts/freetype-2.13.3-FTL.TXT.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/docs/FTL.TXT",
+     "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+    },
+    {
+     "file": "texts/freetype-2.13.3-bdf-README-L99-144.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/src/bdf/README",
+     "sha256": "d97ce69c9dff1f885ad6341b58bdfeecf241337597f78ecc9544776b8f1d7416"
+    },
+    {
+     "file": "texts/freetype-2.13.3-pcf-README-L66-88.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/src/pcf/README",
+     "sha256": "acb4adde9db25f992623adb83a3c95db21fb157aae02a19b56aad9194fe8cc64"
+    },
+    {
+     "file": "texts/freetype-2.13.3-fthash.c-header-L1-31.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/src/base/fthash.c",
+     "sha256": "180939ebfe3b23a864b4ed529b46fd81a200c6907454f7f99a370674a4f8bff6"
+    },
+    {
+     "file": "texts/freetype-2.13.3-gzip-zlib.h-header-L1-29.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/src/gzip/zlib.h",
+     "sha256": "871024b2721f77d335ed79d10a7f90f47a14502cf8f1aa6e9ae7448e06ff7988"
+    },
+    {
+     "file": "texts/freetype-2.13.3-pcfutil.c-header-L1-25.txt",
+     "url": "https://raw.githubusercontent.com/freetype/freetype/42608f77f20749dd6ddc9e0536788eaad70ea4b5/src/pcf/pcfutil.c",
+     "sha256": "af57587b2694810c266311071d5f723d156e32cfebc86c1438c7a8ba24daa2c8"
+    }
+   ],
+   "statement": "Portions of this software are copyright © 2024 The FreeType Project (www.freetype.org). All rights reserved.",
+   "evidence": "RDKit's 01_deps.Dockerfile builds github.com/freetype/freetype/archive/refs/tags/VER-2-13-3.tar.gz (sha256 bc5c898e4756d373e0d991bab053036c5eb2aa7c0d5c67e8662ddc6da40c4103 as downloaded; the raw files at the tag commit equal the tarball's). The credit year is 2024, from include/freetype/freetype.h \"Copyright (C) 1996-2024\", as FTL.TXT asks (\"replace <year> with the value from the FreeType version you actually use\"). The build log compiles src/bdf/bdf.c, src/pcf/pcf.c, src/gzip/ftgzip.c, src/lzw/ftlzw.c, src/psaux/psaux.c and src/winfonts/winfnt.c; the wasm holds the module names \"bsdf\", \"bdf\", \"pcf\" at offsets 6621735-6621744, \"STARTFONT\" (BDF) at 6663534 and \"FREETYPE_PROPERTIES\" at 6664167. With FT_DISABLE_ZLIB, FT_CONFIG_OPTION_USE_ZLIB stays on and SYSTEM_ZLIB off, so ftgzip.c #includes its own zlib 1.3 copy (src/gzip/README.freetype); whether that copy survived dead-code elimination is not visible (no names section; its strings equal zlib 1.3.2's). Saved excerpts: src/bdf/README lines 99-144 and src/pcf/README lines 66-88 (their \"License\" sections), fthash.c lines 1-31, src/gzip/zlib.h lines 1-29. Not compiled: ft-hb.c (needs FT_CONFIG_OPTION_USE_HARFBUZZ) and md5.c (FT_DEBUG_LEVEL_TRACE only). Adobe's CFF code (src/psaux/ps*) is under the FTL plus a patent grant stated in each file header. Added by the checker: src/pcf/pcf.c (compiled, log line 17879) #includes pcfutil.c, whose lines 1-25 carry \"Copyright 1990, 1994, 1998  The Open Group\" and The Open Group's X11 permission notice (\"shall be included in all copies or substantial portions of the Software\"); saved verbatim as texts/freetype-2.13.3-pcfutil.c-header-L1-25.txt (same bytes as the Indigo record's pcfutil text). Copyright lines: freetype.h's 1996-2024 line stands for the files naming only David Turner, Robert Wilhelm, and Werner Lemberg; every other distinct statement in the leading comments of the compiled modules' .c/.h files (autofit base bdf bzip2 cache cff cid lzw pcf pfr psaux pshinter psnames raster sdf sfnt smooth svg truetype type1 type42 winfonts, ftgzip.c), include/freetype and builds/unix/ftsystem.c is listed, extracted by script from the VER-2-13-3 tarball (comment markers stripped, continuation lines joined with \\n); md5.c/h (FT_DEBUG_LEVEL_TRACE only) and ft-hb.c/h (#ifdef FT_CONFIG_OPTION_USE_HARFBUZZ) are left out, and src/gzip's zlib files are represented by zlib.h's line. ftmac.c's line is listed although its body is Mac-only."
+  },
+  {
+   "name": "zlib",
+   "version": "1.3.2 (release tarball https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz; tag v1.3.2, commit da607da739fa6047df13e66a2af6b8bec7c2a498)",
+   "licence": "Zlib",
+   "copyright": [
+    "(C) 1995-2026 Jean-loup Gailly and Mark Adler"
+   ],
+   "texts": [
+    {
+     "file": "texts/zlib-1.3.2-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/madler/zlib/da607da739fa6047df13e66a2af6b8bec7c2a498/LICENSE",
+     "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2"
+    }
+   ],
+   "statement": "Included as a courtesy: the zlib licence does not require a notice in a compiled copy.",
+   "evidence": "RDKit links it for PNG metadata (ZLIB_LIBRARY=/opt/zlib/lib/libz.a in 03_build.Dockerfile; log line 18324 \"Found ZLIB: /opt/zlib/lib/libz.a (found version \"1.3.2\")\"). The wasm holds \"1.3.2\" at offset 6674203 and zlib's \"incorrect header check\" at 6616991. The LICENSE at the tag equals the one in the release tarball (sha256 bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16)."
+  },
+  {
+   "name": "Boost C++ Libraries (headers only)",
+   "version": "1.87.0 (https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz; tag boost-1.87.0, commit c89e6267665516192015a9e40955e154466f4f68)",
+   "licence": "BSL-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/boost-1.87.0-LICENSE_1_0.txt",
+     "url": "https://raw.githubusercontent.com/boostorg/boost/c89e6267665516192015a9e40955e154466f4f68/LICENSE_1_0.txt",
+     "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+    }
+   ],
+   "statement": "Included as a courtesy: the Boost Software License does not require its notice in machine-executable object code.",
+   "evidence": "01_deps.Dockerfile defaults BOOST_* to 1.87.0 and downloads that tarball (log line 1547); only Boost.System is built for the host, the rest is header templates compiled into RDKit. The wasm holds boost::json, boost::property_tree, boost::rational and boost::format strings (e.g. offsets 6584396, 6636297, 6633053). LICENSE_1_0.txt in the tarball (streamed) and at the tag are identical. It has no copyright line; Boost's per-file notices are not listed because BSL-1.0 exempts object code. RDKit's own copy of boost hash (Code/RDGeneral/hash) is under the same licence.",
+   "noCopyright": "a courtesy entry: the Boost Software License asks for no notice in machine code"
+  },
+  {
+   "name": "Telex Regular font (embedded in RDKit's MolDraw2D)",
+   "version": "1.100 (name table \"Version 1.100\"), via RDKit's Code/GraphMol/MolDraw2D/Fonts/telex_regular.h",
+   "licence": "OFL-1.1 (Reserved Font Name \"Telex\")",
+   "copyright": [
+    "Copyright 2011 The Telex Project Authors (info@andrestorresi.com.ar), with Reserved Font Name Telex."
+   ],
+   "texts": [
+    {
+     "file": "texts/telex-1.100-ofl-1.1.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/Data/Fonts/telex_font_license.txt",
+     "sha256": "b76d2e0cf60d47d9ee90148bb1740ab7f13586a0f2c7295861661e67d655cb8e"
+    }
+   ],
+   "statement": "",
+   "evidence": "All 38940 bytes of the TTF in telex_regular.h at the RDKit commit are present, unchanged, in the wasm's linear memory at address 850032 (spread over 43 active data segments; the first data byte is at file offset 6956435). Its name table: copyright \"Copyright 2011 The Telex Project Authors (info@andrestorresi.com.ar), with Reserved Font Name Telex.\", trademark \"Telex is a trademark of Andres Torresi\". The wasm also holds \"/Data/Fonts/Telex-Regular.ttf\" at offset 6621484. The licence text is RDKit's Data/Fonts/telex_font_license.txt (OFL 1.1 with the font's copyright line), as the task asked."
+  },
+  {
+   "name": "Roboto Regular font (embedded in RDKit's MolDraw2D)",
+   "version": "2.137 (name table \"Version 2.137; 2017\"), via RDKit's Code/GraphMol/MolDraw2D/Fonts/roboto_regular.h",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright 2011 Google Inc. All Rights Reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/roboto-2-apache-2.0-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/googlefonts/roboto-2/ab4876f650a4aeb9b661c83fee47f908c739bb70/LICENSE",
+     "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    }
+   ],
+   "statement": "",
+   "evidence": "All 168260 bytes of the TTF in roboto_regular.h at the RDKit commit are present, unchanged, in the wasm's linear memory at address 888976 (131 active data segments; first data byte at file offset 6994757). Name table (Windows, en-US): copyright \"Copyright 2011 Google Inc. All Rights Reserved.\", trademark \"Roboto is a trademark of Google.\", licence \"Licensed under the Apache License, Version 2.0\", http://www.apache.org/licenses/LICENSE-2.0. The copyright line is from that name table. The Apache-2.0 text is googlefonts/roboto-2 (formerly googlefonts/roboto) LICENSE at tag v2.138; there is no v2.137 tag, and LICENSE is byte-identical at v2.136 and v2.138. Neither tag has a NOTICE file (HTTP 404), so Apache-2.0 4(d) adds nothing. RDKit's own Data/Fonts/roboto_regular_license.txt only names Apache 2.0 and a URL, so it is not used."
+  },
+  {
+   "name": "Emscripten runtime (JS glue, embind, Emscripten's system library code)",
+   "version": "6.0.11 (tag 6.0.11, commit a0014542110d6078c3a1a7941fa1ddb3a2281f16)",
+   "licence": "MIT (chosen of Emscripten's MIT or University of Illinois/NCSA licences)",
+   "copyright": [
+    "Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file."
+   ],
+   "texts": [
+    {
+     "file": "texts/emscripten-6.0.11-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/LICENSE",
+     "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    }
+   ],
+   "statement": "",
+   "evidence": "The publish log (lines 17783-17798) resolves emsdk \"latest\" to 6.0.11 = sdk-releases-f6264d4a4dd9ba24a9f0a5702835a44d1463de13, and emscripten-releases' DEPS at f6264d4a pins emscripten_revision a0014542, the 6.0.11 tag commit. The wasm has no producers section, so this rests on the log. node_modules/@rdkit/rdkit/dist/RDKit_minimal.js is Emscripten-generated (MODULARIZE, EXPORT_NAME initRDKitModule); it has no licence comments. The wasm holds embind type names (\"emscripten::memory_view<char>\" at offset 6670704) and \"/emsdk/emscripten/system/lib/libcxxabi/src/private_typeinfo.cpp\" at 6605677. Whether the MIT notice is legally needed for generated glue is not stated by Emscripten; shipping it is the safe reading."
+  },
+  {
+   "name": "Node.js path module code (PATH object in Emscripten's src/lib/libpath.js)",
+   "version": "as bundled in Emscripten 6.0.11",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright Joyent, Inc. and other Node contributors. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/emscripten-6.0.11-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/LICENSE",
+     "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    }
+   ],
+   "statement": "",
+   "evidence": "The glue holds \"var PATH={isAbs:...\" at byte offset 6614 of node_modules/@rdkit/rdkit/dist/RDKit_minimal.js (from Emscripten's src/lib/libpath.js). Emscripten's LICENSE carries Node's MIT licence for this code; it still names the file by its old path, src/library_path.js."
+  },
+  {
+   "name": "musl libc (Emscripten's modified copy)",
+   "version": "musl v1.2.6 base, per system/lib/libc/README.md at Emscripten 6.0.11, with Emscripten's changes",
+   "licence": "MIT (portions under other permissive terms listed in its COPYRIGHT file)",
+   "copyright": [
+    "Copyright © 2005-2020 Rich Felker, et al."
+   ],
+   "texts": [
+    {
+     "file": "texts/musl-1.2.6-COPYRIGHT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/libc/musl/COPYRIGHT",
+     "sha256": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b"
+    }
+   ],
+   "statement": "",
+   "evidence": "Emscripten always links libc (tools/system_libs.py get_libs_to_link: add_library('libc')). The wasm holds musl vfprintf's prefix string \"-+   0X0x\" at offset 6583680 (system/lib/libc/musl/src/stdio/vfprintf.c line 589 at 6.0.11). Emscripten's COPYRIGHT is byte-identical to upstream https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT?h=v1.2.6. Which musl objects were linked cannot be seen (no names section), so the whole file, with its third-party credits (TRE, Sun/FreeBSD maths, smoothsort, ...), is shipped."
+  },
+  {
+   "name": "LLVM runtime libraries (libc++, libc++abi, libunwind, compiler-rt builtins)",
+   "version": "LLVM 22.1.8 sources as bundled in Emscripten 6.0.11 (system/lib/*/README.md)",
+   "licence": "Apache-2.0 WITH LLVM-exception (legacy University of Illinois/NCSA and MIT also stated)",
+   "copyright": [
+    "Copyright (c) 2009-2019 by the contributors listed in CREDITS.TXT",
+    "Copyright (c) 2009-2014 by the contributors listed in CREDITS.TXT",
+    "Copyright (c) 2009-2015 by the contributors listed in CREDITS.TXT",
+    "Copyright (c) 2007-2019 University of Illinois at Urbana-Champaign."
+   ],
+   "texts": [
+    {
+     "file": "texts/llvm-22.1.8-libcxx-LICENSE.TXT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/libcxx/LICENSE.TXT",
+     "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+    },
+    {
+     "file": "texts/llvm-22.1.8-libcxxabi-LICENSE.TXT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/libcxxabi/LICENSE.TXT",
+     "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+    },
+    {
+     "file": "texts/llvm-22.1.8-libunwind-LICENSE.TXT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/libunwind/LICENSE.TXT",
+     "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d"
+    },
+    {
+     "file": "texts/llvm-22.1.8-compiler-rt-LICENSE.TXT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/compiler-rt/LICENSE.TXT",
+     "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+    },
+    {
+     "file": "texts/llvm-libc-emscripten-6.0.11-LICENSE.TXT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/llvm-libc/LICENSE.TXT",
+     "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47"
+    }
+   ],
+   "statement": "Included as a courtesy: the LLVM exception waives Apache-2.0 sections 4(a), 4(b) and 4(d) for code embedded in object form.",
+   "evidence": "get_libs_to_link adds libclang_rt.builtins always, libc++ and libc++abi for C++ links, and libunwind when WASM_EXCEPTIONS (the build uses -fwasm-exceptions). The wasm holds libc++abi's \"terminating due to %s exception of type %s\" at offset 6598039 and its source path at 6605677. The four LICENSE.TXT files differ only in the library named in the legacy section (and compiler-rt's 2009-2015 line). llvm-libc is not linked as a library (no add_library for libllvmlibc) but libc++ is compiled with -I system/lib/llvm-libc; whether any of its header code survived linking is not visible, so its licence is listed too."
+  },
+  {
+   "name": "dlmalloc (Doug Lea's malloc)",
+   "version": "2.8.6, as system/lib/dlmalloc.c in Emscripten 6.0.11",
+   "licence": "CC0-1.0 (public domain dedication)",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/dlmalloc-2.8.6-header-L51-60.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/a0014542110d6078c3a1a7941fa1ddb3a2281f16/system/lib/dlmalloc.c",
+     "sha256": "c09ba77b872e03dc99c1a63a234abeb4c489f58ce042c62d36aabf0c57c5d078"
+    }
+   ],
+   "statement": "Public domain; credited as a courtesy.",
+   "evidence": "src/settings.js at 6.0.11 sets MALLOC = \"dlmalloc\" by default and the RDKit build passes no -sMALLOC; get_libs_to_link adds libmalloc, built from dlmalloc.c for that setting. The text is lines 51-60 of dlmalloc.c (the dedication and version), saved verbatim. The glue calls the wasm export emscripten_builtin_memalign, which dlmalloc.c line 6087 defines as an alias of dlmemalign; the binary has no names section, so the allocator rests on the default setting.",
+   "noCopyright": "public domain (CC0)"
+  }
+ ],
+ "slug": "rdkit-wasm"
+}

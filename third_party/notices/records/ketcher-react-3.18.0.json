@@ -1,0 +1,40 @@
+{
+ "title": "ketcher-react 3.18.0 (EPAM's Ketcher): licence, NOTICE and copyright from Ketcher's v3.18.0 tag",
+ "part": 2,
+ "keys": [
+  {
+   "package": "ketcher-react@3.18.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "ketcher-react",
+   "version": "3.18.0",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright 2021 EPAM Systems"
+   ],
+   "texts": [
+    {
+     "file": "texts/ketcher-3.18.0-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/ketcher/f4f013e1855b71b0cbd37fc79d55b0cbe51c2371/LICENSE",
+     "sha256": "3d54b234fa88c11d1d96380ff5fe29f3c5d8e1078ef914dfe8185ce4b1fbeac7"
+    },
+    {
+     "file": "texts/ketcher-3.18.0-NOTICE.txt",
+     "url": "https://raw.githubusercontent.com/epam/ketcher/f4f013e1855b71b0cbd37fc79d55b0cbe51c2371/NOTICE",
+     "sha256": "ab82986438fc66fa2b40836415b734ff018b1e42ee3a18434b27bdf1c42eb368"
+    },
+    {
+     "file": "texts/ketcher-3.18.0-LICENSE-history.txt",
+     "url": "https://raw.githubusercontent.com/epam/ketcher/f4f013e1855b71b0cbd37fc79d55b0cbe51c2371/LICENSE-history",
+     "sha256": "9e71b45a8979632e892051a2fa65e5eb0968d148a43eb79f48c86039063c5090"
+    }
+   ],
+   "statement": "MU Draw's build changes ketcher-react 3.18.0's dist/index.js: it removes the InChI, InChI AuxInfo and InChIKey formats from the Save dialog, and points its import of miew-react, Ketcher's 3D viewer, at a stand-in, so Miew is not shipped.",
+   "evidence": "Copyright line: the banner ' * Copyright 2021 EPAM Systems' heads dist/index.js (sha256 b1434eab3936c0c11cea70c03ab2f1c9633c36e843d9b6d32e9a77e6aa1560cb) and dist/index.modern-55d8e3ef.js; no other copyright or @license comment in either. dist/index.js.map lists only ketcher-react src/ (375 sources), so index.js inlines nothing else. The statement records the build's changes (web/config/ketcherTrim.ts: withoutInchiFormats() on node_modules/ketcher-react/dist/index.js and the MIEW_STAND_IN alias to src/editor/noMiew.ts), for Apache-2.0 §4(b) ('cause any modified files to carry prominent notices stating that You changed the files'); whether NOTICES is a sufficient place for that notice is open (REPORT.md). No LICENSE or NOTICE in the npm package (its folder holds only dist/, package.json, README.md, and for ketcher-core/-react a node_modules/). The npm registry's gitHead for 3.18.0 is f4f013e1855b71b0cbd37fc79d55b0cbe51c2371, which is what tag v3.18.0 points to (api.github.com: ref tags/v3.18.0 -> tag object 5f0a0cdd3a1564f3a43f387d3a76e571ae7d05f1 -> commit f4f013e1855b71b0cbd37fc79d55b0cbe51c2371); LICENSE, NOTICE and LICENSE-history fetched at that commit and at the tag are byte-identical. web/package-lock.json's integrity for the package equals the registry's dist.integrity. The repo LICENSE is Apache-2.0 whose appendix is filled in as 'Copyright 2021 EPAM Systems' (inside the licence body, so not a copyright line by subtraction); the copyright line is the banner at the top of every shipped dist file. LICENSE-history says Ketcher version 1 was AGPL-3.0 and version 2 was re-licensed under Apache-2.0 by EPAM; 3.18.0 is Apache-2.0 (package.json \"license\": \"Apache-2.0\"). NOTICE lists licence families of Ketcher's dependencies (incl. LGPL-2.1 and MPL-1.0) without naming files; it is reproduced whole, as Apache-2.0 §4(d) asks. ketcher-macromolecules and the third-party code inlined in dist/index.modern-55d8e3ef.js have their own records."
+  }
+ ],
+ "slug": "ketcher-react-3.18.0"
+}

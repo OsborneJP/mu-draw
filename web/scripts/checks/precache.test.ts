@@ -79,6 +79,7 @@ describe('checkPrecache', () => {
     ['IR hint table', 'ir-bands.json'],
     ['practice list file', 'practice.json'],
     ['InChI and cairo source', 'third-party/indigo-b36d38f5-inchi-cairo.tar.xz'],
+    ['third-party notices', 'third-party/NOTICES.txt'],
   ])('fails when the %s is missing from the build', (what, path) => {
     const files = FILES.filter((f) => f.path !== path);
     expect(files.length).toBe(FILES.length - 1);

@@ -1,0 +1,30 @@
+{
+ "title": "asap 1.0.0: MIT, declared in the old package.json \"licenses\" array",
+ "part": 2,
+ "keys": [
+  {
+   "package": "asap@1.0.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "asap",
+   "version": "1.0.0",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright 2009–2013 Contributors. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/asap-1.0.0-LICENSE.txt",
+     "url": "https://registry.npmjs.org/asap/-/asap-1.0.0.tgz",
+     "sha256": "eb49626825c0e74be4fb5a2411fbd0de0b265c76aa50dd4e763636341167bc0f"
+    }
+   ],
+   "statement": "",
+   "evidence": "package.json has no \"license\" field, only \"licenses\": [{\"type\": \"MIT\", \"url\": \"https://github.com/kriskowal/asap/raw/master/LICENSE.md\"}] (so Vite's build.license prints no identifier). The package's LICENSE.md is the MIT text with the line above; the npm tarball https://registry.npmjs.org/asap/-/asap-1.0.0.tgz (sha512 = lockfile integrity) holds the same bytes as package/LICENSE.md. kriskowal/asap has no v1 tag (its tags start at v2.0.0) and the registry has no gitHead, so the tarball is the primary source. Shipped module: asap.js."
+  }
+ ],
+ "slug": "asap-1.0.0"
+}

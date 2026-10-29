@@ -1,0 +1,67 @@
+{
+ "title": "src/chem/rdkitTables.json: data taken from RDKit's source and periodic table",
+ "part": 4,
+ "keys": [
+  {
+   "module": "src/chem/rdkitTables.json"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "RDKit tautomer transforms (MolStandardize/TautomerCatalog/tautomerTransforms.in)",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2021 Greg Landrum",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "tautomerTransforms.in at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 72cfe428c2c46c60e02b611e5b1e4dd8f17e817aa5c9109daedd4cae5d33ac07, = rdkitTables.json sources[tautomerTransforms.in] and the recorded fixture). rdkitTables.json 'tautomer_transforms' (37 rows) are parsed from it by server/scripts/gen_rdkit_tables.py. The file says its transforms are 'Derived from the transforms in Sitzmann et al. https://doi.org/10.1007/s10822-010-9346-4' (a citation, no licence of its own). Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  },
+  {
+   "name": "RDKit Allen electronegativity table (Resonance.cpp)",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2015 Paolo Tosco",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Resonance.cpp at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 f2641722…, = rdkitTables.json sources[Resonance.cpp]). rdkitTables.json 'electronegativity' is Resonance.cpp's 'static const std::vector<unsigned int> en{...}', read by gen_rdkit_tables.py. Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  },
+  {
+   "name": "RDKit periodic-table data (outer electrons, valences; atomic_data.cpp)",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2001-2024 Greg Landrum and other RDKit contributors",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Code/GraphMol/atomic_data.cpp at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 7f9cee6e430b60d303a0a7fa9e33c45e5c529ee204f86afeab6a20f68b6b0631). rdkitTables.json 'elements' comes from Python RDKit 2026.09.1's periodic table (GetNOuterElecs, GetValenceList; the conda env's rdkit.__version__ is 2026.09.1), whose data is in atomic_data.cpp. The file's own comment says its data 'came from a variety of sources' (only some named); those origins were not traced. rdkitTables.json also carries license.txt verbatim ('rdkit_license'). Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  }
+ ],
+ "slug": "derived-rdkit-tables-json"
+}

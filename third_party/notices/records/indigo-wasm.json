@@ -1,0 +1,690 @@
+{
+ "title": "Indigo WebAssembly and its Emscripten glue, as shipped by indigo-ketcher 1.46.0",
+ "part": 3,
+ "keys": [
+  {
+   "file": "node_modules/indigo-ketcher/indigo-ketcher-1.46.0.wasm",
+   "sha256": "fce4bf2c93e5cc3188883c254a1b9f2a6558fcb999c974305a3b1dbdc764f120"
+  },
+  {
+   "file": "node_modules/ketcher-standalone/dist/binaryWasm/indigo-ketcher-1.46.0.wasm",
+   "sha256": "fce4bf2c93e5cc3188883c254a1b9f2a6558fcb999c974305a3b1dbdc764f120"
+  },
+  {
+   "file": "node_modules/indigo-ketcher/indigo-ketcher-separate-wasm.js",
+   "sha256": "8824813b3a5a5f61f967b8047855ced297483db6ad744c58f9187aaeae052cf8"
+  },
+  {
+   "file": "node_modules/ketcher-standalone/dist/binaryWasm/indigoWorker-d22340fa.js",
+   "sha256": "b417f087027592c35a3a08e486a268c70df8bc63a02d0b4471d1d07ee4c9fcdc"
+  },
+  {
+   "package": "indigo-ketcher@1.46.0"
+  },
+  {
+   "package": "ketcher-standalone@3.18.0"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "Indigo",
+   "version": "1.46.0 (epam/Indigo commit b36d38f5293470721fe02ee570d9f0e6488a5b8d, tag indigo-1.46.0)",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright (C) from 2009 to Present EPAM Systems.",
+    "Copyright (C) from 2024 to Present EPAM Systems."
+   ],
+   "texts": [
+    {
+     "file": "texts/indigo-apache-2.0-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/LICENSE",
+     "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+   ],
+   "statement": "",
+   "evidence": "The wasm holds the version string \"1.46.0.0-gb36d38f52-wasm32-wasm-clang-23.0.0\" at file offset 9180211. Both keyed wasm files are byte-identical (same SHA-256). The link line is TARGET_FILES in api/wasm/indigo-ketcher/CMakeLists.txt at the commit (indigo-ketcher-object, indigo-static, indigo-inchi-static, indigo-renderer-static, render2d, lunasvg, plutovg, cairo, freetype, png, pixman, indigo-core, inchi, tinyxml2, z); the shipped file is the render build (target indigo-ketcher-separate, glue indigo-ketcher-separate-wasm.js, renamed by patch.cmake). Indigo has no NOTICE file at the commit (raw URL returns 404). Its LICENSE is the bare Apache-2.0 text with the unfilled appendix, byte-identical to node_modules/indigo-ketcher/LICENSE; the copyright lines are the only two forms in the headers of core/, api/c/indigo, api/c/indigo-inchi, api/c/indigo-renderer and api/wasm/indigo-ketcher (557 header lines say 2009; core/indigo-core/molecule/src/idt_alias.cpp says 2024). core/indigo-core/molecule/meta_commons.h has an 8-line pair hash \"taken from boost library\" (Boost licence, which asks nothing of binaries); not given its own entry. CDXConstants.h has its own component."
+  },
+  {
+   "name": "InChI",
+   "version": "1.06 (Software version 1.06, December 15, 2020), modified by EPAM Systems (ichicans.c, ichiparm.c, runichi4.c, util.c)",
+   "licence": "IUPAC/InChI-Trust InChI Licence No. 1.0",
+   "copyright": [
+    "Copyright (C) Brainspark B.V.",
+    "Copyright (C) IUPAC and InChI Trust",
+    "Copyright (C) IUPAC and InChI Trust Limited"
+   ],
+   "texts": [
+    {
+     "file": "texts/inchi-licence-1.0.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/inchi/LICENCE",
+     "sha256": "041c100ae2d59b8593320a361d31266ca71a57a07c80a9a782b1ad845fb2ab37"
+    }
+   ],
+   "statement": "MU Draw uses the InChI library, inside Indigo; the library and its use are covered by the IUPAC/InChI-Trust InChI Licence No. 1.0, whose text follows.",
+   "modifications": [
+    "Upstream: IUPAC-InChI/InChI tag v1.06, commit a515b3973d08abe659d0de3e4def3d28d74eeb88 (INCHI-1-SRC). Of the 89 .c/.h files in INCHI_BASE/src and INCHI_API/libinchi/src (52 .c files compiled) only these differ, by git blob hash: INCHI_BASE/src/ichicans.c, ichiparm.c, runichi4.c, util.c.",
+    "util.c already differed in Indigo commit 3deae3406062ea9fb304e654ae249d25f6a40e8f (2021-07-22, \"Indigo 1.5 pre-release\", the 1.06 import); the other three matched v1.06 there.",
+    "ichiparm.c: Indigo commit 59efbd0be0b42f449f706c3a3c8d094e483e5ef4 (2021-12-23).",
+    "runichi4.c: Indigo commit 1509ee5dfb8a55774107c34c1a454ebe40f0c837 (2023-03-14, \"Memory leak in 3rd party library\").",
+    "ichicans.c: Indigo commit bcd9c732b2ad693238d13ccb1a8dc2121223f8b5 (2024-09-04).",
+    "Indigo adds third_party/inchi/CMakeLists.txt and the plain-text LICENCE; the tbb and ixa directories of v1.06 are not vendored."
+   ],
+   "evidence": "Wasm strings \"InChI version 1, Software v. 1.06 (API Library)\" at file offset 9191487 and \"InChI=1S/\" at 9258681. CMake target inchi (third_party/inchi/CMakeLists.txt) compiles INCHI_BASE/src/*.c and INCHI_API/libinchi/src/*.c and is on the link line. Copyright lines: every compiled .c/.h header, distinct forms only; \"Copyright (C) Brainspark B.V.\" is the SHA-256 code in INCHI_BASE/src/sha2.c and sha2.h (both also carry \"Copyright (C) IUPAC and InChI Trust Limited\"). Blob comparison against the shallow clone of IUPAC-InChI/InChI at a515b397 and the Indigo clone at b36d38f5; per-file commit history from the GitHub API. The licence text is Indigo's plain-text third_party/inchi/LICENCE (added in Indigo commit 4574b31a845c, 2012, \"indigo-inchi: official InChI library\"); it is the 2011 edition of Licence No. 1.0. Word by word it equals the official INCHI-1-SRC/LICENCE.pdf at v1.06 (2020 edition, sha256 485c8cd29f48c0cdcc7aba5803b868ed3aed5e07ac6dbc4e7acc27308ae3e422, pdftotext) except \"(c)\" for \"©\", \"InChI Trust Limited\" for \"InChI Trust\", the postal contact in the how-to-apply appendix and the footer \"(c) 2011 IUPAC and InChI Trust Limited\" for \"© 2020 IUPAC and InChI Trust\": the terms are the same."
+  },
+  {
+   "name": "cairo",
+   "version": "1.17.4 per src/cairo-version.h; in fact a cairo git snapshot: upstream commit 06f405c775f46e29a7cc89b03fba9ab71a3f2623 (2021-07-20), modified by EPAM Systems",
+   "licence": "MPL-1.1 (cairo offers LGPL-2.1 or MPL-1.1 per file; MPL-1.1 elected); some files MIT or HPND",
+   "copyright": [
+    "Copyright (c) 2006 Mozilla Corporation",
+    "Copyright (c) 2006 Red Hat, Inc.",
+    "Copyright (c) 2007  David Turner",
+    "Copyright (c) 2007 Netlabs",
+    "Copyright (c) 2008  M Joonas Pihlaja",
+    "Copyright (c) 2011  Intel Corporation",
+    "Copyright (C) 2011 Andrea Canciani",
+    "Copyright (c) 2011 Andrea Canciani",
+    "Copyright 2009 Andrea Canciani",
+    "Copyright © 1999 Tom Tromey",
+    "Copyright © 2000 Keith Packard",
+    "Copyright © 2002 Keith Packard",
+    "Copyright © 2002 University of Southern California",
+    "Copyright © 2003 University of Southern California",
+    "Copyright © 2004 Carl Worth",
+    "Copyright © 2004 David Reveman",
+    "Copyright © 2004 Keith Packard",
+    "Copyright © 2004 Red Hat, Inc",
+    "Copyright © 2004 Red Hat, Inc.",
+    "Copyright © 2005 Emmanuel Pacaud <emmanuel.pacaud@univ-poitiers.fr>",
+    "Copyright © 2005 Keith Packard",
+    "Copyright © 2005 Red Hat Inc.",
+    "Copyright © 2005 Red Hat, Inc",
+    "Copyright © 2005 Red Hat, Inc.",
+    "Copyright © 2005,2007 Red Hat, Inc.",
+    "Copyright © 2005,2008 Red Hat Inc.",
+    "Copyright © 2005-2006 Emmanuel Pacaud <emmanuel.pacaud@free.fr>",
+    "Copyright © 2005-2007 Emmanuel Pacaud <emmanuel.pacaud@free.fr>",
+    "Copyright © 2006 Adrian Johnson",
+    "Copyright © 2006 Joonas Pihlaja",
+    "Copyright © 2006 Keith Packard",
+    "Copyright © 2006 Red Hat, Inc",
+    "Copyright © 2006 Red Hat, Inc.",
+    "Copyright © 2006, 2008 Red Hat, Inc",
+    "Copyright © 2007 Adrian Johnson",
+    "Copyright © 2007 Chris Wilson",
+    "Copyright © 2007 David Turner",
+    "Copyright © 2007 Mathias Hasselmann",
+    "Copyright © 2007 Mozilla Corporation",
+    "Copyright © 2007 Red Hat, Inc.",
+    "Copyright © 2007, 2008 Adrian Johnson",
+    "Copyright © 2007,2008 Adrian Johnson",
+    "Copyright © 2008 Adrian Johnson",
+    "Copyright © 2008 Chris Wilson",
+    "Copyright © 2008 M Joonas Pihlaja",
+    "Copyright © 2008 Red Hat, Inc.",
+    "Copyright © 2009 Adrian Johnson",
+    "Copyright © 2009 Chris Wilson",
+    "Copyright © 2009 Intel Corporation",
+    "Copyright © 2009,2010,2011 Intel Corporation",
+    "Copyright © 2010 Andrea Canciani",
+    "Copyright © 2010 Intel Corporation",
+    "Copyright © 2010 Joonas Pihlaja",
+    "Copyright © 2011 Intel Corporation",
+    "Copyright © 2012 Intel Corporation",
+    "Copyright © 2013 Intel Corporation",
+    "Copyright © 2014 Intel Corporation",
+    "Copyright © 2014 Intel Corporation, Inc",
+    "Copyright © 2016 Adrian Johnson",
+    "Copyright © 2020-2021 Anton Danilkin <afdw@yandex.ru>",
+    "Copyright ©2013 Intel Corporation"
+   ],
+   "initialDevelopers": [
+    "The Initial Developer of the Original Code is Keith Packard",
+    "The Initial Developer of the Original Code is Red Hat, Inc.",
+    "The Initial Developer of the Original Code is University of Southern\nCalifornia.",
+    "The Initial Developer of the Original Code is Intel Corporation",
+    "The Initial Developer of the Original Code is Carl Worth",
+    "The Initial Developer of the Original Code is Adrian Johnson.",
+    "The Initial Developer of the Original Code is Chris Wilson",
+    "The Initial Developer of the Original Code is Intel Corporation.",
+    "The Initial Developer of the Original Code is Mozilla Foundation",
+    "The Initial Developer of the Original Code is Chris Wilson.",
+    "The Initial Developer of the Original Code is Andrea Canciani.",
+    "The Initial Developer of the Original Code is Tom Tromey.\nand Red Hat, Inc."
+   ],
+   "texts": [
+    {
+     "file": "texts/cairo-COPYING-MPL-1.1.txt",
+     "url": "https://gitlab.freedesktop.org/cairo/cairo/-/raw/06f405c775f46e29a7cc89b03fba9ab71a3f2623/COPYING-MPL-1.1",
+     "sha256": "53692a2ed6c6a2c6ec9b32dd0b820dfae91e0a1fcdf625ca9ed0bdf8705fcc4f"
+    },
+    {
+     "file": "texts/cairo-mit-mono-scan-converter-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/cairo/src/cairo-mono-scan-converter.c",
+     "sha256": "16f1b020095e0945f4b52fbe0166f48146d82521924c0df12b4339226e15f546",
+     "extract": "lines 2-25 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/cairo-hpnd-pattern-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/cairo/src/cairo-pattern.c",
+     "sha256": "17581f36c10ca7d8ed5df001531394a1d4927d960eb1baa4d32e63ebb2f6dd28",
+     "extract": "lines 2-29 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/cairo-hpnd-time-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/cairo/src/cairo-time.c",
+     "sha256": "135fc09cd4dffa4444e8c098a864450a2e1ea64d4470131e50ac7c7c361d3ad4",
+     "extract": "lines 1-31 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/cairo-hpnd-time-private-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/cairo/src/cairo-time-private.h",
+     "sha256": "b32388ff2791e0b6ce19225b48a3050001fd10f5e54e971bfa3356225602af16",
+     "extract": "lines 1-28 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/cairo-hpnd-freelist-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/cairo/src/cairo-freelist.c",
+     "sha256": "4673cf06efef95aca38918caf02360fd95edb99b287162a1656566dfec756a85",
+     "extract": "lines 1-21 of the file at url, verbatim"
+    }
+   ],
+   "statement": "Distributed here under the Mozilla Public License 1.1, which cairo's authors let the recipient choose.",
+   "modifications": [
+    "Compared with upstream cairo commit 06f405c7 (git blob hashes of all 374 files in src/), Indigo's copy differs in 15 files and adds src/cairo-features.h.in and CMakeLists.txt:",
+    "src/cairo-compiler-private.h (#include \"config.h\" commented out) and the added cairo-features.h.in: Indigo commit 7cd807266dc311302aaefd89ea3794a3ce26d4ca (2021-08-05, \"using full version of Cairo if not WASM build\").",
+    "src/cairo.h, src/cairo-scaled-font.c, src/cairoint.h (new cairo_scaled_font_map_destroy): Indigo commits 40e438ad23f63c7b58726810f23bdc28a2c13604 (2021-08-24), 902dcf213997e7c997cfa3c346f7d7c0a3ad5478 and 134430d638cf2ffb461dcc477f14f5f887756713 (2021-08-25).",
+    "src/cairo-ft-font.c, cairo-path-fill.c, cairo-path-fixed.c, cairo-path-in-fill.c, cairo-path-stroke.c, cairo-path-stroke-polygon.c, cairo-path-stroke-traps.c, cairo-path-stroke-tristrip.c, cairo-rectangle.c, cairo-spline.c, cairo-types-private.h, cairoint.h: Indigo commit 23479abeb6847db5e9203dcd17c2ce21118b9fa9 (2025-02-07, \"Elliptical arrows can not be saved to the png\").",
+    "boilerplate/ (compiled into libcairo.a but not linked into the wasm; 33 of upstream's 39 files vendored, without its build files and README): boilerplate/cairo-boilerplate.h (#include \"config.h\" commented out) and boilerplate/make-cairo-boilerplate-constructors.py (reformatted) differ from 06f405c7. Indigo's GitHub path history at b36d38f5 lists commit 54e24353c5eb6b3690e69bf32cd57f629c0f513b (2021-04-22) and 7cd807266dc311302aaefd89ea3794a3ce26d4ca (2021-08-05) for the header, and 7cd80726 and d92399e20c95af5795eb39a0dd945c3aa1330815 (2021-12-22, formatting checks) for the script.",
+    "CMakeLists.txt only: Indigo commits 0be455d3a6a658698a04e76bbcca994a0ec84230, 93cd7b33798489aa6e587129e4d999cd8520855e, c9da0d7bc57bfe80d3d15b9711fb691f1e693c73, ab85e023158df9dbdcd1f69d0b57e8c39077dc1a."
+   ],
+   "evidence": "Wasm strings \"1.17.4\" at file offset 9145285 (beside libpng's \"1.6.54\" at 9145266), \"cairo_restore() without matching cairo_save()\" at 9196397 and \"invalid matrix (not invertible)\" at 9193722. CMake target cairo (third_party/cairo/CMakeLists.txt) compiles src/*.c and boilerplate/*.c minus its REMOVE_ITEM list: 135 files under Emscripten (127 in src/, 8 in boilerplate/). src/cairo-fixed.c and src/cairo-freed-pool.c are removed only if (APPLE), and src/cairo-ft-font.c only if (NOT UNIX OR APPLE); Emscripten's CMake toolchain sets UNIX 1 (cmake/Modules/Platform/Emscripten.cmake), so all three are compiled (cairo-ft-font.c is how cairo reaches FreeType). The 8 boilerplate files go into libcairo.a but are not linked: none of their strings (e.g. \"CAIRO_TEST_TARGET\", \"Known targets:\", \"POSIXLY_CORRECT\") is in the wasm, so their Red Hat HPND and Mark K. Kim BSD notices are left out. Copyright lines, Initial Developer lines and licence classes come from the leading comments of the 127 compiled src/ files plus every header they reach by #include (234 files, an over-approximation that includes headers behind #if): 220 carry the LGPL-2.1/MPL-1.1 notice; the MIT files are cairo-tor-scan-converter.c, cairo-tor22-scan-converter.c, cairo-clip-tor-scan-converter.c, cairo-mono-scan-converter.c, cairo-spans.c, cairo-spans-private.h (one licence body, saved once from cairo-mono-scan-converter.c); the HPND files are cairo-pattern.c, cairo-time.c, cairo-time-private.h, cairo-freelist.c, cairo-freelist-private.h and cairo-freelist-type-private.h (four distinct bodies, each saved once); cairo-version.h and cairo-font-face-twin-data.c carry no notice. The snapshot was identified by comparing git blob hashes of Indigo's src/ with every upstream commit from 2020-11-20 to 2021-09-15 in a blobless clone of gitlab.freedesktop.org/cairo/cairo: 06f405c7 matches 358 of 374 files and no commit matches more. The cairo 1.17.4 release tarball (cairographics.org/snapshots/cairo-1.17.4.tar.xz, SHA-1 68712ae1039b114347be3b7200bc1c901d47a636 as published) differs from Indigo's copy in 87 files under src/, mostly upstream changes made after the release. COPYING-MPL-1.1 is byte-identical at 06f405c7, at the 1.17.4 tag (commit 156cd3eaaebfd8635517c2baf61fcf3627ff7ec2) and in the release tarball; Indigo's copy has no COPYING files."
+  },
+  {
+   "name": "pixman",
+   "version": "0.40.1 per pixman/pixman-version.h: a pixman git snapshot (pixman/ identical to upstream commits 3b1fefda7f073491aacad93b4197fbfd0383c77f of 2020-04-26 to e93eaff517567518696cac21203bbc5efdfee426 of 2021-05-07), modified by EPAM Systems (pixman-bits-image.c)",
+   "licence": "MIT AND HPND-style (X11) notices",
+   "copyright": [
+    "Copyright   2007 Red Hat, Inc.",
+    "Copyright 1987 by Digital Equipment Corporation, Maynard, Massachusetts.",
+    "Copyright 1987, 1988, 1989 by\nDigital Equipment Corporation, Maynard, Massachusetts.",
+    "Copyright 1987, 1988, 1989, 1998  The Open Group",
+    "Copyright 1987, 1998  The Open Group",
+    "Copyright 2010, 2011, 2012, Red Hat, Inc",
+    "Copyright 2010, 2012, Soren Sandmann <sandmann@cs.au.dk>",
+    "Copyright 2012, Red Hat, Inc.",
+    "Copyright 2012, Soren Sandmann",
+    "Copyright © 1998 Keith Packard",
+    "Copyright © 1998, 2004 Keith Packard",
+    "Copyright © 1999 Keith Packard",
+    "Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.",
+    "Copyright © 2000 SuSE, Inc.",
+    "Copyright © 2002 Keith Packard, member of The XFree86 Project, Inc.",
+    "Copyright © 2004 Keith Packard",
+    "Copyright © 2007 Red Hat, Inc.",
+    "Copyright © 2007, 2009 Red Hat, Inc.",
+    "Copyright © 2008 André Tupinambá <andrelrt@gmail.com>",
+    "Copyright © 2008 Keith Packard",
+    "Copyright © 2008 Red Hat, Inc.",
+    "Copyright © 2009 Red Hat, Inc.",
+    "Copyright © 2009 Soren Sandmann",
+    "Copyright © 2010, 2012 Red Hat, Inc.",
+    "Copyright © 2010, 2012 Soren Sandmann Pedersen",
+    "Copyright © 2011 Red Hat, Inc."
+   ],
+   "texts": [
+    {
+     "file": "texts/pixman-COPYING.txt",
+     "url": "https://gitlab.freedesktop.org/pixman/pixman/-/raw/e93eaff517567518696cac21203bbc5efdfee426/COPYING",
+     "sha256": "fac9270f0987b96ff4533fca3548c633e02083cbba4a0172a3b149b2e4019793"
+    },
+    {
+     "file": "texts/pixman-access-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-access.c",
+     "sha256": "efa3bc8e9a6494dd2f6782d2a06eecdc2e705ffb581ca08d27535370af3c64be",
+     "extract": "lines 1-25 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-arm-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-arm.c",
+     "sha256": "929390cdc968525ad747d1b60df75223735a22cfce09371203fa5ceb81a0fdec",
+     "extract": "lines 1-21 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-edge-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-edge.c",
+     "sha256": "ef1bf40426bbde4e18ae69fbf977231fe67763336f6c7dd40d35329b7f519da4",
+     "extract": "lines 1-21 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-fast-path-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-fast-path.c",
+     "sha256": "cb599a0219e8103d6eaa01d83deeed62bc32f39d9e121f1c0302594eb3e59745",
+     "extract": "lines 2-24 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-general-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-general.c",
+     "sha256": "52a68bdd1a46ac914ebf8af1e9553b306bd1698c373c8fa8212d67511f50907f",
+     "extract": "lines 1-27 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-matrix-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-matrix.c",
+     "sha256": "4e5360f713fa53fb74ba3d534c51fd8ecc803952558023d87c6373a002e5971d",
+     "extract": "lines 1-21 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-region-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-region.c",
+     "sha256": "44e69d207da201608b8db761d8b5cd6ffae6da46e11e88bc3452ec5b0074cada",
+     "extract": "lines 1-64 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-region16-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-region16.c",
+     "sha256": "5bf1de864eef488e401c3b2540c993f6c121c485241c15a58e7be710a02fcbe6",
+     "extract": "lines 1-24 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-h-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman.h",
+     "sha256": "1a477e900e45b3cffa1d80c4354501b5d3f2b2dbe59bdc3d856a8fe671949857",
+     "extract": "lines 1-45 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-combine-float-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-combine-float.c",
+     "sha256": "346ec6598732c31ededc3651bcfc432c628037d6cc805bc862ae18366e1d78c0",
+     "extract": "lines 2-26 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-filter-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-filter.c",
+     "sha256": "105a1de9316cb209cb6069f35409343ec0fec87d6bb4ad4ce8f3dff2b6bec81e",
+     "extract": "lines 1-25 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/pixman-glyph-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/pixman/pixman/pixman-glyph.c",
+     "sha256": "807792dab2bac5909521105e9ce059c750e931ed2e523ebf0569e61d6971e63b",
+     "extract": "lines 1-25 of the file at url, verbatim"
+    }
+   ],
+   "statement": "",
+   "modifications": [
+    "pixman/pixman-bits-image.c: two function-pointer casts, Indigo commit d61aba4b39c175f67cc924ce7d38f33d79f82965 (2022-09-28, \"Force cast on function pointers\").",
+    "pixman/pixman-version.h is the generated header (upstream ships pixman-version.h.in); Indigo imported pixman in commit 54e24353c5eb6b3690e69bf32cd57f629c0f513b (2021-04-22)."
+   ],
+   "evidence": "Wasm strings \"Invalid rectangle passed\" at file offset 9120992 and pixman function names (56 hits of \"pixman\", first at 9191602, e.g. \"void pixman_region32_init_rect(...)\"). CMake target pixman compiles pixman/*.c and pixman/dither/*.c minus pixman-region.c (which pixman-region16.c and pixman-region32.c #include). Notices: the licence comment of every compiled file and every header it reaches (39 files); 13 distinct licence bodies were found. pixman-noop.c's body equals COPYING's MIT text; the other 12 (9 HPND-style, 3 MIT wordings) are saved once each from a representative file; all copyright lines of the 39 files are listed. make-blue-noise.c (no notice) is a generator program whose main() nothing references. COPYING is byte-identical at pixman-0.40.0 and 0.42.0 (earlier research) and is pinned here at e93eaff5; Indigo's copy has no COPYING. Snapshot found by comparing git blob hashes with every upstream commit 2020-03 to 2022-12 in a blobless clone of gitlab.freedesktop.org/pixman/pixman: 38 of 40 files match (pixman-version.h and pixman-bits-image.c differ)."
+  },
+  {
+   "name": "FreeType",
+   "version": "2.12.1 (include/freetype/freetype.h FREETYPE_MAJOR/MINOR/PATCH)",
+   "licence": "FTL (FreeType offers FTL or GPL-2.0; FTL elected); BDF and PCF drivers and fthash under MIT-style terms",
+   "copyright": [
+    "Copyright (C) 1996-2022 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 1996-2022 by\nJust van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2000, 2001, 2002, 2003, 2006, 2010 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2000-2004, 2006-2011, 2013, 2014 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2001, 2002 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2001, 2002, 2003, 2004 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2001-2008, 2011, 2013, 2014 by\nFrancesco Zappa Nardelli",
+    "Copyright (C) 2002-2022 by\nRoberto Alameda.",
+    "Copyright (C) 2003-2022 by\nMasatake YAMATO, Redhat K.K.,\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2004-2022 by\nAlbert Chin-A-Young.",
+    "Copyright (C) 2004-2022 by\nDavid Turner, Robert Wilhelm, Werner Lemberg and George Williams.",
+    "Copyright (C) 2004-2022 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and George Williams.",
+    "Copyright (C) 2004-2022 by\nMasatake YAMATO and Redhat K.K.",
+    "Copyright (C) 2004-2022 by\nMasatake YAMATO, Red Hat K.K.,\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2004-2022 by\nMasatake YAMATO, Redhat K.K,\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2005-2022 by\nDavid Turner.",
+    "Copyright (C) 2007-2022 by\nDavid Turner.",
+    "Copyright (C) 2007-2022 by\nDereg Clegg and Michael Toftdal.",
+    "Copyright (C) 2007-2022 by\nDerek Clegg and Michael Toftdal.",
+    "Copyright (C) 2007-2022 by\nRahul Bhalerao <rahul.bhalerao@redhat.com>, <b.rahul.pm@gmail.com>.",
+    "Copyright (C) 2008-2022 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and suzuki toshiya.",
+    "Copyright (C) 2009-2022 by\nOran Agra and Mickey Gabel.",
+    "Copyright (C) 2010-2022 by\nJoel Klinghed.",
+    "Copyright (C) 2013-2022 by\nGoogle, Inc.",
+    "Copyright (C) 2018-2022 by\nArmin Hasitzka, David Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2018-2022 by\nDavid Turner, Robert Wilhelm, Dominik Röttsches, and Werner Lemberg.",
+    "Copyright (C) 2019-2022 by\nNikhil Ramakrishnan, David Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 2022 by\nDavid Turner, Robert Wilhelm, Werner Lemberg, and Moazin Khatti.",
+    "Copyright 1990, 1994, 1998  The Open Group",
+    "Copyright 2000 Computing Research Labs, New Mexico State University",
+    "Copyright 2000, 2001, 2004 by\nFrancesco Zappa Nardelli",
+    "Copyright 2000-2001, 2002 by\nFrancesco Zappa Nardelli",
+    "Copyright 2000-2001, 2003 by\nFrancesco Zappa Nardelli",
+    "Copyright 2000-2010, 2012-2014 by\nFrancesco Zappa Nardelli",
+    "Copyright 2001, 2002, 2012 Francesco Zappa Nardelli",
+    "Copyright 2001-2004, 2011 Francesco Zappa Nardelli",
+    "Copyright 2001-2014\nFrancesco Zappa Nardelli",
+    "Copyright 2001-2015\nFrancesco Zappa Nardelli",
+    "Copyright 2003 by\nFrancesco Zappa Nardelli",
+    "Copyright 2003 Huw D M Davies for Codeweavers",
+    "Copyright 2006-2013 Adobe Systems Incorporated.",
+    "Copyright 2007 Dmitry Timoshkov for Codeweavers",
+    "Copyright 2007-2013 Adobe Systems Incorporated.",
+    "Copyright 2007-2014 Adobe Systems Incorporated.",
+    "Copyright 2009-2013 Adobe Systems Incorporated.",
+    "Copyright 2009-2014 Adobe Systems Incorporated.",
+    "Copyright 2011-2013 Adobe Systems Incorporated.",
+    "Copyright 2013 Adobe Systems Incorporated.",
+    "Copyright 2013 by Google, Inc.",
+    "Copyright 2013-2014 Adobe Systems Incorporated."
+   ],
+   "texts": [
+    {
+     "file": "texts/freetype-FTL.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/freetype/docs/FTL.TXT",
+     "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+    },
+    {
+     "file": "texts/freetype-bdflib-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/freetype/src/bdf/bdflib.c",
+     "sha256": "a3cbc1321f1e6e66c4b1a98deed6d0aede0d868377d94060641e9530661d1ab5",
+     "extract": "lines 1-23 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/freetype-bdfdrivr-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/freetype/src/bdf/bdfdrivr.c",
+     "sha256": "f4898ee0d5a77eb657b8d3ab34cc61ddc0a2e11bf5b74bedfb8cd2c383e7d081",
+     "extract": "lines 1-25 of the file at url, verbatim"
+    },
+    {
+     "file": "texts/freetype-pcfutil-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/freetype/src/pcf/pcfutil.c",
+     "sha256": "af57587b2694810c266311071d5f723d156e32cfebc86c1438c7a8ba24daa2c8",
+     "extract": "lines 1-25 of the file at url, verbatim"
+    }
+   ],
+   "statement": "Portions of this software are copyright © 2022 The FreeType Project (www.freetype.org).  All rights reserved.",
+   "evidence": "BDF property names \"FONT_ASCENT\" (file offset 9135109) and \"_MULE_RELATIVE_COMPOSE\" (9139657) from bdflib.c, driver names \"bdf\" (9104113), \"pcf\" (9104121) and \"truetype\" (9108564) are in the wasm. CMake target freetype (third_party/freetype/CMakeLists.txt BASE_SRCS) compiles src/bdf/bdf.c, src/pcf/pcf.c and src/base/ftbase.c (which #includes fthash.c); ftmodule.h registers bdf_driver_class and pcf_driver_class. Built with FT_CONFIG_OPTION_SYSTEM_ZLIB, so src/gzip's own zlib copy is not compiled (Indigo's zlib is used); md5.c is included only under FT_DEBUG_LEVEL_TRACE and dlg only under FT_DEBUG_LOGGING, both off. Year 2022 for the credit comes from freetype.h (\"Copyright (C) 1996-2022\"). docs/FTL.TXT is byte-identical to upstream freetype/freetype tag VER-2-12-1 (commit e8ebfe988b5f57bfb9a3ecb13c70d9791bce9ecf); Indigo's LICENSE.TXT is a truncated FTL copy, while upstream's LICENSE.TXT offers FTL or GPLv2. Extra notices: the BDF/PCF/fthash files carry two MIT bodies (bdflib.c, bdf.h, bdferror.h, fthash.c/.h: the Computing Research Lab wording, saved from bdflib.c; the other bdf/pcf files: standard MIT, saved from bdfdrivr.c) and pcfutil.c carries The Open Group's notice. Copyright lines: all distinct statements in the leading comments of the compiled modules' files and include/freetype; the 20 statements naming only \"David Turner, Robert Wilhelm, and Werner Lemberg\" are represented by freetype.h's 1996-2022 line. The Adobe-copyright files (src/psaux) are under FTL with an extra patent grant from Adobe that asks nothing more of a binary."
+  },
+  {
+   "name": "libpng",
+   "version": "1.6.54 (include/png.h PNG_LIBPNG_VER_STRING)",
+   "licence": "libpng-2.0",
+   "copyright": [
+    "Copyright (c) 1995-2026 The PNG Reference Library Authors.",
+    "Copyright (c) 2018-2026 Cosmin Truta.",
+    "Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.",
+    "Copyright (c) 1996-1997 Andreas Dilger.",
+    "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc."
+   ],
+   "texts": [
+    {
+     "file": "texts/libpng-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/libpng/LICENSE",
+     "sha256": "bdb0a645ea18c60507d0368379b1ac5474b92255fcc2d115e07486a7672ba526"
+    }
+   ],
+   "statement": "",
+   "evidence": "Wasm strings \"1.6.54\" at file offset 9145266 and \"Not a PNG file\" at 9111602; CMake target png is on the link line. Indigo's third_party/libpng/LICENSE is byte-identical to pnggroup/libpng tag v1.6.54 (commit 02f2b4f4699f0ef9111a6534f093b53732df4452). Copyright lines are the five at the top of that LICENSE; the per-file lines in src/ name the same holders."
+  },
+  {
+   "name": "zlib",
+   "version": "1.3.1 (zlib.h ZLIB_VERSION)",
+   "licence": "Zlib",
+   "copyright": [
+    "Copyright (C) 1995-2024 Jean-loup Gailly and Mark Adler"
+   ],
+   "texts": [
+    {
+     "file": "texts/zlib-h-header.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/zlib/include/zlib.h",
+     "sha256": "02421fcfbfb1d656ef0b6ff4cd3c39f2946f08c3219fa42db482add7ce1f53ea",
+     "extract": "lines 1-29 of the file at url, verbatim"
+    }
+   ],
+   "statement": "",
+   "evidence": "Wasm strings \"1.3.1\" at file offset 9179673, \"incorrect header check\" at 9099973 and \"invalid distance too far back\" at 9100113; CMake target z is on the link line and is also used by libpng and FreeType. Indigo vendors no LICENSE for zlib; the text is the leading comment of third_party/zlib/include/zlib.h, which is byte-identical to madler/zlib tag v1.3.1 (commit 51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf). Upstream's LICENSE file at v1.3.1 still says \"(C) 1995-2022\", so zlib.h's 1995-2024 line is used. Other per-file lines name Jean-loup Gailly and/or Mark Adler only."
+  },
+  {
+   "name": "TinyXML-2",
+   "version": "9.0.0 (tinyxml2.h TINYXML2_MAJOR/MINOR/PATCH_VERSION)",
+   "licence": "Zlib",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/tinyxml2-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/tinyxml2/LICENSE.txt",
+     "sha256": "9332252e9b9e46db8285d4a3f0bf25f139bf1dca6781b956d57f2302efca6432"
+    }
+   ],
+   "statement": "TinyXML-2 carries no copyright line (none upstream); its source says \"Original code by Lee Thomason (www.grinninglizard.com)\".",
+   "evidence": "Wasm strings \"XML_ERROR_PARSING\" at file offset 9134741 and RTTI names \"N8tinyxml2...\" from 11676937; CMake target tinyxml2 is on the link line. Indigo's LICENSE.txt is byte-identical to leethomason/tinyxml2 tag 9.0.0 (commit 1dee28e51f9175a31955b9791c74c430fe13dc82). Neither LICENSE.txt nor tinyxml2.h/.cpp has a copyright line: \"none upstream\".",
+   "noCopyright": "none named upstream; its source says \"Original code by Lee Thomason\""
+  },
+  {
+   "name": "RapidJSON",
+   "version": "1.1.0 per rapidjson.h; in fact a git snapshot of Tencent/rapidjson (include/ identical to commits of 2018-06-18 to 2018-07-16, e.g. ff76343336aa7c4128da9cd6c2263c33af904909), modified by EPAM Systems (prettywriter.h)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/rapidjson-license.txt",
+     "url": "https://raw.githubusercontent.com/Tencent/rapidjson/f54b0e47a08782a6131cc3d60f94d038fa6e0a51/license.txt",
+     "sha256": "a140e5d46fe734a1c78f1a3c3ef207871dd75648be71fdda8e309b23ab8b1f32"
+    }
+   ],
+   "statement": "",
+   "modifications": [
+    "rapidjson/prettywriter.h: formatOptions_ initialised in a constructor, Indigo commit 2bda69fa51309b0982960a8f4ca08c7502feba25 (2023-02-17)."
+   ],
+   "evidence": "Header-only; RTTI names \"N9rapidjson...\" from wasm file offset 11569108. Included by indigo-core, render2d and indigo-ketcher.cpp. Indigo vendors no licence file; license.txt is byte-identical (git blob 7ccc161c) at tag v1.1.0 (commit f54b0e47a08782a6131cc3d60f94d038fa6e0a51, the URL) and at the matched snapshot. Its msinttypes (BSD) part is for MSVC before 2013 only and its JSON-licence part (bin/jsonchecker) is not vendored. Snapshot found by blob comparison of include/rapidjson with every upstream commit since 2016 (35 of 36 files match)."
+  },
+  {
+   "name": "cppcodec",
+   "version": "no release (third_party/cppcodec/CMakeLists.txt says 0.1; the base64 headers match upstream tag v0.2 and master)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2015 Topology Inc.",
+    "Copyright (c) 2018 Jakob Petsovits",
+    "Copyright (c) various other contributors, see individual files",
+    "Copyright (C) 2015 Topology LP",
+    "Copyright (C) 2013 Adam Rudd (bit calculations)",
+    "Copyright (C) 2018 Jakob Petsovits"
+   ],
+   "texts": [
+    {
+     "file": "texts/cppcodec-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/cppcodec/LICENSE",
+     "sha256": "c076970c8139ffd5b28d788ef62421d1f019581e24bc5e1e754103631e9fc192"
+    }
+   ],
+   "statement": "",
+   "evidence": "Header-only; RTTI \"N8cppcodec11parse_errorE\" at wasm file offset 11503695. Indigo includes cppcodec/base64_rfc4648.hpp and base64_default_rfc4648.hpp (indigo-ketcher.cpp and three core files). The first three lines are from LICENSE, the last three from the headers those reach (detail/base64.hpp, codec.hpp, stream_codec.hpp, config.hpp, data/access.hpp, data/raw_result_buffer.hpp, parse_error.hpp). Indigo's LICENSE is byte-identical to tplgy/cppcodec master (git blob b8ff4bd1)."
+  },
+  {
+   "name": "object_threadsafe (safe_ptr.h)",
+   "version": "no version; the single header safe_ptr.h",
+   "licence": "Apache-2.0",
+   "copyright": [
+    "Copyright 2013-2017 Docker, Inc."
+   ],
+   "texts": [
+    {
+     "file": "texts/object_threadsafe-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/object_threadsafe/LICENSE",
+     "sha256": "2d81ea060825006fc8f3fe28aa5dc0ffeb80faf325b612c955229157b8c10dc0"
+    }
+   ],
+   "statement": "",
+   "evidence": "Header-only templates (no strings): included by core/indigo-core/common/base_cpp/tlscont.h, profiling.h and profiling.cpp, which are compiled into indigo-core. Indigo's LICENSE is byte-identical to AlexeyAB/object_threadsafe master (git blob 9c8e20ab, master commit 940911017993d73ebfe5cb9ebabd3a9dd7bd45b2). Its only copyright line is the filled-in Apache appendix \"Copyright 2013-2017 Docker, Inc.\", apparently copied from Docker's LICENSE; safe_ptr.h and the Readme name no holder. Reproduced verbatim."
+  },
+  {
+   "name": "lunasvg",
+   "version": "3.0.0 per CMakeLists.txt; in fact upstream commit 167416671a68e63f2e0e8234518dbbdde0adf2a6 (2024-09-15, before the v3.0.0 tag); only CMakeLists.txt changed by EPAM Systems",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright (c) 2020-2024 Samuel Ugochukwu <sammycageagle@gmail.com>"
+   ],
+   "texts": [
+    {
+     "file": "texts/lunasvg-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/sammycage/lunasvg/167416671a68e63f2e0e8234518dbbdde0adf2a6/LICENSE",
+     "sha256": "308647f12c8111159e299a0aa50161c8b4309c59e58accd52a5f3a0c53702c05"
+    }
+   ],
+   "statement": "",
+   "modifications": [
+    "CMakeLists.txt: plutovg FetchContent pinned to GIT_TAG v1.1.0 instead of main (Indigo lunasvg commits c44b31d4199169efea619f4e77c863fdef0dda2a, 2024-09-18, and c74e5eea4912e4bde0af3ce02c93efb4f55a9f99, 2025-07-15)."
+   ],
+   "evidence": "RTTI names \"N7lunasvg...\" from wasm file offset 11394900; $<TARGET_FILE:lunasvg> is on the link line. Blob comparison with every commit of a blobless clone of github.com/sammycage/lunasvg: 21 of 22 files equal commit 16741667 (only CMakeLists.txt differs). Earlier research compared against tag v3.0.0 and wrongly counted 12 EPAM-modified files. LICENSE is byte-identical at 16741667 and v3.0.0 (git blob 0c17a4b3); Indigo vendors none. The same copyright line heads include/lunasvg.h."
+  },
+  {
+   "name": "plutovg",
+   "version": "v1.1.0 (commit 1a8412d0574c4345dd7ef8a91ce7b58c7dcfe253), fetched at build time by lunasvg's FetchContent",
+   "licence": "MIT; FreeType-derived rasteriser, stroker and math files under FTL; stb code MIT OR Unlicense (public domain elected)",
+   "copyright": [
+    "Copyright (c) 2020-2025 Samuel Ugochukwu <sammycageagle@gmail.com>",
+    "Copyright 2000-2003, 2005-2014 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright 1996-2010, 2013 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright 2002-2006, 2008-2011, 2013 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright 2002-2006, 2008, 2009, 2011-2012 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright 2001-2005, 2012-2013 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright 2001, 2003, 2005, 2007, 2013 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (C) 1996-2020 by\nDavid Turner, Robert Wilhelm, and Werner Lemberg.",
+    "Copyright (c) 2017 Sean Barrett"
+   ],
+   "texts": [
+    {
+     "file": "texts/plutovg-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/sammycage/plutovg/1a8412d0574c4345dd7ef8a91ce7b58c7dcfe253/LICENSE",
+     "sha256": "e008ab9f8b36ec517cc47be20e776e68d69f5ba75f8f774d506ae4696d0e50c4"
+    },
+    {
+     "file": "texts/freetype-FTL.txt",
+     "url": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/third_party/freetype/docs/FTL.TXT",
+     "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+    },
+    {
+     "file": "texts/stb-licence-block.txt",
+     "url": "https://raw.githubusercontent.com/sammycage/plutovg/1a8412d0574c4345dd7ef8a91ce7b58c7dcfe253/source/plutovg-stb-truetype.h",
+     "sha256": "7587efcca32db8f95bf5860dea6dfa4be410ee723e1964db3689c8ddf2a2e4a9",
+     "extract": "lines 5037-5077 of the file at url, verbatim"
+    }
+   ],
+   "statement": "plutovg's source/plutovg-ft-raster.c, plutovg-ft-stroker.c and plutovg-ft-math.c (with their headers) are FreeType code under the FreeType License, covered by the FreeType credit above. The stb_image, stb_image_write and stb_truetype code inside plutovg is used under its public-domain alternative (ALTERNATIVE B, www.unlicense.org).",
+   "evidence": "third_party/lunasvg/CMakeLists.txt at the Indigo commit: FetchContent_Declare(plutovg GIT_TAG v1.1.0 FIND_PACKAGE_ARGS 0.0.4); the emsdk image has no plutovg package, so v1.1.0 is fetched (CI logs not seen). $<TARGET_FILE:plutovg> is on the link line. stb_image error strings \"bad huffman code\" (wasm file offset 9114348), \"outofmem\" (9097054) and \"unknown image type\" (9109206) are present; plutovg-surface.c defines STB_IMAGE_IMPLEMENTATION and STB_IMAGE_WRITE_IMPLEMENTATION, plutovg-font.c STB_TRUETYPE_IMPLEMENTATION (whether stb_image_write and stb_truetype survive dead-code removal was not checked). The stb licence block is byte-identical at the end of all three stb headers (saved from plutovg-stb-truetype.h). FTL text: plutovg's own source/FTL.TXT (sha256 e60d07dfb2c5264f9f405fa52bf0d4f85429dd9ae1bc2ffcff8af1924ef720d1, https://raw.githubusercontent.com/sammycage/plutovg/1a8412d0574c4345dd7ef8a91ce7b58c7dcfe253/source/FTL.TXT) is the same FTL revision (2006-Jan-27) but has U+FFFD where FreeType's has ©, an http:// URL and no trailer, so the FreeType copy (byte-identical to upstream VER-2-12-1) is named instead. Copyright lines: plutovg.h and LICENSE, the seven FreeType-derived files, the stb block."
+  },
+  {
+   "name": "Noto Sans (Regular, Bold, Italic, Bold Italic)",
+   "version": "2.007 (name ID 5 \"Version 2.007\"), modified by EPAM Systems: based on google/fonts commit a970ecbe0bf1e6ae5cb22d6abdea672448655f0c (\"Noto Sans: 2.007 added\")",
+   "licence": "OFL-1.1",
+   "copyright": [
+    "Copyright 2015-2021 Google LLC. All Rights Reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/noto-sans-OFL.txt",
+     "url": "https://raw.githubusercontent.com/google/fonts/a970ecbe0bf1e6ae5cb22d6abdea672448655f0c/ofl/notosans/OFL.txt",
+     "sha256": "3a579abd469a5b75b779f244e4cebcb74451e32154503fce2c8e004d15bc7e98"
+    }
+   ],
+   "statement": "",
+   "modifications": [
+    "Indigo commit d6109b1f22df63483669e933d05d030fc35461ee (2023-01-26): \"OpenSans fonts in WASM replaced with modified NotoSans fonts\"; updated in 8ef32ab5d97ec755febe171b16faeca272a47ff8 (2023-03-02). The embedded fonts carry a FontForge FFTM table and differ from every NotoSans-Regular.ttf in google/fonts and notofonts/noto-fonts history (git blob search)."
+   ],
+   "evidence": "Rebuilding the wasm's initial linear memory from its 3131 active data segments (wasm-opt splits the fonts between segments, so they are not contiguous in the file) gives four TrueType fonts at memory offsets 475200 (Bold Italic, sha256 24ee75f6239a83e8626a7d075159880616b9ce8f63855f866d48792a049436c9), 911776 (Bold, 27f21b493fe411f9cd080d20d4453f6c27f4bba908027fc24f72d85f855ea9db), 1513840 (Italic, 67f7e602de31ed36343e8b0b5e08c28274d08bfa52a621ea042dacbd802d76d1) and 1952640 (Regular, 13184522f1ce55a15667c6145f189c0c477b8e3ca77ba842d31527e0ee8c496b); each is byte-identical to the font rebuilt from Indigo's third_party/googlefonts/NotoSans_*.h. Every name table says ID 0 \"Copyright 2015-2021 Google LLC. All Rights Reserved.\", ID 7 \"Noto is a trademark of Google LLC.\", ID 13 the OFL 1.1 pointer, ID 5 \"Version 2.007\"; the UTF-16 copyright string is at wasm file offset 9655938. The base is google/fonts' static Noto Sans 2.007 (same name-ID 13 wording and table set; the noto-fonts builds carry ttfautohint and DSIG/STAT). OFL.txt at that google/fonts commit has the same copyright line as the fonts. The OFL declares no Reserved Font Name. Not used: Indigo's vendored third_party/googlefonts/OFL.txt and the .h comment headers, which name \"The Open Sans Project Authors\". The CJK fonts are not in this build (RENDER_ENABLE_CJK off)."
+  },
+  {
+   "name": "CDX file format constants (CDXConstants.h)",
+   "version": "$Revision: 82 $, $Date: 7/02/02 6:39p $",
+   "licence": "none stated",
+   "copyright": [
+    "Copyright:\t© 1986-2002 CambridgeSoft Corp., all rights reserved."
+   ],
+   "texts": [],
+   "statement": "Indigo's CDXConstants.h holds the constants of the CDX (ChemDraw) file format; it is treated here as a file format's constants, and its copyright line is reproduced as found.",
+   "evidence": "https://raw.githubusercontent.com/epam/Indigo/b36d38f5293470721fe02ee570d9f0e6488a5b8d/core/indigo-core/molecule/CDXConstants.h (header line 5, with a tab after \"Copyright:\"; sha256 of file f4328f10e1f4e7799624ab8b20e52e6bd5ab346e9a5e36a028da34a208e78cbc) describes itself as \"Constants defined by the CDX file format Specification\". It is included through CDXCommons.h by molecule_cdxml_loader.h, molecule_cdxml_saver.h and multiple_cdx_loader.cpp in indigo-core; it contributes enum values only, no strings. Accepted limit in the plan; ask EPAM if challenged."
+  },
+  {
+   "name": "Emscripten runtime and JavaScript glue",
+   "version": "Emscripten 5.0.7 (emsdk image named by Indigo's CI; tag commit 263db4cffa6f9fc2ec514a70abac81362ea41849)",
+   "licence": "MIT (Emscripten offers MIT or NCSA; MIT elected); its PATH code from Node.js under MIT",
+   "copyright": [
+    "Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.",
+    "Copyright Joyent, Inc. and other Node contributors. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/emscripten-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/263db4cffa6f9fc2ec514a70abac81362ea41849/LICENSE",
+     "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    }
+   ],
+   "statement": "Used under the MIT licence, one of the two licences Emscripten offers.",
+   "evidence": "Glue: node_modules/indigo-ketcher/indigo-ketcher-separate-wasm.js is Emscripten output (MODULARIZE, EXPORT_ES6, embind, MEMFS/TTY, \"var PATH=\" with normalizeArray and isAbs from Node.js's path module), edited by Indigo's patch.cmake (wasm file name; fetch(new URL(binaryFile, self.location.origin))). It ships twice: as a module of the app's biochem worker chunk (module log worker-1670231-0-1793227661676.json) and inlined in ketcher-standalone's prebuilt indigoWorker-d22340fa.js, whose source map lists only that glue and Ketcher's indigoWorker.ts and whose sourcesContent for the glue is byte-identical to the npm file. The rest of indigoWorker-d22340fa.js is ketcher-standalone's own code (Apache-2.0, its own package entry). Neither glue file carries a licence comment. In the wasm: embind RTTI \"N10emscripten3valE\" at file offset 9372709. Version: Indigo's .github/workflows/indigo-ci.yaml job build_indigo_ketcher at the commit uses container emscripten/emsdk:5.0.7; the wasm records only \"clang-23.0.0\"; the CI logs were not read."
+  },
+  {
+   "name": "musl libc (in Emscripten's libc)",
+   "version": "1.2.5, as bundled by Emscripten 5.0.7 (system/lib/libc/musl/VERSION; Emscripten-modified)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright © 2005-2020 Rich Felker, et al."
+   ],
+   "texts": [
+    {
+     "file": "texts/musl-COPYRIGHT.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/263db4cffa6f9fc2ec514a70abac81362ea41849/system/lib/libc/musl/COPYRIGHT",
+     "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    }
+   ],
+   "statement": "",
+   "evidence": "Wasm string \"Illegal byte sequence\" (musl strerror table) at file offset 11691888. Emscripten's copy of COPYRIGHT (the URL) is byte-identical to upstream musl v1.2.5 (https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT?h=v1.2.5). Which libc objects are linked cannot be seen (no name section), so the whole COPYRIGHT is given (plan: accepted limit)."
+  },
+  {
+   "name": "LLVM libc++, libc++abi and compiler-rt (in Emscripten)",
+   "version": "LLVM 21.1.8 per Emscripten 5.0.7's system/lib/libcxx/readme.txt and ChangeLog",
+   "licence": "Apache-2.0 WITH LLVM-exception (legacy code also NCSA and MIT)",
+   "copyright": [
+    "Copyright (c) 2009-2019 by the contributors listed in CREDITS.TXT",
+    "Copyright (c) 2009-2014 by the contributors listed in CREDITS.TXT",
+    "Copyright (c) 2009-2015 by the contributors listed in CREDITS.TXT"
+   ],
+   "texts": [
+    {
+     "file": "texts/llvm-libcxx-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/263db4cffa6f9fc2ec514a70abac81362ea41849/system/lib/libcxx/LICENSE.TXT",
+     "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+    },
+    {
+     "file": "texts/llvm-libcxxabi-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/263db4cffa6f9fc2ec514a70abac81362ea41849/system/lib/libcxxabi/LICENSE.TXT",
+     "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+    },
+    {
+     "file": "texts/llvm-compiler-rt-LICENSE.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/263db4cffa6f9fc2ec514a70abac81362ea41849/system/lib/compiler-rt/LICENSE.TXT",
+     "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+    }
+   ],
+   "statement": "",
+   "evidence": "libc++ RTTI names \"NSt3__2...\" (273 hits from wasm file offset 9371200); libc++abi strings \"terminate_handler unexpectedly returned\" (9121520) and \"std::bad_alloc\" (9128383); compiler-rt has no strings and is assumed linked as emcc always links it. The three LICENSE.TXT files differ only in the library named on line 240 and, for compiler-rt, the legacy MIT year (2009-2015 vs 2009-2014). The LLVM exception asks nothing of binaries; the texts are a courtesy."
+  },
+  {
+   "name": "dlmalloc (Emscripten's default allocator)",
+   "version": "2.8.6, as in Emscripten 5.0.7 system/lib/dlmalloc.c",
+   "licence": "CC0-1.0 (public domain)",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/dlmalloc-header.txt",
+     "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/263db4cffa6f9fc2ec514a70abac81362ea41849/system/lib/dlmalloc.c",
+     "sha256": "c0e21c9c703d7dde484e7230657401754572860108f2388a0bde2d714c35f184",
+     "extract": "lines 51-57 of the file at url, verbatim"
+    }
+   ],
+   "statement": "dlmalloc, by Doug Lea, is released to the public domain (CC0).",
+   "evidence": "Indigo's emcc flags set no MALLOC option, and Emscripten 5.0.7's src/settings.js says var MALLOC = \"dlmalloc\" (line 140). The release build carries no dlmalloc strings, so linkage is inferred. No copyright line (none upstream).",
+   "noCopyright": "public domain (CC0)"
+  }
+ ],
+ "slug": "indigo-wasm"
+}

@@ -1,0 +1,251 @@
+{
+ "title": "web/public/glassware/: lab glassware cut from public-domain and CC0 drawings",
+ "part": 4,
+ "keys": [
+  {
+   "public": "glassware/round-bottom-flask.svg"
+  },
+  {
+   "public": "glassware/round-bottom-flask-small.svg"
+  },
+  {
+   "public": "glassware/two-neck-flask.svg"
+  },
+  {
+   "public": "glassware/three-neck-flask.svg"
+  },
+  {
+   "public": "glassware/schlenk-flask.svg"
+  },
+  {
+   "public": "glassware/conical-flask.svg"
+  },
+  {
+   "public": "glassware/beaker.svg"
+  },
+  {
+   "public": "glassware/buchner-flask.svg"
+  },
+  {
+   "public": "glassware/liebig-condenser-slanted.svg"
+  },
+  {
+   "public": "glassware/liebig-condenser-upright.svg"
+  },
+  {
+   "public": "glassware/allihn-condenser.svg"
+  },
+  {
+   "public": "glassware/still-head.svg"
+  },
+  {
+   "public": "glassware/receiver-adapter.svg"
+  },
+  {
+   "public": "glassware/buchner-funnel.svg"
+  },
+  {
+   "public": "glassware/filter-funnel.svg"
+  },
+  {
+   "public": "glassware/dropping-funnel.svg"
+  },
+  {
+   "public": "glassware/separating-funnel.svg"
+  },
+  {
+   "public": "glassware/burette.svg"
+  },
+  {
+   "public": "glassware/measuring-cylinder.svg"
+  },
+  {
+   "public": "glassware/stirrer-hotplate.svg"
+  },
+  {
+   "public": "glassware/oil-bath.svg"
+  },
+  {
+   "public": "glassware/ice-bath.svg"
+  },
+  {
+   "public": "glassware/tlc-tank.svg"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "\"Simple distillation apparatus\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Simple_distillation_apparatus.svg (sha256 0a73283a06aea6fe614e2231cfc87151a6705663591a4c8935da943d0d615582)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "\"Simple distillation apparatus\" by Quantockgoblin (original PNG) and Slashme (SVG) (Wikimedia Commons, Public domain): https://commons.wikimedia.org/wiki/File:Simple_distillation_apparatus.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/round-bottom-flask.svg, glassware/round-bottom-flask-small.svg, glassware/liebig-condenser-slanted.svg, glassware/liebig-condenser-upright.svg, glassware/still-head.svg, glassware/receiver-adapter.svg, glassware/stirrer-hotplate.svg, glassware/oil-bath.svg, glassware/ice-bath.svg from this drawing (third_party/glassware/pieces.json source 'qg-distillation'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'Public domain', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "public domain"
+  },
+  {
+   "name": "\"Schlenk flasks\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Schlenk_flasks.svg (sha256 f0f15d3fdb0214d63165523c588c269b94268fa37d5024f257e0be4779acd35a)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "\"Schlenk flasks\" by Quantockgoblin (original PNG) and Slashme (SVG) (Wikimedia Commons, Public domain): https://commons.wikimedia.org/wiki/File:Schlenk_flasks.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/schlenk-flask.svg from this drawing (third_party/glassware/pieces.json source 'qg-schlenk'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'Public domain', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "public domain"
+  },
+  {
+   "name": "\"Allihn condenser\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Allihn_condenser.svg (sha256 18cd158e988cff11ec1f779858f6aea457d396463e7a5c746c9105b0612d8241)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "\"Allihn condenser\" by Quantockgoblin (original) and Jxjl (vector) (Wikimedia Commons, Public domain): https://commons.wikimedia.org/wiki/File:Allihn_condenser.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/allihn-condenser.svg from this drawing (third_party/glassware/pieces.json source 'qg-allihn'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'Public domain', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "public domain"
+  },
+  {
+   "name": "\"Burette\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Burette.svg (sha256 1948e53328ff889505f6b4e3a088f249dffc8e93cf34cd240eb775738c495c3c)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "\"Burette\" by Mysid, after Quantockgoblin (Wikimedia Commons, Public domain): https://commons.wikimedia.org/wiki/File:Burette.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/burette.svg from this drawing (third_party/glassware/pieces.json source 'qg-burette'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'Public domain', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "public domain"
+  },
+  {
+   "name": "\"Tlc sequence\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Tlc_sequence.svg (sha256 d96bebf9f7bdd1e752686e1f142fa0b6095910f499bed89ddcf31402c0af01ed)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "\"Tlc sequence\" by Quantockgoblin (original PNG) and Shakiestone (SVG) (Wikimedia Commons, Public domain): https://commons.wikimedia.org/wiki/File:Tlc_sequence.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/tlc-tank.svg from this drawing (third_party/glassware/pieces.json source 'qg-tlc'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'Public domain', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "public domain"
+  },
+  {
+   "name": "\"Mehrhalskolben V.1\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Mehrhalskolben.V.1.V.1.svg (sha256 c9f0b9175c251f8cbbfb257f628ccf5b5b03dc3c3ef31a1b3bf0cbc593669c65)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Mehrhalskolben V.1\" by Jü (Wikimedia Commons, CC0 1.0): https://commons.wikimedia.org/wiki/File:Mehrhalskolben.V.1.V.1.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/two-neck-flask.svg, glassware/three-neck-flask.svg from this drawing (third_party/glassware/pieces.json source 'jue-multineck'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'CC0', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  },
+  {
+   "name": "\"Funnel Types V.1\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Funnel_Types_V.1.svg (sha256 8c76ee7e889ea52bf0888e616353e271379945332b567fa431b98fe2976508bc)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Funnel Types V.1\" by Jü (Wikimedia Commons, CC0 1.0): https://commons.wikimedia.org/wiki/File:Funnel_Types_V.1.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/filter-funnel.svg from this drawing (third_party/glassware/pieces.json source 'jue-funnels'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'CC0', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  },
+  {
+   "name": "\"Dropping Funnel V.1\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Dropping_Funnel_V.1.svg (sha256 35043ff99a1aec92c6a658a56ae45911e9252e43f3bb7fbf90bb215a12edae72)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Dropping Funnel V.1\" by Jü (Wikimedia Commons, CC0 1.0): https://commons.wikimedia.org/wiki/File:Dropping_Funnel_V.1.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/dropping-funnel.svg from this drawing (third_party/glassware/pieces.json source 'jue-dropping'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'CC0', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  },
+  {
+   "name": "\"Graduated Cylinder tall form 250ml\" (Wikimedia Commons)",
+   "version": "third_party/glassware/originals/Graduated_Cylinder_tall_form_250ml.svg (sha256 c8ba5988c42020b536d9460516a412be475b34abbe5cd1865ae282694bd30e4e)",
+   "licence": "Public domain",
+   "copyright": [],
+   "texts": [],
+   "statement": "\"Graduated Cylinder tall form 250ml\" by Xavax (Wikimedia Commons, Public domain): https://commons.wikimedia.org/wiki/File:Graduated_Cylinder_tall_form_250ml.svg",
+   "evidence": "scripts/build_glassware.py cuts glassware/measuring-cylinder.svg from this drawing (third_party/glassware/pieces.json source 'xavax-cylinder'; its sha256 matches the committed file). Commons API (2026-10-29, imageinfo): LicenseShortName 'Public domain', AttributionRequired false; the current file's SHA-1 equals the committed original's. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "public domain"
+  },
+  {
+   "name": "\"Erlenmeyerkolben\" (Openclipart)",
+   "version": "third_party/glassware/originals/176995_Erlenmeyerkolben.svg (sha256 ea5c449e6cfe7ea91b346a0029bdd794cb3bf5750e53674c3bee0262e64a5e7c)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Erlenmeyerkolben\" by B_Lachner (Openclipart, CC0 1.0): https://openclipart.org/detail/176995/erlenmeyerkolben",
+   "evidence": "scripts/build_glassware.py cuts glassware/conical-flask.svg from this drawing (third_party/glassware/pieces.json source 'bl-erlenmeyer'; its sha256 matches the committed file). Openclipart detail page (2026-10-29): schema.org license https://creativecommons.org/publicdomain/zero/1.0/; its download is byte-identical to the committed original. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  },
+  {
+   "name": "\"Beakers\" (Openclipart)",
+   "version": "third_party/glassware/originals/175615_Becherglaeser.svg (sha256 ad444a3f488638125db5e278831c285248c6520c64a0f6f1858a1a3fa62659e6)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Beakers\" by B_Lachner (Openclipart, CC0 1.0): https://openclipart.org/detail/175615/beakers",
+   "evidence": "scripts/build_glassware.py cuts glassware/beaker.svg from this drawing (third_party/glassware/pieces.json source 'bl-beakers'; its sha256 matches the committed file). Openclipart detail page (2026-10-29): schema.org license https://creativecommons.org/publicdomain/zero/1.0/; its download is byte-identical to the committed original. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  },
+  {
+   "name": "\"Separatory funnel\" (Openclipart)",
+   "version": "third_party/glassware/originals/175342_1361989489.svg (sha256 ddd4b2d618286f8de1bc3cb5d862dc5149986571bc3f677be62c90be446e4e79)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Separatory funnel\" by stefg1971 (Openclipart, CC0 1.0): https://openclipart.org/detail/175342/separatory-funnel",
+   "evidence": "scripts/build_glassware.py cuts glassware/separating-funnel.svg from this drawing (third_party/glassware/pieces.json source 'sf-separatory'; its sha256 matches the committed file). Openclipart detail page (2026-10-29): schema.org license https://creativecommons.org/publicdomain/zero/1.0/; its download is byte-identical to the committed original. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  },
+  {
+   "name": "\"Buchner funnel and flask\" (Openclipart)",
+   "version": "third_party/glassware/originals/28348_MeV-Buchner-Funnel-and-Flask.svg (sha256 8261051837361744ce44662eb21eef9ab2a5ca5813b9e1581985369906086354)",
+   "licence": "CC0-1.0",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/cc0-1.0-legalcode.txt",
+     "url": "https://raw.githubusercontent.com/creativecommons/cc-legal-tools-data/a0dac18d1a773b4cdb7d8dd5d9bf4efab7901030/docs/publicdomain/zero/1.0/legalcode.txt",
+     "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    }
+   ],
+   "statement": "\"Buchner funnel and flask\" by MeV (Openclipart, CC0 1.0): https://openclipart.org/detail/28348/buchner-funnel-and-flask",
+   "evidence": "scripts/build_glassware.py cuts glassware/buchner-flask.svg, glassware/buchner-funnel.svg from this drawing (third_party/glassware/pieces.json source 'mev-buchner'; its sha256 matches the committed file). Openclipart detail page (2026-10-29): schema.org license https://creativecommons.org/publicdomain/zero/1.0/; its download is byte-identical to the committed original. No credit is required; the app gives one (glassware.json 'credit', shown in the Glassware tab and About).",
+   "noCopyright": "waived (CC0)"
+  }
+ ],
+ "slug": "public-glassware"
+}

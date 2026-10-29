@@ -1,0 +1,67 @@
+{
+ "title": "src/chem/resonance.ts: a port of RDKit's ResonanceMolSupplier and conjugation rules",
+ "part": 4,
+ "keys": [
+  {
+   "module": "src/chem/resonance.ts"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "RDKit ResonanceMolSupplier (Resonance.cpp), ported to TypeScript",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2015 Paolo Tosco",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Code/GraphMol/Resonance.cpp at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 f2641722322b6ca85bd5c659f0d828d9f3804871d2d99c68d075fdc9c9da9258, = tests/fixtures/recorded/rdkit/Resonance.cpp). resonance.ts's header says it ports ResonanceMolSupplier from Resonance.cpp. Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  },
+  {
+   "name": "RDKit MolOps::setConjugation (ConjugHybrid.cpp), ported to TypeScript",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2001-2024 Greg Landrum and other RDKit contributors",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Code/GraphMol/ConjugHybrid.cpp at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 f891eb7a0ff010ce19aad88617861369ba5c2f1ea3f2e0342079dda197308a0c). resonance.ts's header says it ports the conjugation rules MolOps::setConjugation from ConjugHybrid.cpp. Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  },
+  {
+   "name": "RDKit countAtomElec (Aromaticity.cpp), ported to TypeScript",
+   "version": "RDKit 2026.09.1 (Release_2026_09_1)",
+   "licence": "BSD-3-Clause",
+   "copyright": [
+    "Copyright (C) 2003-2022 Greg Landrum and other RDKit contributors",
+    "Copyright (c) 2006-2015, Rational Discovery LLC, Greg Landrum, and Julie Penzotti and others"
+   ],
+   "texts": [
+    {
+     "file": "texts/rdkit-license.txt",
+     "url": "https://raw.githubusercontent.com/rdkit/rdkit/fece8caa860bdf6c9c82bdb9253f22a0cf87150c/license.txt",
+     "sha256": "daeb8d194502cbcf34c05c39541a0d02be65bc9bada5b891c1974cd24e9fca30"
+    }
+   ],
+   "statement": "",
+   "evidence": "Code/GraphMol/Aromaticity.cpp at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (sha256 0249e581b2995a39ceb9faf9722915edd7c96d4734a30824ee5c06c11381c924). resonance.ts's header says it ports countAtomElec from Aromaticity.cpp. Each RDKit file's header reads: 'This file is part of the RDKit. The contents are covered by the terms of the BSD license which is included in the file license.txt, found at the root of the RDKit source tree.' Files fetched at fece8caa860bdf6c9c82bdb9253f22a0cf87150c (= tag Release_2026_09_1 per api.github.com ref tags/Release_2026_09_1; the npm @rdkit/rdkit 2026.9.1 gitHead is the same commit). license.txt there is byte-identical to tests/fixtures/recorded/rdkit/license.txt and to rdkitTables.json's rdkit_license field (gen_rdkit_tables.py copies it in)."
+  }
+ ],
+ "slug": "derived-resonance-ts"
+}

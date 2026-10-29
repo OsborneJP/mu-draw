@@ -1,0 +1,35 @@
+{
+ "title": "Copies inlined in workbox-window 7.4.1, build/workbox-window.prod.es5.mjs",
+ "part": 2,
+ "keys": [
+  {
+   "file": "node_modules/workbox-window/build/workbox-window.prod.es5.mjs",
+   "sha256": "f7d63cd3ff522af382d9ee3f8d0510ab7fb450229c2909bd913ed378d8a9e41f"
+  },
+  {
+   "package": "workbox-window@7.4.1"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "workbox-core (same project and authors as workbox-window)",
+   "version": "7.4.1 (marker workbox:core:7.4.0)",
+   "licence": "MIT",
+   "copyright": [
+    "Copyright 2018 Google LLC",
+    "Copyright 2019 Google LLC"
+   ],
+   "texts": [
+    {
+     "file": "texts/workbox-core-7.4.1-LICENSE.txt",
+     "url": "https://registry.npmjs.org/workbox-core/-/workbox-core-7.4.1.tgz#package/LICENSE",
+     "sha256": "aee9670e09b75ca8a2a1fe62d545ae38a6797970caf0335628e3a4dd15bc9b6c"
+    }
+   ],
+   "statement": "",
+   "evidence": "NOT prebuilt by the plan's marker rule (no __webpack_require__, define.amd or wasmBinary): a rollup build that inlines another package with no runtime left. Found through its sibling source map. The sibling map lists ../../workbox-core/_version.js, _private/Deferred.js and _private/dontWaitFor.js; each sourcesContent is byte-identical to that file in the workbox-core 7.4.1 tarball (gitHead 62b9d8ba, the same as workbox-window 7.4.1's). Same project and copyright holder (Google LLC), so arguably nothing from \"other authors\"; recorded so the rule gap is visible."
+  }
+ ],
+ "slug": "workbox-window-build-prod-es5-mjs"
+}

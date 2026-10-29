@@ -1,0 +1,27 @@
+{
+ "title": "hoist-non-react-statics 3.3.2",
+ "part": 2,
+ "keys": [
+  {
+   "package": "hoist-non-react-statics@3.3.2"
+  }
+ ],
+ "components": [
+  {
+   "name": "hoist-non-react-statics",
+   "version": "3.3.2",
+   "licence": "BSD-3-Clause (Yahoo's wording)",
+   "copyright": [
+    "Copyright (c) 2015, Yahoo! Inc. All rights reserved."
+   ],
+   "texts": [
+    {
+     "file": "texts/hoist-non-react-statics-3.3.2-LICENSE.md.txt",
+     "url": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#package/LICENSE.md",
+     "sha256": "eb32ff0ec52b6ea86e3d3e06c6ad1b68ee03798b6729af13919f6d5c14b368f3"
+    }
+   ],
+   "evidence": "Its LICENSE.md words the BSD 3-clause licence as Yahoo's 'Software License Agreement (BSD License)', which the canonical BSD-3-Clause opening doesn't match, so the notices script asked for a record. Copied from node_modules, whose tarball has lockfile integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==."
+  }
+ ]
+}

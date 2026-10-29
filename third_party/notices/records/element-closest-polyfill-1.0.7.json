@@ -1,0 +1,29 @@
+{
+ "title": "element-closest-polyfill 1.0.7: ISC, with no copyright holder upstream",
+ "part": 2,
+ "keys": [
+  {
+   "package": "element-closest-polyfill@1.0.7"
+  }
+ ],
+ "inlinesNothing": false,
+ "components": [
+  {
+   "name": "element-closest-polyfill",
+   "version": "1.0.7",
+   "licence": "ISC",
+   "copyright": [],
+   "texts": [
+    {
+     "file": "texts/isc.txt",
+     "url": "https://raw.githubusercontent.com/spdx/license-list-data/31ba1a50e5397e00a304dbadc76531740e89ee48/text/ISC.txt",
+     "sha256": "521c6f0ed8e64736684f89843d16a4df6b4b7449acbcfc6ca6630a3037ca8c53"
+    }
+   ],
+   "statement": "element-closest-polyfill 1.0.7 (by idmadj) declares the ISC licence; no copyright holder is named in the package or its repository.",
+   "evidence": "package.json \"license\": \"ISC\", no author field; the package has only index.js, package.json, README.md (npm tarball, integrity = lockfile, unpacks identical to node_modules). Upstream idmadj/element-closest-polyfill at the npm gitHead 3163c54cfe6789bf4eadcffe73689476eeb0dd83 has no LICENSE (tree: .gitignore, .npmignore, README.md, index.js, index.test.js, package-lock.json, package.json). The npm maintainer and publisher is 'idmadj' (registry metadata). The README says it uses MDN's implementation (MDN code samples added after 20 Aug 2010 are CC0; not checked for this snippet). ISC text: SPDX License List v3.29.0 (commit 31ba1a50e5397e00a304dbadc76531740e89ee48) text/ISC.txt, the text for the SPDX id package.json uses; it carries a template line 'Copyright <year> <owner>' that is not a holder (copyright: [] = none upstream).",
+   "noCopyright": "none named upstream"
+  }
+ ],
+ "slug": "element-closest-polyfill-1.0.7"
+}
