@@ -27,6 +27,7 @@ ONLY_NAME_IT = {
     "tests/fixtures/nmr_names.txt": NAMES,
     "tests/fixtures/proton_nmr_names.txt": NAMES,
     "web/scripts/checks/fixtures/dist-files.json": "a list of built file names",
+    "third_party/notices/inventory.json": "a list of shipped file names",
 }
 
 # Each jar, and the file listing what is packed inside it (kept out of server/: a deploy that

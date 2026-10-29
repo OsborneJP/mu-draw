@@ -45,11 +45,11 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
 `export PATH="$(conda info --base)/envs/<env>/bin:$PATH"`.
 - Setup once: `conda env create -n <env> -f environment.yml`, then (env on PATH)
   `cd web && npm ci && npx playwright install --no-shell chromium`.
-- Check (before every commit and deploy): `scripts/check.sh`. Ends with `CHECK PASSED`;
-  the full log is in `.check.log`. Run it as its own command; read its exit status.
+- Check before every commit and deploy: `scripts/check.sh` (ends `CHECK PASSED`; log `.check.log`). Run it alone; read its exit status.
 - Dev server: API `STATE_DIRECTORY=<dir> uvicorn main:app --app-dir server --port <port>`
-  (ports.dev); web `cd web && npm run dev` (proxies `<base>api/`). Both with the env on PATH.
-- Build: `cd web && npm run build` (staging base unless `BASE` is set).
+  (ports.dev); web `cd web && npm run dev` (proxies `<base>api/`); build `npm run build` (staging base unless `BASE`).
+- Licence notices (docs/plans/licence-notices.md): after a dependency upgrade verify-dist lists what ships differently;
+  review it, then `DIST_DIR=dist node scripts/build-notices.ts --accept` (in web/) records it in third_party/notices/.
 - Deploy: `scripts/deploy.sh staging`, `scripts/deploy.sh --production`,
   `scripts/deploy.sh --smoke-only <staging|production>`. Production promotes only the
   commit that passed the live staging checks; live checks run from that commit.

@@ -11,6 +11,8 @@ __pycache__/
 web/node_modules/
 web/dist/
 web/dist-*/
+# What a build bundled, beside its output folder (config/noticesLog.ts).
+web/*.notices-build.json
 web/.vitest/
 web/test-results/
 web/playwright-report/

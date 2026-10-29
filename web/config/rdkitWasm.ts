@@ -18,7 +18,8 @@ export function rdkitWasm(): Plugin {
     name: 'rdkit-wasm',
     apply: 'build',
     generateBundle() {
-      this.emitFile({ type: 'asset', fileName: RDKIT_WASM_FILE, source: readFileSync(SOURCE) });
+      // Named after its source, so the licence notices' inventory can place it.
+      this.emitFile({ type: 'asset', fileName: RDKIT_WASM_FILE, originalFileName: SOURCE, source: readFileSync(SOURCE) });
     },
   };
 }
