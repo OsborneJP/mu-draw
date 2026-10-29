@@ -226,6 +226,7 @@ To list EPAM's changes reliably, the script also commits a SHA-256 manifest of t
 2. The panel shows NOTICES.txt as served by the service worker. Checked lines: InChI's copyright and a fixed phrase of its licence, the FreeType credit, Ketcher's NOTICE, and the MPL 1.1 statement for cairo.
 3. Save, offline: the archive comes from the service worker, and the saved file's SHA-256 equals the recorded one.
 4. By hand on staging, once each: the installed app on Chrome desktop and Android, and Safari on iOS.
+   Jeff confirmed on 2026-10-29, after the production deploy, that the Third-party licences panel behaves as expected.
 
 **D. Unchanged**
 - **Invariants 1 and 4:** no link is added; the only new requests are two same-base fetches of precached files; the new files are precached.
