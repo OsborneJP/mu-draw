@@ -83,12 +83,12 @@ browser; a small FastAPI service on osbornelab does the naming and safety lookup
 - `server/main.py`: FastAPI `/api/health`, `name`, `structure`, `safety`, `conformer`, `count` (`create_app()` takes
   fakes); `chem.py` (RDKit), `pubchem.py` (rate limit, retry), `ghs.py` (PubChem's GHS), `threed.py` (3D
   models: RDKit.js can't embed), `cache.py` (SQLite in `$STATE_DIRECTORY`), `usage.py`, `opsin.py` (jar, Java).
-- `scripts/`: check.sh, deploy.sh, usage_report.py, `lib/`, `checks/`, generators (build_glassware.py
+- `scripts/`: check.sh, deploy.sh, usage_report.py, build_hand_checks.py, `lib/`, `checks/`, generators (build_glassware.py
   cuts web/public/glassware/ from third_party/glassware/: PD/CC0 originals, pieces.json; build_indigo_source.py
   makes third_party/indigo-source/, the InChI and cairo source the app ships: redo it when indigo-ketcher changes).
 - `tests/fixtures/`: generated chemistry, `recorded/` API responses, `*_responses.json` (e2e
   replays), `functional_group*`, `nmr*`, `proton_nmr*`, `proton_rule*` (test sets; judgement provisional), `chemdraw/`.
-- `docs/`: SPEC.md, server-setup.md (rendered, do not hand-edit), plans/ (acceptance bars).
+- `docs/`: SPEC.md, server-setup.md and v1-hand-checks.md (rendered, do not hand-edit), plans/ (acceptance bars).
 
 ## Conventions
 - Never write the name or URL path literally; derive them from app.config.json via
