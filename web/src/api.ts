@@ -140,7 +140,8 @@ export async function requestStructure(name: string, signal: AbortSignal): Promi
   return answer ? structureOutcome(answer.status, answer.body) : NOT_RESPONDING;
 }
 
-/** Ask the server for the drawing's GHS classification. Same deadline as requestName. */
+/** Ask the server for the drawing's GHS classification. It waits SAFETY_DEADLINE_MS, longer
+ * than the other lookups: two PubChem lookups each (safetyAnswer.ts). */
 export async function requestSafety(smiles: string, signal: AbortSignal): Promise<SafetyOutcome> {
   const answer = await post('safety', { smiles }, signal, SAFETY_DEADLINE_MS);
   return answer ? safetyOutcome(answer.status, answer.body) : NOT_RESPONDING;
