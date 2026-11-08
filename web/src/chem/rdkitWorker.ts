@@ -18,6 +18,7 @@
 // functional-group patterns (on the first properties request) and the ¹³C and ¹H tables (on
 // the first prediction of each), all from the precache.
 import initRDKitModule from '@rdkit/rdkit';
+import { readableMolfile } from './aromaticHydrogens';
 import { decodeTable, lookup, PROTON, type CarbonTable, type ShiftTable } from './carbonTable';
 import { answer, type FormsReply, type FormsRequest } from './formPictures';
 import { computeProperties, configureRdkit, type PatternsOrReason } from './compute';
@@ -153,15 +154,25 @@ function forms(request: FormsRequest): void {
   );
 }
 
+/** Every request's drawing, made readable for RDKit first: the aromatic hydrogens Ketcher's
+ * Molfile can't carry (aromaticHydrogens.ts). Requests keep their order: each waits for RDKit
+ * once, here. */
 scope.onmessage = (event) => {
-  if ('kind' in event.data) {
-    if (event.data.kind === 'nmr') predict(event.data);
-    else if (event.data.kind === 'proton') predictHydrogens(event.data);
-    else if (event.data.kind === 'stereoisomers') stereoisomers(event.data);
-    else forms(event.data);
+  ready.then(
+    (rdkit) => handle({ ...event.data, molfile: readableMolfile(rdkit, event.data.molfile) }),
+    () => {}, // already reported as {failed}
+  );
+};
+
+function handle(data: WorkerRequest | NmrRequest | ProtonRequest | StereoRequest | FormsRequest): void {
+  if ('kind' in data) {
+    if (data.kind === 'nmr') predict(data);
+    else if (data.kind === 'proton') predictHydrogens(data);
+    else if (data.kind === 'stereoisomers') stereoisomers(data);
+    else forms(data);
     return;
   }
-  const { id, molfile } = event.data;
+  const { id, molfile } = data;
   Promise.all([ready, (patterns ??= loadPatterns())]).then(
     ([rdkit, groups]) => {
       let computed = null;
@@ -174,4 +185,4 @@ scope.onmessage = (event) => {
     },
     () => {}, // already reported as {failed}
   );
-};
+}

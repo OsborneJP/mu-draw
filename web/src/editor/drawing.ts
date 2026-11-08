@@ -1,9 +1,32 @@
 // The drawing as the properties panel needs it (src/chem/tracker.ts): what kind of drawing
 // it is, and for a plain structure, a Molfile plus the Ketcher atom id of each Molfile atom.
-import { Elements, MolSerializer, type Ketcher } from 'ketcher-core';
+import { Bond, Elements, MolSerializer, type Ketcher } from 'ketcher-core';
+import { noteHydrogens, type AromaticHydrogens } from '../chem/aromaticHydrogens';
 import type { Drawing } from '../chem/tracker';
 
 const serializer = new MolSerializer();
+
+type Struct = ReturnType<Ketcher['editor']['struct']>;
+
+/** Ketcher's H count for each aromatic atom whose hydrogens RDKit can't work out from a
+ * Molfile: in a drawing whose aromatic atoms are not all neutral carbons (an N-H, a charged
+ * ring carbon), every aromatic atom with hydrogens. The worker gives these to RDKit
+ * (src/chem/aromaticHydrogens.ts). None for a benzene ring, which RDKit reads as it is. */
+function aromaticHydrogens(struct: Struct, atomIds: number[]): AromaticHydrogens {
+  const aromatic = new Set<number>();
+  for (const bond of struct.bonds.values()) {
+    if (bond.type === Bond.PATTERN.TYPE.AROMATIC) aromatic.add(bond.begin).add(bond.end);
+  }
+  const plain = (id: number) => {
+    const atom = struct.atoms.get(id)!;
+    return atom.label === 'C' && !atom.charge;
+  };
+  if ([...aromatic].every(plain)) return [];
+  return atomIds.flatMap((id, index): AromaticHydrogens => {
+    const count = struct.atoms.get(id)!.implicitHCount;
+    return aromatic.has(id) && count ? [[index, count]] : [];
+  });
+}
 
 /** Read the drawing now. Synchronous, so the Molfile and the atom ids are of one moment.
  * Safe to call from Ketcher's change event: Ketcher announces a change once the action is
@@ -23,10 +46,11 @@ export function readDrawing(ketcher: Ketcher): Drawing {
     // Ketcher's in-page Molfile writer, not Indigo: Indigo's converter mixes up answers to
     // two requests in flight at once (like its images, src/editor/imageQueue.ts). The writer
     // copies the drawing in its own atom order, so Molfile atom i is the i-th atom here.
+    const atomIds = [...struct.atoms.keys()];
     return {
       kind: 'structure',
-      molfile: serializer.serialize(struct),
-      atomIds: [...struct.atoms.keys()],
+      molfile: noteHydrogens(serializer.serialize(struct), aromaticHydrogens(struct, atomIds)),
+      atomIds,
       // Ketcher's own valence warning (the atoms it underlines in red).
       badValence: atoms.filter((a) => a.badConn).length,
     };

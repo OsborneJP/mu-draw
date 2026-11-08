@@ -275,6 +275,10 @@ All notable changes to this project. The format follows
   at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
+- After Aromatize, or with an aromatic SMILES pasted in, a ring with an N-H (imidazole,
+  histidine, purines, pyrimidine bases, indole) showed no properties, NMR or stereo, and
+  guanine and allopurinol showed a formula two H short. RDKit is now given those hydrogens,
+  so the panels show the same values as before Aromatize.
 - With the app open in two windows, a reload (the update banner's Reload, a refresh) brought
   back the other window's drawing, and this window's was lost. Each window now reloads into
   its own drawing and groups; a relaunch brings back the drawing of the window closed last.

@@ -252,6 +252,34 @@ test("explicit hydrogens drawn by Ketcher don't change the values", async ({ app
   await expectShows(page, ibuprofen, ibuprofen.properties.NumAtoms);
 });
 
+// Ketcher's Aromatize keeps an aromatic N-H only as an H count its Molfile writer drops, so
+// RDKit read imidazole and histidine as nothing, and guanine and allopurinol as other
+// compounds, two H short. The worker gives RDKit those hydrogens (src/chem/aromaticHydrogens.ts).
+const AROMATIZED = ['guanine', 'allopurinol', 'imidazole', 'histidine', 'benzene'];
+
+test('Aromatize changes none of the values, for rings with an N-H as for benzene', async ({ app }) => {
+  const { context, page } = app;
+  await context.addInitScript(holdableRdkitReplies);
+  await openEditor(app);
+  const panel = page.getByTestId('properties-panel');
+  const busy = /^(working|updating)$/;
+  /** What the panel shows once RDKit has answered for the drawing that `act` leaves. */
+  const shownAfter = async (act: () => Promise<unknown>) => {
+    await page.evaluate(() => (window as unknown as { __holdRdkit(): void }).__holdRdkit());
+    await act();
+    await expect(panel).toHaveAttribute('data-state', busy);
+    await page.evaluate(() => (window as unknown as { __releaseRdkit(): void }).__releaseRdkit());
+    await expect(panel).not.toHaveAttribute('data-state', busy);
+    return readPanel(page);
+  };
+  for (const name of AROMATIZED) {
+    const drawn = await shownAfter(() => load(page, fixture(`forms/${name}.mol`)));
+    expect(drawn.state, name).toBe('ready');
+    const aromatized = await shownAfter(() => page.getByTestId('Aromatize button').filter({ visible: true }).click());
+    expect(aromatized, name).toEqual(drawn);
+  }
+});
+
 test('if RDKit cannot start, the panel says so and the editor carries on', async ({ app }) => {
   const { context, page } = app;
   test.skip(!app.server.local, 'changes what the server sends');
