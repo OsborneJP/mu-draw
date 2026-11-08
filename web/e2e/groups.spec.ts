@@ -380,6 +380,22 @@ async function replacing(page: Page, testId: string) {
   await deselect(page);
 }
 
+test("Ketcher's full-screen mode shows the whole app, so the Group button still works", async ({ app }) => {
+  const { page } = app;
+  await openEditor(app);
+  await drawing(page);
+  await page.getByTestId('fullscreen-mode-button').filter({ visible: true }).click();
+  await expect.poll(() => page.evaluate(() => document.fullscreenElement?.className ?? null)).toBe('app');
+  // The header and the properties panel are in what the browser shows full screen.
+  const inside = (testId: string) =>
+    page.evaluate((id) => document.fullscreenElement!.contains(document.querySelector(`[data-testid="${id}"]`)), testId);
+  expect(await inside('app-export-button')).toBe(true);
+  expect(await inside('properties-panel')).toBe(true);
+  // A real click on the button, which must be what is under the pointer.
+  await groupEverything(page);
+  await page.evaluate(() => document.exitFullscreen());
+});
+
 // Ketcher (Indigo) makes a new drawing for Aromatize, the same items where they were. (Whether
 // Layout or Clean Up keep a group depends on whether they move its items together; the rule,
 // a group carried only when found whole, is in groups.test.ts.)

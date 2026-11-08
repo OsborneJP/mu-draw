@@ -275,6 +275,8 @@ All notable changes to this project. The format follows
   at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
+- Ketcher's full-screen button showed the editor alone: the header, the side panel and the
+  Group button were gone until full screen ended. It now shows the whole app.
 - After Aromatize, or with an aromatic SMILES pasted in, a ring with an N-H (imidazole,
   histidine, purines, pyrimidine bases, indole) showed no properties, NMR or stereo, and
   guanine and allopurinol showed a formula two H short. RDKit is now given those hydrogens,
