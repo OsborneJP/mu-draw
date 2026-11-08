@@ -283,9 +283,9 @@ All notable changes to this project. The format follows
 - Ketcher's full-screen button showed the editor alone: the header, the side panel and the
   Group button were gone until full screen ended. It now shows the whole app.
 - After Aromatize, or with an aromatic SMILES pasted in, a ring with an N-H (imidazole,
-  histidine, purines, pyrimidine bases, indole) showed no properties, NMR or stereo, and
-  guanine and allopurinol showed a formula two H short. RDKit is now given those hydrogens,
-  so the panels show the same values as before Aromatize.
+  histidine, purines, pyrimidine bases, indole) showed no properties, NMR, stereo, tautomers
+  or resonance, and guanine and allopurinol showed a formula two H short. RDKit is now given
+  those hydrogens, so the panels show the same values as before Aromatize.
 - With the app open in two windows, a reload (the update banner's Reload, a refresh) brought
   back the other window's drawing, and this window's was lost. Each window now keeps its own
   copy and reloads into its own drawing and groups; a launch brings back the last drawing

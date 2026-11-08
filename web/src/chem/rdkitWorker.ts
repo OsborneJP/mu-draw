@@ -18,7 +18,7 @@
 // functional-group patterns (on the first properties request) and the ¹³C and ¹H tables (on
 // the first prediction of each), all from the precache.
 import initRDKitModule from '@rdkit/rdkit';
-import { readableMolfile } from './aromaticHydrogens';
+import { molfileFor } from './aromaticHydrogens';
 import { decodeTable, lookup, PROTON, type CarbonTable, type ShiftTable } from './carbonTable';
 import { answer, type FormsReply, type FormsRequest } from './formPictures';
 import { computeProperties, configureRdkit, type PatternsOrReason } from './compute';
@@ -155,11 +155,14 @@ function forms(request: FormsRequest): void {
 }
 
 /** Every request's drawing, made readable for RDKit first: the aromatic hydrogens Ketcher's
- * Molfile can't carry (aromaticHydrogens.ts). Requests keep their order: each waits for RDKit
- * once, here. */
+ * Molfile can't carry (aromaticHydrogens.ts), by the request's kind. Requests keep their
+ * order: each waits for RDKit once, here. */
 scope.onmessage = (event) => {
   ready.then(
-    (rdkit) => handle({ ...event.data, molfile: readableMolfile(rdkit, event.data.molfile) }),
+    (rdkit) => {
+      const kind = 'kind' in event.data ? event.data.kind : undefined;
+      handle({ ...event.data, molfile: molfileFor(rdkit, kind, event.data.molfile) });
+    },
     () => {}, // already reported as {failed}
   );
 };
