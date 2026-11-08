@@ -89,6 +89,33 @@ test('autosave: the drawing survives reloads offline, and Undo stops at the rest
   expect(uploads).toEqual([]);
 });
 
+test('autosave: with two windows open, each reloads into its own drawing', async ({ app }) => {
+  // Every window shares one saved drawing; the last save wins. A reload must bring back the
+  // window's own drawing, not the other window's later save (docs/plans/v1-release.md).
+  const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
+  const draw = async (page: Page, smiles: string) => {
+    const saved = await nextAutosave(page);
+    await page.evaluate((s) => window.ketcher!.setMolecule(s), smiles);
+    return saved();
+  };
+  await openEditor(app);
+  const first = app.page;
+  await draw(first, aspirin.smiles);
+  const second = await app.newPage();
+  await second.goto(first.url());
+  await waitForEditor(app, second);
+  // The second window's save replaced the first's drawing in storage.
+  const secondSaved = await draw(second, caffeine.smiles);
+  expect(await stored(first)).toBe(secondSaved);
+
+  await first.reload();
+  await waitForEditor(app, first);
+  expect(await inchiKey(first)).toBe(aspirin.inchikey);
+  await second.reload();
+  await waitForEditor(app, second);
+  expect(await inchiKey(second)).toBe(caffeine.inchikey);
+});
+
 test('autosave: the drawing survives quitting and relaunching the browser', async ({ app }) => {
   await openEditor(app);
   const saved = await nextAutosave(app.page);

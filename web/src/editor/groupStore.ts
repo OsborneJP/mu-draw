@@ -174,18 +174,35 @@ function editOne(event: Event): void {
 }
 
 /** Restore the saved groups onto the restored drawing, then keep them: call once the
- * autosave has put the drawing back. `storage` is a getter, as for the autosave; `events` is
- * where double-clicks are heard first (the window, capturing). */
-export function startGroups(ketcher: Ketcher, storage: () => Storage, key: string, events: EventTarget): void {
+ * autosave has put the drawing back, saying whether it did (`drawingRestored`). `storage` is
+ * a getter, as for the autosave; `events` is where double-clicks are heard first (the window,
+ * capturing) and where the page's pagehide is heard. */
+export function startGroups(
+  ketcher: Ketcher,
+  storage: () => Storage,
+  key: string,
+  events: EventTarget,
+  drawingRestored: boolean,
+): void {
   editor = ketcher.editor as unknown as Editor;
   drawing = editor.struct();
   others = new WeakMap();
+  // This window's groups as last restored or stored (null: none), as the autosave keeps its
+  // drawing: written back on the way out, so a reload never takes another window's groups.
+  // Undefined while this window has no drawing of its own, so nothing is written for it.
+  let mine: string | null | undefined;
   persist = (current, struct) => {
     try {
       // Nothing is kept while there are no groups (Practice, for one, stores nothing).
       const kept = saved(current, canvasOf(struct), whereIn(struct));
-      if (kept.groups.length > 0) storage().setItem(key, JSON.stringify(kept));
-      else storage().removeItem(key);
+      if (kept.groups.length > 0) {
+        const text = JSON.stringify(kept);
+        storage().setItem(key, text);
+        mine = text;
+      } else {
+        storage().removeItem(key);
+        mine = null;
+      }
     } catch {
       // Storage off or full: the groups last until the page closes. The drawing's own
       // autosave reports storage trouble in the header.
@@ -194,9 +211,19 @@ export function startGroups(ketcher: Ketcher, storage: () => Storage, key: strin
   try {
     const kept = storage().getItem(key);
     groups = kept ? restored(JSON.parse(kept), canvasOf(drawing), whereIn(drawing)) : [];
+    if (drawingRestored) mine = kept;
   } catch {
     groups = [];
   }
+  events.addEventListener('pagehide', () => {
+    if (mine === undefined) return;
+    try {
+      if (mine === null) storage().removeItem(key);
+      else storage().setItem(key, mine);
+    } catch {
+      // What is stored stays.
+    }
+  });
   // A pipeline event: each handler must hand on what it was given.
   editor.event.selectionChange.add((value) => {
     selectionChanged();

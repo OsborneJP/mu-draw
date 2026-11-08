@@ -103,6 +103,8 @@ export function fixturePath(rel: string): string {
 
 export interface ReferenceCompound {
   typed_name: string;
+  /** PubChem's SMILES for the name. */
+  smiles: string;
   inchikey: string;
   files: string[];
 }

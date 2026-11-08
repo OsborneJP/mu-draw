@@ -143,13 +143,24 @@ test.describe('update banner', () => {
     await expect(app.page.getByTestId('update-banner')).toHaveCount(0);
   });
 
-  test("with two tabs open, Reload in one never reloads the other", async ({ app }) => {
+  test('with two tabs open, Reload in one never reloads the other, and each keeps its own drawing', async ({
+    app,
+  }) => {
     const { page: first } = app;
     const secondBuild = (page: Page) => page.locator(`meta[name="${BUILD_MARKER}"]`);
+    const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
+    const draw = async (page: Page, smiles: string) => {
+      const saved = await nextAutosave(page);
+      await page.evaluate((s) => window.ketcher!.setMolecule(s), smiles);
+      await saved();
+    };
     await launchInstalled(app);
+    await draw(first, aspirin.smiles);
     const second = await app.newPage();
     await second.goto(app.server.url);
     await waitForEditor(app, second);
+    // The second tab started on the first's drawing; its own save replaces it in storage.
+    await draw(second, caffeine.smiles);
 
     publishSecondBuild(app.server);
     await checkForUpdate(first);
@@ -166,6 +177,7 @@ test.describe('update banner', () => {
     });
     await clickReload(app, first);
     await expect(secondBuild(first)).toHaveCount(1);
+    expect(await inchiKey(first)).toBe(aspirin.inchikey);
     await second.evaluate(() => (window as unknown as { __takenOver: Promise<true> }).__takenOver);
     // The second tab has not reloaded, and still offers to.
     await expect(secondBuild(second)).toHaveCount(0);
@@ -176,5 +188,6 @@ test.describe('update banner', () => {
     await clickReload(app, second);
     await expect(secondBuild(second)).toHaveCount(1);
     await expect(second.getByTestId('update-banner')).toHaveCount(0);
+    expect(await inchiKey(second)).toBe(caffeine.inchikey);
   });
 });
