@@ -23,12 +23,6 @@ body {
   flex-direction: column;
 }
 
-/* Full screen (Ketcher's button), the app is shown on its own: on white, as the page is,
-   not the browser's black backdrop. */
-.app:fullscreen {
-  background: #fff;
-}
-
 /* The editor, with the properties panel on its right. */
 .workspace {
   flex: 1;

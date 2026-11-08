@@ -385,7 +385,7 @@ test("Ketcher's full-screen mode shows the whole app, so the Group button still 
   await openEditor(app);
   await drawing(page);
   await page.getByTestId('fullscreen-mode-button').filter({ visible: true }).click();
-  await expect.poll(() => page.evaluate(() => document.fullscreenElement?.className ?? null)).toBe('app');
+  await expect.poll(() => page.evaluate(() => document.fullscreenElement?.tagName ?? null)).toBe('HTML');
   // The header and the properties panel are in what the browser shows full screen.
   const inside = (testId: string) =>
     page.evaluate((id) => document.fullscreenElement!.contains(document.querySelector(`[data-testid="${id}"]`)), testId);

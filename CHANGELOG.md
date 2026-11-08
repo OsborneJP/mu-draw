@@ -281,7 +281,9 @@ All notable changes to this project. The format follows
   with PubChem busy and a class typing names at once, most students got "not responding"
   and nothing was drawn. After 6 s OPSIN's drawing goes back without PubChem's stereo.
 - Ketcher's full-screen button showed the editor alone: the header, the side panel and the
-  Group button were gone until full screen ended. It now shows the whole app.
+  Group button were gone until full screen ended, and Ketcher's drop-down lists (Save's file
+  format, the choices in its atom, bond and settings dialogs) didn't show. It now shows the
+  whole page, lists included.
 - After Aromatize, or with an aromatic SMILES pasted in, a ring with an N-H (imidazole,
   histidine, purines, pyrimidine bases, indole) showed no properties, NMR, stereo, tautomers
   or resonance, and guanine and allopurinol showed a formula two H short. RDKit is now given

@@ -15,9 +15,7 @@ import UpdateBanner from './shell/UpdateBanner';
 
 export default function App() {
   return (
-    // Ketcher's full-screen button shows what this marks, the whole app; unmarked, it showed
-    // the editor alone, without the header, the panels or the Group button.
-    <div className="app" data-ketcher-fullscreen-container>
+    <div className="app">
       <Header />
       <UpdateBanner />
       <InstallStrip />

@@ -208,3 +208,29 @@ test('Ctrl+V on the canvas still pastes, without the dialog', async ({ app }) =>
   await clickOnCanvas(page);
   await expect.poll(() => fragmentCount(page)).toBe(2);
 });
+
+test("in Ketcher's full screen, Save's format list shows and takes a click", async ({ app }) => {
+  // Ketcher opens its lists outside the app's root (its Select in #root, MUI's in body), so
+  // only a full screen of the whole page shows them (src/App.tsx; docs/plans/v1-release.md,
+  // review round 2).
+  const { page } = app;
+  await openEditor(app);
+  await load(page, 'aspirin');
+  await page.getByTestId('fullscreen-mode-button').filter({ visible: true }).click();
+  await expect.poll(() => page.evaluate(() => document.fullscreenElement !== null)).toBe(true);
+  await page.getByTestId('save-file-button').filter({ visible: true }).click();
+  const format = page.getByTestId('save-dialog').getByRole('combobox');
+  await format.click();
+  const option = page.getByTestId('CDX-option');
+  await option.scrollIntoViewIfNeeded();
+  // What is under the pointer at the option is the option, not what the full screen covers.
+  const underPointer = await option.evaluate((o) => {
+    const box = o.getBoundingClientRect();
+    const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return hit !== null && o.contains(hit);
+  });
+  expect(underPointer).toBe(true);
+  await option.click();
+  await expect(format).toHaveText('CDX');
+  await page.evaluate(() => document.exitFullscreen());
+});
