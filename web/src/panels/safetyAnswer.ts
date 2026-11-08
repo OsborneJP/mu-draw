@@ -14,6 +14,13 @@ function isNameOrNull(value: unknown): value is string | null {
   return value === null || typeof value === 'string';
 }
 
+/** How long Safety waits for its answer (src/api.ts). It asks PubChem twice, for the compound
+ * and then for its hazards, so a class pressing it together makes twice the calls Get name
+ * does: 30 structures, 60 calls, which PubChem's limit of 5 a second spreads over 12 s. It
+ * waits that long, with room to spare, before the service counts as not responding
+ * (docs/plans/v1-release.md, review round 1). */
+export const SAFETY_DEADLINE_MS = 15_000;
+
 export interface GhsStatement {
   code: string;
   /** CLP Annex VI's * notes, "**". */

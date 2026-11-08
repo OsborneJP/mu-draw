@@ -275,6 +275,8 @@ All notable changes to this project. The format follows
   at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
+- Safety waits 15 s for its answer, not 8: it asks PubChem twice, so a class pressing it at
+  once needs about 12 s, and two thirds of the students got "not responding".
 - Name to structure no longer waits for PubChem's stereo check past the browser's deadline:
   with PubChem busy and a class typing names at once, most students got "not responding"
   and nothing was drawn. After 6 s OPSIN's drawing goes back without PubChem's stereo.

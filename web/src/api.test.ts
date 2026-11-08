@@ -6,7 +6,9 @@ import {
   pubchemCompoundPage,
   requestConformer,
   requestName,
+  requestSafety,
   requestStructure,
+  SAFETY_DEADLINE_MS,
   structureOutcome,
 } from './api';
 
@@ -229,6 +231,36 @@ describe('requestStructure', () => {
     await vi.advanceTimersByTimeAsync(NAMING_DEADLINE_MS);
     expect(await outcome).toEqual(NOT_RESPONDING);
     expect(requests[0].init.signal!.aborted).toBe(true);
+  });
+});
+
+describe('requestSafety', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it('waits 15 s: its two PubChem lookups, for a class at once, take about 12 s', () => {
+    expect(SAFETY_DEADLINE_MS).toBe(15_000);
+  });
+
+  it('takes an answer that comes after the naming deadline, and gives up at its own', async () => {
+    const requests = holdFetch();
+    const late = requestSafety('s', new AbortController().signal);
+    expect(requests[0].url).toBe(`${import.meta.env.BASE_URL}api/safety`);
+    await vi.advanceTimersByTimeAsync(SAFETY_DEADLINE_MS - 1);
+    expect(requests[0].init.signal!.aborted).toBe(false);
+    requests[0].answer(503, { error: 'busy' });
+    expect(await late).toEqual({ kind: 'busy' });
+
+    const unanswered = requestSafety('s', new AbortController().signal);
+    await vi.advanceTimersByTimeAsync(SAFETY_DEADLINE_MS);
+    expect(await unanswered).toEqual(NOT_RESPONDING);
+    expect(requests[1].init.signal!.aborted).toBe(true);
   });
 });
 

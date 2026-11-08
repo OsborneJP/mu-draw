@@ -1,10 +1,10 @@
 // Calls to the app's own API under <base>api/, the only server the app talks to. Get name,
 // Safety and the 3D view send just the drawing's SMILES and Name to structure just the typed
 // name, each in a POST body, so none appears in a URL or a log line.
-import { safetyOutcome, type SafetyOutcome } from './panels/safetyAnswer';
+import { SAFETY_DEADLINE_MS, safetyOutcome, type SafetyOutcome } from './panels/safetyAnswer';
 import { pubchemCompoundPage } from './pubchemPage';
 
-export { pubchemCompoundPage };
+export { pubchemCompoundPage, SAFETY_DEADLINE_MS };
 
 /** With no answer after this long, the naming service counts as not responding (spec). */
 export const NAMING_DEADLINE_MS = 8000;
@@ -48,11 +48,17 @@ export function nameOutcome(status: number, body: unknown): NameOutcome {
   return { kind: 'found', iupac, title, cid, url, undefinedStereo };
 }
 
-/** POST `body` to `<base>api/<path>` and read the JSON answer. Gives up after
- * NAMING_DEADLINE_MS, or when `signal` aborts. Null means no usable answer arrived. */
-async function post(path: string, body: object, signal: AbortSignal): Promise<{ status: number; body: unknown } | null> {
+/** POST `body` to `<base>api/<path>` and read the JSON answer. Gives up after `deadlineMs`
+ * (NAMING_DEADLINE_MS unless given), or when `signal` aborts. Null means no usable answer
+ * arrived. */
+async function post(
+  path: string,
+  body: object,
+  signal: AbortSignal,
+  deadlineMs = NAMING_DEADLINE_MS,
+): Promise<{ status: number; body: unknown } | null> {
   const deadline = new AbortController();
-  const timer = setTimeout(() => deadline.abort(), NAMING_DEADLINE_MS);
+  const timer = setTimeout(() => deadline.abort(), deadlineMs);
   try {
     const response = await fetch(`${import.meta.env.BASE_URL}api/${path}`, {
       method: 'POST',
@@ -136,7 +142,7 @@ export async function requestStructure(name: string, signal: AbortSignal): Promi
 
 /** Ask the server for the drawing's GHS classification. Same deadline as requestName. */
 export async function requestSafety(smiles: string, signal: AbortSignal): Promise<SafetyOutcome> {
-  const answer = await post('safety', { smiles }, signal);
+  const answer = await post('safety', { smiles }, signal, SAFETY_DEADLINE_MS);
   return answer ? safetyOutcome(answer.status, answer.body) : NOT_RESPONDING;
 }
 

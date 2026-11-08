@@ -10,6 +10,7 @@ import {
   noneListed,
   othersLine,
   REMINDER,
+  SAFETY_DEADLINE_MS,
   SAFETY_MESSAGES,
   safetyOutcome,
 } from '../src/panels/safetyAnswer.ts';
@@ -228,7 +229,7 @@ test('Safety: nothing shows until the answer comes, and only for the drawing it 
   expect(safety.count()).toBe(3);
 });
 
-test('Safety: no answer within 8 s means "not responding", and a late answer is dropped', async ({ app }) => {
+test('Safety: no answer within its 15 s means "not responding", and a late answer is dropped', async ({ app }) => {
   const { page } = app;
   const { button, panel, message } = ui(page);
   await openEditor(app);
@@ -240,7 +241,8 @@ test('Safety: no answer within 8 s means "not responding", and a late answer is 
   await page.clock.pauseAt(start + 1000);
   await button.click();
   const held = await guarded(app, safety.next());
-  await page.clock.runFor(7999);
+  // Past Get name's 8 s, still asking (src/api.ts SAFETY_DEADLINE_MS).
+  await page.clock.runFor(SAFETY_DEADLINE_MS - 1);
   await expect(panel).toHaveAttribute('data-state', 'asking');
   const aborted = page.waitForEvent('requestfailed', (r) => r === held.request);
   await page.clock.runFor(1);

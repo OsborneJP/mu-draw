@@ -308,7 +308,8 @@ the SMILES reaches PubChem only in a POST body, in the same request as Get name'
 - **Pure substances only.** A solution or a mixture is classified differently.
 - **No precautionary statements.**
 - **Timing.** Two PubChem requests, each with one retry, can outlast the browser's 8 s deadline
-  when PubChem is slow. The student then sees "not responding".
+  when PubChem is slow. The student then sees "not responding". (Since 2026-11-08 Safety waits
+  15 s, room for its two lookups when a class asks at once: docs/plans/v1-release.md.)
 - **Format changes.** If PubChem changes its format, lookups say "unavailable" rather than show
   part of a list.
 - **HCIS** gives no licence through PubChem. It is credited, and shown only when there is no EU or
