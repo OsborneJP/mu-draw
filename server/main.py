@@ -15,11 +15,12 @@ checks the import).
 
 from __future__ import annotations
 
+import asyncio
 import datetime as dt
 import logging
 import os
 import time
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -58,6 +59,10 @@ MAX_COUNT_BODY = 2048
 # Apache sets this on count requests it keeps out of its access log (docs/server-setup.md (c)).
 # Without it, counts would sit in that log beside an address, so none is taken.
 UNLOGGED = "x-unlogged-count"
+# Name to structure's PubChem stereo check only adds to OPSIN's drawing, so it may not hold
+# the answer past the browser's deadline (8 s, web/src/api.ts): after this long OPSIN's
+# drawing goes back without it. 2 s are left for the rest of the round trip.
+STEREO_CHECK_S = 6.0
 
 
 class NameRequest(BaseModel):
@@ -167,9 +172,11 @@ def create_app(
     clock=None,
     opsin_command: tuple[str, ...] = OPSIN_COMMAND,
     embed: threed.Embed = threed.embed,
+    stereo_deadline: Callable[[], Awaitable[object]] = lambda: asyncio.sleep(STEREO_CHECK_S),
 ) -> FastAPI:
     """The app. Tests pass a replay transport, a temporary state folder, fake time and
-    stand-ins for OPSIN and the 3D embedding."""
+    stand-ins for OPSIN and the 3D embedding, and choose when the stereo check's deadline
+    passes."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -309,9 +316,22 @@ def create_app(
     async def with_pubchems_stereo(naming: Naming, name: str, mol):
         """OPSIN left stereo undefined (trivial names such as "nicotine" carry none in OPSIN).
         PubChem's record for the name, if it is the same compound with less left undefined
-        (Jeff, 2026-10-24); else None. PubChem trouble here never fails the request."""
+        (Jeff, 2026-10-24); else None. PubChem trouble here never fails the request, and
+        neither does a lookup still waiting at the deadline (STEREO_CHECK_S): a class's
+        requests queued behind PubChem's rate limit or its retries (docs/plans/v1-release.md,
+        review round 1). That lookup is dropped, so it holds no place in the queue."""
+        lookup = asyncio.ensure_future(by_name(naming, name))
+        deadline = asyncio.ensure_future(stereo_deadline())
         try:
-            record = await by_name(naming, name)
+            await asyncio.wait({lookup, deadline}, return_when=asyncio.FIRST_COMPLETED)
+        finally:
+            deadline.cancel()
+        if not lookup.done():
+            lookup.cancel()
+            log.warning("PubChem stereo check skipped: deadline")
+            return None
+        try:
+            record = lookup.result()
         except (Busy, Unavailable) as error:
             log.warning("PubChem stereo check skipped: %s", type(error).__name__)
             return None

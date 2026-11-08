@@ -275,6 +275,9 @@ All notable changes to this project. The format follows
   at full size, only half a line lower or higher. The saved drawing is unchanged.
 
 ### Fixed
+- Name to structure no longer waits for PubChem's stereo check past the browser's deadline:
+  with PubChem busy and a class typing names at once, most students got "not responding"
+  and nothing was drawn. After 6 s OPSIN's drawing goes back without PubChem's stereo.
 - Ketcher's full-screen button showed the editor alone: the header, the side panel and the
   Group button were gone until full screen ended. It now shows the whole app.
 - After Aromatize, or with an aromatic SMILES pasted in, a ring with an N-H (imidazole,

@@ -4,9 +4,11 @@ OPSIN is server/tests/fake_opsin.py here (its answers chosen by the name); the r
 runs in tests/test_name_to_structure_fixtures.py and test_opsin.py.
 """
 
+import asyncio
 import logging
 import uuid
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 from rdkit import Chem
@@ -31,6 +33,11 @@ def found(cid: int, smiles: str, title: str, more: int = 0) -> dict:
     return {"PropertyTable": {"Properties": rows}}
 
 
+async def never() -> None:
+    """A stereo-check deadline that doesn't pass: PubChem's answer decides."""
+    await asyncio.Event().wait()
+
+
 def app_with(tmp_path, fake_time, answers):
     server = FakePubChem(fake_time, answers)
     app = main.create_app(
@@ -40,6 +47,7 @@ def app_with(tmp_path, fake_time, answers):
         sleep=fake_time.sleep,
         clock=fake_time.clock,
         opsin_command=FAKE_OPSIN,
+        stereo_deadline=never,
     )
     return server, app
 
@@ -247,3 +255,45 @@ def test_opsins_structure_stays_unless_pubchem_has_the_same_with_stereo(
     assert response.status_code == 200
     assert (answer["source"], answer["stereo_from_pubchem"]) == ("OPSIN", False)
     assert answer["smiles"] == Chem.MolToSmiles(Chem.MolFromSmiles(undefined))
+
+
+def test_a_stereo_check_still_waiting_at_its_deadline_leaves_opsins_drawing(
+    tmp_path, fake_time, expected, caplog
+):
+    # A class's names queued behind PubChem's rate limit or its retries: PubChem has been
+    # asked and hasn't answered when the deadline passes. OPSIN's drawing goes back then.
+    butanol = compound(expected, "(R)-2-butanol")
+    asked: list[asyncio.Event] = []
+
+    async def holding(request: httpx.Request) -> httpx.Response:
+        asked[0].set()
+        await asyncio.Event().wait()  # never answers
+        raise AssertionError("unreachable")
+
+    async def once_asked() -> None:
+        await asked[0].wait()
+
+    asked.append(asyncio.Event())
+    app = main.create_app(
+        state_dir=tmp_path,
+        transport=httpx.MockTransport(holding),
+        limit=RateLimit(clock=fake_time.clock, sleep=fake_time.sleep),
+        sleep=fake_time.sleep,
+        clock=fake_time.clock,
+        opsin_command=FAKE_OPSIN,
+        stereo_deadline=once_asked,
+    )
+    undefined = without_stereo(butanol["smiles"])
+    with caplog.at_level(logging.WARNING), TestClient(app) as client:
+        response = post(client, f"ok:{undefined}")
+    answer = response.json()
+    assert asked[0].is_set()
+    assert response.status_code == 200
+    assert (answer["source"], answer["stereo_from_pubchem"]) == ("OPSIN", False)
+    assert answer["smiles"] == Chem.MolToSmiles(Chem.MolFromSmiles(undefined))
+    assert "PubChem stereo check skipped: deadline" in caplog.text
+
+
+def test_the_stereo_check_deadline_leaves_room_in_the_browsers_8_s():
+    # web/src/api.ts gives up at 8 s; the deadline leaves 2 s for OPSIN and the round trip.
+    assert main.STEREO_CHECK_S == 6.0
