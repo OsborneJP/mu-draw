@@ -7,10 +7,13 @@
 //   serializes in the page (no Indigo round trip), so the save made for a change is done
 //   before a reload or close can start. An IndexedDB write could still be pending.
 // - One key per base path: staging and production share an origin (and so a storage).
-// - Every window of the app shares that key, and the last save wins. So each window keeps
-//   the drawing it last restored or stored, and writes it back as it goes (pagehide: a
-//   reload, the update banner's Reload, a close): a window reloads into its own drawing,
-//   never another window's (docs/plans/v1-release.md, review round 1).
+// - Two copies under that key (docs/plans/v1-release.md, review rounds 1 and 2): one in
+//   localStorage, which every window of the app shares and where the last save wins, and the
+//   window's own in sessionStorage, which the browser keeps across the window's reloads and
+//   drops when it closes. A window starts from its own copy when it has one (a reload, the
+//   update banner's Reload), else from the shared one (a launch, a new window), which then
+//   becomes its own. So a reload brings back the window's own drawing, a launch the last one
+//   changed in any window, and nothing is written as a window closes.
 
 /** The parts of Ketcher that autosave uses (a fake in the unit tests). */
 export interface AutosaveEditor {
@@ -22,11 +25,14 @@ export interface AutosaveEditor {
 
 export type SaveStatus = 'saved' | 'failed';
 
+/** The copy a window started from: its own (a reload), or the one every window shares. */
+export type Copy = 'own' | 'shared';
+
 export function autosaveKey(base: string): string {
   return `autosave:${base}`;
 }
 
-function readSaved(storage: () => Storage, key: string): string | null {
+function read(storage: () => Storage, key: string): string | null {
   try {
     return storage().getItem(key);
   } catch {
@@ -34,36 +40,52 @@ function readSaved(storage: () => Storage, key: string): string | null {
   }
 }
 
-/** Put the saved drawing back, then save on every change. Resolves once changes are being
- * saved, with whether a drawing was restored. Never rejects. `storage` is a getter because
- * reading window.localStorage itself throws when the browser blocks storage. `page` is
- * where the page's pagehide is heard (the window). */
+/** Make `value` this window's own copy, or remove it (null). If it can't be written, the own
+ * copy goes, so a reload takes the shared one rather than an older own one. */
+export function keepOwn(own: () => Storage, key: string, value: string | null): void {
+  try {
+    if (value === null) own().removeItem(key);
+    else own().setItem(key, value);
+  } catch {
+    try {
+      own().removeItem(key);
+    } catch {
+      // Storage switched off: there is no own copy to go back to.
+    }
+  }
+}
+
+/** Put this window's drawing back, then save on every change. Resolves once changes are being
+ * saved, with whether a drawing was restored and from which copy. Never rejects. `shared` and
+ * `own` are getters (localStorage and sessionStorage) because reading window.localStorage
+ * itself throws when the browser blocks storage. */
 export async function startAutosave(
   editor: AutosaveEditor,
-  storage: () => Storage,
+  shared: () => Storage,
+  own: () => Storage,
   key: string,
   onStatus: (status: SaveStatus) => void,
-  page: EventTarget,
-): Promise<{ restored: boolean }> {
+): Promise<{ restored: boolean; from: Copy }> {
   // Restore before listening: loading the drawing is itself a change, and a change seen
   // before the restore would overwrite the saved drawing with an empty canvas.
   let restored = false;
-  // This window's drawing as last restored or stored; null until there is one.
-  let mine: string | null = null;
-  const saved = readSaved(storage, key);
-  if (saved !== null) {
+  const mine = read(own, key);
+  const from: Copy = mine === null ? 'shared' : 'own';
+  // An empty canvas's own copy is '' (getKet never gives that).
+  const saved = mine ?? read(shared, key);
+  if (saved) {
     try {
       await editor.setMolecule(saved);
       // Loading went into the undo history; Undo must not take the restored drawing away.
       editor.clearHistory();
       restored = true;
-      mine = saved;
     } catch {
       // Unreadable (it would take a Ketcher upgrade): start empty. The next change
       // replaces it. (Ketcher 3.18's setMolecule reports load errors to its error handler
       // and resolves anyway; that ends the same way.)
     }
   }
+  if (from === 'shared') keepOwn(own, key, saved ?? '');
   let latest = 0;
   editor.onChange(() => {
     const ticket = ++latest;
@@ -71,27 +93,20 @@ export async function startAutosave(
       (ket) => {
         // Only the newest change is written, whichever serialization finishes first.
         if (ticket !== latest) return;
+        let stored = true;
         try {
-          storage().setItem(key, ket);
-          mine = ket;
-          onStatus('saved');
+          shared().setItem(key, ket);
         } catch {
           // Usually the storage quota. The last good copy stays in storage.
-          onStatus('failed');
+          stored = false;
         }
+        keepOwn(own, key, ket);
+        onStatus(stored ? 'saved' : 'failed');
       },
       () => onStatus('failed'),
     );
   });
-  page.addEventListener('pagehide', () => {
-    if (mine === null) return; // nothing of this window's to keep
-    try {
-      storage().setItem(key, mine);
-    } catch {
-      // As for a change: what is stored stays.
-    }
-  });
-  return { restored };
+  return { restored, from };
 }
 
 // What the header shows: whether the last save worked.

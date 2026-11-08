@@ -34,6 +34,13 @@ async function stored(page: Page): Promise<string | null> {
   return page.evaluate((key) => localStorage.getItem(key), KEY);
 }
 
+/** Put a reference compound on the canvas; resolves with what autosave stored for it. */
+async function draw(page: Page, smiles: string): Promise<string> {
+  const saved = await nextAutosave(page);
+  await page.evaluate((s) => window.ketcher!.setMolecule(s), smiles);
+  return saved();
+}
+
 test('autosave: the drawing survives reloads offline, and Undo stops at the restored drawing', async ({
   app,
 }) => {
@@ -93,11 +100,6 @@ test('autosave: with two windows open, each reloads into its own drawing', async
   // Every window shares one saved drawing; the last save wins. A reload must bring back the
   // window's own drawing, not the other window's later save (docs/plans/v1-release.md).
   const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
-  const draw = async (page: Page, smiles: string) => {
-    const saved = await nextAutosave(page);
-    await page.evaluate((s) => window.ketcher!.setMolecule(s), smiles);
-    return saved();
-  };
   await openEditor(app);
   const first = app.page;
   await draw(first, aspirin.smiles);
@@ -114,6 +116,28 @@ test('autosave: with two windows open, each reloads into its own drawing', async
   await second.reload();
   await waitForEditor(app, second);
   expect(await inchiKey(second)).toBe(caffeine.inchikey);
+});
+
+test('autosave: closing a window that sat idle keeps the drawing since made in another', async ({ app }) => {
+  // Nothing is written as a window closes: a forgotten second window, closed last, must not put
+  // back the drawing it opened with over the student's later work (docs/plans/v1-release.md,
+  // review round 2).
+  const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
+  await openEditor(app);
+  const first = app.page;
+  await draw(first, aspirin.smiles);
+  const idle = await app.newPage();
+  await idle.goto(first.url());
+  await waitForEditor(app, idle);
+  expect(await inchiKey(idle)).toBe(aspirin.inchikey);
+  await draw(first, caffeine.smiles);
+  await idle.close();
+
+  // A window opened now, as at the next launch, shows the later drawing.
+  const next = await app.newPage();
+  await next.goto(first.url());
+  await waitForEditor(app, next);
+  expect(await inchiKey(next)).toBe(caffeine.inchikey);
 });
 
 test('autosave: the drawing survives quitting and relaunching the browser', async ({ app }) => {
@@ -136,12 +160,13 @@ test("autosave starts once, although Ketcher calls the app's onInit twice", asyn
     counter.__writes = 0;
     const setItem = Storage.prototype.setItem;
     Storage.prototype.setItem = function (this: Storage, name: string, value: string) {
-      if (name === key) counter.__writes++;
+      if (this === localStorage && name === key) counter.__writes++;
       setItem.call(this, name, value);
     };
   }, KEY);
 
-  // One change, one save. (All saves for a change are written in the same task.)
+  // One change, one save (to the copy all windows share; the window's own has its own write).
+  // All saves for a change are written in the same task.
   const saved = await nextAutosave(page);
   await placeRing(page, { x: 150, y: 150 });
   await saved();

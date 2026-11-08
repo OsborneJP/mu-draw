@@ -122,15 +122,15 @@ function tidy(selection: unknown) {
 }
 
 /** Start the store on a fake Ketcher and group both molecules and the text. */
-function grouped(storage: Storage = memoryStorage()) {
+function grouped(storage: Storage = memoryStorage(), own: Storage = memoryStorage()) {
   const { fake, ketcher } = fakeKetcher(drawing());
-  store.startGroups(ketcher, () => storage, KEY, fake.events, true);
+  store.startGroups(ketcher, () => storage, () => own, KEY, fake.events, 'shared');
   fake.selection({ atoms: [0, 2], texts: [0] });
   expect(store.getGroupState().offer).toBe('group');
   store.groupSelection();
   expect(tidy(fake.selection())).toEqual(WHOLE);
   expect(store.getGroupState().offer).toBe('ungroup');
-  return { fake, storage };
+  return { fake, storage, own };
 }
 
 describe('the store on a Ketcher', () => {
@@ -267,7 +267,7 @@ describe('the store on a Ketcher', () => {
 
   it('leaves a double-click outside every group to Ketcher (it edits every selected atom)', () => {
     const { fake, ketcher } = fakeKetcher(drawing());
-    store.startGroups(ketcher, () => memoryStorage(), KEY, fake.events, true);
+    store.startGroups(ketcher, () => memoryStorage(), () => memoryStorage(), KEY, fake.events, 'shared');
     // The first molecule and the text grouped; the second molecule selected, not grouped.
     fake.selection({ atoms: [0], texts: [0] });
     store.groupSelection();
@@ -299,7 +299,7 @@ describe('the store on a Ketcher', () => {
     const { fake, ketcher } = fakeKetcher(drawing('second molecule first'));
     // Ketcher has put back the selection saved with the drawing: part of the group.
     fake.selection({ atoms: [0, 1] });
-    store.startGroups(ketcher, () => storage, KEY, fake.events, true);
+    store.startGroups(ketcher, () => storage, () => memoryStorage(), KEY, fake.events, 'shared');
     expect(tidy(fake.selection())).toEqual(WHOLE);
     expect(store.getGroupState().offer).toBe('ungroup');
     fake.selection(null);
@@ -308,59 +308,72 @@ describe('the store on a Ketcher', () => {
   });
 
   it('keeps nothing in storage while there are no groups', () => {
-    const storage = memoryStorage();
+    const [storage, own] = [memoryStorage(), memoryStorage()];
     const { fake, ketcher } = fakeKetcher(drawing());
-    store.startGroups(ketcher, () => storage, KEY, fake.events, true);
+    store.startGroups(ketcher, () => storage, () => own, KEY, fake.events, 'shared');
     fake.change();
-    expect(storage.length).toBe(0);
+    expect([storage.length, own.length]).toEqual([0, 0]);
     fake.selection({ atoms: [0, 2] });
     store.groupSelection();
     expect(JSON.parse(storage.getItem(KEY)!).groups).toHaveLength(1);
+    expect(own.getItem(KEY)).toBe(storage.getItem(KEY));
     store.ungroupSelection();
-    expect(storage.length).toBe(0);
+    expect([storage.length, own.length]).toEqual([0, 0]);
   });
 
-  it("writes this window's groups back as it goes, over another window's", async () => {
-    // Two windows share one key: the second, grouping only one molecule, replaced the first's.
-    const { fake: first, storage } = grouped();
-    const firsts = storage.getItem(KEY);
+  it("a reload brings back this window's own groups, though another window saved since", async () => {
+    // Every window shares one copy, where the last save wins; each also keeps its own.
+    const { storage: shared, own: firstOwn } = grouped();
+    const firsts = shared.getItem(KEY);
+    expect(firstOwn.getItem(KEY)).toBe(firsts);
     vi.resetModules();
     store = await import('./groupStore');
-    const { fake: second, ketcher } = fakeKetcher(drawing());
-    store.startGroups(ketcher, () => storage, KEY, second.events, true);
-    second.selection(null);
-    second.selection({ atoms: [0] });
+    // A second window, from the shared copy, groups only the second molecule.
+    const secondOwn = memoryStorage();
+    const second = fakeKetcher(drawing());
+    store.startGroups(second.ketcher, () => shared, () => secondOwn, KEY, second.fake.events, 'shared');
+    second.fake.selection(null);
+    second.fake.selection({ atoms: [0] });
     store.ungroupSelection();
-    second.selection({ atoms: [2, 3] });
+    second.fake.selection({ atoms: [2, 3] });
     store.groupSelection();
-    const seconds = storage.getItem(KEY);
-    expect(seconds).not.toBe(firsts);
-    // The first reloads: its own groups are there for it. The second, closing later: its own.
-    first.events.dispatchEvent(new Event('pagehide'));
-    expect(storage.getItem(KEY)).toBe(firsts);
-    second.events.dispatchEvent(new Event('pagehide'));
-    expect(storage.getItem(KEY)).toBe(seconds);
-  });
-
-  it("a window whose restored drawing has no groups takes another window's away as it goes", async () => {
-    const { storage } = grouped();
+    expect(shared.getItem(KEY)).not.toBe(firsts);
+    expect(secondOwn.getItem(KEY)).toBe(shared.getItem(KEY));
+    // The first reloads: its own groups, the whole drawing in one.
     vi.resetModules();
     store = await import('./groupStore');
-    storage.removeItem(KEY); // this window started on a drawing without groups
-    const { fake, ketcher } = fakeKetcher(drawing());
-    store.startGroups(ketcher, () => storage, KEY, fake.events, true);
-    storage.setItem(KEY, "another window's groups");
-    fake.events.dispatchEvent(new Event('pagehide'));
-    expect(storage.getItem(KEY)).toBeNull();
+    const reloaded = fakeKetcher(drawing());
+    store.startGroups(reloaded.ketcher, () => shared, () => firstOwn, KEY, reloaded.fake.events, 'own');
+    reloaded.fake.selection({ atoms: [0] });
+    expect(tidy(reloaded.fake.selection())).toEqual(WHOLE);
   });
 
-  it('a window with no drawing of its own writes nothing as it goes', () => {
-    const storage = memoryStorage();
+  it('takes the shared groups as its own with the shared drawing, before any change', async () => {
+    const { storage: shared } = grouped();
+    vi.resetModules();
+    store = await import('./groupStore');
+    const own = memoryStorage();
+    own.setItem(KEY, 'left from before');
     const { fake, ketcher } = fakeKetcher(drawing());
-    store.startGroups(ketcher, () => storage, KEY, fake.events, false);
-    storage.setItem(KEY, "another window's groups");
-    fake.events.dispatchEvent(new Event('pagehide'));
-    expect(storage.getItem(KEY)).toBe("another window's groups");
+    store.startGroups(ketcher, () => shared, () => own, KEY, fake.events, 'shared');
+    expect(own.getItem(KEY)).toBe(shared.getItem(KEY));
+    // And none, when the shared drawing has none.
+    shared.removeItem(KEY);
+    vi.resetModules();
+    store = await import('./groupStore');
+    const next = fakeKetcher(drawing());
+    store.startGroups(next.ketcher, () => shared, () => own, KEY, next.fake.events, 'shared');
+    expect(own.getItem(KEY)).toBeNull();
+  });
+
+  it("a window whose own drawing has no groups starts with none, whatever the shared copy has", async () => {
+    const { storage: shared } = grouped();
+    vi.resetModules();
+    store = await import('./groupStore');
+    const { fake, ketcher } = fakeKetcher(drawing());
+    store.startGroups(ketcher, () => shared, () => memoryStorage(), KEY, fake.events, 'own');
+    fake.selection({ atoms: [0] });
+    expect(tidy(fake.selection())).toEqual({ atoms: [0] });
   });
 
   it('works for the session when storage fails', () => {
@@ -371,7 +384,7 @@ describe('the store on a Ketcher', () => {
     broken.setItem = () => {
       throw new Error('storage full');
     };
-    const { fake } = grouped(broken);
+    const { fake } = grouped(broken, broken);
     fake.selection(null);
     fake.selection({ texts: [0] });
     expect(tidy(fake.selection())).toEqual(WHOLE);
@@ -379,7 +392,7 @@ describe('the store on a Ketcher', () => {
 
   it('puts the button beside Ketcher’s floating tools while they show on the canvas, and tells its listeners', () => {
     const { fake, ketcher } = fakeKetcher(drawing());
-    store.startGroups(ketcher, () => memoryStorage(), KEY, fake.events, true);
+    store.startGroups(ketcher, () => memoryStorage(), () => memoryStorage(), KEY, fake.events, 'shared');
     const heard = vi.fn();
     store.subscribeGroups(heard);
     fake.floatingTools({ visible: true, rotateHandlePosition: { x: 300, y: 200 } });

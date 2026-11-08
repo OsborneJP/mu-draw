@@ -15,6 +15,7 @@
 // - The Group / Ungroup button sits beside Ketcher's own floating tools (flip, delete) when they
 //   show, which they do over a selection; groupButton.css anchors it there.
 import type { Ketcher } from 'ketcher-core';
+import { keepOwn, type Copy } from './autosave';
 import { carried, grouped, OBJECT_KINDS, offer, restored, saved, selectionOf, ungrouped, widened, type Canvas, type Drawing, type Group, type ObjectKind, type Point, type Selection } from './groups';
 
 export function groupsKey(base: string): string {
@@ -174,56 +175,43 @@ function editOne(event: Event): void {
 }
 
 /** Restore the saved groups onto the restored drawing, then keep them: call once the
- * autosave has put the drawing back, saying whether it did (`drawingRestored`). `storage` is
- * a getter, as for the autosave; `events` is where double-clicks are heard first (the window,
- * capturing) and where the page's pagehide is heard. */
+ * autosave has put the drawing back, saying which copy it took (`from`). The groups are kept
+ * as the drawing is, in the copy every window shares and in the window's own (autosave.ts).
+ * `shared` and `own` are getters, as for the autosave; `events` is where double-clicks are
+ * heard first (the window, capturing). */
 export function startGroups(
   ketcher: Ketcher,
-  storage: () => Storage,
+  shared: () => Storage,
+  own: () => Storage,
   key: string,
   events: EventTarget,
-  drawingRestored: boolean,
+  from: Copy,
 ): void {
   editor = ketcher.editor as unknown as Editor;
   drawing = editor.struct();
   others = new WeakMap();
-  // This window's groups as last restored or stored (null: none), as the autosave keeps its
-  // drawing: written back on the way out, so a reload never takes another window's groups.
-  // Undefined while this window has no drawing of its own, so nothing is written for it.
-  let mine: string | null | undefined;
   persist = (current, struct) => {
     try {
       // Nothing is kept while there are no groups (Practice, for one, stores nothing).
       const kept = saved(current, canvasOf(struct), whereIn(struct));
-      if (kept.groups.length > 0) {
-        const text = JSON.stringify(kept);
-        storage().setItem(key, text);
-        mine = text;
-      } else {
-        storage().removeItem(key);
-        mine = null;
-      }
+      const text = kept.groups.length > 0 ? JSON.stringify(kept) : null;
+      keepOwn(own, key, text);
+      if (text === null) shared().removeItem(key);
+      else shared().setItem(key, text);
     } catch {
       // Storage off or full: the groups last until the page closes. The drawing's own
       // autosave reports storage trouble in the header.
     }
   };
+  let text: string | null = null;
   try {
-    const kept = storage().getItem(key);
-    groups = kept ? restored(JSON.parse(kept), canvasOf(drawing), whereIn(drawing)) : [];
-    if (drawingRestored) mine = kept;
+    text = (from === 'own' ? own : shared)().getItem(key);
+    groups = text ? restored(JSON.parse(text), canvasOf(drawing), whereIn(drawing)) : [];
   } catch {
     groups = [];
   }
-  events.addEventListener('pagehide', () => {
-    if (mine === undefined) return;
-    try {
-      if (mine === null) storage().removeItem(key);
-      else storage().setItem(key, mine);
-    } catch {
-      // What is stored stays.
-    }
-  });
+  // The shared copy's groups, beside the shared drawing the window took as its own.
+  if (from === 'shared') keepOwn(own, key, text);
   // A pipeline event: each handler must hand on what it was given.
   editor.event.selectionChange.add((value) => {
     selectionChanged();

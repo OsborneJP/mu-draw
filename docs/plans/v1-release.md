@@ -92,8 +92,100 @@ runs meanwhile; it changes nothing by itself, and its fixes follow the bar below
 
 ## Review rounds
 
-(Filled in as the review runs.)
+### Round 1 (2026-11-07): six reviewers, two skeptics for each finding
+
+One reviewer for each area of B.1. They raised 18 findings; 9 stood through both skeptics.
+Fixed, each with a test that fails on the build before (staging's, at 4067287):
+- **High: with two windows open, a reload lost a drawing.** Every window shares one autosaved
+  drawing, and the last save wins: the update banner's Reload, or a refresh, brought back the
+  other window's drawing. Each window now writes its own back as it goes (fadf6b0).
+- **High: Aromatize hid an aromatic N-H from RDKit.** Ketcher keeps it only as an H count its
+  Molfile writer drops. Imidazole, histidine, purines and pyrimidine bases showed no values;
+  guanine and allopurinol showed a formula two H short. The worker now gives RDKit those
+  hydrogens (75cdee5).
+- **Medium: Ketcher's full-screen button showed the editor alone,** without the header, the
+  panels or the Group button. The whole app goes full screen now (ec227e4).
+- **Medium: Name to structure waited for PubChem's stereo check.** With PubChem busy, 20 of a
+  class of 30 got "not responding" and nothing was drawn. The check gives up at 6 s (4336c3c).
+- **Medium: Safety under a class's load.** Its two PubChem lookups for 30 students take 12 s
+  at PubChem's limit, so 20 of 30 got "not responding" at 8 s. Safety waits 15 s now, which
+  changes the Safety plan's 8 s (1be04ff).
+
+### Round 2 (2026-11-08): the five fixes only, two skeptics for each finding
+
+Two fixes caused new problems, so under B.6 the review stopped here and a simpler design went
+to Jeff instead of another patch:
+- **High, caused by fadf6b0 (two windows):** the write-back on the way out also runs when a
+  window closes. An idle second window, still holding the drawing it restored, writes it over
+  the student's later work when it is closed last, and the next launch shows the old drawing.
+  Beside a window still on the build before (during an update), the new window's write
+  replaces the old window's newer drawing. Both skeptics reproduced both.
+- **Medium, caused by 75cdee5 (aromatic N-H):** the tautomer and resonance cards now get the
+  Kekulé bonds too, so a ring the student drew aromatic no longer counts as either order:
+  aromatized pyridinium, readable before, lost its second "Your drawing" card and highlights
+  all six ring bonds.
+- **Medium, older than ec227e4 (full screen; one skeptic dropped it as out of scope):**
+  Ketcher's drop-down lists (Save's file format, the atom and bond dialogs, Settings, the
+  abbreviation lookup) open outside the app's root, so in full screen they are invisible.
+  Marking the whole page instead of the app's root fixes it too (a skeptic's probe).
+
+Its lows: the stereo-check test passes with the cancel removed, and would hang rather than
+fail if the race regressed; the Safety tests pin a constant rather than a class's load;
+requestSafety's comment still says it has Get name's deadline.
+
+### The simpler designs (Jeff approved them on 2026-11-08)
+
+Each has a test that fails on the commit before it, and its own commit after check.sh.
+1. **Each window keeps its own copy** (in place of fadf6b0's write-back).
+   - Every change is saved twice: to the copy all windows share (localStorage, as before),
+     and to this window's own copy (sessionStorage, which the browser keeps for the window
+     across reloads and drops when it closes). The same for the groups.
+   - A window starts from its own copy when it has one (a reload, the update banner's
+     Reload), else from the shared one (a launch, a new window), which becomes its own at
+     once. Nothing is written when a window is hidden or closed.
+   - If the own copy can't be written, it is removed, so a reload takes the shared copy
+     rather than an older own one.
+   - Tests: an idle second window closed last leaves the student's later drawing for the
+     next launch (e2e, fails on 1be04ff); the two-windows reload test stays.
+   - Limit: a window still on production's build before this one has no own copy, so its
+     first reload into the new build can bring back another window's drawing, as before.
+2. **Tautomers and resonance get the hydrogens with the bonds as drawn.** Their requests
+   get the noted hydrogens as atoms and the drawing's own bond types; the properties panel,
+   NMR and stereoisomers keep 75cdee5's Kekulé bonds. Tests: for every forms fixture written
+   aromatic as Ketcher writes it, the lists are those of the drawing without 75cdee5 wherever
+   RDKit read that as the compound drawn, and listed for the rings it couldn't read.
+3. **Full screen marks the whole page** (`<html>`, not the app's root), so Ketcher's lists,
+   which open outside the root, show in full screen. Test: Save's format list is under the
+   pointer in full screen (e2e, fails on 1be04ff).
+4. requestSafety's comment names its own deadline.
+
+Round 3 reviews these changes only, as round 2 did, and is the last.
 
 ## Accepted limits
 
-(Filled in from the review's lows.)
+From round 1: the lows that stood, and the findings the skeptics dropped as breaking nothing
+in the bar though their mechanism is real.
+- **Esc doesn't close Ketcher's own dialogs** (Open, Save, Settings, Structure Library,
+  Periodic Table) unless a text field has the focus: Ketcher's macromolecules editor, mounted
+  though it is disabled, takes the key. Cancel and × close them; the app's dialogs close on Esc.
+- **The 3D panel scrolls sideways by 2 px** (its viewer's border); Windows shows a scrollbar.
+- **The header at 125% or 150% zoom on a laptop:** below about 1,020 px of page width the
+  labels wrap out of the bar, and below about 900 px About goes off the edge and the page
+  scrolls sideways.
+- **The name cache keeps the time of each lookup to the microsecond,** so someone who can read
+  both it and Apache's access log could match a cached structure, or a typed name that named
+  nothing, to an address. Both files are readable only on the server.
+- **Lookups carry other osbornelab apps' cookies** (a Path=/ cookie). The API never reads them
+  and Apache doesn't log them.
+- **TPSA exactly at a tie** (x.25, as for ethanolamine) shows rounded up in the panel and
+  rounded to even by the fixture generator; no fixture compound has one.
+- **With PubChem busy,** a class's retries wait behind its first attempts, so students see
+  "not responding" rather than "Busy, try again shortly".
+- **If the env's java can't run when the API starts** (during an env update), the whole API
+  fails to start, not only OPSIN.
+- **A deploy that changes server code** publishes the new web build before the API is
+  restarted; until then a new endpoint says "not responding".
+- **One conda env** serves development and both API units; needrestart restarts the units
+  unattended onto whatever env is on disk.
+- **The usage totals are not backed up,** and a rename starts a new state directory, leaving
+  the old totals in the old one.

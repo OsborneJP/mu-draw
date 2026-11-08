@@ -66,9 +66,10 @@ function onInit(ketcher: Ketcher) {
   widenTemplateReach(ketcher);
   // Ready once the last drawing is back on the canvas and changes are being saved.
   const key = autosaveKey(import.meta.env.BASE_URL);
-  void startAutosave(autosaveEditor(ketcher), () => window.localStorage, key, setSaveStatus, window).then(({ restored }) => {
+  const [shared, own] = [() => window.localStorage, () => window.sessionStorage];
+  void startAutosave(autosaveEditor(ketcher), shared, own, key, setSaveStatus).then(({ from }) => {
     // The groups beside the restored drawing (docs/plans/v2-grouping.md).
-    startGroups(ketcher, () => window.localStorage, groupsKey(import.meta.env.BASE_URL), window, restored);
+    startGroups(ketcher, shared, own, groupsKey(import.meta.env.BASE_URL), window, from);
     setKetcher(ketcher);
     window.dispatchEvent(new Event('editor-ready'));
   });
