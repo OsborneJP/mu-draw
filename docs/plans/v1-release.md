@@ -161,7 +161,57 @@ Each has a test that fails on the commit before it, and its own commit after che
 
 Round 3 reviews these changes only, as round 2 did, and is the last.
 
+Built and committed, each after check.sh: 7526c6c (own copies), c717f41 (bonds as drawn),
+965207a (full screen), fd867d3 (the comment, and AGENTS.md's note on Safety's 15 s).
+
+### Round 3 (2026-11-08): the four commits above, two skeptics for each finding
+
+The full-screen change stood. The other two each caused a new problem, which both skeptics
+reproduced, so under B.6 the review stopped and the choice went to Jeff:
+- **High, caused by 7526c6c (own copies):** the browser keeps a tab's sessionStorage across
+  navigations in that tab, not only across reloads. A student draws X in a tab, goes to
+  another site in it, draws Y in another window and closes it; back in the first tab (a
+  bookmark, the address typed, Back) the app takes the tab's own copy, X. The next change
+  there writes X's drawing over Y in the shared copy, and Y is gone. A tab that first opened
+  empty reopens empty. Production (4067287) shows Y.
+- **Medium, caused by c717f41 (bonds as drawn):** Ketcher keeps an aromatic N's old H count
+  after a bond is added to it, so a methyl on aromatized imidazole's N-H (or histidine's,
+  adenine's, pasted indole's) still sends a note. readableMolfile drops a note RDKit can't use,
+  but the tautomer and resonance path has no such fallback: both lists say RDKit can't
+  interpret the drawing, where at 7526c6c they were listed.
+
+Its lows:
+- The new forms tests note every aromatic H; the app notes only the atoms Indigo gives an H
+  count (N-H, N+-H, charged carbons). So in the app pyridine N-oxide and warfarin get no note,
+  and c717f41's message is wrong that they lost a card (aromatized pyridinium did). No test
+  sends a forms request through the worker's dispatch.
+- The new full-screen test's comment points to src/App.tsx; the marker is in web/index.html.
+
+The review took about a day of work rather than the three hours planned.
+
+### Jeff's decision (2026-11-09): step back on both
+
+- **Autosave is production's again** (4067287's autosave.ts and groupStore.ts): one copy that
+  every window shares, where the last change wins. Round 1's two-windows finding becomes an
+  accepted limit (below). Two smoke tests keep rounds 2 and 3's failures out: an idle window
+  closed last, and the app opened again in a tab that showed other sites since.
+- **The tautomer and resonance lists read the drawing without the aromatic-H note,** exactly
+  as production's do. The properties panel, NMR and stereoisomers keep 75cdee5. An aromatized
+  ring with an N-H gets no lists, as in production: an accepted limit (below).
+- The full-screen change stays. A design that keeps each window's drawing, or that lists the
+  forms of an aromatized N-H ring, can come after 1.0, each with its own plan.
+
 ## Accepted limits
+
+From rounds 1 to 3, by Jeff's decision of 2026-11-09:
+- **With the app open in two windows, a reload shows the drawing last changed in either**
+  (a refresh, the update banner's Reload). The reloaded window's own drawing is lost if the
+  other window changed its drawing since. Each window keeps what it shows until it reloads.
+  Round 1 rated it high; the two designs tried for it lost work in other ways (rounds 2, 3).
+- **After Aromatize, a ring with an N-H gets no tautomers or resonance structures**
+  (imidazole, histidine, purines, pyrimidine bases, indole): "RDKit can't interpret this
+  structure", because Ketcher's Molfile drops that H. Drawn with Kekulé bonds (Ketcher's
+  Dearomatize) it gets both lists. This is production's behaviour.
 
 From round 1: the lows that stood, and the findings the skeptics dropped as breaking nothing
 in the bar though their mechanism is real.

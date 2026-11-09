@@ -15,9 +15,6 @@ class FakeStorage {
     if (this.refuse) throw new DOMException('quota', 'QuotaExceededError');
     this.items.set(key, value);
   }
-  removeItem(key: string): void {
-    this.items.delete(key);
-  }
   asStorage(): () => Storage {
     return () => this as unknown as Storage;
   }
@@ -80,9 +77,8 @@ describe('autosave', () => {
     const editor = new FakeEditor();
     const statuses: SaveStatus[] = [];
 
-    expect(await startAutosave(editor, storage.asStorage(), new FakeStorage().asStorage(), KEY, (s) => statuses.push(s))).toEqual({
+    expect(await startAutosave(editor, storage.asStorage(), KEY, (s) => statuses.push(s))).toEqual({
       restored: true,
-      from: 'shared',
     });
     expect(editor.calls).toEqual(['setMolecule saved drawing', 'clearHistory', 'onChange']);
     expect(editor.canvas).toBe('saved drawing');
@@ -97,7 +93,7 @@ describe('autosave', () => {
     storage.items.set(KEY, 'saved drawing');
     const editor = new FakeEditor();
     editor.loading = deferred<void>();
-    const started = startAutosave(editor, storage.asStorage(), new FakeStorage().asStorage(), KEY, () => {});
+    const started = startAutosave(editor, storage.asStorage(), KEY, () => {});
 
     // Ketcher reports a change while the canvas is still empty.
     await editor.edit('');
@@ -112,7 +108,7 @@ describe('autosave', () => {
   it('with nothing saved, starts empty and saves the first change', async () => {
     const storage = new FakeStorage();
     const editor = new FakeEditor();
-    expect(await startAutosave(editor, storage.asStorage(), new FakeStorage().asStorage(), KEY, () => {})).toEqual({ restored: false, from: 'shared' });
+    expect(await startAutosave(editor, storage.asStorage(), KEY, () => {})).toEqual({ restored: false });
     expect(editor.calls).toEqual(['onChange']);
     await editor.edit('first drawing');
     expect(storage.items.get(KEY)).toBe('first drawing');
@@ -125,7 +121,7 @@ describe('autosave', () => {
     ]) {
       const storage = new FakeStorage();
       const editor = new FakeEditor();
-      await startAutosave(editor, storage.asStorage(), new FakeStorage().asStorage(), KEY, () => {});
+      await startAutosave(editor, storage.asStorage(), KEY, () => {});
       editor.pendingKets = [];
       editor.change();
       editor.change();
@@ -145,7 +141,7 @@ describe('autosave', () => {
     const storage = new FakeStorage();
     storage.items.set(KEY, 'drawing at /one/');
     const other = new FakeEditor();
-    expect(await startAutosave(other, storage.asStorage(), new FakeStorage().asStorage(), otherKey, () => {})).toEqual({ restored: false, from: 'shared' });
+    expect(await startAutosave(other, storage.asStorage(), otherKey, () => {})).toEqual({ restored: false });
     await other.edit('drawing at /two/');
     expect(storage.items.get(KEY)).toBe('drawing at /one/');
   });
@@ -154,7 +150,7 @@ describe('autosave', () => {
     const storage = new FakeStorage();
     const editor = new FakeEditor();
     const statuses: SaveStatus[] = [];
-    await startAutosave(editor, storage.asStorage(), new FakeStorage().asStorage(), KEY, (s) => statuses.push(s));
+    await startAutosave(editor, storage.asStorage(), KEY, (s) => statuses.push(s));
     await editor.edit('small drawing');
     storage.refuse = true;
     await editor.edit('huge drawing');
@@ -175,74 +171,10 @@ describe('autosave', () => {
       editor.calls.push(`setMolecule ${ket}`);
       throw new Error('cannot parse');
     };
-    expect(await startAutosave(editor, storage.asStorage(), new FakeStorage().asStorage(), KEY, () => {})).toEqual({ restored: false, from: 'shared' });
+    expect(await startAutosave(editor, storage.asStorage(), KEY, () => {})).toEqual({ restored: false });
     expect(editor.calls).toEqual(['setMolecule unreadable', 'onChange']);
     await editor.edit('new drawing');
     expect(storage.items.get(KEY)).toBe('new drawing');
-  });
-
-  it("a reload brings back this window's own drawing, a new window the last one saved", async () => {
-    // Every window shares one copy, where the last save wins; each also keeps its own.
-    const shared = new FakeStorage();
-    shared.items.set(KEY, 'drawing X');
-    const [firstOwn, secondOwn] = [new FakeStorage(), new FakeStorage()];
-    const open = async (own: FakeStorage) => {
-      const editor = new FakeEditor();
-      const started = await startAutosave(editor, shared.asStorage(), own.asStorage(), KEY, () => {});
-      return { editor, started };
-    };
-    expect((await open(firstOwn)).started).toEqual({ restored: true, from: 'shared' });
-    const second = await open(secondOwn);
-    await second.editor.edit('drawing Y');
-    expect(shared.getItem(KEY)).toBe('drawing Y');
-    // The first, idle, reloads (the update banner's Reload, say): its own drawing.
-    const first = await open(firstOwn);
-    expect(first.started).toEqual({ restored: true, from: 'own' });
-    expect(first.editor.canvas).toBe('drawing X');
-    // The second its own; a new window, or the next launch, the last one saved.
-    expect((await open(secondOwn)).editor.canvas).toBe('drawing Y');
-    expect((await open(new FakeStorage())).editor.canvas).toBe('drawing Y');
-  });
-
-  it('a window that started empty reloads empty, whatever another window saved since', async () => {
-    const [shared, own] = [new FakeStorage(), new FakeStorage()];
-    await startAutosave(new FakeEditor(), shared.asStorage(), own.asStorage(), KEY, () => {});
-    shared.items.set(KEY, "another window's drawing");
-    const reloaded = new FakeEditor();
-    expect(await startAutosave(reloaded, shared.asStorage(), own.asStorage(), KEY, () => {})).toEqual({ restored: false, from: 'own' });
-    expect(reloaded.calls).toEqual(['onChange']);
-  });
-
-  it("drops the window's own copy when the browser refuses to update it, so a reload takes the shared one", async () => {
-    const [shared, own] = [new FakeStorage(), new FakeStorage()];
-    const editor = new FakeEditor();
-    const statuses: SaveStatus[] = [];
-    await startAutosave(editor, shared.asStorage(), own.asStorage(), KEY, (s) => statuses.push(s));
-    await editor.edit('small drawing');
-    expect(own.getItem(KEY)).toBe('small drawing');
-    own.refuse = true;
-    await editor.edit('larger drawing');
-    expect(own.getItem(KEY)).toBeNull();
-    // Saved: the shared copy, which the next launch takes, has it.
-    expect(statuses).toEqual(['saved', 'saved']);
-    own.refuse = false;
-    const reloaded = new FakeEditor();
-    expect(await startAutosave(reloaded, shared.asStorage(), own.asStorage(), KEY, () => {})).toEqual({ restored: true, from: 'shared' });
-    expect(reloaded.canvas).toBe('larger drawing');
-  });
-
-  it('works from the shared copy alone when the window can have none of its own', async () => {
-    const shared = new FakeStorage();
-    shared.items.set(KEY, 'saved drawing');
-    const editor = new FakeEditor();
-    const statuses: SaveStatus[] = [];
-    const blocked = () => {
-      throw new DOMException('blocked', 'SecurityError');
-    };
-    expect(await startAutosave(editor, shared.asStorage(), blocked, KEY, (s) => statuses.push(s))).toEqual({ restored: true, from: 'shared' });
-    await editor.edit('edited drawing');
-    expect(shared.getItem(KEY)).toBe('edited drawing');
-    expect(statuses).toEqual(['saved']);
   });
 
   it('starts empty, and reports failed saves, when the browser blocks storage', async () => {
@@ -251,7 +183,7 @@ describe('autosave', () => {
     const blocked = () => {
       throw new DOMException('blocked', 'SecurityError');
     };
-    expect(await startAutosave(editor, blocked, blocked, KEY, (s) => statuses.push(s))).toEqual({ restored: false, from: 'shared' });
+    expect(await startAutosave(editor, blocked, KEY, (s) => statuses.push(s))).toEqual({ restored: false });
     await editor.edit('drawing');
     expect(statuses).toEqual(['failed']);
   });

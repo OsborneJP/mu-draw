@@ -288,10 +288,6 @@ All notable changes to this project. The format follows
   histidine, purines, pyrimidine bases, indole) showed no properties, NMR, stereo, tautomers
   or resonance, and guanine and allopurinol showed a formula two H short. RDKit is now given
   those hydrogens, so the panels show the same values as before Aromatize.
-- With the app open in two windows, a reload (the update banner's Reload, a refresh) brought
-  back the other window's drawing, and this window's was lost. Each window now keeps its own
-  copy and reloads into its own drawing and groups; a launch brings back the last drawing
-  changed in any window.
 - The Group / Ungroup button no longer goes off the canvas with Ketcher's floating tools when
   a selection reaches the top or an edge of the canvas; it stays where it can be clicked.
 - The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds

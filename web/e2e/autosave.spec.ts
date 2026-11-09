@@ -96,32 +96,14 @@ test('autosave: the drawing survives reloads offline, and Undo stops at the rest
   expect(uploads).toEqual([]);
 });
 
-test('autosave: with two windows open, each reloads into its own drawing', async ({ app }) => {
-  // Every window shares one saved drawing; the last save wins. A reload must bring back the
-  // window's own drawing, not the other window's later save (docs/plans/v1-release.md).
-  const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
-  await openEditor(app);
-  const first = app.page;
-  await draw(first, aspirin.smiles);
-  const second = await app.newPage();
-  await second.goto(first.url());
-  await waitForEditor(app, second);
-  // The second window's save replaced the first's drawing in storage.
-  const secondSaved = await draw(second, caffeine.smiles);
-  expect(await stored(first)).toBe(secondSaved);
-
-  await first.reload();
-  await waitForEditor(app, first);
-  expect(await inchiKey(first)).toBe(aspirin.inchikey);
-  await second.reload();
-  await waitForEditor(app, second);
-  expect(await inchiKey(second)).toBe(caffeine.inchikey);
-});
+// Every window of the app shares one saved drawing, and the last change wins: with two windows
+// open, a reload shows the drawing last changed in either (an accepted limit,
+// docs/plans/v1-release.md). Two designs that gave each window its own drawing lost the
+// student's later work in other ways (review rounds 2 and 3); these two tests keep them out.
 
 test('autosave: closing a window that sat idle keeps the drawing since made in another', async ({ app }) => {
   // Nothing is written as a window closes: a forgotten second window, closed last, must not put
-  // back the drawing it opened with over the student's later work (docs/plans/v1-release.md,
-  // review round 2).
+  // back the drawing it opened with over the student's later work.
   const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
   await openEditor(app);
   const first = app.page;
@@ -138,6 +120,26 @@ test('autosave: closing a window that sat idle keeps the drawing since made in a
   await next.goto(first.url());
   await waitForEditor(app, next);
   expect(await inchiKey(next)).toBe(caffeine.inchikey);
+});
+
+test('autosave: the app opened again in a tab that held it shows the drawing since made elsewhere', async ({ app }) => {
+  // A tab keeps its sessionStorage while it shows other sites: a copy kept there brought back
+  // the tab's old drawing, and its next change wrote that over the later work.
+  const [aspirin, caffeine] = [referenceCompound('aspirin'), referenceCompound('caffeine')];
+  await openEditor(app);
+  const tab = app.page;
+  const url = tab.url();
+  await draw(tab, aspirin.smiles);
+  await tab.goto('about:blank'); // the student goes to another site in the same tab
+  const other = await app.newPage();
+  await other.goto(url);
+  await waitForEditor(app, other);
+  await draw(other, caffeine.smiles);
+  await other.close();
+
+  await tab.goto(url); // and back to the app (a bookmark, the address typed)
+  await waitForEditor(app, tab);
+  expect(await inchiKey(tab)).toBe(caffeine.inchikey);
 });
 
 test('autosave: the drawing survives quitting and relaunching the browser', async ({ app }) => {
@@ -160,13 +162,12 @@ test("autosave starts once, although Ketcher calls the app's onInit twice", asyn
     counter.__writes = 0;
     const setItem = Storage.prototype.setItem;
     Storage.prototype.setItem = function (this: Storage, name: string, value: string) {
-      if (this === localStorage && name === key) counter.__writes++;
+      if (name === key) counter.__writes++;
       setItem.call(this, name, value);
     };
   }, KEY);
 
-  // One change, one save (to the copy all windows share; the window's own has its own write).
-  // All saves for a change are written in the same task.
+  // One change, one save. (All saves for a change are written in the same task.)
   const saved = await nextAutosave(page);
   await placeRing(page, { x: 150, y: 150 });
   await saved();
