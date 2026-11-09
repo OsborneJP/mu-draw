@@ -201,6 +201,9 @@ The review took about a day of work rather than the three hours planned.
 - The full-screen change stays. A design that keeps each window's drawing, or that lists the
   forms of an aromatized N-H ring, can come after 1.0, each with its own plan.
 
+Done, each after check.sh: e712abd (autosave), 4bdcde5 (the lists), and the full-screen
+test's comment (round 3's low). The forms tests' low went with c717f41. That ends the review.
+
 ## Accepted limits
 
 From rounds 1 to 3, by Jeff's decision of 2026-11-09:

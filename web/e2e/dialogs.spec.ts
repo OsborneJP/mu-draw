@@ -211,8 +211,8 @@ test('Ctrl+V on the canvas still pastes, without the dialog', async ({ app }) =>
 
 test("in Ketcher's full screen, Save's format list shows and takes a click", async ({ app }) => {
   // Ketcher opens its lists outside the app's root (its Select in #root, MUI's in body), so
-  // only a full screen of the whole page shows them (src/App.tsx; docs/plans/v1-release.md,
-  // review round 2).
+  // only a full screen of the whole page shows them (the marker is on <html>, in index.html;
+  // docs/plans/v1-release.md, review round 2).
   const { page } = app;
   await openEditor(app);
   await load(page, 'aspirin');
