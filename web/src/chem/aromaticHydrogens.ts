@@ -11,9 +11,10 @@
 // the type-4 bonds of the drawing's own Molfile. Nothing else changes: atom order (Molfile atom
 // i is Ketcher's i-th atom), coordinates, wedges, charges, the chiral flag.
 //
-// Except for the tautomer and resonance lists, which compare each form with the bonds as
-// drawn, where a ring drawn aromatic matches either Kekulé order: they get the bonds as drawn,
-// with the hydrogens as atoms after all the others (docs/plans/v1-release.md, review round 2).
+// The tautomer and resonance lists don't take them: they compare each form with the bonds as
+// drawn, so a ring drawn aromatic must stay so. They read the drawing without the note, as
+// before it was made, so an aromatized ring with an N-H is unreadable to them (an accepted
+// limit, docs/plans/v1-release.md: Jeff's decision of 2026-11-09).
 import type { MainModule } from '@rdkit/rdkit';
 
 const MARK = 'aromatic H:';
@@ -62,30 +63,20 @@ function withHydrogenAtoms(lines: string[], atoms: number, bonds: number, hydrog
   ].join('\n');
 }
 
-/** The drawing's noted hydrogens, with its lines (the note taken away) and its counts; or,
- * where nothing is noted, or the note can't be used (the newer Molfile format, more than 999
- * atoms, an atom the drawing doesn't have), the Molfile as RDKit read it before: no note. */
-function readNote(molfile: string): { lines: string[]; atoms: number; bonds: number; hydrogens: AromaticHydrogens } | string {
+/** The Molfile RDKit can read: the drawing's own, its noted aromatic hydrogens turned into
+ * the Kekulé bonds RDKit assigns them. Unchanged where nothing is noted, and with only the
+ * note removed where it can't be done (the newer Molfile format, more than 999 atoms, RDKit
+ * can't read it even so): what RDKit made of it before. */
+export function readableMolfile(rdkit: MainModule, molfile: string): string {
   const lines = molfile.split('\n');
   const hydrogens = noted(lines[2]);
   if (hydrogens === null) return molfile;
   lines[2] = '';
-  if (!/V2000\s*$/.test(lines[3] ?? '')) return lines.join('\n'); // chem-literal-ok: format marker
+  const plain = lines.join('\n');
+  if (!/V2000\s*$/.test(lines[3] ?? '')) return plain; // chem-literal-ok: format marker
   const [atoms, bonds] = [field(lines[3], 0, 3), field(lines[3], 3, 6)];
   const extra = hydrogens.reduce((sum, [, count]) => sum + count, 0);
-  if (atoms + extra > 999 || bonds + extra > 999 || hydrogens.some(([atom]) => atom < 0 || atom >= atoms)) return lines.join('\n');
-  return { lines, atoms, bonds, hydrogens };
-}
-
-/** The Molfile RDKit can read: the drawing's own, its noted aromatic hydrogens turned into
- * the Kekulé bonds RDKit assigns them. Unchanged where nothing is noted, and with only the
- * note removed where it can't be done (see readNote, or RDKit can't read it even so): what
- * RDKit made of it before. */
-export function readableMolfile(rdkit: MainModule, molfile: string): string {
-  const note = readNote(molfile);
-  if (typeof note === 'string') return note;
-  const { lines, atoms, bonds, hydrogens } = note;
-  const plain = lines.join('\n');
+  if (atoms + extra > 999 || bonds + extra > 999 || hydrogens.some(([atom]) => atom < 0 || atom >= atoms)) return plain;
   let kekule: string[];
   try {
     const mol = rdkit.get_mol(withHydrogenAtoms(lines, atoms, bonds, hydrogens), JSON.stringify({ removeHs: false }));
@@ -110,16 +101,17 @@ export function readableMolfile(rdkit: MainModule, molfile: string): string {
   return lines.join('\n');
 }
 
-/** The drawing's own Molfile, its noted hydrogens as atoms after all the others: they fold
- * into their atoms as RDKit reads it with removeHs, as the tautomer and resonance lists do,
- * so the drawing's atoms keep their numbers. */
-function withHydrogens(molfile: string): string {
-  const note = readNote(molfile);
-  return typeof note === 'string' ? note : withHydrogenAtoms(note.lines, note.atoms, note.bonds, note.hydrogens);
+/** The drawing's own Molfile without the note, as it was before notes were made. */
+function withoutNote(molfile: string): string {
+  const lines = molfile.split('\n');
+  if (noted(lines[2]) === null) return molfile;
+  lines[2] = '';
+  return lines.join('\n');
 }
 
 /** The Molfile a worker request reads (by its kind; the properties panel's has none): the
- * bonds as drawn for the tautomer and resonance lists, the Kekulé bonds for everything else. */
+ * drawing without the note for the tautomer and resonance lists, readableMolfile's Kekulé
+ * bonds for everything else. */
 export function molfileFor(rdkit: MainModule, kind: string | undefined, molfile: string): string {
-  return kind === 'tautomers' || kind === 'resonance' ? withHydrogens(molfile) : readableMolfile(rdkit, molfile);
+  return kind === 'tautomers' || kind === 'resonance' ? withoutNote(molfile) : readableMolfile(rdkit, molfile);
 }

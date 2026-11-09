@@ -285,9 +285,9 @@ All notable changes to this project. The format follows
   format, the choices in its atom, bond and settings dialogs) didn't show. It now shows the
   whole page, lists included.
 - After Aromatize, or with an aromatic SMILES pasted in, a ring with an N-H (imidazole,
-  histidine, purines, pyrimidine bases, indole) showed no properties, NMR, stereo, tautomers
-  or resonance, and guanine and allopurinol showed a formula two H short. RDKit is now given
-  those hydrogens, so the panels show the same values as before Aromatize.
+  histidine, purines, pyrimidine bases, indole) showed no properties, NMR or stereo, and
+  guanine and allopurinol showed a formula two H short. RDKit is now given those hydrogens,
+  so the panels show the same values as before Aromatize.
 - The Group / Ungroup button no longer goes off the canvas with Ketcher's floating tools when
   a selection reaches the top or an edge of the canvas; it stays where it can be clicked.
 - The properties panel missed double bonds drawn crossed (E/Z undefined), and double bonds

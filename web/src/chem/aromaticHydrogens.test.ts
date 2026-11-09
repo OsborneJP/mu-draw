@@ -6,8 +6,8 @@ import initRDKitModule, { type MainModule } from '@rdkit/rdkit';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { configureRdkit } from './compute';
 import { molfileFor, noteHydrogens, readableMolfile, type AromaticHydrogens } from './aromaticHydrogens';
-import { listResonance, type ResonanceList } from './resonance';
-import { listTautomers, type TautomerList } from './tautomers';
+import { listResonance } from './resonance';
+import { listTautomers } from './tautomers';
 
 const forms = import.meta.glob<string>('../../../tests/fixtures/forms/*.mol', { eager: true, query: '?raw', import: 'default' });
 const form = (name: string) => {
@@ -37,13 +37,11 @@ function smiles(molfile: string): string | null {
   }
 }
 
-/** The fixture as Ketcher writes it once aromatized, the H count of each aromatic atom, and
- * the same drawing with Kekulé bonds (the same atoms and bonds, in the same order). */
-function asKetcherWritesIt(name: string): { molfile: string; hydrogens: AromaticHydrogens; kekule: string } {
+/** The fixture as Ketcher writes it once aromatized, and the H count of each aromatic atom. */
+function asKetcherWritesIt(name: string): { molfile: string; hydrogens: AromaticHydrogens } {
   const mol = rdkit.get_mol(form(name), JSON.stringify({ removeHs: true }))!;
   try {
     const molfile = mol.get_aromatic_form();
-    const kekule = mol.get_molblock();
     const json = JSON.parse(mol.get_json()) as { molecules: { atoms: { impHs?: number }[] }[] };
     const aromatic = new Set<number>();
     const bonds = molfile.split('\n');
@@ -55,7 +53,7 @@ function asKetcherWritesIt(name: string): { molfile: string; hydrogens: Aromatic
       }
     }
     const hydrogens = json.molecules[0].atoms.flatMap((atom, i): AromaticHydrogens => (aromatic.has(i) && (atom.impHs ?? 0) > 0 ? [[i, atom.impHs!]] : []));
-    return { molfile, hydrogens, kekule };
+    return { molfile, hydrogens };
   } finally {
     mol.delete();
   }
@@ -112,43 +110,46 @@ describe('readableMolfile', () => {
 describe('molfileFor: what each request reads', () => {
   const NAMES = Object.keys(forms).map((path) => path.replace(/^.*\/(.+)\.mol$/, '$1'));
   const LIST = { tautomers: listTautomers, resonance: listResonance };
-  /** Every forms fixture with an aromatic ring, as Ketcher writes it once aromatized, every
-   * aromatic H noted (the app notes them only for a ring with an atom other than a neutral C),
-   * and whether RDKit reads it as the compound drawn without them. */
-  const aromatized = () =>
-    NAMES.flatMap((name) => {
-      const written = asKetcherWritesIt(name);
-      return written.hydrogens.length > 0 ? [{ name, ...written, read: smiles(written.molfile) === smiles(form(name)) }] : [];
-    });
+  const KINDS = ['tautomers', 'resonance'] as const;
 
-  it('the tautomer and resonance lists of a ring RDKit read without its hydrogens are as they were', () => {
-    // Round 1's Kekulé bonds changed them: pyridine N-oxide and warfarin lost a "Your drawing"
-    // card, a ring drawn aromatic matching either Kekulé order no longer.
-    const read = aromatized().filter((a) => a.read);
-    expect(read.map((a) => a.name)).toEqual(expect.arrayContaining(['benzene', 'pyridine-n-oxide', 'warfarin']));
-    for (const { name, molfile, hydrogens } of read) {
-      for (const kind of ['tautomers', 'resonance'] as const) {
+  it('the tautomer and resonance lists read every aromatized drawing as before the note', () => {
+    // Round 1's Kekulé bonds changed them (aromatized pyridinium lost a "Your drawing" card),
+    // and round 2's hydrogens as atoms left them unreadable where a note named an H RDKit
+    // can't place (docs/plans/v1-release.md). Here every aromatic atom's H is noted.
+    const compared: string[] = [];
+    for (const name of NAMES) {
+      const { molfile, hydrogens } = asKetcherWritesIt(name);
+      if (hydrogens.length === 0) continue;
+      compared.push(name);
+      for (const kind of KINDS) {
         expect(LIST[kind](rdkit, molfileFor(rdkit, kind, noteHydrogens(molfile, hydrogens))), `${name}, ${kind}`).toEqual(LIST[kind](rdkit, molfile));
       }
     }
+    expect(compared).toEqual(expect.arrayContaining(['benzene', 'pyridine-n-oxide', ...NEEDS_HYDROGENS]));
   });
 
-  it('a ring RDKit could not read without its hydrogens has the tautomers and resonance structures of its Kekulé drawing', () => {
-    const unread = aromatized().filter((a) => !a.read);
-    expect(unread.map((a) => a.name)).toEqual(expect.arrayContaining(NEEDS_HYDROGENS));
-    // What doesn't depend on the bonds as drawn: each form's SMILES and H, or bonds and charges.
-    const unbonded = (list: TautomerList | ResonanceList | null) =>
-      list?.outcome !== 'listed'
-        ? list
-        : 'tautomers' in list
-          ? list.tautomers.map((t) => `${t.smiles} ${t.hydrogens.join()}`).sort()
-          : list.structures.map((s) => `${s.bonds.join()} ${s.charges.join()}`).sort();
-    for (const { name, molfile, hydrogens, kekule } of unread) {
-      for (const kind of ['tautomers', 'resonance'] as const) {
-        const listed = LIST[kind](rdkit, molfileFor(rdkit, kind, noteHydrogens(molfile, hydrogens)));
-        expect(listed?.outcome, `${name}, ${kind}`).toBe('listed');
-        expect(unbonded(listed), `${name}, ${kind}`).toEqual(unbonded(LIST[kind](rdkit, kekule)));
-      }
+  it('a note left on a ring atom that has since gained a bond leaves both lists as they were', () => {
+    // Ketcher keeps an aromatic atom's old H count when a bond is added to it (a methyl on
+    // imidazole's N-H, say), so a note can name an H the atom no longer has (review round 3).
+    // Pyridine N-oxide's ring N, bonded to its O, stands in for it. (On a ring carbon such an H
+    // does nothing: RDKit.js drops H atoms before it checks valences, and keeps their count only
+    // on an aromatic N or P.)
+    const { molfile } = asKetcherWritesIt('pyridine-n-oxide');
+    const lines = molfile.split('\n');
+    const [atoms, bonds] = [Number.parseInt(lines[3].slice(0, 3), 10), Number.parseInt(lines[3].slice(3, 6), 10)];
+    const ends = lines.slice(4 + atoms, 4 + atoms + bonds).map((line) => ({
+      atoms: [Number.parseInt(line.slice(0, 3), 10) - 1, Number.parseInt(line.slice(3, 6), 10) - 1],
+      aromatic: Number.parseInt(line.slice(6, 9), 10) === 4,
+    }));
+    const substituted = Array.from({ length: atoms }, (_, i) => i).find(
+      (i) => lines[4 + i].slice(31, 34).trim() === 'N' && ends.some((b) => b.aromatic && b.atoms.includes(i)) && ends.filter((b) => b.atoms.includes(i)).length === 3,
+    )!;
+    expect(substituted).toBeDefined();
+    const stale = noteHydrogens(molfile, [[substituted, 1]]);
+    for (const kind of KINDS) {
+      const listed = LIST[kind](rdkit, molfileFor(rdkit, kind, stale));
+      expect(listed?.outcome, kind).toBe('listed');
+      expect(listed, kind).toEqual(LIST[kind](rdkit, molfile));
     }
   });
 
